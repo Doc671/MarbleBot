@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -14,7 +12,6 @@ namespace MarbleBot.Modules
     {
         static SocketMessage s;
         SocketUserMessage msg = s as SocketUserMessage;
-        int argPos = 0;
         bool jumbleActive = false;
         private static Random rand = new Random();
         const ulong CM = 223616088263491595; // Community Marble
@@ -27,15 +24,7 @@ namespace MarbleBot.Modules
         [Summary("Gives the user help. Not done yet.")]
         public async Task _help()
         {
-            // Universal
             EmbedBuilder builder = new EmbedBuilder();
-
-            //builder.AddField("Bot Help", "MarbleBot by Doc671\nStill a work in progress...")
-            //    .WithColor(Color.Orange)
-            //    .WithTimestamp(DateTime.UtcNow)
-            //    .AddInlineField("Prefixes", "Command prefixes:\nu/ (Universal, can be used anywhere)\ncm/ (CM only)\nths/ (THS only)")
-            //    .AddInlineField("Universal Commands", "help (should be fairly obvious)\nrepeat (repeats a message you say)\njumble (doesn't work yet)\ngive (gives a role)")
-            //    .AddInlineField("The Hat Stoar Commands", "orange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)");
 
             builder.AddField("Bot Help", "Still a work in progress...")
                 .WithTimestamp(DateTime.UtcNow);
@@ -43,27 +32,27 @@ namespace MarbleBot.Modules
             switch (Context.Guild.Id)
             {
                 case CM:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nreverse (reverses text)\nstaffcheck (checks the statuses of all staff members)")
+                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nreverse (reverses text)\nstaffcheck (checks the statuses of all staff members)")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                         .WithColor(Color.Teal);
                     break;
                 case THS:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)")
+                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                         .WithColor(Color.Orange);
                     break;
                 case MT:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)")
+                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                         .WithColor(Color.DarkGrey);
                     break;
                 case VFC:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)")
+                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                         .WithColor(Color.Blue);
                     break;
                 case ABCD:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)")
+                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                         .WithColor(Color.Gold);
                     break;
@@ -131,14 +120,21 @@ namespace MarbleBot.Modules
         [Summary("Picks a random person to call the best")]
         public async Task _best()
         {
-            await Context.Channel.SendMessageAsync("**" + "MarbleBot" + "** is the best!");
+            string[] names = new string[Context.Guild.MemberCount];
+            SocketGuildUser[] users = Context.Guild.Users.ToArray();
+            for (int i = 0; i < Context.Guild.MemberCount; i++)
+            {
+                names[i] = users[i].Username;
+            }
+            await Context.Channel.SendMessageAsync("**" + names[rand.Next(0, Context.Guild.MemberCount)] + "** is the best!");
         }
 
         [Command("buyhat")]
         [Summary("A user buys an Uglee Hat!")]
         public async Task _buyHat()
         {
-            if (Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC || Context.Guild.Id == ABCD) {
+            if (Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC || Context.Guild.Id == ABCD)
+            {
                 await Context.Channel.SendMessageAsync("That'll be " + (rand.Next(0, 10000000)).ToString() + " units of money please. Thank you for buying Uglee Hat #" + (rand.Next(0, 69042)).ToString() + "!");
             }
         }
@@ -149,8 +145,10 @@ namespace MarbleBot.Modules
         {
             int a = 0;
             int count = 0;
-            while (a < input.Length - 1)  {
-                if (input[a] == '|') {
+            while (a < input.Length - 1)
+            {
+                if (input[a] == '|')
+                {
                     count += 1;
                 }
                 a += 1;
@@ -160,18 +158,24 @@ namespace MarbleBot.Modules
             int b = 0;
             while (a < input.Length - 1)
             {
-                if (input[a] == '|') {
+                if (input[a] == '|')
+                {
                     b += 1;
-                } else if(input[a] != ' ') {
+                }
+                else if (input[a] != ' ')
+                {
                     choices[b] += input[a];
                 }
                 a += 1;
             }
 
             int choice = rand.Next(0, count);
-            if (count == 0)  {
+            if (count == 0)
+            {
                 await Context.Channel.SendMessageAsync("Enter multiple choices!");
-            } else {
+            }
+            else
+            {
                 await Context.Channel.SendMessageAsync("**" + Context.User.Username + "**, I choose **" + choices[choice] + "**!");
             }
         }
@@ -224,6 +228,26 @@ namespace MarbleBot.Modules
             }
         }
 
+        //[Group("Moderation")]
+        //public class ModModule : ModuleBase
+        //{
+        //    public class Set : ModuleBase
+        //    {
+        //        [Command("nick"), Priority(1)]
+        //        [Summary("Change your nickname to the specified text")]
+        //        [RequireUserPermission(GuildPermission.ChangeNickname)]
+        //        public Task Nick([Remainder]string name)
+        //            => Nick(Context.User as SocketGuildUser, name);
+
+        //        public async Task Nick(SocketGuildUser user, [Remainder]string name)
+        //        {
+        //            // Universal
+        //            await user.ModifyAsync(x => x.Nickname = name);
+        //            await ReplyAsync($"{user.Mention} I changed your name to **{name}**");
+        //        }
+        //    }
+        //}
+
         [Command("override")]
         [Summary("Desk Is Hacc")]
         public async Task _override(string command)
@@ -236,18 +260,83 @@ namespace MarbleBot.Modules
                 System.Threading.Thread.Sleep(1000);
                 await ReplyAsync("Performing " + command + " command...");
                 System.Threading.Thread.Sleep(2000);
-                if (command == "buyhat")  {
+                if (command == "buyhat")
+                {
                     await _buyHat();
-                }  else if (command == "orange") {
+                }
+                else if (command == "orange")
+                {
                     await _orange();
-                } else if (command == "orangeify") {
+                }
+                else if (command == "orangeify")
+                {
                     await ReplyAsync("Unable to perform command.");
-                } else {
+                }
+                else
+                {
                     await ReplyAsync("Unknown command.");
                 }
-            } else {
+            }
+            else
+            {
                 await ReplyAsync("OVERRIDE FAILURE. INSUFFICIENT PERMISSIONS.");
             }
+        }
+
+        [Command("raid")]
+        [Summary("Joke command - pretends user is raiding.")]
+        public async Task _repeat()
+        {
+            await Context.Channel.SendMessageAsync("INITIATING ANTI-RAID PROTOCOL.");
+        }
+
+        [Command("random")]
+        [Summary("Returns a random number with user-defined bounds.")]
+        public async Task _random(int start, int end)
+        {
+            if (start < 0 || end < 0)
+            {
+                await Context.Channel.SendMessageAsync("Only use positive numbers!");
+            }
+            else if (start > end)
+            {
+                int randNumber = rand.Next(end, start);
+                await Context.Channel.SendMessageAsync(randNumber.ToString());
+            }
+            else
+            {
+                int randNumber = rand.Next(start, end);
+                await Context.Channel.SendMessageAsync(randNumber.ToString());
+            }
+        }
+
+        [Command("repeat")]
+        [Summary("Repeats the message they say.")]
+        public async Task _repeat([Remainder] string repeat)
+        {
+            if (repeat == "Am Melmon" && (Context.Guild.Id == THS || Context.Guild.Id == MT))
+            {
+                await Context.Channel.SendMessageAsync("No U");
+            }
+            else
+            {
+                await Context.Channel.SendMessageAsync(repeat);
+            }
+        }
+
+        [Command("reverse")]
+        [Summary("Gives the user a random statement in Orange Language.")]
+        public async Task _reverse([Remainder] string input)
+        {
+            // Another version of orangeify, but for CM (can secretly be used elsewhere)
+            string reverse = "";
+            int length = input.Length - 1;
+            while (length >= 0)
+            {
+                reverse += input[length];
+                length--;
+            }
+            await Context.Channel.SendMessageAsync(reverse);
         }
 
         [Command("staffcheck")]
@@ -265,6 +354,9 @@ namespace MarbleBot.Modules
                 IGuildUser JohnDubuc = Context.Guild.GetUser(161247044713840642);
                 IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
                 IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
+                //IGuildUser Algorox = Context.Guild.GetUser();
+                IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
+                IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
                 IGuildUser Small = Context.Guild.GetUser(222125122020966400);
                 IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, BradyForrest, Small };
                 string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname };
@@ -324,7 +416,9 @@ namespace MarbleBot.Modules
                     }
                 }
                 await Context.Channel.SendMessageAsync(nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
-            } else if (Context.Guild.Id == VFC) {
+            }
+            else if (Context.Guild.Id == VFC)
+            {
                 IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
                 IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                 IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
@@ -341,15 +435,19 @@ namespace MarbleBot.Modules
                 string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString(), users[7].Status.ToString(), users[8].Status.ToString(), users[9].Status.ToString(), users[10].Status.ToString(), users[11].Status.ToString() };
                 for (int i = 0; i < users.Length; i++)
                 {
-                    if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ") {
+                    if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                    {
                         nicks[i] = users[i].Username;
                     }
-                    if (statuses[i] == "DoNotDisturb") {
+                    if (statuses[i] == "DoNotDisturb")
+                    {
                         statuses[i] = "Do Not Disturb";
                     }
                 }
                 await Context.Channel.SendMessageAsync("**__Owner:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n\n**__Co-owners:__** \n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n\n**__Admins:__** \n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7] + "**\n" + nicks[8] + " (" + users[8].Username + "#" + users[8].Discriminator + "): **" + statuses[8] + "**\n" + nicks[9] + " (" + users[9].Username + "#" + users[9].Discriminator + "): **" + statuses[9] + "**\n" + nicks[10] + " (" + users[10].Username + "#" + users[10].Discriminator + "): **" + statuses[10] + "**\n" + nicks[11] + " (" + users[11].Username + "#" + users[11].Discriminator + "): **" + statuses[11] + "**");
-            } else if (Context.Guild.Id == ABCD) {
+            }
+            else if (Context.Guild.Id == ABCD)
+            {
                 IGuildUser BTMR = Context.Guild.GetUser(378875092538621963);
                 IGuildUser Ayumi = Context.Guild.GetUser(189713815414374404);
                 IGuildUser[] users = { BTMR, Ayumi };
@@ -367,74 +465,6 @@ namespace MarbleBot.Modules
                     }
                 }
                 await Context.Channel.SendMessageAsync("**__Hosts:__**\n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
-            }
-        }
-
-        [Command("raid")]
-        [Summary("Joke command - pretends user is raiding.")]
-        public async Task _repeat()
-        {
-            await Context.Channel.SendMessageAsync("INITIATING ANTI-RAID PROTOCOL.");
-        }
-
-        [Command("random")]
-        [Summary("Returns a random number with user-defined bounds.")]
-        public async Task _random(int start, int end)
-        {
-            if (start < 0 || end < 0) {
-                await Context.Channel.SendMessageAsync("Only use positive numbers!");
-            } else if (start > end) {
-                int randNumber = rand.Next(end, start);
-                await Context.Channel.SendMessageAsync(randNumber.ToString());
-            } else {
-                int randNumber = rand.Next(start, end);
-                await Context.Channel.SendMessageAsync(randNumber.ToString());
-            }
-        }
-
-        [Command("repeat")]
-        [Summary("Repeats the message they say.")]
-        public async Task _repeat([Remainder] string repeat)
-        {
-            if (repeat == "Am Melmon" && (Context.Guild.Id == THS || Context.Guild.Id == MT)) {
-                await Context.Channel.SendMessageAsync("No U");
-            } else {
-                await Context.Channel.SendMessageAsync(repeat);
-            }
-        }
-
-        [Command("reverse")]
-        [Summary("Gives the user a random statement in Orange Language.")]
-        public async Task _reverse([Remainder] string input)
-        {
-            // Another version of orangeify, but for CM (can secretly be used elsewhere)
-            string reverse = "";
-            int length = input.Length - 1;
-            while (length >= 0)
-            {
-                reverse += input[length];
-                length--;
-            }
-            await Context.Channel.SendMessageAsync(reverse);
-        }
-
-        [Group("Moderation")]
-        public class ModModule : ModuleBase
-        {
-            public class Set : ModuleBase
-            {
-                [Command("nick"), Priority(1)]
-                [Summary("Change your nickname to the specified text")]
-                [RequireUserPermission(GuildPermission.ChangeNickname)]
-                public Task Nick([Remainder]string name)
-                    => Nick(Context.User as SocketGuildUser, name);
-
-                public async Task Nick(SocketGuildUser user, [Remainder]string name)
-                {
-                    // Universal
-                    await user.ModifyAsync(x => x.Nickname = name);
-                    await ReplyAsync($"{user.Mention} I changed your name to **{name}**");
-                }
             }
         }
 
@@ -465,7 +495,8 @@ namespace MarbleBot.Modules
                     egnaro = "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT";
                     break;
             }
-            if (Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC || Context.Guild.Id == ABCD) {
+            if (Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC || Context.Guild.Id == ABCD)
+            {
                 await Context.Channel.SendMessageAsync(egnaro);
             }
         }
@@ -480,7 +511,8 @@ namespace MarbleBot.Modules
                 orangeified += input[length];
                 length--;
             }
-            if ((Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC || Context.Guild.Id == ABCD)) {
+            if ((Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC || Context.Guild.Id == ABCD))
+            {
                 await Context.Channel.SendMessageAsync(orangeified);
             }
         }
@@ -495,98 +527,135 @@ namespace MarbleBot.Modules
             switch (input.ToLower())
             {
                 // These inputs have custom ratings and messages:
-                case "256 mg": rating = -2;
+                case "256 mg":
+                    rating = -2;
                     message = "I Am In Confusial Why";
                     break;
-                case "ddsc": rating = 0;
+                case "ddsc":
+                    rating = 0;
                     break;
-                case "desk": rating = 11;
+                case "desk":
+                    rating = 11;
                     message = "what did you expect?";
                     break;
-                case "desk176": rating = 11;
+                case "desk176":
+                    rating = 11;
                     message = "what did you expect?";
                     break;
-                case "desks": rating = 11;
+                case "desks":
+                    rating = 11;
                     message = "what did you expect?";
                     break;
-                case "doc671": rating = -1;
+                case "doc671":
+                    rating = -1;
                     message = "terrible at everything";
                     break;
-                case "erango": rating = 0;
+                case "erango":
+                    rating = 0;
                     message = "stoP noW";
                     break;
-                case "erikfassett": rating = 10;
+                case "erikfassett":
+                    rating = 10;
                     message = "so good at everything";
                     break;
-                case "flask": rating = -1;
+                case "flask":
+                    rating = -1;
                     message = "don't you dare";
                     break;
-                case "magenta curse": rating = 0;
+                case "magenta curse":
+                    rating = 0;
                     message = "stuck in the old ways, I see, tut-tut...";
                     break;
-                case "magenta virus": rating = 0;
+                case "magenta virus":
+                    rating = 0;
                     message = "doesn't exist anymore; stop";
                     break;
-                case "orange": rating = 10;
+                case "orange":
+                    rating = 10;
                     message = "!egnarO";
                     break;
-                case "poup soop": rating = 10;
+                case "poup soop":
+                    rating = 10;
                     message = "considering who made this bot...";
                     break;
-                case "table": rating = -999;
+                case "table":
+                    rating = -999;
                     message = "do not mention that unholy creature near me";
                     input = "dGFibGU=";
                     break;
-                case "tables": rating = -999;
+                case "tables":
+                    rating = -999;
                     message = "do not mention those unholy creatures near me";
                     input = "dGFibGVz";
                     break;
-                case "the hat stoar": rating = 10;
+                case "the hat stoar":
+                    rating = 10;
                     message = "!raotS taH ehT owt oG";
                     break;
-                case "vinh": rating = 10;
+                case "vinh":
+                    rating = 10;
                     message = "Henlo Cooooooooool Vinh";
                     break;
                 // If the input is none of the above, randomise the rating:
-                default: rating = rand.Next(0, 10);
+                default:
+                    rating = rand.Next(0, 10);
                     break;
             }
-            switch(input.ToLower()) {
+            switch (input.ToLower())
+            {
                 // These have custom messages but no preset ratings:
-                case "blueice57": message = "icccce";
+                case "blueice57":
+                    message = "icccce";
                     break;
-                case "flam": message = "Am Flam Flam Flam Flam Flam Flam";
+                case "flam":
+                    message = "Am Flam Flam Flam Flam Flam Flam";
                     break;
-                case "flame": message = "Am Flam Flam Flam Flam Flam Flam";
+                case "flame":
+                    message = "Am Flam Flam Flam Flam Flam Flam";
                     break;
-                case "flamevapour": message = "Am Flam Flam Flam Flam Flam Flam";
+                case "flamevapour":
+                    message = "Am Flam Flam Flam Flam Flam Flam";
                     break;
-                case "flurp": message = "FLURP I TO SIGN UP AND NOT BE";
+                case "flurp":
+                    message = "FLURP I TO SIGN UP AND NOT BE";
                     break;
-                case "george012": message = "henlo jorj";
+                case "george012":
+                    message = "henlo jorj";
                     break;
-                case "icce": message = "icccce";
+                case "icce":
+                    message = "icccce";
                     break;
-                case "jorj": message = "henlo jorj";
+                case "jorj":
+                    message = "henlo jorj";
                     break;
-                case "ken": message = "#kenismelmon";
+                case "ken":
+                    message = "#kenismelmon";
                     break;
-                case "kenlimepie": message = "#kenismelmon";
+                case "kenlimepie":
+                    message = "#kenismelmon";
                     break;
-                case "keylimepie": message = "#kenismelmon";
+                case "keylimepie":
+                    message = "#kenismelmon";
                     break;
-                case "meadow": message = "somebody toucha mei doe";
+                case "meadow":
+                    message = "somebody toucha mei doe";
                     break;
-                case "meidoe": message = "somebody toucha mei doe";
+                case "meidoe":
+                    message = "somebody toucha mei doe";
                     break;
-                case "melmon": message = "Wnhy Arey Yoou A Melmon";
+                case "melmon":
+                    message = "Wnhy Arey Yoou A Melmon";
                     break;
             }
-            if (input.ToLower() == "dann" || input.ToLower() == "danny playz")  {
+            if (input.ToLower() == "dann" || input.ToLower() == "danny playz")
+            {
                 int choice = rand.Next(0, 2);
-                if (choice == 1)  {
+                if (choice == 1)
+                {
                     message = "you guys, are a rat kids";
-                } else {
+                }
+                else
+                {
                     message = "I don’t know who you are I don’t know what you want but if I don’t get my t-shirt tomorrow i will find you and I will rob you.";
                 }
                 rating = rand.Next(9, 10);
@@ -594,71 +663,101 @@ namespace MarbleBot.Modules
             switch (rating)
             {
                 // Emoji time!
-                case -999: emoji = ":gun: :dagger: :bomb:";
+                case -999:
+                    emoji = ":gun: :dagger: :bomb:";
                     break;
-                case -1: emoji = ":gun:";
+                case -1:
+                    emoji = ":gun:";
                     break;
-                case 0: emoji = ":no_entry_sign:";
+                case 0:
+                    emoji = ":no_entry_sign:";
                     break;
-                case 1: emoji = ":nauseated_face:";
+                case 1:
+                    emoji = ":nauseated_face:";
                     break;
-                case 2: emoji = ":rage:";
+                case 2:
+                    emoji = ":rage:";
                     break;
-                case 3: emoji = ":angry:";
+                case 3:
+                    emoji = ":angry:";
                     break;
-                case 4: emoji = ":slight_frown:";
+                case 4:
+                    emoji = ":slight_frown:";
                     break;
-                case 5: emoji = ":neutral_face:";
+                case 5:
+                    emoji = ":neutral_face:";
                     break;
-                case 6: emoji = ":slight_smile:";
+                case 6:
+                    emoji = ":slight_smile:";
                     break;
-                case 7: emoji = ":grinning:";
+                case 7:
+                    emoji = ":grinning:";
                     break;
-                case 8: emoji = ":thumbsup:";
+                case 8:
+                    emoji = ":thumbsup:";
                     break;
-                case 9: emoji = ":white_check_mark:";
+                case 9:
+                    emoji = ":white_check_mark:";
                     break;
-                case 10: emoji = ":rofl:";
+                case 10:
+                    emoji = ":rofl:";
                     break;
-                case 11: emoji = ":heart:";
+                case 11:
+                    emoji = ":heart:";
                     break;
-                default: emoji = ":thinking:";
+                default:
+                    emoji = ":thinking:";
                     break;
             }
-            if(message == "")
+            if (message == "")
             {
-                switch(rating)
+                switch (rating)
                 {
                     // If there isn't already a custom message, pick one depending on rating:
-                    case 0: message = "Excuse me, kind sir/madam, please cease your current course of action immediately.";
+                    case 0:
+                        message = "Excuse me, kind sir/madam, please cease your current course of action immediately.";
                         break;
-                    case 1: message = "Immediate desistance required.";
+                    case 1:
+                        message = "Immediate desistance required.";
                         break;
-                    case 2: message = "I don't like it...";
+                    case 2:
+                        message = "I don't like it...";
                         break;
-                    case 3: message = "angery";
+                    case 3:
+                        message = "angery";
                         break;
-                    case 4: message = "ehhh...";
+                    case 4:
+                        message = "ehhh...";
                         break;
-                    case 5: message = "not bad... but not good either";
+                    case 5:
+                        message = "not bad... but not good either";
                         break;
-                    case 6: message = "slightly above average... I guess...";
+                    case 6:
+                        message = "slightly above average... I guess...";
                         break;
-                    case 7: message = "pretty cool, don't you think?";
+                    case 7:
+                        message = "pretty cool, don't you think?";
                         break;
-                    case 8: message = "yes";
+                    case 8:
+                        message = "yes";
                         break;
-                    case 9: message = "approaching perfection";
+                    case 9:
+                        message = "approaching perfection";
                         break;
-                    case 10: message = "PERFECT!!";
+                    case 10:
+                        message = "PERFECT!!";
                         break;
-                    default: message = "Uhhhhhhhh\nNot";
+                    default:
+                        message = "Uhhhhhhhh\nNot";
                         break;
                 }
             }
-            if (rating == -2) {
+            if (rating == -2)
+            {
                 await Context.Channel.SendMessageAsync("**" + Context.User.Username + "**, I rATE " + input + " UNd3FINED10. " + emoji + "\n(" + message + ")");
-            } else {
+            }
+            else
+            {
                 await Context.Channel.SendMessageAsync("**" + Context.User.Username + "**, I rate " + input + " **" + rating + "**/10. " + emoji + "\n(" + message + ")");
             }
         }
@@ -677,5 +776,57 @@ namespace MarbleBot.Modules
             await Context.Channel.SendMessageAsync(mensage);
         }
 
+        [Command("vinhglish")]
+        [Summary("Returns a Vinhglish word, its inventor and meaning")]
+        public async Task _vinhglish([Remainder] string word = "")
+        {
+            int randNo = 0;
+            bool wordSet = false;
+            string[] wordList = new string[44];
+            string[] invList = new string[44];
+            string[] descList = new string[44];
+            int a = 0;
+            if (word == "") {
+                using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
+                    while (!stream.EndOfStream) {
+                        string list = stream.ReadLine();
+                        string[] vocab = list.Split(',');
+                        wordList[a] = vocab[0];
+                        invList[a] = vocab[1];
+                        descList[a] = vocab[2];
+                        a++;
+                    }
+                }
+                randNo = rand.Next(1, wordList.Length);
+            } else {
+                using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
+                    while (!stream.EndOfStream)
+                    {
+                        string list = stream.ReadLine();
+                        string[] vocab = list.Split(',');
+                        wordList[a] = vocab[0];
+                        invList[a] = vocab[1];
+                        descList[a] = vocab[2];
+                        if (wordList[a].ToLower() == word.ToLower())
+                        {
+                            randNo = a;
+                            stream.Close();
+                            wordSet = true;
+                            break;
+                        }
+                        //JGeoroegeos
+                        a++;
+                    }
+                    if (!wordSet)
+                    {
+                        randNo = rand.Next(1, wordList.Length - 1);
+                    }
+                }
+            }
+            if (Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC || Context.Guild.Id == ABCD)
+            {
+                await Context.Channel.SendMessageAsync("**__" + wordList[randNo] + "__**\nInventor: " + invList[randNo] + "\nDescription: " + descList[randNo]);
+            }
+        }
     }
 }
