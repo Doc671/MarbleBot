@@ -122,7 +122,7 @@ namespace MarbleBot.Modules
         {
             string[] names = new string[Context.Guild.MemberCount];
             SocketGuildUser[] users = Context.Guild.Users.ToArray();
-            for (int i = 0; i < Context.Guild.MemberCount; i++)
+            for (int i = 0; i < Context.Guild.MemberCount - 1; i++)
             {
                 names[i] = users[i].Username;
             }
@@ -636,6 +636,12 @@ namespace MarbleBot.Modules
                     break;
                 case "keylimepie":
                     message = "#kenismelmon";
+                    break;
+                case "matheus":
+                    message = "marbles will realize in +inf";
+                    break;
+                case "matheus fazzion":
+                    message = "marbles will realize in +inf";
                     break;
                 case "meadow":
                     message = "somebody toucha mei doe";
