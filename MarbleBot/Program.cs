@@ -18,7 +18,7 @@ namespace MarbleBot
         {
             _client = new DiscordSocketClient();
 
-            await _client.LoginAsync(TokenType.Bot, "Mjg2MjI4NTI2MjM0MDc1MTM2.DVh1NA.btjvCAsMN_Cx9ZY5suKKuawXKG4");
+            await _client.LoginAsync(TokenType.Bot, "no");
 
             await _client.StartAsync();
 
