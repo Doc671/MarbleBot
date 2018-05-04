@@ -139,6 +139,7 @@
   <ItemGroup>
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Modules\General.cs" />
+    <Compile Include="Modules\Moderation.cs" />
     <Compile Include="Modules\Roles.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

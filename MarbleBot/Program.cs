@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using Discord;
 using Discord.WebSocket;
 using System.Threading.Tasks;
@@ -18,7 +20,16 @@ namespace MarbleBot
         {
             _client = new DiscordSocketClient();
 
-            await _client.LoginAsync(TokenType.Bot, "Mjg2MjI4NTI2MjM0MDc1MTM2.DVh1NA.btjvCAsMN_Cx9ZY5suKKuawXKG4");
+            string token = "";
+            using (StreamReader stream = new StreamReader("C:/Folder/MBT.txt"))
+            {
+                while (!stream.EndOfStream)
+                {
+                    token = stream.ReadLine();
+                }
+            }
+
+            await _client.LoginAsync(TokenType.Bot, token);
 
             await _client.StartAsync();
 

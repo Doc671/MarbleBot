@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -10,8 +11,6 @@ namespace MarbleBot.Modules
 {
     public class General : ModuleBase<SocketCommandContext>
     {
-        static SocketMessage s;
-        SocketUserMessage msg = s as SocketUserMessage;
         bool jumbleActive = false;
         private static Random rand = new Random();
         const ulong CM = 223616088263491595; // Community Marble
@@ -32,28 +31,43 @@ namespace MarbleBot.Modules
             switch (Context.Guild.Id)
             {
                 case CM:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nreverse (reverses text)\nstaffcheck (checks the statuses of all staff members)")
+                    builder.AddField("Command List", "help (should be fairly obvious)")
+                        .AddField("Fun Commands", "8ball (predicts an outcome)\nbest (picks a random user to call the best)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nreverse (reverses text)")
+                        .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                        .AddField("Games", "\njumble (doesn't work yet)")
                         .WithColor(Color.Teal);
                     break;
                 case THS:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                    builder.AddField("Command List", "help (should be fairly obvious)")
+                        .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                        .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                        .AddField("Games", "\njumble (doesn't work yet)")
                         .WithColor(Color.Orange);
                     break;
                 case MT:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                    builder.AddField("Command List", "help (should be fairly obvious)")
+                        .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                        .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays information about a user; try not to ping if possible)")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                        .AddField("Games", "\njumble (doesn't work yet)")
                         .WithColor(Color.DarkGrey);
                     break;
                 case VFC:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                    builder.AddField("Command List", "help (should be fairly obvious)")
+                        .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                        .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                        .AddField("Games", "\njumble (doesn't work yet)")
                         .WithColor(Color.Blue);
                     break;
                 case ABCD:
-                    builder.AddField("Command List", "help (should be fairly obvious)\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                    builder.AddField("Command List", "help (should be fairly obvious)")
+                        .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
+                        .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays information about a user; try not to ping if possible)")
                         .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                        .AddField("Games", "\njumble (doesn't work yet)")
                         .WithColor(Color.Gold);
                     break;
                 default:
@@ -192,7 +206,7 @@ namespace MarbleBot.Modules
             else
             {
                 jumbleActive = true;
-                string[] wordList = new string[50];
+                string[] wordList = new string[60];
                 int a = 0;
                 using (StreamReader stream = new StreamReader("Jumble.csv"))
                 {
@@ -209,9 +223,9 @@ namespace MarbleBot.Modules
                 char[] wordArray = word.ToCharArray();
                 Console.WriteLine(wordArray);
 
-                for (a = 0; a < word.Length; a++)
+                for (a = 0; a < word.Length - 1; a++)
                 {
-                    int b = rand.Next(0, word.Length);
+                    int b = rand.Next(0, word.Length - 1);
                     char temp = wordArray[a];
                     wordArray[a] = wordArray[b];
                     wordArray[b] = temp;
@@ -219,12 +233,31 @@ namespace MarbleBot.Modules
                 string output = new string(wordArray);
                 output = output.ToLower();
                 await ReplyAsync("Guess what the word is: **" + output + "**.");
-                string guess = Context.Message.Content;
-                if (guess.ToLower() == word.ToLower())
-                {
-                    await Context.Channel.SendMessageAsync("**" + Context.Message.Author + "** guessed the word! Well done!");
-                    jumbleActive = false;
+                string guess2;
+                int timeout = 0;
+                //Timer timer = new Timer(new TimerCallback());
+                do {
+                    var guess = Context.Channel.GetMessagesAsync(1);
+                    guess2 = guess.ToString();
+                    if (guess2.ToLower() == word.ToLower())
+                    {
+                        await Context.Channel.SendMessageAsync("**" + Context.Message.Author + "** guessed the word! Well done!");
+                        jumbleActive = false;
+                    }
+                    timeout++;
+                    Thread.Sleep(1);
+                    if (timeout > 10000) {
+                        break;
+                    }
+                } while (guess2.ToLower() != word.ToLower());
+                if (timeout > 10000) {
+                    await Context.Channel.SendMessageAsync("Game over! Nobody could guess the word in time!");
                 }
+                else if (guess2.ToLower() == word.ToLower())
+                {
+                    await Context.Channel.SendMessageAsync("**" + Context.User.Username + "** guessed the word! Well done!");
+                }
+                timeout = 0;
             }
         }
 
@@ -354,13 +387,12 @@ namespace MarbleBot.Modules
                 IGuildUser JohnDubuc = Context.Guild.GetUser(161247044713840642);
                 IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
                 IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
-                //IGuildUser Algorox = Context.Guild.GetUser();
-                IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
+                IGuildUser Algorox = Context.Guild.GetUser(323680030724980736);
                 IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
                 IGuildUser Small = Context.Guild.GetUser(222125122020966400);
-                IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, BradyForrest, Small };
-                string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname };
-                string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString() };
+                IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, BradyForrest, FlameVapour, Small };
+                string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname };
+                string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString(), users[7].Status.ToString() };
                 for (int i = 0; i < users.Length; i++)
                 {
                     if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
@@ -372,7 +404,7 @@ namespace MarbleBot.Modules
                         statuses[i] = "Do Not Disturb";
                     }
                 }
-                await Context.Channel.SendMessageAsync("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n\n**__Mods:__**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**");
+                await Context.Channel.SendMessageAsync("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n\n**__Mods:__**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7] + "**");
             }
             else if (Context.Guild.Id == THS)
             {
@@ -768,6 +800,47 @@ namespace MarbleBot.Modules
             }
         }
 
+        [Command("serverinfo")]
+        [Summary("Returns some stats")]
+        public async Task _serverinfo()
+        {
+            EmbedBuilder builder = new EmbedBuilder();
+            Color coloure = Color.LightGrey;
+            int botUsers = 0;
+            int onlineUsers = 0;
+            SocketGuildUser[] users = Context.Guild.Users.ToArray();
+            switch(Context.Guild.Id)
+            {
+                case CM: coloure = Color.Teal; break;
+                case THS: coloure = Color.Orange; break;
+                case MT: coloure = Color.DarkGrey; break;
+                case VFC: coloure = Color.Blue; break;
+                case ABCD: coloure = Color.Gold; break;
+            }
+            for(int i = 0; i < Context.Guild.Users.Count - 1; i++)
+            {
+                if(users[i].IsBot)
+                {
+                    botUsers++;
+                }
+                if(users[i].Status.ToString().ToLower() == "online")
+                {
+                    onlineUsers++;
+                }
+            }
+            builder.AddField("Owner", Context.Guild.GetUser(Context.Guild.OwnerId).Username + "#" + Context.Guild.GetUser(Context.Guild.OwnerId).Discriminator)
+                .AddInlineField("Voice Region", Context.Guild.VoiceRegionId)
+                .AddField("Text Channels", Context.Guild.TextChannels.Count)
+                .AddInlineField("Voice Channels", Context.Guild.VoiceChannels.Count)
+                .AddField("Members", Context.Guild.Users.Count)
+                .AddInlineField("Bots", botUsers)
+                .AddField("Online", onlineUsers)
+                .AddInlineField("Roles", Context.Guild.Roles.Count)
+                .WithColor(coloure)
+                .WithTimestamp(DateTime.UtcNow);
+            await Context.Channel.SendMessageAsync("", false, builder.Build());
+        }
+
         [Command("stats")]
         [Summary("Returns some stats")]
         public async Task _stats()
@@ -788,9 +861,9 @@ namespace MarbleBot.Modules
         {
             int randNo = 0;
             bool wordSet = false;
-            string[] wordList = new string[44];
-            string[] invList = new string[44];
-            string[] descList = new string[44];
+            string[] wordList = new string[46];
+            string[] invList = new string[46];
+            string[] descList = new string[46];
             int a = 0;
             if (word == "") {
                 using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
