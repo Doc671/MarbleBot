@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Discord;
 using Discord.WebSocket;
 using System.Threading.Tasks;
@@ -30,6 +29,8 @@ namespace MarbleBot
             }
 
             await _client.LoginAsync(TokenType.Bot, token);
+
+            await _client.LoginAsync(TokenType.Bot, "no");
 
             await _client.StartAsync();
 
