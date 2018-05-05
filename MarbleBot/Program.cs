@@ -30,8 +30,6 @@ namespace MarbleBot
 
             await _client.LoginAsync(TokenType.Bot, token);
 
-            await _client.LoginAsync(TokenType.Bot, "no");
-
             await _client.StartAsync();
 
             _handler = new CommandHandler(_client);
