@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenSSL.X509Certificate2.Provider</name>
+    </assembly>
+    <members>
+        <member name="T:OpenSSL.X509Certificate2Provider.BaseCertificateProvider">
+            <summary>
+            BaseCertificateProvider to parse OpenSSL public and private key components. Based on http://www.jensign.com/opensslkey/opensslkey.cs
+            </summary>
+        </member>
+        <member name="M:OpenSSL.X509Certificate2Provider.BaseCertificateProvider.GetPublicKeyBytes(System.String)">
+            <summary>
+            GetPublicKeyBytes
+            </summary>
+            <param name="publicText">The certificate or public key text.</param>
+            <returns>byte array</returns>
+        </member>
+        <member name="T:OpenSSL.X509Certificate2Provider.CertificateFromFileProvider">
+            <summary>
+            CertificateFromFileProvider
+            </summary>
+        </member>
+        <member name="M:OpenSSL.X509Certificate2Provider.CertificateFromFileProvider.#ctor(System.String,System.String,System.Security.SecureString)">
+            <summary>
+            CertificateFromFileProvider
+            </summary>
+            <param name="certificateText">The certificate or public key text.</param>
+            <param name="privateKeyText">The private (rsa) key text.</param>
+            <param name="securePassword">The optional securePassword to decrypt the private key.</param>
+        </member>
+        <member name="P:OpenSSL.X509Certificate2Provider.CertificateFromFileProvider.Certificate">
+            <summary>
+            Gets the generated X509Certificate2 object.
+            </summary>
+        </member>
+        <member name="P:OpenSSL.X509Certificate2Provider.CertificateFromFileProvider.PrivateKey">
+            <summary>
+            Gets the PrivateKey object.
+            </summary>
+        </member>
+        <member name="P:OpenSSL.X509Certificate2Provider.CertificateFromFileProvider.PublicKey">
+            <summary>
+            Gets the PublicKey object.
+            </summary>
+        </member>
+        <member name="T:OpenSSL.X509Certificate2Provider.ICertificateProvider">
+            <summary>
+            ICertificateProvider
+            </summary>
+        </member>
+        <member name="P:OpenSSL.X509Certificate2Provider.ICertificateProvider.Certificate">
+            <summary>
+            Gets the generated X509Certificate2 object.
+            </summary>
+        </member>
+        <member name="P:OpenSSL.X509Certificate2Provider.ICertificateProvider.PrivateKey">
+            <summary>
+            Gets the PrivateKey object.
+            </summary>
+        </member>
+        <member name="P:OpenSSL.X509Certificate2Provider.ICertificateProvider.PublicKey">
+            <summary>
+            Gets the PublicKey object.
+            </summary>
+        </member>
+        <member name="T:OpenSSL.X509Certificate2Provider.RSAExtensions">
+            <summary>
+            Based on https://gist.github.com/Jargon64/5b172c452827e15b21882f1d76a94be4
+            </summary>
+        </member>
+        <member name="M:OpenSSL.X509Certificate2Provider.RSAExtensions.FromXmlString(System.Security.Cryptography.RSA,System.String)">
+            <summary>
+            Initializes an System.Security.Cryptography.RSA object from the key information from an XML string.
+            </summary>
+            <param name="rsa">The RSA.</param>
+            <param name="xmlString">The XML string containing System.Security.Cryptography.RSA key information.</param>
+            <exception cref="T:System.ArgumentNullException">The RSA or xmlString is null.</exception>
+            <exception cref="T:System.Security.Cryptography.CryptographicException">The format of the xmlString parameter is not valid.</exception>
+        </member>
+        <member name="M:OpenSSL.X509Certificate2Provider.RSAExtensions.ToXmlString(System.Security.Cryptography.RSA,System.Boolean)">
+            <summary>
+            Creates and returns an XML string containing the key of the current System.Security.Cryptography.RSA object.
+            </summary>
+            <param name="rsa">The RSACryptoServiceProvider.</param>
+            <param name="includePrivateParameters">true to include a public and private RSA key; false to include only the public key.</param>
+            <exception cref="T:System.ArgumentNullException">The RSA is null.</exception>
+            <returns>An XML string containing the key of the current RSA object.</returns>
+        </member>
+    </members>
+</doc>

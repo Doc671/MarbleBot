@@ -9,6 +9,7 @@ namespace MarbleBot.Modules
     {
         const ulong CM = 223616088263491595; // Community Marble
         const ulong THS = 224277738608001024; // The Hat Stoar
+        const ulong THSC = 318053169999511554; // The Hat Stoar Crew
         const ulong VFC = 394086559676235776; // Vinh Fan Club
         const ulong ABCD = 412253669392777217; // Blue & Ayumi's Discord Camp
         const ulong MT = 408694288604463114; // Melmon Test
@@ -146,6 +147,11 @@ namespace MarbleBot.Modules
                     builder.AddField("MarbleBot Role List", "Roleplayer\nGamer\nSpammer\nArchivist\nDead\nAlgodoodlers")
                         .WithColor(Color.Orange)
                         .WithTimestamp(DateTime.UtcNow);
+                    break;
+                case THSC:
+                    builder.AddField("MarbleBot Role List", "There aren't any roles here!")
+                       .WithColor(Color.Orange)
+                       .WithTimestamp(DateTime.UtcNow);
                     break;
                 case MT:
                     builder.AddField("MarbleBot Role List", "There aren't any roles here!")

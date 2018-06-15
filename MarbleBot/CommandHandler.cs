@@ -30,12 +30,14 @@ namespace MarbleBot
             var msg = s as SocketUserMessage;
             if (msg == null) return;
 
-            var context = new SocketCommandContext(_client, msg);
+            var Context = new SocketCommandContext(_client, msg);
+
+            await Context.Client.SetGameAsync("Try mb/help!");
 
             int argPos = 0;
             if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false)
             {
-                var result = await _service.ExecuteAsync(context, argPos);
+                var result = await _service.ExecuteAsync(Context, argPos);
 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                 {

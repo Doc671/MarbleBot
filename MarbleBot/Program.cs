@@ -11,7 +11,7 @@ namespace MarbleBot
         static void Main(string[] args)
         => new Program().StartAsync().GetAwaiter().GetResult();
 
-        private DiscordSocketClient _client;
+        public static DiscordSocketClient _client;
 
         private CommandHandler _handler;
 

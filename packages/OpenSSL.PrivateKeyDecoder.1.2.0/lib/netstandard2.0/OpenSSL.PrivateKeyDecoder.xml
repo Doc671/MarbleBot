@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OpenSSL.PrivateKeyDecoder</name>
+    </assembly>
+    <members>
+        <member name="T:OpenSSL.PrivateKeyDecoder.IOpenSSLPrivateKeyDecoder">
+            <summary>
+            IOpenSSLPrivateKeyDecoder
+            </summary>
+        </member>
+        <member name="M:OpenSSL.PrivateKeyDecoder.IOpenSSLPrivateKeyDecoder.Decode(System.String,System.Security.SecureString)">
+            <summary>
+            Decode PrivateKey into a RSACryptoServiceProvider object. (Windows only)
+            </summary>
+            <param name="privateText">The private (rsa) key text.</param>
+            <param name="securePassword">The optional password to decrypt this private key.</param>
+            <returns>RSACryptoServiceProvider</returns>
+        </member>
+        <member name="M:OpenSSL.PrivateKeyDecoder.IOpenSSLPrivateKeyDecoder.DecodeParameters(System.String,System.Security.SecureString)">
+            <summary>
+            Decode PrivateKey into a RSAParameters struct.
+            </summary>
+            <param name="privateText">The private text.</param>
+            <param name="securePassword">The secure password.</param>
+            <returns>RSAParameters</returns>
+        </member>
+        <member name="T:OpenSSL.PrivateKeyDecoder.OpenSSLPrivateKeyDecoder">
+            <summary>
+            OpenSSLPrivateKeyDecoder
+            </summary>
+        </member>
+        <member name="M:OpenSSL.PrivateKeyDecoder.OpenSSLPrivateKeyDecoder.Decode(System.String,System.Security.SecureString)">
+            <inheritdoc cref="M:OpenSSL.PrivateKeyDecoder.IOpenSSLPrivateKeyDecoder.Decode(System.String,System.Security.SecureString)"/>
+        </member>
+        <member name="M:OpenSSL.PrivateKeyDecoder.OpenSSLPrivateKeyDecoder.DecodeParameters(System.String,System.Security.SecureString)">
+            <inheritdoc cref="M:OpenSSL.PrivateKeyDecoder.IOpenSSLPrivateKeyDecoder.DecodeParameters(System.String,System.Security.SecureString)"/>
+        </member>
+        <member name="M:OpenSSL.PrivateKeyDecoder.OpenSSLPrivateKeyDecoder.DecryptPBDK2(System.Byte[],System.Byte[],System.Byte[],System.Security.SecureString,System.Int32)">
+            <summary>
+            Uses PBKD2 to derive a 3DES key and decrypts data
+            </summary>
+        </member>
+        <member name="T:OpenSSL.Common.SecureStringUtils">
+            <summary>
+            SecureString Utility methods
+            </summary>
+        </member>
+        <member name="M:OpenSSL.Common.SecureStringUtils.Encrypt(System.String)">
+            <summary>
+            Converts a string to a SecureString.
+            </summary>
+            <param name="input">The string to encrypt.</param>
+            <returns>SecureString</returns>
+        </member>
+        <member name="M:OpenSSL.Common.SecureStringUtils.Decrypt(System.Security.SecureString)">
+            <summary>
+            Decrypt a securestring into a byte array.
+            </summary>
+            <param name="secure">The SecureString.</param>
+            <returns>byte[]</returns>
+        </member>
+    </members>
+</doc>
