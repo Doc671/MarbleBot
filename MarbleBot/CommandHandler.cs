@@ -41,7 +41,7 @@ namespace MarbleBot
 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                 {
-                    Console.WriteLine(result.ErrorReason);
+                    Console.WriteLine(result.ErrorReason + " & " + result.Error.Value);
                 }
             }
         }

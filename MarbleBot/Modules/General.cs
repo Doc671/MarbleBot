@@ -57,7 +57,7 @@ namespace MarbleBot.Modules
                             .AddField("Fun Commands", "8ball (predicts an outcome)\nbest (picks a random user to call the best)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nreverse (reverses text)")
                             .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
                             .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video")
+                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                             .AddField("Games", "\njumble (doesn't work yet)")
                             .WithColor(Color.Teal);
                         break;
@@ -66,7 +66,7 @@ namespace MarbleBot.Modules
                             .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                             .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
                             .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video")
+                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                             .AddField("Games", "\njumble (doesn't work yet)")
                             .WithColor(Color.Orange);
                         break;
@@ -75,7 +75,7 @@ namespace MarbleBot.Modules
                             .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                             .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
                             .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video")
+                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                             .AddField("Games", "\njumble (doesn't work yet)")
                             .WithColor(Color.Orange);
                         break;
@@ -84,7 +84,7 @@ namespace MarbleBot.Modules
                             .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                             .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays information about a user; try not to ping if possible)")
                             .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video")
+                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                             .AddField("Games", "\njumble (doesn't work yet)")
                             .WithColor(Color.DarkGrey);
                         break;
@@ -93,7 +93,7 @@ namespace MarbleBot.Modules
                             .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                             .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
                             .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video")
+                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                             .AddField("Games", "\njumble (doesn't work yet)")
                             .WithColor(Color.Blue);
                         break;
@@ -102,7 +102,7 @@ namespace MarbleBot.Modules
                             .AddField("Fun Commands", "\n8ball (predicts an outcome)\nbest (picks a random user to call the best)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\njumble (doesn't work yet)\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
                             .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays information about a user; try not to ping if possible)")
                             .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video")
+                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                             .AddField("Games", "\njumble (doesn't work yet)")
                             .WithColor(Color.Gold);
                         break;
@@ -262,48 +262,18 @@ namespace MarbleBot.Modules
         [Summary("Chooses between several choices")]
         public async Task _choose([Remainder] string input)
         {
-            int a = 0;
-            int count = 0;
-            while (a < input.Length - 1)
+            string[] choices = input.Split('|');
+            int choice = rand.Next(0, choices.Length);
+            if (Moderation._checkSwear(input) || Moderation._checkSwear(choices[choice]))
             {
-                if (input[a] == '|')
-                {
-                    count += 1;
+                SocketGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
+                if (!Context.IsPrivate) {
+                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
                 }
-                a += 1;
-            }
-            string[] choices = new string[count + 1];
-            a = 0;
-            int b = 0;
-            while (a < input.Length - 1)
-            {
-                if (input[a] == '|')
-                {
-                    b += 1;
-                }
-                else if (input[a] != ' ')
-                {
-                    choices[b] += input[a];
-                }
-                a += 1;
-            }
-
-            int choice = rand.Next(0, count);
-            if (count == 0)
-            {
-                await ReplyAsync("Enter multiple choices!");
             }
             else
             {
-                if (Moderation._checkSwear(input) || Moderation._checkSwear(choices[choice]))
-                {
-                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
-                }
-                else
-                {
-                    await ReplyAsync("**" + Context.User.Username + "**, I choose **" + choices[choice] + "**!");
-                }
+                await ReplyAsync("**" + Context.User.Username + "**, I choose **" + choices[choice].Trim() + "**!");
             }
         }
 
