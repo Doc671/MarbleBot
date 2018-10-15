@@ -12,17 +12,15 @@ namespace MarbleBot.Modules
 
     public class YT : ModuleBase<SocketCommandContext>
     {
-        const ulong CM = 223616088263491595; // Community Marble
-        const ulong THS = 224277738608001024; // The Hat Stoar
-        const ulong THSC = 318053169999511554; // The Hat Stoar Crew
-        const ulong VFC = 394086559676235776; // Vinh Fan Club
-        const ulong ABCD = 412253669392777217; // Blue & Ayumi's Discord Camp
-        const ulong MT = 408694288604463114; // Melmon Test
+        /// <summary>
+        /// YouTube API-related commands
+        /// </summary>
 
         [Command("channelinfo")]
         [Summary("returns information about a channel")]
         public async Task _channelinfo([Remainder] string searchTerm)
         {
+            await Context.Channel.TriggerTypingAsync();
             Channel display = new Channel();
 
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
@@ -38,12 +36,11 @@ namespace MarbleBot.Modules
             Color coloure = Color.LightGrey;
             switch (Context.Guild.Id)
             {
-                case CM: coloure = Color.Teal; break;
-                case THS: coloure = Color.Orange; break;
-                case MT: coloure = Color.DarkGrey; break;
-                case VFC: coloure = Color.Blue; break;
-                case ABCD: coloure = Color.Gold; break;
-                case THSC: coloure = Color.Orange; break;
+                case Global.CM: coloure = Color.Teal; break;
+                case Global.THS: coloure = Color.Orange; break;
+                case Global.MT: coloure = Color.DarkGrey; break;
+                case Global.VFC: coloure = Color.Blue; break;
+                case Global.THSC: coloure = Color.Orange; break;
             }
 
             builder.WithTitle(display.Snippet.Title)
@@ -65,11 +62,14 @@ namespace MarbleBot.Modules
         [Summary("searches channels")]
         public async Task _searchchannel([Remainder] string searchTerm)
         {
+            await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = "AIzaSyCa6hUsjY_2pt0ZrxxTNtfYE-BBUci3Jhg",
                 ApplicationName = GetType().ToString()
             });
+
+            byte profaneCount = 0;
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
@@ -84,19 +84,31 @@ namespace MarbleBot.Modules
 
             // Add each result to the appropriate list, and then display the lists of
             // matching videos, channels, and playlists.
+            bool found = false;
+
             foreach (var searchResult in searchListResponse.Items)
             {
                 if (searchResult.Id.Kind == "youtube#channel" && !Moderation._checkSwear(searchResult.Snippet.Title))
                 {
                     channels.Add(String.Format("{0} (<https://www.youtube.com/channel/{1}>)", searchResult.Snippet.Title, searchResult.Id.ChannelId));
+                    found = true;
                 }
                 else
                 {
-                    channels.Add("(profanity detected, item not displayed)");
+                    //channels.Add("(profanity detected, item not displayed)");
+                    profaneCount++;
                 }
             }
 
-            await ReplyAsync(String.Format("**__Channels:__**\n{0}\n", string.Join("\n", channels)));
+            if (found) {
+                if (profaneCount > 0) {
+                    await ReplyAsync(String.Format("**__Channels:__**\n{0}\n", string.Join("\n", channels)) + "\n" + profaneCount + " results omitted (profanity detected)");
+                } else {
+                    await ReplyAsync(String.Format("**__Channels:__**\n{0}\n", string.Join("\n", channels)));
+                }
+            } else {
+                await ReplyAsync("Couldn't seem to find anything...");
+            }
         }
 
 
@@ -104,11 +116,14 @@ namespace MarbleBot.Modules
         [Summary("searches videos")]
         public async Task _searchvideo([Remainder] string searchTerm)
         {
+            await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = "AIzaSyCa6hUsjY_2pt0ZrxxTNtfYE-BBUci3Jhg",
                 ApplicationName = GetType().ToString()
             });
+
+            byte profaneCount = 0;
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
@@ -121,16 +136,27 @@ namespace MarbleBot.Modules
 
             // Add each result to the appropriate list, and then display the lists of
             // matching videos, channels, and playlists.
+            bool found = false;
             foreach (var searchResult in searchListResponse.Items)
             {
                 if (searchResult.Id.Kind == "youtube#video" && Moderation._checkSwear(searchResult.Snippet.Title)) {
-                    videos.Add("(profanity detected, item not displayed)");
+                    //videos.Add("(profanity detected, item not displayed)");
+                    profaneCount++;
                 } else if (searchResult.Id.Kind == "youtube#video") {
                     videos.Add(String.Format("{0} (<https://youtu.be/{1}>)", searchResult.Snippet.Title, searchResult.Id.VideoId));
+                    found = true;
                 }
             }
 
-            await ReplyAsync(String.Format("**__Videos__**:\n{0}\n", string.Join("\n", videos)));
+            if (found) {
+                if (profaneCount > 0) {
+                    await ReplyAsync(String.Format("**__Videos__**:\n{0}\n", string.Join("\n", videos)) + "\n" + profaneCount + " results omitted (profanity detected)");
+                } else {
+                    await ReplyAsync(String.Format("**__Videos__**:\n{0}\n", string.Join("\n", videos)));
+                }
+            } else {
+                await ReplyAsync("Couldn't seem to find anything...");
+            }
         }
     }
 }

@@ -8,12 +8,17 @@ namespace MarbleBot.Modules
 {
     class Moderation : ModuleBase<SocketCommandContext>
     {
+        /// <summary>
+        /// Moderation commands
+        /// </summary>
+
         [Command("clear")]
         [Summary("Deletes the specified amount of messages.")]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task _clear(uint amount)
         {
+            await Context.Channel.TriggerTypingAsync();
             var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).Flatten();
             await Context.Channel.DeleteMessagesAsync(messages);
             const int delay = 5000;

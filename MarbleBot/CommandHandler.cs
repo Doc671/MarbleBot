@@ -38,12 +38,13 @@ namespace MarbleBot
             if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false)
             {
                 var result = await _service.ExecuteAsync(Context, argPos);
-
+                
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                 {
-                    Console.WriteLine(result.ErrorReason + " & " + result.Error.Value);
+                    Console.WriteLine("[" + DateTime.UtcNow + "] " + result.Error.Value + ": " + result.ErrorReason);
                 }
             }
+            if (Context.IsPrivate) Console.WriteLine("[" + DateTime.UtcNow + "] " + msg.Author.Username + "#" + msg.Author.Discriminator + ": " + msg); 
         }
     }
 }

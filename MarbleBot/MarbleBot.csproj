@@ -163,7 +163,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandHandler.cs" />
+    <Compile Include="Global.cs" />
+    <Compile Include="Modules\Games.cs" />
     <Compile Include="Modules\General.cs" />
+    <Compile Include="Modules\MBCommand.cs" />
     <Compile Include="Modules\Moderation.cs" />
     <Compile Include="Modules\Roles.cs" />
     <Compile Include="Modules\YT.cs" />

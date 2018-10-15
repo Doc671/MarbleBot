@@ -17,6 +17,7 @@ namespace MarbleBot
 
         public async Task StartAsync()
         {
+            Console.Title = "MarbleBot";
             _client = new DiscordSocketClient();
 
             string token = "";
