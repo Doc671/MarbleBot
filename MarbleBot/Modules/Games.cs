@@ -174,7 +174,7 @@ namespace MarbleBot.Modules
                     do {
                         eliminated = Global.rand.Next(0, Global.id);
                     } while (marbles[eliminated] == "///out");
-                    int choice = Global.rand.Next(0, 4);
+                    int choice = Global.rand.Next(0, 15);
                     string deathmsg = "";
                     switch (choice)
                     {
@@ -183,6 +183,21 @@ namespace MarbleBot.Modules
                         case 2: deathmsg = "kept getting hit by other marbles"; break;
                         case 3: deathmsg = "glitched out"; break;
                         case 4: deathmsg = "got scared, rolled away"; break;
+                        case 5: deathmsg = "invoked the Magenta Curse"; break;
+                        case 6: deathmsg = "missed the shooter"; break;
+                        case 7: deathmsg = "teleported to the start"; break;
+                        case 8: deathmsg = "fell behind the other marbles"; break;
+                        case 9: deathmsg = "ricocheted off the wall"; break;
+                        case 10: deathmsg = "contracted the Magenta Virus"; break;
+                        case 11: deathmsg = "was not Approved by Orange"; break;
+                        case 12: deathmsg = "lacked the will to go on"; break;
+                        case 13: deathmsg = "realized in +inf"; break;
+                        case 14: deathmsg = "got stuck"; break;
+                        case 15: deathmsg = "flew off the screen"; break;
+                        case 16: deathmsg = "was voted out"; break;
+                        case 17: deathmsg = "got beat by the boss"; break;
+                        case 18: deathmsg = "ran out of time"; break;
+                        case 19: deathmsg = "went backwards"; break;
                     }
                     builder.AddField("**" + marbles[eliminated] + "** is eliminated!", marbles[eliminated] + " " + deathmsg + " and is now out of the competition!");
                     marbles[eliminated] = "///out";
