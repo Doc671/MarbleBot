@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -115,6 +116,8 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             ulong fileID = 0ul;
+            Global.Alive.Add(0, 0);
+            Global.Alive.Remove(0);
             if (Context.IsPrivate) fileID = Context.User.Id; else fileID = Context.Guild.Id;
             Color coloure = Color.LightGrey;
             if (!Context.IsPrivate) {
@@ -140,25 +143,31 @@ namespace MarbleBot.Modules
                 else name = option;
                 builder.AddField("Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
                 if (!File.Exists(fileID.ToString() + "race.txt")) File.Create(fileID.ToString() + "race.txt");
+                byte alive = 0;
+                if (Context.IsPrivate) {
+                    if (!Global.Alive.ContainsKey(Context.User.Id)) Global.Alive.Add(Context.User.Id, 1);
+                    else Global.Alive[Context.User.Id]++;
+                    alive = Global.Alive[Context.User.Id];
+                } else {
+                    if (!Global.Alive.ContainsKey(Context.Guild.Id)) Global.Alive.Add(Context.Guild.Id, 1);
+                    else Global.Alive[Context.Guild.Id]++;
+                    alive = Global.Alive[Context.Guild.Id];
+                }
                 using (var marbleList = new StreamWriter(fileID.ToString() + "race.txt", true))
                 {
                     await marbleList.WriteLineAsync(name);
                     marbleList.Close();
                 }
-                Global.id++;
-                Global.alive++;
                 await ReplyAsync("", false, builder.Build());
-                if (Global.alive > 9) {
+                if (alive > 9) { 
                     await ReplyAsync("The limit of 10 contestants has been reached!");
                     await _race("start");
                 }
             } else if (command == "start") {
                 string[] marbles = new string[10];
-                using (var marbleList = new StreamReader(fileID.ToString() + "race.txt"))
-                {
+                using (var marbleList = new StreamReader(fileID.ToString() + "race.txt")) {
                     var i = 0;
-                    while (!marbleList.EndOfStream)
-                    {
+                    while (!marbleList.EndOfStream) {
                         marbles[i] = await marbleList.ReadLineAsync();
                         i++;
                     }
@@ -168,11 +177,15 @@ namespace MarbleBot.Modules
                 builder.WithTitle("The race has started!");
                 var msg = await ReplyAsync("", false, builder.Build());
                 Thread.Sleep(1500);
-                while (Global.alive > 1)
+                byte alive = 255;
+                if (Context.IsPrivate) alive = Global.Alive[Context.User.Id];
+                else alive = Global.Alive[Context.Guild.Id];
+                byte id = alive;
+                while (alive > 1)
                 {
                     int eliminated = 0;
                     do {
-                        eliminated = Global.rand.Next(0, Global.id);
+                        eliminated = Global.rand.Next(0, id);
                     } while (marbles[eliminated] == "///out");
                     int choice = Global.rand.Next(0, 15);
                     string deathmsg = "";
@@ -201,10 +214,12 @@ namespace MarbleBot.Modules
                     }
                     builder.AddField("**" + marbles[eliminated] + "** is eliminated!", marbles[eliminated] + " " + deathmsg + " and is now out of the competition!");
                     marbles[eliminated] = "///out";
-                    Global.alive--;
+                    alive--;
                     await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                     Thread.Sleep(1500);
                 }
+                if (Context.IsPrivate) Global.Alive.Remove(Context.User.Id);
+                else Global.Alive.Remove(Context.Guild.Id);
                 for (int a = 0; a < marbles.Length - 1; a++)
                 {
                     if (marbles[a] != "///out" && !string.IsNullOrEmpty(marbles[a]) && !string.IsNullOrWhiteSpace(marbles[a]))
@@ -215,14 +230,19 @@ namespace MarbleBot.Modules
                         break;
                     }
                 }
-                Global.id = 0;
-                Global.alive = 0;
                 using (var marbleList = new StreamWriter(fileID.ToString() + "race.txt"))
                 {
                     await marbleList.WriteAsync("");
                     marbleList.Close();
                 }
                 Global.raceActive = false;
+            } else if (command == "clear" && Context.User.Id == 224267581370925056) {
+                using (var marbleList = new StreamWriter(fileID.ToString() + "race.txt"))
+                {
+                    await marbleList.WriteAsync("");
+                    if (option != null || option == string.Empty) await ReplyAsync("Contestant list successfully cleared!");
+                    marbleList.Close();
+                }
             }
         }
 

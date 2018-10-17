@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MarbleBot
 {
@@ -20,7 +21,6 @@ namespace MarbleBot
         // Games
         internal static bool jumbleActive = false;
         internal static bool raceActive = false;
-        internal static byte id = 0;
-        internal static byte alive = 0;
+        internal static Dictionary<ulong, byte> Alive = new Dictionary<ulong, byte>();
     }
 }
