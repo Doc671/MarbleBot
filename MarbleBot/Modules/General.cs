@@ -23,74 +23,79 @@ namespace MarbleBot.Modules
             if (command == "") {
                 EmbedBuilder builder = new EmbedBuilder();
 
-                builder.AddField("MarbleBot Help", "Still a work in progress...")
+                builder.AddField("MarbleBot Help", "*by Doc671#1965*\nLast edit **29 Oct 2018**\n\nUse mb/help followed by a command name for more info!")
                     .WithTimestamp(DateTime.UtcNow);
-
-                switch (Context.Guild.Id)
-                {
-                    case Global.CM:
-                        builder.AddField("Command List", "help (should be fairly obvious)")
-                            .AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)")
-                            .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
-                            .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                            .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
-                            .AddField("Note", "Commands best and userinfo are broken.")
-                            .WithColor(Color.Teal);
-                        break;
-                    case Global.THS:
-                        builder.AddField("Command List", "help (should be fairly obvious)")
-                            .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
-                            .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
-                            .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                            .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
-                            .AddField("Note", "Command userinfo is broken.")
-                            .WithColor(Color.Orange);
-                        break;
-                    case Global.THSC:
-                        builder.AddField("Command List", "help (should be fairly obvious)")
-                            .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
-                            .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
-                            .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                            .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
-                            .AddField("Note", "Command userinfo is broken.")
-                            .WithColor(Color.Orange);
-                        break;
-                    case Global.MT:
-                        builder.AddField("Command List", "help (should be fairly obvious)")
-                            .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
-                            .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays information about a user; try not to ping if possible)")
-                            .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                            .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
-                            .AddField("Note", "Command userinfo is broken.")
-                            .WithColor(Color.DarkGrey);
-                        break;
-                    case Global.VFC:
-                        builder.AddField("Command List", "help (should be fairly obvious)")
-                            .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word")
-                            .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.\nuserinfo (displays info about a user)")
-                            .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                            .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                            .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
-                            .AddField("Note", "Command userinfo is broken.")
-                            .WithColor(Color.Blue);
-                        break;
-                    default:
-                        break;
+                if (Context.IsPrivate) {
+                    builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
+                    .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
+                    .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                    .WithColor(Color.DarkerGrey);
+                } else {
+                    switch (Context.Guild.Id)
+                    {
+                        case Global.CM:
+                            builder.AddField("Command List", "help (should be fairly obvious)")
+                                .AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)\nuptime (shows how long the bot has been running)")
+                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
+                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Note", "Command best is broken.")
+                                .WithColor(Color.Teal);
+                            break;
+                        case Global.THS:
+                            builder.AddField("Command List", "help (should be fairly obvious)")
+                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
+                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
+                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
+                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Note", "Command userinfo is broken.")
+                                .WithColor(Color.Orange);
+                            break;
+                        case Global.THSC:
+                            builder.AddField("Command List", "help (should be fairly obvious)")
+                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
+                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
+                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
+                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Note", "Command userinfo is broken.")
+                                .WithColor(Color.Orange);
+                            break;
+                        case Global.MT:
+                            builder.AddField("Command List", "help (should be fairly obvious)")
+                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
+                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
+                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
+                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Note", "Command userinfo is broken.")
+                                .WithColor(Color.DarkGrey);
+                            break;
+                        case Global.VFC:
+                            builder.AddField("Command List", "help (should be fairly obvious)")
+                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
+                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
+                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
+                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Note", "Command userinfo is broken.")
+                                .WithColor(Color.Blue);
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 await ReplyAsync("", false, builder.Build());
             } else {
                 MBCommand bCommand = new MBCommand();
                 string THSOnly = "This command cannot be used in Community Marble!";
                 bCommand.Name = command;
-                switch(command)
+                switch (command)
                 {
                     // General
                     case "7ball": bCommand.Desc = "Predicts an outcome to an event."; bCommand.Usage = "mb/7ball <condition>"; bCommand.Example = "mb/7ball Will I break?"; break;
-                    case "best": bCommand.Desc = "Picks a Global.random user in the server to call the best."; bCommand.Usage = "mb/best"; bCommand.Warning = "This doesn't work on Community Marble for some reason!";  break;
+                    case "best": bCommand.Desc = "Picks a Global.random user in the server to call the best."; bCommand.Usage = "mb/best"; bCommand.Warning = "This doesn't work on Community Marble for some reason!"; break;
                     case "bet": bCommand.Desc = "Bets on a marble to win from a list of up to 100."; bCommand.Usage = "mb/bet [number of marbles]"; bCommand.Example = "mb/bet 30"; break;
                     case "buyhat": bCommand.Desc = "Picks a Global.random user in the server to call the best."; bCommand.Usage = "mb/buyhat"; bCommand.Warning = THSOnly; break;
                     case "choose": bCommand.Desc = "Chooses between several choices"; bCommand.Usage = "mb/choose <choice1> | <choice2>"; bCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
@@ -104,6 +109,7 @@ namespace MarbleBot.Modules
                     case "reverse": bCommand.Desc = "Reverses text."; bCommand.Usage = "mb/reverse <text>"; bCommand.Example = "mb/reverse Bowl"; break;
                     case "serverinfo": bCommand.Desc = "Displays information about a server."; bCommand.Usage = "mb/serverinfo"; break;
                     case "staffcheck": bCommand.Desc = "Displays a list of all staff members and their statuses."; bCommand.Usage = "mb/staffcheck"; break;
+                    case "uptime": bCommand.Desc = "Displays how long the bot has been running."; bCommand.Usage = "mb/uptime"; break;
                     case "userinfo": bCommand.Desc = "Displays information about a user."; bCommand.Usage = "mb/userinfo <user>"; bCommand.Example = "mb/userinfo MarbleBot"; bCommand.Warning = "This command doesn't work!"; break;
                     case "vinhglish": bCommand.Desc = "Displays information about a Vinhglish word."; bCommand.Usage = "mb/vinglish OR mb/vinhglish <word>"; bCommand.Example = "mb/vinhglish Am Will You"; bCommand.Warning = THSOnly; break;
 
@@ -126,7 +132,7 @@ namespace MarbleBot.Modules
                 message += "**__MarbleBot Help: `" + bCommand.Name + "` command__**\n*" + bCommand.Desc + "*\n\nUsage: `" + bCommand.Usage + "`";
                 if (!(bCommand.Example == null)) message += "\nExample: `" + bCommand.Example + "`";
                 if (!(bCommand.Warning == null)) message += "\n\n:warning: " + bCommand.Warning;
-                
+
                 await ReplyAsync(message);
             }
         }
@@ -235,7 +241,7 @@ namespace MarbleBot.Modules
             using (StreamReader stream = new StreamReader("Marbles.csv")) {
                 while (!stream.EndOfStream) {
                     string[] row = stream.ReadLine().Split(',');
-                    for (int b = 0; b < row.Length - 1; b++)  {
+                    for (int b = 0; b < row.Length - 1; b++) {
                         marbles[a, b] = row[b];
                     }
                     a++;
@@ -252,7 +258,7 @@ namespace MarbleBot.Modules
         public async Task _buyHat()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.THSC || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC)
+            if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.THSC || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC)
             {
                 await ReplyAsync("That'll be " + (Global.rand.Next(0, 10000000)).ToString() + " units of money please. Thank you for buying Uglee Hat #" + (Global.rand.Next(0, 69042)).ToString() + "!");
             }
@@ -267,10 +273,12 @@ namespace MarbleBot.Modules
             int choice = Global.rand.Next(0, choices.Length);
             if (Moderation._checkSwear(input) || Moderation._checkSwear(choices[choice]))
             {
-                SocketGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                if (!Context.IsPrivate) {
+                if (Context.IsPrivate)
+                {
+                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
                 }
+                else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
             }
             else
             {
@@ -306,7 +314,7 @@ namespace MarbleBot.Modules
                     egnaro = "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT";
                     break;
             }
-            if (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) await ReplyAsync(egnaro);
+            if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) await ReplyAsync(egnaro);
         }
 
         [Command("orangeify")]
@@ -321,10 +329,13 @@ namespace MarbleBot.Modules
                 orangeified += input[length];
                 length--;
             }
-            if (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) {
+            if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) {
                 if (Moderation._checkSwear(input) || Moderation._checkSwear(orangeified)) {
-                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                    if (Context.IsPrivate)
+                    {
+                        IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
+                        await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                    } else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
                 } else {
                     await ReplyAsync(orangeified);
                 }
@@ -373,7 +384,7 @@ namespace MarbleBot.Modules
             await ReplyAsync("INITIATING ANTI-RAID PROTOCOL.");
         }
 
-        [Command("Global.random")]
+        [Command("random")]
         [Summary("Returns a Global.random number with user-defined bounds.")]
         public async Task _random(int start, int end)
         {
@@ -419,7 +430,7 @@ namespace MarbleBot.Modules
             byte level = Convert.ToByte(Global.rand.Next(0, 25));
             int xp = 0;
 
-            switch(level) {
+            switch (level) {
                 case 0: xp = Global.rand.Next(0, 99); break;
                 case 1: xp = Global.rand.Next(100, 254); break;
                 case 2: xp = Global.rand.Next(255, 474); break;
@@ -434,29 +445,29 @@ namespace MarbleBot.Modules
                 case 11: xp = Global.rand.Next(5575, 7029); break;
                 case 12: xp = Global.rand.Next(7030, 8449); break;
                 case 13: xp = Global.rand.Next(8450, 10044); break;
-                case 14: xp = Global.rand.Next(10045,11824); break;
-                case 15: xp = Global.rand.Next(11825,13799); break;
-                case 16: xp = Global.rand.Next(13800,15979); break;
-                case 17: xp = Global.rand.Next(15980,18374); break;
+                case 14: xp = Global.rand.Next(10045, 11824); break;
+                case 15: xp = Global.rand.Next(11825, 13799); break;
+                case 16: xp = Global.rand.Next(13800, 15979); break;
+                case 17: xp = Global.rand.Next(15980, 18374); break;
                 case 18: xp = Global.rand.Next(18735, 20994); break;
                 case 19: xp = Global.rand.Next(20995, 23849); break;
                 case 20: xp = Global.rand.Next(23850, 26949); break;
                 case 21: xp = Global.rand.Next(26950, 30304); break;
-                case 22: xp = Global.rand.Next(30305,33924); break;
-                case 23: xp = Global.rand.Next(33925,37819); break;
-                case 24: xp = Global.rand.Next(37820,41999); break;
-                case 25: xp = Global.rand.Next(42000,46474); break;
+                case 22: xp = Global.rand.Next(30305, 33924); break;
+                case 23: xp = Global.rand.Next(33925, 37819); break;
+                case 24: xp = Global.rand.Next(37820, 41999); break;
+                case 25: xp = Global.rand.Next(42000, 46474); break;
             }
 
             Color coloure = Color.DarkerGrey;
-
-            switch (Context.Guild.Id)
-            {
-                case Global.CM: coloure = Color.Teal; break;
-                case Global.THS: coloure = Color.Orange; break;
-                case Global.MT: coloure = Color.DarkGrey; break;
-                case Global.VFC: coloure = Color.Blue; break;
-                default: coloure = Color.DarkerGrey; break;
+            if (!Context.IsPrivate) {
+                switch (Context.Guild.Id) {
+                    case Global.CM: coloure = Color.Teal; break;
+                    case Global.THS: coloure = Color.Orange; break;
+                    case Global.MT: coloure = Color.DarkGrey; break;
+                    case Global.VFC: coloure = Color.Blue; break;
+                    default: coloure = Color.DarkerGrey; break;
+                }
             }
 
             var msgs = await Context.Channel.GetMessagesAsync(100).Flatten();
@@ -508,7 +519,7 @@ namespace MarbleBot.Modules
                 .WithTitle(Context.User.Username + "#" + Context.User.Discriminator)
                 .WithFooter(flavour);
 
-             await ReplyAsync("", false, builder.Build());
+            await ReplyAsync("", false, builder.Build());
         }
 
         [Command("rate")]
@@ -545,6 +556,10 @@ namespace MarbleBot.Modules
                     rating = -1;
                     message = "terrible at everything";
                     break;
+                case "dockque the rockque":
+                    rating = -1;
+                    message = "AM NOT ROCKQUE YOU MELMON";
+                    break;
                 case "erango":
                     rating = 0;
                     message = "stoP noW";
@@ -565,14 +580,6 @@ namespace MarbleBot.Modules
                     rating = -1;
                     message = "don't you dare";
                     break;
-                case "magenta curse":
-                    rating = 0;
-                    message = "stuck in the old ways, I see...";
-                    break;
-                case "magenta virus":
-                    rating = 0;
-                    message = "doesn't exist anymore; stop";
-                    break;
                 case "orange":
                     rating = 10;
                     message = "!egnarO";
@@ -580,6 +587,14 @@ namespace MarbleBot.Modules
                 case "poup soop":
                     rating = 10;
                     message = "considering who made this bot...";
+                    break;
+                case "rockque":
+                    rating = -1;
+                    message = "I Hate Rocks";
+                    break;
+                case "rockques":
+                    rating = -1;
+                    message = "I Hate Rocks";
                     break;
                 case "table":
                     rating = -999;
@@ -676,8 +691,14 @@ namespace MarbleBot.Modules
                 case "oh so muches":
                     message = "Is To Much";
                     break;
+                case "rackquette":
+                    message = "WHACC";
+                    break;
                 case "shotgun":
                     message = "Vinh Shotgun All";
+                    break;
+                case "you silly desk":
+                    message = "Now I\nCry";
                     break;
             }
             // Dann Annoy Me >:((((
@@ -812,8 +833,12 @@ namespace MarbleBot.Modules
             {
                 if (Moderation._checkSwear(input))
                 {
-                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                    if (Context.IsPrivate)
+                    {
+                        IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
+                        await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                    }
+                    else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
                 }
                 else
                 {
@@ -833,8 +858,11 @@ namespace MarbleBot.Modules
             }
             else if (Moderation._checkSwear(repeat))
             {
-                IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                if (Context.IsPrivate) {
+                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
+                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                }
+                else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + repeat);
             }
             else
             {
@@ -847,16 +875,20 @@ namespace MarbleBot.Modules
         public async Task _reverse([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
-            // Another version of orangeify, but for Global.CM (can secretly be used elsewhere)
+            // Another version of orangeify, but for CM (can secretly be used elsewhere)
             string reverse = "";
             int length = input.Length - 1;
             while (length >= 0) {
                 reverse += input[length];
                 length--;
             }
-            if(Moderation._checkSwear(input) || Moderation._checkSwear(reverse)) {
-                IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                await ReplyAsync("Profanity detected. " + Doc671.Mention);
+            if (Moderation._checkSwear(input) || Moderation._checkSwear(reverse)) {
+                if (Context.IsPrivate)
+                {
+                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
+                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                }
+                else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
             } else {
                 await ReplyAsync(reverse);
             }
@@ -867,37 +899,39 @@ namespace MarbleBot.Modules
         public async Task _serverinfo()
         {
             await Context.Channel.TriggerTypingAsync();
-            EmbedBuilder builder = new EmbedBuilder();
-            Color coloure = Color.LightGrey;
-            int botUsers = 0;
-            int onlineUsers = 0;
-            SocketGuildUser[] users = Context.Guild.Users.ToArray();
-            switch (Context.Guild.Id)
-            {
-                case Global.CM: coloure = Color.Teal; break;
-                case Global.THS: coloure = Color.Orange; break;
-                case Global.MT: coloure = Color.DarkGrey; break;
-                case Global.VFC: coloure = Color.Blue; break;
-            }
-            for (int i = 0; i < Context.Guild.Users.Count - 1; i++)
-            {
-                if (users[i].IsBot) botUsers++;
-                if (users[i].Status.ToString().ToLower() == "online") onlineUsers++;
-            }
-            builder.WithThumbnailUrl(Context.Guild.IconUrl)
-                .WithTitle(Context.Guild.Name)
-                .AddInlineField("Owner", Context.Guild.GetUser(Context.Guild.OwnerId).Username + "#" + Context.Guild.GetUser(Context.Guild.OwnerId).Discriminator)
-                .AddInlineField("Voice Region", Context.Guild.VoiceRegionId)
-                .AddInlineField("Text Channels", Context.Guild.TextChannels.Count)
-                .AddInlineField("Voice Channels", Context.Guild.VoiceChannels.Count)
-                .AddInlineField("Members", Context.Guild.Users.Count)
-                .AddInlineField("Bots", botUsers)
-                .AddInlineField("Online", onlineUsers)
-                .AddInlineField("Roles", Context.Guild.Roles.Count)
-                .WithColor(coloure)
-                .WithTimestamp(DateTime.UtcNow)
-                .WithFooter(Context.Guild.Id.ToString());
-            await ReplyAsync("", false, builder.Build());
+            if (!Context.IsPrivate) {
+                EmbedBuilder builder = new EmbedBuilder();
+                Color coloure = Color.LightGrey;
+                int botUsers = 0;
+                int onlineUsers = 0;
+                SocketGuildUser[] users = Context.Guild.Users.ToArray();
+                switch (Context.Guild.Id)
+                {
+                    case Global.CM: coloure = Color.Teal; break;
+                    case Global.THS: coloure = Color.Orange; break;
+                    case Global.MT: coloure = Color.DarkGrey; break;
+                    case Global.VFC: coloure = Color.Blue; break;
+                }
+                for (int i = 0; i < Context.Guild.Users.Count - 1; i++)
+                {
+                    if (users[i].IsBot) botUsers++;
+                    if (users[i].Status.ToString().ToLower() == "online") onlineUsers++;
+                }
+                builder.WithThumbnailUrl(Context.Guild.IconUrl)
+                    .WithTitle(Context.Guild.Name)
+                    .AddInlineField("Owner", Context.Guild.GetUser(Context.Guild.OwnerId).Username + "#" + Context.Guild.GetUser(Context.Guild.OwnerId).Discriminator)
+                    .AddInlineField("Voice Region", Context.Guild.VoiceRegionId)
+                    .AddInlineField("Text Channels", Context.Guild.TextChannels.Count)
+                    .AddInlineField("Voice Channels", Context.Guild.VoiceChannels.Count)
+                    .AddInlineField("Members", Context.Guild.Users.Count)
+                    .AddInlineField("Bots", botUsers)
+                    .AddInlineField("Online", onlineUsers)
+                    .AddInlineField("Roles", Context.Guild.Roles.Count)
+                    .WithColor(coloure)
+                    .WithTimestamp(DateTime.UtcNow)
+                    .WithFooter(Context.Guild.Id.ToString());
+                await ReplyAsync("", false, builder.Build());
+            } else await ReplyAsync("This is a DM, not a server!");
         }
 
         [Command("stats")]
@@ -916,107 +950,130 @@ namespace MarbleBot.Modules
         public async Task _staffCheck()
         {
             await Context.Channel.TriggerTypingAsync();
-            IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-            if (Context.Guild.Id == Global.CM)
+            if (!Context.IsPrivate)
             {
-                IGuildUser Erikfassett = Context.Guild.GetUser(161258738429329408);
-                IGuildUser JohnDubuc = Context.Guild.GetUser(161247044713840642);
-                IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
-                IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
-                IGuildUser Algorox = Context.Guild.GetUser(323680030724980736);
-                IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
-                IGuildUser Small = Context.Guild.GetUser(222125122020966400);
-                IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, BradyForrest, FlameVapour, Small };
-                string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname };
-                string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString(), users[7].Status.ToString() };
-                for (int i = 0; i < users.Length; i++)
+                IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
+                if (Context.Guild.Id == Global.CM)
                 {
-                    if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                    IGuildUser Erikfassett = Context.Guild.GetUser(161258738429329408);
+                    IGuildUser JohnDubuc = Context.Guild.GetUser(161247044713840642);
+                    IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
+                    IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
+                    IGuildUser Algorox = Context.Guild.GetUser(323680030724980736);
+                    IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
+                    IGuildUser Small = Context.Guild.GetUser(222125122020966400);
+                    IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, BradyForrest, FlameVapour, Small };
+                    string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname };
+                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString(), users[7].Status.ToString() };
+                    for (int i = 0; i < users.Length; i++)
                     {
-                        nicks[i] = users[i].Username;
+                        if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                        {
+                            nicks[i] = users[i].Username;
+                        }
+                        if (statuses[i] == "DoNotDisturb")
+                        {
+                            statuses[i] = "Do Not Disturb";
+                        }
                     }
-                    if (statuses[i] == "DoNotDisturb")
-                    {
-                        statuses[i] = "Do Not Disturb";
-                    }
+                    await ReplyAsync("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n\n**__Mods:__**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7] + "**");
                 }
-                await ReplyAsync("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n\n**__Mods:__**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7] + "**");
-            }
-            else if (Context.Guild.Id == Global.THS)
-            {
-                IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
-                IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
-                IGuildUser DannyPlayz = Context.Guild.GetUser(329532528031563777);
-                IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
-                IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
-                IGuildUser[] users = { Doc671, FlameVapour, BradyForrest, DannyPlayz, George012, Kenlimepie };
-                string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname };
-                string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString() };
-                for (int i = 0; i < users.Length; i++)
+                else if (Context.Guild.Id == Global.THS)
                 {
-                    if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                    IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
+                    IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
+                    IGuildUser DannyPlayz = Context.Guild.GetUser(329532528031563777);
+                    IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
+                    IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
+                    IGuildUser[] users = { Doc671, FlameVapour, BradyForrest, DannyPlayz, George012, Kenlimepie };
+                    string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname };
+                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString() };
+                    for (int i = 0; i < users.Length; i++)
                     {
-                        nicks[i] = users[i].Username;
+                        if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                        {
+                            nicks[i] = users[i].Username;
+                        }
+                        if (statuses[i] == "DoNotDisturb")
+                        {
+                            statuses[i] = "Do Not Disturb";
+                        }
+                        Console.WriteLine(nicks[i]);
                     }
-                    if (statuses[i] == "DoNotDisturb")
-                    {
-                        statuses[i] = "Do Not Disturb";
-                    }
-                    Console.WriteLine(nicks[i]);
+                    await ReplyAsync("**__Overlords:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n\n**__Hat Stoar Managers:__**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n\n**__Hat Stoar Employees:__**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**");
                 }
-                await ReplyAsync("**__Overlords:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n\n**__Hat Stoar Managers:__**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n\n**__Hat Stoar Employees:__**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**");
-            }
-            else if (Context.Guild.Id == Global.MT)
-            {
-                IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
-                IGuildUser[] users = { Doc671, George012 };
-                string[] nicks = { users[0].Nickname, users[1].Nickname, };
-                string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString() };
-                for (int i = 0; i < users.Length; i++)
+                else if (Context.Guild.Id == Global.MT)
                 {
-                    if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                    IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
+                    IGuildUser[] users = { Doc671, George012 };
+                    string[] nicks = { users[0].Nickname, users[1].Nickname, };
+                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString() };
+                    for (int i = 0; i < users.Length; i++)
                     {
-                        nicks[i] = users[i].Username;
+                        if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                        {
+                            nicks[i] = users[i].Username;
+                        }
+                        if (statuses[i] == "DoNotDisturb")
+                        {
+                            statuses[i] = "Do Not Disturb";
+                        }
                     }
-                    if (statuses[i] == "DoNotDisturb")
-                    {
-                        statuses[i] = "Do Not Disturb";
-                    }
+                    await ReplyAsync(nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
                 }
-                await ReplyAsync(nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
-            }
-            else if (Context.Guild.Id == Global.VFC)
-            {
-                IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
-                IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
-                IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
-                IGuildUser Matheus = Context.Guild.GetUser(403595947537334274);
-                IGuildUser Meadow = Context.Guild.GetUser(370463333763121152);
-                IGuildUser Nihonium = Context.Guild.GetUser(233912334517534720);
-                IGuildUser Petrified = Context.Guild.GetUser(373322546084577280);
-                IGuildUser Ayumi = Context.Guild.GetUser(189713815414374404);
-                IGuildUser Quackitye = Context.Guild.GetUser(371575413115322379);
-                IGuildUser BTMR = Context.Guild.GetUser(378875092538621963);
-                IGuildUser Holly = Context.Guild.GetUser(210397169075748864);
-                IGuildUser ZeeTaa = Context.Guild.GetUser(373086863369699328);
-                IGuildUser[] users = { Vinh, George012, Kenlimepie, Matheus, Meadow, Nihonium, Petrified, Ayumi, Quackitye, BTMR, Doc671, Holly, ZeeTaa };
-                string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname, users[8].Nickname, users[9].Nickname, users[10].Nickname, users[11].Nickname, users[12].Nickname };
-                string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString(), users[7].Status.ToString(), users[8].Status.ToString(), users[9].Status.ToString(), users[10].Status.ToString(), users[11].Status.ToString(), users[12].Status.ToString() };
-                for (int i = 0; i < users.Length; i++)
+                else if (Context.Guild.Id == Global.VFC)
                 {
-                    if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                    IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
+                    IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
+                    IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
+                    IGuildUser Matheus = Context.Guild.GetUser(403595947537334274);
+                    IGuildUser Meadow = Context.Guild.GetUser(370463333763121152);
+                    IGuildUser Nihonium = Context.Guild.GetUser(233912334517534720);
+                    IGuildUser Petrified = Context.Guild.GetUser(373322546084577280);
+                    IGuildUser Ayumi = Context.Guild.GetUser(189713815414374404);
+                    IGuildUser Quackitye = Context.Guild.GetUser(371575413115322379);
+                    IGuildUser BTMR = Context.Guild.GetUser(378875092538621963);
+                    IGuildUser Holly = Context.Guild.GetUser(210397169075748864);
+                    IGuildUser ZeeTaa = Context.Guild.GetUser(373086863369699328);
+                    IGuildUser[] users = { Vinh, George012, Kenlimepie, Matheus, Meadow, Nihonium, Petrified, Ayumi, Quackitye, BTMR, Doc671, Holly, ZeeTaa };
+                    string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname, users[8].Nickname, users[9].Nickname, users[10].Nickname, users[11].Nickname, users[12].Nickname };
+                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString(), users[7].Status.ToString(), users[8].Status.ToString(), users[9].Status.ToString(), users[10].Status.ToString(), users[11].Status.ToString(), users[12].Status.ToString() };
+                    for (int i = 0; i < users.Length; i++)
                     {
-                        nicks[i] = users[i].Username;
+                        if (nicks[i] == "" || nicks[i] == null || nicks[i] == "  ")
+                        {
+                            nicks[i] = users[i].Username;
+                        }
+                        if (statuses[i] == "DoNotDisturb")
+                        {
+                            statuses[i] = "Do Not Disturb";
+                        }
                     }
-                    if (statuses[i] == "DoNotDisturb")
-                    {
-                        statuses[i] = "Do Not Disturb";
-                    }
+                    await ReplyAsync("**__Owner:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n\n**__Co-owners:__** \n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**\n\n**__Admins:__**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7] + "**\n" + nicks[8] + " (" + users[8].Username + "#" + users[8].Discriminator + "): **" + statuses[8] + "**\n" + nicks[9] + " (" + users[9].Username + "#" + users[9].Discriminator + "): **" + statuses[9] + "**\n" + nicks[10] + " (" + users[10].Username + "#" + users[10].Discriminator + "): **" + statuses[10] + "**\n" + nicks[11] + " (" + users[11].Username + "#" + users[11].Discriminator + "): **" + statuses[11] + "**\n" + nicks[12] + " (" + users[12].Username + "#" + users[12].Discriminator + "): **" + statuses[9] + "**");
                 }
-                await ReplyAsync("**__Owner:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n\n**__Co-owners:__** \n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**\n\n**__Admins:__**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7] + "**\n" + nicks[8] + " (" + users[8].Username + "#" + users[8].Discriminator + "): **" + statuses[8] + "**\n" + nicks[9] + " (" + users[9].Username + "#" + users[9].Discriminator + "): **" + statuses[9] + "**\n" + nicks[10] + " (" + users[10].Username + "#" + users[10].Discriminator + "): **" + statuses[10] + "**\n" + nicks[11] + " (" + users[11].Username + "#" + users[11].Discriminator + "): **" + statuses[11] + "**\n" + nicks[12] + " (" + users[12].Username + "#" + users[12].Discriminator + "): **" + statuses[9] + "**");
-            }    
+            } else await ReplyAsync("There are no staff members in a DM!");
         }
-    
+
+        [Command("uptime")]
+        [Summary("Returns the bot's uptime")]
+        public async Task _uptime() {
+            var timeDiff = DateTime.UtcNow.Subtract(Global.StartTime);
+            var output = "";
+            if (timeDiff.Days > 1) output += timeDiff.Days + " days, ";
+            else if (timeDiff.Days > 0) output += timeDiff.Days + " day, ";
+            if (timeDiff.Hours > 1) output += timeDiff.Hours + " hours, ";
+            else if (timeDiff.Hours > 0) output += timeDiff.Hours + " hour, ";
+            if (timeDiff.Minutes > 1) output += timeDiff.Minutes + " minutes, ";
+            else if (timeDiff.Minutes > 0) output += timeDiff.Minutes + " minute, ";
+            if (timeDiff.Seconds > 1) {
+                if (timeDiff.Minutes > 0) output += " and " + timeDiff.Seconds + " seconds";
+                else output += timeDiff.Seconds + " seconds";
+            } else if(timeDiff.Seconds > 0) {
+                if (timeDiff.Minutes > 0) output += " and " + timeDiff.Seconds + " second";
+                else output += timeDiff.Seconds + " second";
+            }
+            await ReplyAsync("The bot has been running for **" + output + "**.");
+        }
 
         [Command("userinfo")]
         [Summary("Returns info of a user")]
@@ -1108,6 +1165,21 @@ namespace MarbleBot.Modules
                 SocketGuild TheHatStoar = Program._client.GetGuild(Global.THS);
                 ISocketMessageChannel THSMSPMRGCTMW = TheHatStoar.GetTextChannel(224277892182310912);
                 await THSMSPMRGCTMW.SendMessageAsync(msg);
+            }
+        }
+
+        [Command("domybidding")]
+        public async Task _domybidding()
+        {
+            if (Context.User.Id == 224267581370925056) {
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.WithAuthor(Context.User)
+                    .WithDescription("**Message edited in <#224277892182310912>**")
+                    .AddField("Before", "update video eventulaly")
+                    .AddField("After", "update video eventually")
+                    .WithColor(Color.DarkBlue)
+                    .WithFooter("User ID: 224267581370925056 • Yesterday at 18:40");
+                await ReplyAsync("", false, builder.Build());
             }
         }
     }

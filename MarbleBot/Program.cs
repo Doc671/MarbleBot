@@ -18,15 +18,12 @@ namespace MarbleBot
         public async Task StartAsync()
         {
             Console.Title = "MarbleBot";
+            Global.StartTime = DateTime.UtcNow;
             _client = new DiscordSocketClient();
 
             string token = "";
-            using (StreamReader stream = new StreamReader("C:/Folder/MBT.txt"))
-            {
-                while (!stream.EndOfStream)
-                {
-                    token = stream.ReadLine();
-                }
+            using (StreamReader stream = new StreamReader("C:/Folder/MBT.txt")) {
+                while (!stream.EndOfStream) token = stream.ReadLine();
             }
 
             await _client.LoginAsync(TokenType.Bot, token);

@@ -10,6 +10,7 @@ namespace MarbleBot
         /// </summary>
 
         internal static Random rand = new Random();
+        internal static DateTime StartTime = new DateTime();
 
         // Server IDs
         internal const ulong CM = 223616088263491595; // Community Marble

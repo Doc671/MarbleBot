@@ -140,7 +140,8 @@ namespace MarbleBot.Modules
             } else if (command == "signup" && !Global.raceActive) {
                 string name = "";
                 if (option == " " || option == null || option == string.Empty) name = Context.User.Username;
-                else name = option;
+                else if (option.Length > 100) await ReplyAsync("Your entry exceeds the 100 character limit.");
+                else option = option.Replace("\n", " "); name = option;
                 builder.AddField("Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
                 if (!File.Exists(fileID.ToString() + "race.txt")) File.Create(fileID.ToString() + "race.txt");
                 byte alive = 0;
@@ -187,7 +188,7 @@ namespace MarbleBot.Modules
                     do {
                         eliminated = Global.rand.Next(0, id);
                     } while (marbles[eliminated] == "///out");
-                    int choice = Global.rand.Next(0, 15);
+                    int choice = Global.rand.Next(0, 19);
                     string deathmsg = "";
                     switch (choice)
                     {
@@ -208,7 +209,7 @@ namespace MarbleBot.Modules
                         case 14: deathmsg = "got stuck"; break;
                         case 15: deathmsg = "flew off the screen"; break;
                         case 16: deathmsg = "was voted out"; break;
-                        case 17: deathmsg = "got beat by the boss"; break;
+                        case 17: deathmsg = "was beaten by the boss"; break;
                         case 18: deathmsg = "ran out of time"; break;
                         case 19: deathmsg = "went backwards"; break;
                     }
@@ -240,7 +241,7 @@ namespace MarbleBot.Modules
                 using (var marbleList = new StreamWriter(fileID.ToString() + "race.txt"))
                 {
                     await marbleList.WriteAsync("");
-                    if (option != null || option == string.Empty) await ReplyAsync("Contestant list successfully cleared!");
+                    await ReplyAsync("Contestant list successfully cleared!");
                     marbleList.Close();
                 }
             }
