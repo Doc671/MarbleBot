@@ -22,8 +22,12 @@ namespace MarbleBot
             _client = new DiscordSocketClient();
 
             string token = "";
-            using (StreamReader stream = new StreamReader("C:/Folder/MBT.txt")) {
-                while (!stream.EndOfStream) token = stream.ReadLine();
+            using (var stream = new StreamReader("C:/Folder/MBT.txt")) {
+                token = stream.ReadLine();
+            }
+
+            using (var stream = new StreamReader("C:/Folder/MBK.txt")) {
+                Global.YTKey = stream.ReadLine();
             }
 
             await _client.LoginAsync(TokenType.Bot, token);

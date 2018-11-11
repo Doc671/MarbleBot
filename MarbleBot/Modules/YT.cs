@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -25,7 +27,7 @@ namespace MarbleBot.Modules
 
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = "AIzaSyCa6hUsjY_2pt0ZrxxTNtfYE-BBUci3Jhg",
+                ApiKey = Global.YTKey,
                 ApplicationName = GetType().ToString()
             });
 
@@ -57,6 +59,68 @@ namespace MarbleBot.Modules
             await ReplyAsync("", false, builder.Build());
         }
 
+        [Command("cv")]
+        [Summary("Allows verified users to send a video in CM #community-videos")]
+        public async Task _cv(string url, [Remainder] string desc = "")
+        {
+            if (Context.IsPrivate)
+            {
+                var validUser = false;
+                var channelLink = "";
+                using (var CVID = new StreamReader("CVID.csv")) {
+                    while (!CVID.EndOfStream) {
+                        var person = (await CVID.ReadLineAsync()).Split(',');
+                        if (Context.User.Id == Convert.ToUInt64(person[0])) {
+                            validUser = true;
+                            channelLink = person[1];
+                            break;
+                        }
+                    }
+                }
+                if (validUser) {
+                    var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
+                        ApiKey = Global.YTKey,
+                        ApplicationName = GetType().ToString()
+                    });
+
+                    var searchListRequest = youtubeService.Search.List("snippet");
+                    searchListRequest.Q = channelLink;
+                    searchListRequest.MaxResults = 1;
+                    var searchListResponse = await searchListRequest.ExecuteAsync();
+                    var channel = searchListResponse.Items[0].Snippet;
+
+                    searchListRequest.Q = url;
+                    searchListResponse = await searchListRequest.ExecuteAsync();
+                    var video = searchListResponse.Items[0].Snippet;
+                    if (channel.Title == video.ChannelTitle) {
+                        if (DateTime.Now.Subtract((DateTime)video.PublishedAt).Days > 1) {
+                            await ReplyAsync("The video cannot be more than two days old!");
+                        } else {
+                            if (desc.Length > 200) await ReplyAsync("Your description length is too long!");
+                            else {
+                                var CV = (IMessageChannel)Context.Client.GetGuild(Global.CM).GetChannel(442474624417005589);
+                                var msgs = await CV.GetMessagesAsync(100).Flatten();
+                                var already = false;
+                                foreach (var msg in msgs) {
+                                    if (msg.Content.Contains(url)) already = true; break;
+                                }
+                                if (already) await ReplyAsync("This video has already been posted!");
+                                else
+                                {
+                                    await CV.SendMessageAsync(desc + "\n" + url);
+                                }
+                            }
+                        }
+                    }
+                    else await ReplyAsync("This isn't your video!\n\n*(notify Doc671 if it is)*");
+                } else {
+                    var output = "It doesn't look like you're allowed to post in <#442474624417005589>.\n\n";
+                    output += "If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n";
+                    output += "If you're an accepted user, please notify Doc671.";
+                    await ReplyAsync(output);
+                }
+            }
+        }
 
         [Command("searchchannel")]
         [Summary("searches channels")]
@@ -65,7 +129,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = "AIzaSyCa6hUsjY_2pt0ZrxxTNtfYE-BBUci3Jhg",
+                ApiKey = Global.YTKey,
                 ApplicationName = GetType().ToString()
             });
 
@@ -119,7 +183,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = "AIzaSyCa6hUsjY_2pt0ZrxxTNtfYE-BBUci3Jhg",
+                ApiKey = Global.YTKey,
                 ApplicationName = GetType().ToString()
             });
 

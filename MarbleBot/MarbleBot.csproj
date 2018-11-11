@@ -164,6 +164,7 @@
   <ItemGroup>
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Modules\Games.cs" />
     <Compile Include="Modules\General.cs" />
     <Compile Include="Modules\MBCommand.cs" />
