@@ -82,13 +82,20 @@ namespace MarbleBot.Modules
                         ApiKey = Global.YTKey,
                         ApplicationName = GetType().ToString()
                     });
-
                     var searchListRequest = youtubeService.Search.List("snippet");
                     searchListRequest.Q = channelLink;
-                    searchListRequest.MaxResults = 1;
+                    searchListRequest.MaxResults = 10;
                     var searchListResponse = await searchListRequest.ExecuteAsync();
-                    var channel = searchListResponse.Items[0].Snippet;
-
+                    var channel = new SearchResultSnippet();
+                    foreach (var e in searchListResponse.Items) {
+                        if (searchListResponse.Kind == "youtube#channel") channel = e.Snippet;
+                    }
+                    if (channel == null) {
+                        searchListRequest.Q = Context.User.Username;
+                        foreach (var e in searchListResponse.Items) {
+                            if (searchListResponse.Kind == "youtube#channel") channel = e.Snippet;
+                        }
+                    }
                     searchListRequest.Q = url;
                     searchListResponse = await searchListRequest.ExecuteAsync();
                     var video = searchListResponse.Items[0].Snippet;
@@ -111,8 +118,7 @@ namespace MarbleBot.Modules
                                 }
                             }
                         }
-                    }
-                    else await ReplyAsync("This isn't your video!\n\n*(notify Doc671 if it is)*");
+                    } else await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
                 } else {
                     var output = "It doesn't look like you're allowed to post in <#442474624417005589>.\n\n";
                     output += "If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n";
