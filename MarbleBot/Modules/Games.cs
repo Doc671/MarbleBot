@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
@@ -113,8 +114,7 @@ namespace MarbleBot.Modules
 
         [Command("race")]
         [Summary("Players compete in a marble race!")]
-        public async Task _race(string command = "", [Remainder] string option = null)
-        {
+        public async Task _race(string command = "", [Remainder] string option = null) {
             await Context.Channel.TriggerTypingAsync();
             ulong fileID = 0ul;
             Global.Alive.Add(0, 0);
@@ -122,7 +122,7 @@ namespace MarbleBot.Modules
 
             if (Context.IsPrivate) fileID = Context.User.Id; else fileID = Context.Guild.Id;
             Color coloure = Color.LightGrey;
-            if (!Context.IsPrivate) {
+            if (!Context.IsPrivate){
                 switch (Context.Guild.Id) {
                     case Global.CM: coloure = Color.Teal; break;
                     case Global.THS: coloure = Color.Orange; break;
@@ -136,7 +136,7 @@ namespace MarbleBot.Modules
                 .WithColor(coloure)
                 .WithCurrentTimestamp();
             if (command != "signup" && command != "start" && command != "clear" && command != "contestants" && command != "marbles" && command != "participants" && option.IsEmpty() && !Global.raceActive) {
-                builder.AddField("How to play", "Use `mb/race signup [marble name]` to sign up as a marble!\nWhen everyone's done (or when 10 people have signed up), use `mb/race start`!\\n\nCheck who's participating with `mb/race contestants`!")
+                builder.AddField("How to play", "Use `mb/race signup [marble name]` to sign up as a marble!\nWhen everyone's done (or when 10 people have signed up), use `mb/race start`!\n\nCheck who's participating with `mb/race contestants`!")
                     .WithTitle("Marble Race!");
                 await ReplyAsync("", false, builder.Build());
             } else if (command == "signup" && !Global.raceActive) {
@@ -145,6 +145,7 @@ namespace MarbleBot.Modules
                 else if (option.Length > 100) await ReplyAsync("Your entry exceeds the 100 character limit.");
                 else option = option.Replace("\n", " "); name = option;
                 builder.AddField("Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
+                using (var racers = new StreamWriter("RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
                 if (!File.Exists(fileID.ToString() + "race.txt")) File.Create(fileID.ToString() + "race.txt");
                 byte alive = 0;
                 if (Context.IsPrivate) {
@@ -155,9 +156,7 @@ namespace MarbleBot.Modules
                     if (!Global.Alive.ContainsKey(Context.Guild.Id)) Global.Alive.Add(Context.Guild.Id, 1);
                     else Global.Alive[Context.Guild.Id]++;
                     alive = Global.Alive[Context.Guild.Id];
-                }
-                using (var marbleList = new StreamWriter(fileID.ToString() + "race.txt", true))
-                {
+                } using (var marbleList = new StreamWriter(fileID.ToString() + "race.txt", true)) {
                     await marbleList.WriteLineAsync(name);
                     marbleList.Close();
                 }
@@ -217,6 +216,7 @@ namespace MarbleBot.Modules
                     for (int a = 0; a < marbles.Length - 1; a++) {
                         if (marbles[a] != "///out" && !string.IsNullOrEmpty(marbles[a]) && !string.IsNullOrWhiteSpace(marbles[a])) {
                             builder.AddField("**" + marbles[a] + "** wins!", marbles[a] + " is the winner!");
+                            using (var racers = new StreamWriter("RaceWinners.txt", true)) await racers.WriteLineAsync(marbles[a]);
                             await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                             await ReplyAsync("**" + marbles[a] + "** won the race!");
                             break;
@@ -234,16 +234,85 @@ namespace MarbleBot.Modules
                     await ReplyAsync("Contestant list successfully cleared!");
                     marbleList.Close();
                 }
+            } else if (command == "setcount" && (Context.User.Id == 224267581370925056 || Context.IsPrivate)) {
+                var newcount = byte.Parse(option);
+                if (Context.IsPrivate) {
+                    if (Global.Alive.ContainsKey(Context.User.Id)) Global.Alive[Context.User.Id] = newcount;
+                    await ReplyAsync("Changed the contestant count to " + newcount + ".");
+                } else {
+                    if (Global.Alive.ContainsKey(Context.Guild.Id)) Global.Alive[Context.Guild.Id] = newcount;
+                    await ReplyAsync("Changed the contestant count to " + newcount + ".");
+                }
             } else if (command == "contestants" || command == "marbles" || command == "participants") {
                 var marbles = "";
                 using (var marbleList = new StreamReader(fileID.ToString() + "race.txt")) {
                     marbles = await marbleList.ReadToEndAsync();
                 }
-                if (marbles.IsEmpty()) {
-                    await ReplyAsync("It looks like there aren't any contestants...");
-                } else {
+                if (marbles.IsEmpty()) await ReplyAsync("It looks like there aren't any contestants...");
+                else {
                     builder.AddField("Contestants", marbles);
                     await ReplyAsync("", false, builder.Build());
+                }
+            }
+            else if (command == "leaderboard")  {
+                switch (option.ToLower()) {
+                    case "winners": {
+                        var winners = new SortedDictionary<string, int>();
+                        using (var win = new StreamReader("RaceWinners.txt")) {
+                            while (!win.EndOfStream) {
+                                var racerInfo = await win.ReadLineAsync();
+                                if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
+                                else winners.Add(racerInfo, 1);
+                            }
+                        }
+                        var winList = new List<Tuple<string, int>>();
+                        foreach (var winner in winners) {
+                            winList.Add(Tuple.Create(winner.Key, winner.Value));
+                        }
+                        winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                        int i = 1, j = 1;
+                        var desc = "";
+                        foreach (var winner in winList) {
+                            if (i < 11) {
+                                desc += string.Format("{0}{1}: {2} {3}\n", new string[] { i.ToString(), i.Ordinal(), winner.Item1, winner.Item2.ToString() });
+                                if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
+                                j++;
+                            } else break;
+                        }
+                        builder.WithTitle("Race Leaderboard: Winners")
+                            .WithDescription(desc);
+                        await ReplyAsync("", false, builder.Build());
+                        break;
+                    }
+                    case "mostused": {
+                        var winners = new SortedDictionary<string, int>();
+                        using (var win = new StreamReader("RaceMostUsed.txt")) {
+                            while (!win.EndOfStream) {
+                                var racerInfo = await win.ReadLineAsync();
+                                if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
+                                else winners.Add(racerInfo, 1);
+                            }
+                        }
+                        var winList = new List<Tuple<string, int>>();
+                        foreach (var winner in winners) {
+                            winList.Add(Tuple.Create(winner.Key, winner.Value));
+                        }
+                        winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                        int i = 1, j = 1;
+                        var desc = "";
+                        foreach (var winner in winList) {
+                            if (i < 11) {
+                                desc += string.Format("{0}{1}: {2} {3}\n", new string[] { i.ToString(), i.Ordinal(), winner.Item1, winner.Item2.ToString() });
+                                if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
+                                j++;
+                            }
+                            else break;
+                        }
+                        builder.WithTitle("Race Leaderboard: Most Used")
+                            .WithDescription(desc);
+                        await ReplyAsync("", false, builder.Build());
+                        break;
+                    }
                 }
             }
         }

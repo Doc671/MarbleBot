@@ -24,7 +24,7 @@ namespace MarbleBot.Modules
             if (command == "") {
                 EmbedBuilder builder = new EmbedBuilder();
 
-                builder.AddField("MarbleBot Help", "*by Doc671#1965*\nLast edit **04 Nov 2018**\nUse mb/help followed by a command name for more info!")
+                builder.AddField("MarbleBot Help", "*by Doc671#1965*\nUse mb/help followed by a command name for more info!")
                     .WithTimestamp(DateTime.UtcNow);
                 if (Context.IsPrivate) {
                     builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
@@ -122,7 +122,7 @@ namespace MarbleBot.Modules
 
                     // Games
                     case "jumble": bCommand.Desc = "Does not work."; bCommand.Usage = "mb/jumble"; bCommand.Warning = "This command is completely dysfunctional!"; break;
-                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race start"; break;
+                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race start, mb/race leaderboards <winners/mostUsed>"; break;
                 }
 
                 string message = "";
@@ -531,302 +531,108 @@ namespace MarbleBot.Modules
             switch (input.ToLower())
             {
                 // These inputs have custom ratings and messages:
-                case "256 mg":
-                    rating = -2;
-                    message = "I Am In Confusial Why";
-                    break;
-                case "ddsc":
-                    rating = 0;
-                    break;
-                case "desk":
-                    rating = 11;
-                    message = "what did you expect?";
-                    break;
-                case "desk176":
-                    rating = 11;
-                    message = "what did you expect?";
-                    break;
-                case "desks":
-                    rating = 11;
-                    message = "what did you expect?";
-                    break;
-                case "doc671":
-                    rating = -1;
-                    message = "terrible at everything";
-                    break;
-                case "dockque the rockque":
-                    rating = -1;
-                    message = "AM NOT ROCKQUE YOU MELMON";
-                    break;
-                case "erango":
-                    rating = 0;
-                    message = "stoP noW";
-                    break;
-                case "flask":
-                    rating = -1;
-                    message = "don't you dare";
-                    break;
-                case ":regional_indicator_f::flag_la::flag_sk:":
-                    rating = -1;
-                    message = "don't you dare";
-                    break;
-                case ":regional_indicator_f::regional_indicator_l::regional_indicator_a::regional_indicator_s::regional_indicator_k:":
-                    rating = -1;
-                    message = "don't you dare";
-                    break;
-                case ":regional_indicator_f: :regional_indicator_l: :regional_indicator_a: :regional_indicator_s: :regional_indicator_k:":
-                    rating = -1;
-                    message = "don't you dare";
-                    break;
-                case "orange":
-                    rating = 10;
-                    message = "!egnarO";
-                    break;
-                case "poup soop":
-                    rating = 10;
-                    message = "considering who made this bot...";
-                    break;
-                case "rockque":
-                    rating = -1;
-                    message = "I Hate Rocks";
-                    break;
-                case "rockques":
-                    rating = -1;
-                    message = "I Hate Rocks";
-                    break;
-                case "table":
-                    rating = -999;
-                    message = "do not mention that unholy creature near me";
-                    input = "dGFibGU=";
-                    break;
-                case "tables":
-                    rating = -999;
-                    message = "do not mention those unholy creatures near me";
-                    input = "dGFibGVz";
-                    break;
-                case "the hat stoar":
-                    rating = 10;
-                    message = "!raotS taH ehT owt oG";
-                    break;
-                case "vinh":
-                    rating = 10;
-                    message = "Henlo Cooooooooool Vinh";
-                    break;
-                // If the input is none of the above, Global.randomise the rating:
-                default:
-                    rating = Global.rand.Next(0, 10);
-                    break;
+                case "256 mg": rating = -2; message = "I Am In Confusial Why"; break;
+                case "ddsc": rating = 0; break;
+                case "desk": rating = 11; message = "what did you expect?"; break;
+                case "desk176": rating = 11; message = "what did you expect?"; break;
+                case "desks": goto case "desk";
+                case "doc671": rating = -1; message = "terrible at everything"; break;
+                case "dockque the rockque": rating = -1; message = "AM NOT ROCKQUE YOU MELMON"; break;
+                case "erango": rating = 0; message = "stoP noW"; break;
+                case "marblebot's creator": input = "Doc671"; goto case "doc671";
+                case "marblebot's dad": input = "Doc671"; goto case "doc671";
+                case "my creator": input = "Doc671"; goto case "doc671";
+                case "my dad": input = "Doc671"; goto case "doc671";
+                case "orange": rating = 10; message = "!egnarO"; break;
+                case "poup soop": rating = 10; message = "!pooS puoP knirD"; break;
+                case "rockque": rating = -1; message = "I Hate Rocks"; break;
+                case "rockques": goto case "rockque";
+                case "table": rating = -999; message = "do not mention that unholy creature near me"; input = "dGFibGU="; break;
+                case "tables": rating = -999; message = "do not mention those unholy creatures near me"; input = "dGFibGVz"; break;
+                case "the hat stoar": rating = 10; message = "!raotS taH ehT owt oG"; break;
+                case "vinh": rating = 10; message = "Henlo Cooooooooool Vinh"; break;
+                default: rating = Global.rand.Next(0, 11); break;
             }
             switch (input.ToLower())
             {
                 // These have custom messages but no preset ratings:
-                case "blueice57":
-                    message = "icccce";
-                    break;
-                case "confusial":
-                    message = "I Am In Confusial Why";
-                    break;
-                case "eknimpie":
-                    message = "EKNIMPIE YOUR A RAXIST";
-                    break;
-                case "flam":
-                    message = "Am Flam Flam Flam Flam Flam Flam";
-                    break;
-                case "flame":
-                    message = "Am Flam Flam Flam Flam Flam Flam";
-                    break;
-                case "flamevapour":
-                    message = "Am Flam Flam Flam Flam Flam Flam";
-                    break;
-                case "flurp":
-                    message = "FLURP I TO SIGN UP AND NOT BE";
-                    break;
-                case "george012":
-                    message = "henlo jorj";
-                    break;
-                case "icce":
-                    message = "icccce";
-                    break;
-                case "jgeoroegeos":
-                    message = "JGeoroegeos Geroge Jorj";
-                    break;
-                case "jorj":
-                    message = "henlo jorj";
-                    break;
-                case "ken":
-                    message = "#kenismelmon";
-                    break;
-                case "kenlimepie":
-                    message = "#kenismelmon";
-                    break;
-                case "keylimepie":
-                    message = "#kenismelmon";
-                    break;
-                case "matheus":
-                    message = "marbles will realize in +inf";
-                    break;
-                case "matheus fazzion":
-                    message = "marbles will realize in +inf";
-                    break;
-                case "meadow":
-                    message = "somebody toucha mei doe";
-                    break;
-                case "meidoe":
-                    message = "somebody toucha mei doe";
-                    break;
-                case "melmon":
-                    message = "Wnhy Arey Yoou A Melmon";
-                    break;
-                case "no u":
-                    message = "No Your";
-                    break;
-                case "no your":
-                    message = "No You're";
-                    break;
-                case "no you're":
-                    message = "N'Yuroe";
-                    break;
-                case "oh so muches":
-                    message = "Is To Much";
-                    break;
-                case "rackquette":
-                    message = "WHACC";
-                    break;
-                case "shotgun":
-                    message = "Vinh Shotgun All";
-                    break;
-                case "you silly desk":
-                    message = "Now I\nCry";
-                    break;
+                case "blueice57": message = "icccce"; break;
+                case "confusial": message = "I Am In Confusial Why"; break;
+                case "eknimpie": message = "EKNIMPIE YOUR A RAXIST"; break;
+                case "flam": message = "Am Flam Flam Flam Flam Flam Flam"; break;
+                case "flame": goto case "flam";
+                case "flamevapour": goto case "flam";
+                case "flurp": message = "FLURP I TO SIGN UP AND NOT BE"; break;
+                case "george012": message = "henlo jorj"; break;
+                case "icce": goto case "blueice57";
+                case "+inf": message = "marbles will realize in +inf"; break;
+                case "jgeoroegeos": goto case "george012";
+                case "jorj": goto case "george012";
+                case "ken": message = "#kenismelmon"; break;
+                case "kenlimepie": goto case "ken";
+                case "keylimepie": goto case "ken";
+                case "marblebot": input = "myself"; goto case "myself";
+                case "myself": message = "who am I?"; break;
+                case "matheus": message = "marbles will realize in +inf"; break;
+                case "matheus fazzion": goto case "matheus";
+                case "meadow": message = "somebody toucha mei doe"; break;
+                case "mei doe": goto case "meadow";
+                case "melmon": message = "Wnhy Arey Yoou A Melmon"; break;
+                case "no u": message = "No Your"; break;
+                case "no your": message = "No You're"; break;
+                case "no you're": message = "N'Yuroe"; break;
+                case "oh so muches": message = "Is To Much"; break;
+                case "rackquette":  message = "WHACC"; break;
+                case "shotgun": message = "Vinh Shotgun All"; break;
+                case "you silly desk": message = "Now I\nCry"; break;
             }
             // Dann Annoy Me >:((((
             if (input.ToLower() == "dann" || input.ToLower() == "danny playz")
             {
                 int choice = Global.rand.Next(0, 2);
-                if (choice == 1)
-                {
-                    message = "you guys, are a rat kids";
-                }
-                else
-                {
-                    message = "I don’t know who you are I don’t know what you want but if I don’t get my t-shirt tomorrow i will find you and I will rob you.";
-                }
-                rating = Global.rand.Next(9, 10);
-            }
-            // Must be stopped
-            bool[] flask = { false, false, false, false, false };
-            for (int i = 0; i < input.Length - 1; i++)
-            {
-                switch (input[i].ToString().ToLower())
-                {
-                    case "f": flask[0] = true; break;
-                    case "l": flask[1] = true; break;
-                    case "a": flask[2] = true; break;
-                    case "s": flask[3] = true; break;
-                    case "k": flask[4] = true; break;
-                }
-            }
-            if (flask[0] == true && flask[1] == true && flask[2] == true && flask[3] == true && flask[4] == true)
-            {
-                rating = -1;
-                message = "don't you dare";
+                if (choice == 1)  message = "you guys, are a rat kids";
+                else message = "I don’t know who you are I don’t know what you want but if I don’t get my t-shirt tomorrow i will find you and I will rob you.";
+                rating = Global.rand.Next(9, 11);
             }
             switch (rating)
             {
                 // Emoji time!
-                case -999:
-                    emoji = ":gun: :dagger: :bomb:";
-                    break;
-                case -1:
-                    emoji = ":gun:";
-                    break;
-                case 0:
-                    emoji = ":no_entry_sign:";
-                    break;
-                case 1:
-                    emoji = ":nauseated_face:";
-                    break;
-                case 2:
-                    emoji = ":rage:";
-                    break;
-                case 3:
-                    emoji = ":angry:";
-                    break;
-                case 4:
-                    emoji = ":slight_frown:";
-                    break;
-                case 5:
-                    emoji = ":neutral_face:";
-                    break;
-                case 6:
-                    emoji = ":slight_smile:";
-                    break;
-                case 7:
-                    emoji = ":grinning:";
-                    break;
-                case 8:
-                    emoji = ":thumbsup:";
-                    break;
-                case 9:
-                    emoji = ":white_check_mark:";
-                    break;
-                case 10:
-                    emoji = ":rofl:";
-                    break;
-                case 11:
-                    emoji = ":heart:";
-                    break;
-                default:
-                    emoji = ":thinking:";
-                    break;
+                case -999: emoji = ":gun: :dagger: :bomb:"; break;
+                case -1: emoji = ":gun:"; break;
+                case 0: emoji = ":no_entry_sign:"; break;
+                case 1: emoji = ":nauseated_face:"; break;
+                case 2: emoji = ":rage:"; break;
+                case 3: emoji = ":angry:"; break;
+                case 4: emoji = ":slight_frown:"; break;
+                case 5: emoji = ":neutral_face:"; break;
+                case 6: emoji = ":slight_smile:"; break;
+                case 7: emoji = ":grinning:"; break;
+                case 8: emoji = ":thumbsup:"; break;
+                case 9: emoji = ":white_check_mark:"; break;
+                case 10: emoji = ":rofl:"; break;
+                case 11: emoji = ":heart:"; break;
+                default: emoji = ":thinking:"; break;
             }
             if (message == "")
             {
                 switch (rating)
                 {
                     // If there isn't already a custom message, pick one depending on rating:
-                    case 0:
-                        message = "Excuse me, kind sir/madam, please cease your current course of action immediately.";
-                        break;
-                    case 1:
-                        message = "Immediate desistance required.";
-                        break;
-                    case 2:
-                        message = "I don't like it...";
-                        break;
-                    case 3:
-                        message = "angery";
-                        break;
-                    case 4:
-                        message = "ehhh...";
-                        break;
-                    case 5:
-                        message = "not bad... but not good either";
-                        break;
-                    case 6:
-                        message = "slightly above average... I guess...";
-                        break;
-                    case 7:
-                        message = "pretty cool, don't you think?";
-                        break;
-                    case 8:
-                        message = "yes";
-                        break;
-                    case 9:
-                        message = "approaching perfection";
-                        break;
-                    case 10:
-                        message = "PERFECT!!";
-                        break;
-                    default:
-                        message = "Uhhhhhhhh\nNot";
-                        break;
+                    case 0: message = "Excuse me, kind user, please cease your current course of action immediately."; break;
+                    case 1: message = "Immediate desistance required."; break;
+                    case 2: message = "I don't like it..."; break;
+                    case 3: message = "angery"; break;
+                    case 4: message = "ehhh..."; break;
+                    case 5: message = "not bad... but not good either"; break;
+                    case 6: message = "slightly above average... I guess..."; break;
+                    case 7: message = "pretty cool, don't you think?"; break;
+                    case 8: message = "yes"; break;
+                    case 9: message = "approaching perfection"; break;
+                    case 10: message = "PERFECT!!"; break;
+                    default: message = "Uhhhhhhhh\nNot"; break;
                 }
             }
-            if (rating == -2)
-            {
-                await ReplyAsync("**" + Context.User.Username + "**, I rATE " + input + " UNd3FINED10. " + emoji + "\n(" + message + ")");
-            }
+            if (rating == -2)  await ReplyAsync("**" + Context.User.Username + "**, I rATE " + input + " UNd3FINED10. " + emoji + "\n(" + message + ")");
             else
             {
                 if (Moderation._checkSwear(input))
@@ -838,10 +644,7 @@ namespace MarbleBot.Modules
                     }
                     else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
                 }
-                else
-                {
-                    await ReplyAsync("**" + Context.User.Username + "**, I rate " + input + " **" + rating + "**/10. " + emoji + "\n(" + message + ")");
-                }
+                else await ReplyAsync("**" + Context.User.Username + "**, I rate " + input + " **" + rating + "**/10. " + emoji + "\n(" + message + ")");
             }
         }
 
@@ -1023,30 +826,33 @@ namespace MarbleBot.Modules
                     IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                     IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
-                    IGuildUser Matheus = Context.Guild.GetUser(403595947537334274);
                     IGuildUser Meadow = Context.Guild.GetUser(370463333763121152);
-                    IGuildUser Nihonium = Context.Guild.GetUser(233912334517534720);
-                    IGuildUser Petrified = Context.Guild.GetUser(373322546084577280);
                     IGuildUser Ayumi = Context.Guild.GetUser(189713815414374404);
-                    IGuildUser Quackitye = Context.Guild.GetUser(371575413115322379);
-                    IGuildUser BTMR = Context.Guild.GetUser(378875092538621963);
-                    IGuildUser Holly = Context.Guild.GetUser(210397169075748864);
-                    IGuildUser ZeeTaa = Context.Guild.GetUser(373086863369699328);
-                    IGuildUser[] users = { Vinh, George012, Kenlimepie, Matheus, Meadow, Nihonium, Petrified, Ayumi, Quackitye, BTMR, Doc671, Holly, ZeeTaa };
-                    string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname, users[8].Nickname, users[9].Nickname, users[10].Nickname, users[11].Nickname, users[12].Nickname };
-                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString(), users[7].Status.ToString(), users[8].Status.ToString(), users[9].Status.ToString(), users[10].Status.ToString(), users[11].Status.ToString(), users[12].Status.ToString() };
-                    for (int i = 0; i < users.Length; i++)
-                    {
-                        if (nicks[i].IsEmpty())
-                        {
-                            nicks[i] = users[i].Username;
-                        }
-                        if (statuses[i] == "DoNotDisturb")
-                        {
-                            statuses[i] = "Do Not Disturb";
-                        }
+                    IGuildUser BlueIce57 = Context.Guild.GetUser(310960432909254667);
+                    IGuildUser Miles = Context.Guild.GetUser(170804546438692864);
+                    IGuildUser[] users = { Vinh, Kenlimepie, Doc671, Meadow, Ayumi, BlueIce57, Miles };
+                    string[] nicks = new string[users.Length];
+                    string[] statuses = new string[users.Length];
+                    int h = 0;
+                    foreach (var user in users) {
+                        nicks[h] = user.Nickname;
+                        statuses[h] = user.Status.ToString();
+                        h++;
                     }
-                    await ReplyAsync("**__Owner:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n\n**__Co-owners:__** \n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**\n\n**__Admins:__**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7] + "**\n" + nicks[8] + " (" + users[8].Username + "#" + users[8].Discriminator + "): **" + statuses[8] + "**\n" + nicks[9] + " (" + users[9].Username + "#" + users[9].Discriminator + "): **" + statuses[9] + "**\n" + nicks[10] + " (" + users[10].Username + "#" + users[10].Discriminator + "): **" + statuses[10] + "**\n" + nicks[11] + " (" + users[11].Username + "#" + users[11].Discriminator + "): **" + statuses[11] + "**\n" + nicks[12] + " (" + users[12].Username + "#" + users[12].Discriminator + "): **" + statuses[9] + "**");
+                    for (int i = 0; i < users.Length - 1; i++) {
+                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
+                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
+                    }
+                    var output = "";
+                    output += "**__Owner:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0];
+                    output += "**\n\n**__Co-owners:__** \n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1];
+                    output += "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2];
+                    output += "\n\n**__Admins:__** \n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3];
+                    output += "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4];
+                    output += "\n\n**__Mods:__** \n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5];
+                    output += "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6];
+                    output += "**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7];
+                    await ReplyAsync(output);
                 }
             } else await ReplyAsync("There are no staff members in a DM!");
         }
@@ -1180,41 +986,20 @@ namespace MarbleBot.Modules
             if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) await ReplyAsync("**__" + wordList[randNo] + "__**\nInventor: " + invList[randNo] + "\nDescription: " + descList[randNo]);
         }
 
-        [Command("deskismelmon")]
-        [Summary("deskismelmon")]
-        public async Task _deskismelmon([Remainder] string msg)
+        [Command("melmon")]
+        [Summary("melmon")]
+        public async Task _melmon(string melmon, [Remainder] string msg)
         {
-            if (Context.User.Id == 224267581370925056) { 
+            if (Context.User.Id == 224267581370925056) {
+                SocketGuild srvr = Program._client.GetGuild(Global.THS);
+                ISocketMessageChannel chnl = srvr.GetTextChannel(Global.THS);
                 Console.WriteLine("Time For MElmonry >:)");
-                SocketGuild TheHatStoar = Program._client.GetGuild(Global.THS);
-                ISocketMessageChannel THSGeneral = TheHatStoar.GetTextChannel(Global.THS);
-                await THSGeneral.SendMessageAsync(msg);
-            }
-        }
-
-        [Command("kenismelmon")]
-        [Summary("kenismelmon")]
-        public async Task _kenismelmon([Remainder] string msg)
-        {
-            if (Context.User.Id == 224267581370925056)
-            {
-                Console.WriteLine("Time For MElmonry >:)");
-                SocketGuild CommunityMarble = Program._client.GetGuild(Global.CM);
-                ISocketMessageChannel CMGeneral = CommunityMarble.GetTextChannel(Global.CM);
-                await CMGeneral.SendMessageAsync(msg);
-            }
-        }
-
-        [Command("flamismelmon")]
-        [Summary("flamismelmon")]
-        public async Task _flamismelmon([Remainder] string msg)
-        {
-            if (Context.User.Id == 224267581370925056)
-            {
-                Console.WriteLine("Time For MElmonry >:)");
-                SocketGuild TheHatStoar = Program._client.GetGuild(Global.THS);
-                ISocketMessageChannel THSMSPMRGCTMW = TheHatStoar.GetTextChannel(224277892182310912);
-                await THSMSPMRGCTMW.SendMessageAsync(msg);
+                switch(melmon) {
+                    case "desk": await chnl.SendMessageAsync(msg); break;
+                    case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
+                    case "ken": srvr = Program._client.GetGuild(Global.CM); chnl = srvr.GetTextChannel(Global.CM); await chnl.SendMessageAsync(msg); break;
+                    case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
+                }
             }
         }
 

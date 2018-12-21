@@ -88,12 +88,13 @@ namespace MarbleBot.Modules
                     var searchListResponse = await searchListRequest.ExecuteAsync();
                     var channel = new SearchResultSnippet();
                     foreach (var e in searchListResponse.Items) {
-                        if (searchListResponse.Kind == "youtube#channel") channel = e.Snippet;
+                        if (e.Id.Kind == "youtube#channel") channel = e.Snippet;
                     }
+                    Console.WriteLine(channel.ToString() + channel.Title + channel.ChannelTitle);
                     if (channel == null) {
                         searchListRequest.Q = Context.User.Username;
                         foreach (var e in searchListResponse.Items) {
-                            if (searchListResponse.Kind == "youtube#channel") channel = e.Snippet;
+                            if (e.Id.Kind == "youtube#channel") channel = e.Snippet;
                         }
                     }
                     searchListRequest.Q = url;

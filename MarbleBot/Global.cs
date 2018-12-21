@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MarbleBot
 {
@@ -12,6 +13,7 @@ namespace MarbleBot
         internal static Random rand = new Random();
         internal static DateTime StartTime = new DateTime();
         internal static string YTKey = "";
+        internal static ulong BotId = 286228526234075136;
 
         // Server IDs
         internal const ulong CM = 223616088263491595; // Community Marble

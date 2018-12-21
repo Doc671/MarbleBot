@@ -41,7 +41,6 @@ C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Newtonsoft.Json.xml
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\System.Collections.Immutable.xml
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\System.Diagnostics.DiagnosticSource.xml
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\System.Interactive.Async.xml
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.csprojResolveAssemblyReference.cache
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.csproj.CoreCompileInputs.cache
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.exe
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.pdb
@@ -144,3 +143,4 @@ C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.Core.pdb
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.Core.xml
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.YouTube.v3.pdb
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.YouTube.v3.xml
+C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.csprojResolveAssemblyReference.cache
