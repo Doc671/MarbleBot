@@ -1,12 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
+using System;
 using System.IO;
 using System.Threading.Tasks;
-using System;
 
 namespace MarbleBot.Modules
 {
-    class Moderation : ModuleBase<SocketCommandContext>
+    public class Moderation : ModuleBase<SocketCommandContext>
     {
         /// <summary>
         /// Moderation commands
@@ -25,6 +25,49 @@ namespace MarbleBot.Modules
             var m = await ReplyAsync($"{amount} message(s) have been deleted. This message will be deleted in {delay / 1000} seconds.");
             await Task.Delay(delay);
             await m.DeleteAsync();
+        }
+
+        [Command("clear-recent-spam")]
+        [Summary("Clears recent empty messages")]
+        [RequireOwner]
+        public async Task _clearRecentSpam(string rserver, string rchannel)
+        {
+            Console.WriteLine("hi");
+            var server = ulong.Parse(rserver);
+            var channel = ulong.Parse(rchannel);
+            var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).Flatten();
+            var srvr = new EmbedAuthorBuilder();
+            if (server == Global.THS) {
+                var THS = Context.Client.GetGuild(Global.THS);
+                srvr.WithName(THS.Name);
+                srvr.WithIconUrl(THS.IconUrl);
+            } else if (server == Global.CM) {
+                var CM = Context.Client.GetGuild(Global.CM);
+                srvr.WithName(CM.Name);
+                srvr.WithIconUrl(CM.IconUrl);
+            }
+            var builder = new EmbedBuilder()
+                .WithAuthor(srvr)
+                .WithTitle("Bulk delete in " + Context.Client.GetGuild(server).GetTextChannel(channel).Mention)
+                .WithColor(Color.Red)
+                .WithDescription("Reason: Empty Messages")
+                .WithFooter("ID: " + channel)
+                .WithCurrentTimestamp();
+            foreach (var msg in msgs) {
+                var IsLett = !(char.TryParse(msg.Content.Trim('`'), out char e));
+                if (!IsLett) IsLett = (char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e));
+                if (!(IsLett) && channel != 252481530130202624) {
+                    builder.AddField(msg.Author.Mention, msg.Content);
+                    await msg.DeleteAsync();
+                }
+            }
+            if (server == Global.THS) {
+                var logs = Context.Client.GetGuild(Global.THS).GetTextChannel(327132239257272327);
+                await logs.SendMessageAsync("", false, builder.Build());
+            } else if (server == Global.CM) {
+                var logs = Context.Client.GetGuild(Global.CM).GetTextChannel(387306347936350213);
+                await logs.SendMessageAsync("", false, builder.Build());
+            }
         }
 
         // Checks if a string contains a swear; returns true if profanity is present

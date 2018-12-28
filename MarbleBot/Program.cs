@@ -20,6 +20,7 @@ namespace MarbleBot
         {
             Console.Title = "MarbleBot";
             Global.StartTime = DateTime.UtcNow;
+            Global.ARLastUse = DateTime.UtcNow;
             _client = new DiscordSocketClient();
 
             string token = "";
@@ -29,6 +30,13 @@ namespace MarbleBot
 
             using (var stream = new StreamReader("C:/Folder/MBK.txt")) {
                 Global.YTKey = stream.ReadLine();
+            }
+
+            using (var ar = new StreamReader("Autoresponses.txt")) {
+                while (!ar.EndOfStream) {
+                    var arar = ar.ReadLine().Split(';');
+                    Global.Autoresponses.Add(arar[0], arar[1]);
+                }
             }
 
             await _client.LoginAsync(TokenType.Bot, token);
