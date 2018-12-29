@@ -35,3 +35,4 @@ torcqurst;And kill torcqurst!
 please cease;Excuse me, kind sir, please cease your current course of action immediately. Failure to comply will result in [BAD]. You have been thoroughly warned.
 +inf;Marbles Will Realize In +inf
 i angry;You are iw23095i2w8907ing guys
+hi jorj;give jorj Supreme Overlord

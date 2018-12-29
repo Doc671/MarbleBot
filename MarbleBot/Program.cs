@@ -31,6 +31,14 @@ namespace MarbleBot
                 Global.YTKey = stream.ReadLine();
             }
 
+            using (var ar = new StreamReader("Autoresponses.txt")) {
+                while (!ar.EndOfStream) {
+                    var arar = ar.ReadLine().Split(';');
+                    Global.Autoresponses.Add(arar[0], arar[1]);
+                }
+            }
+
+
             await _client.LoginAsync(TokenType.Bot, token);
 
             await _client.StartAsync();

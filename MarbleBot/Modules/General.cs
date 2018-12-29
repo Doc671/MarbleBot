@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -159,56 +160,76 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             int choice = Global.rand.Next(0, 13);
             string outcome = "";
-            switch (choice)
-            {
-                case 0:
-                    outcome = "no.";
-                    break;
-                case 1:
-                    outcome = "looking negative.";
-                    break;
-                case 2:
-                    outcome = "probably not.";
-                    break;
-                case 3:
-                    outcome = "it is very doubtful.";
-                    break;
-                case 4:
-                    outcome = "my visions are cloudy, try again another time.";
-                    break;
-                case 5:
-                    outcome = "do you *really* want to know?";
-                    break;
-                case 6:
-                    outcome = "I forgot.";
-                    break;
-                case 7:
-                    outcome = "possibly.";
-                    break;
-                case 8:
-                    outcome = "it is highly likely.";
-                    break;
-                case 9:
-                    outcome = "I believe so.";
-                    break;
-                case 10:
-                    outcome = "it is certain.";
-                    break;
-                case 11:
-                    outcome = "and the sign points to... yes!";
-                    break;
-                case 12:
-                    outcome = "and the sign points to... no!";
-                    break;
-                case 13:
-                    outcome = "probably not, but there is still a chance...";
-                    break;
+            switch (choice) {
+                case 0: outcome = "no."; break;
+                case 1: outcome = "looking negative."; break;
+                case 2: outcome = "probably not."; break;
+                case 3: outcome = "it is very doubtful."; break;
+                case 4: outcome = "my visions are cloudy, try again another time."; break;
+                case 5: outcome = "do you *really* want to know?"; break;
+                case 6: outcome = "I forgot."; break;
+                case 7: outcome = "possibly."; break;
+                case 8: outcome = "it is highly likely."; break;
+                case 9: outcome = "I believe so."; break;
+                case 10: outcome = "it is certain."; break;
+                case 11: outcome = "and the sign points to... yes!"; break;
+                case 12: outcome = "and the sign points to... no!"; break;
+                case 13: outcome = "probably not, but there is still a chance..."; break;
             }
             await ReplyAsync(":seven: |  **" + Context.User.Username + "**, " + outcome);
         }
 
-        [Command("best")]
-        [Summary("Picks a Global.random person to call the best")]
+        [Command("autoresponse")]
+        [Summary("Things to do with autoresponses")]
+        [RequireOwner]
+        public async Task _autoresponses(string option) {
+            switch (option) {
+                case "time": await ReplyAsync(string.Format("Last Use: {0}\nCurrent Time: {1}", Global.ARLastUse.ToString(), DateTime.UtcNow.ToString())); break;
+                case "update": {
+                    Global.Autoresponses = new Dictionary<string, string>();
+                    using (var ar = new StreamReader("Autoresponses.txt")) {
+                        while (!ar.EndOfStream) {
+                            var arar = ar.ReadLine().Split(';');
+                            Global.Autoresponses.Add(arar[0], arar[1]);
+                        }
+                    }
+                    await ReplyAsync("Dictionary update complete!");
+                    break;
+                }
+                default: break;
+            }
+        }
+
+        /*[Command("autoresponses")]
+        [Summary("Returns a list of autoresponses")]
+        public async Task _autoresponses()
+        {
+            if (Context.IsPrivate) {
+                await Context.Channel.TriggerTypingAsync();
+                var builder = new EmbedBuilder()
+                    .WithTitle("Autoresponses")
+                    .WithCurrentTimestamp()
+                    .WithColor(Color.DarkerGrey);
+                foreach (var response in Global.Autoresponses) {
+                    builder.AddInlineField(response.Key, response.Value);
+                }
+                await ReplyAsync("", false, builder.Build());
+            } else if (Context.Guild.Id == Global.THS) {
+                await Context.Channel.TriggerTypingAsync();
+                var builder = new EmbedBuilder()
+                    .WithTitle("Autoresponses")
+                    .WithCurrentTimestamp()
+                    .WithColor(Color.DarkerGrey);
+                foreach (var response in Global.Autoresponses) {
+                    builder.AddInlineField(response.Key, response.Value);
+                }
+                var DM = await Context.User.GetOrCreateDMChannelAsync();
+                await DM.SendMessageAsync("", false, builder.Build());
+            }
+        }*/
+
+       [Command("best")]
+        [Summary("Picks a random person to call the best")]
         public async Task _best()
         {
             await Context.Channel.TriggerTypingAsync();
@@ -269,17 +290,13 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             string[] choices = input.Split('|');
             int choice = Global.rand.Next(0, choices.Length);
-            if (Moderation._checkSwear(input) || Moderation._checkSwear(choices[choice]))
-            {
-                if (Context.IsPrivate)
-                {
+            if (Moderation._checkSwear(input) || Moderation._checkSwear(choices[choice])) {
+                if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
                 }
                 else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
-            }
-            else
-            {
+            } else {
                 await ReplyAsync("**" + Context.User.Username + "**, I choose **" + choices[choice].Trim() + "**!");
             }
         }
@@ -291,26 +308,13 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             int choice = Global.rand.Next(1, 6);
             string egnaro = "";
-            switch (choice)
-            {
-                case 1:
-                    egnaro = "!olleH";
-                    break;
-                case 2:
-                    egnaro = "!raotS taH ehT owt oG";
-                    break;
-                case 3:
-                    egnaro = "!pooS puoP knirD";
-                    break;
-                case 4:
-                    egnaro = ".depfeQ ,ytiC ogitreV ni evil I";
-                    break;
-                case 5:
-                    egnaro = "!haoW";
-                    break;
-                case 6:
-                    egnaro = "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT";
-                    break;
+            switch (choice){
+                case 1: egnaro = "!olleH"; break;
+                case 2: egnaro = "!raotS taH ehT owt oG"; break;
+                case 3: egnaro = "!pooS puoP knirD"; break;
+                case 4: egnaro = ".depfeQ ,ytiC ogitreV ni evil I"; break;
+                case 5: egnaro = "!haoW"; break;
+                case 6: egnaro = "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"; break;
             }
             if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) await ReplyAsync(egnaro);
         }
@@ -322,15 +326,13 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             string orangeified = "";
             int length = input.Length - 1;
-            while (length >= 0)
-            {
+            while (length >= 0) {
                 orangeified += input[length];
                 length--;
             }
             if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) {
                 if (Moderation._checkSwear(input) || Moderation._checkSwear(orangeified)) {
-                    if (Context.IsPrivate)
-                    {
+                    if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync("Profanity detected. " + Doc671.Mention);
                     } else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
@@ -344,35 +346,21 @@ namespace MarbleBot.Modules
         [Summary("Desk Is Hacc")]
         public async Task _override(string command)
         {
-            if (Context.User.Id == 224267581370925056)
-            {
+            if (Context.User.Id == 224267581370925056) {
                 await ReplyAsync("Overriding command blockages...");
                 Thread.Sleep(3000);
                 await ReplyAsync("Overriding complete!");
                 Thread.Sleep(1000);
                 await ReplyAsync("Performing " + command + " command...");
                 Thread.Sleep(2000);
-                if (command == "buyhat")
-                {
-                    await _buyHat();
-                }
-                else if (command == "orange")
-                {
-                    await _orange();
-                }
-                else if (command == "orangeify")
-                {
-                    await ReplyAsync("Unable to perform command.");
-                }
-                else
-                {
-                    await ReplyAsync("Unknown command.");
+                switch(command) {
+                    case "buyhat": await _buyHat(); break;
+                    case "orange": await _orange(); break;
+                    case "haha": await ReplyAsync(Global.ARLastUse.ToString()); break;
+                    default: await ReplyAsync("Unknown command."); break;
                 }
             }
-            else
-            {
-                await ReplyAsync("OVERRIDE FAILURE. INSUFFICIENT PERMISSIONS.");
-            }
+            else await ReplyAsync("OVERRIDE FAILURE. INSUFFICIENT PERMISSIONS.");
         }
 
         [Command("raid")]
@@ -387,32 +375,21 @@ namespace MarbleBot.Modules
         public async Task _random(int start, int end)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (start < 0 || end < 0)
-            {
+            if (start < 0 || end < 0) {
                 await ReplyAsync("Only use positive numbers!");
-            }
-            else if (start > end)
-            {
-                try
-                {
+            } else if (start > end) {
+                try  {
                     int randNumber = Global.rand.Next(end, start);
                     await ReplyAsync(randNumber.ToString());
-                }
-                catch (FormatException)
-                {
+                } catch (FormatException) {
                     await ReplyAsync("Number too large/small.");
                     throw;
                 }
-            }
-            else
-            {
-                try
-                {
+            } else {
+                try {
                     int randNumber = Global.rand.Next(start, end);
                     await ReplyAsync(randNumber.ToString());
-                }
-                catch (FormatException)
-                {
+                } catch (FormatException) {
                     await ReplyAsync("Number too large/small.");
                     throw;
                 }
@@ -455,17 +432,6 @@ namespace MarbleBot.Modules
                 case 23: xp = Global.rand.Next(33925, 37819); break;
                 case 24: xp = Global.rand.Next(37820, 41999); break;
                 case 25: xp = Global.rand.Next(42000, 46474); break;
-            }
-
-            Color coloure = Color.DarkerGrey;
-            if (!Context.IsPrivate) {
-                switch (Context.Guild.Id) {
-                    case Global.CM: coloure = Color.Teal; break;
-                    case Global.THS: coloure = Color.Orange; break;
-                    case Global.MT: coloure = Color.DarkGrey; break;
-                    case Global.VFC: coloure = Color.Blue; break;
-                    default: coloure = Color.DarkerGrey; break;
-                }
             }
 
             var msgs = await Context.Channel.GetMessagesAsync(100).Flatten();
@@ -512,7 +478,7 @@ namespace MarbleBot.Modules
 
             builder.AddInlineField("Level", level)
                 .AddInlineField("Total XP", xp)
-                .WithColor(coloure)
+                .WithColor(Global.GetColor(Context))
                 .WithTimestamp(DateTime.UtcNow)
                 .WithTitle(Context.User.Username + "#" + Context.User.Discriminator)
                 .WithFooter(flavour);
@@ -653,20 +619,15 @@ namespace MarbleBot.Modules
         public async Task _repeat([Remainder] string repeat)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (repeat == "Am Melmon" && (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT))
-            {
+            if (repeat == "Am Melmon" && (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT)) {
                 await ReplyAsync("No U");
-            }
-            else if (Moderation._checkSwear(repeat))
-            {
+            } else if (Moderation._checkSwear(repeat)) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
                 }
                 else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + repeat);
-            }
-            else
-            {
+            } else {
                 await ReplyAsync(repeat);
             }
         }
@@ -684,12 +645,10 @@ namespace MarbleBot.Modules
                 length--;
             }
             if (Moderation._checkSwear(input) || Moderation._checkSwear(reverse)) {
-                if (Context.IsPrivate)
-                {
+                if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
-                }
-                else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
+                } else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
             } else {
                 await ReplyAsync(reverse);
             }
@@ -702,17 +661,9 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             if (!Context.IsPrivate) {
                 EmbedBuilder builder = new EmbedBuilder();
-                Color coloure = Color.LightGrey;
                 int botUsers = 0;
                 int onlineUsers = 0;
                 SocketGuildUser[] users = Context.Guild.Users.ToArray();
-                switch (Context.Guild.Id)
-                {
-                    case Global.CM: coloure = Color.Teal; break;
-                    case Global.THS: coloure = Color.Orange; break;
-                    case Global.MT: coloure = Color.DarkGrey; break;
-                    case Global.VFC: coloure = Color.Blue; break;
-                }
                 for (int i = 0; i < Context.Guild.Users.Count - 1; i++)
                 {
                     if (users[i].IsBot) botUsers++;
@@ -728,7 +679,7 @@ namespace MarbleBot.Modules
                     .AddInlineField("Bots", botUsers)
                     .AddInlineField("Online", onlineUsers)
                     .AddInlineField("Roles", Context.Guild.Roles.Count)
-                    .WithColor(coloure)
+                    .WithColor(Global.GetColor(Context))
                     .WithTimestamp(DateTime.UtcNow)
                     .WithFooter(Context.Guild.Id.ToString());
                 await ReplyAsync("", false, builder.Build());
@@ -765,21 +716,16 @@ namespace MarbleBot.Modules
                     IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, BradyForrest, FlameVapour};
                     string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname };
                     string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString() };
-                    for (int i = 0; i < users.Length; i++)
-                    {
-                        if (nicks[i].IsEmpty())
-                        {
+                    for (int i = 0; i < users.Length; i++) {
+                        if (nicks[i].IsEmpty()) {
                             nicks[i] = users[i].Username;
                         }
-                        if (statuses[i] == "DoNotDisturb")
-                        {
+                        if (statuses[i] == "DoNotDisturb") {
                             statuses[i] = "Do Not Disturb";
                         }
                     }
                     await ReplyAsync("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n\n**__Mods:__**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**");
-                }
-                else if (Context.Guild.Id == Global.THS)
-                {
+                } else if (Context.Guild.Id == Global.THS) {
                     IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
                     IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
                     IGuildUser DannyPlayz = Context.Guild.GetUser(329532528031563777);
@@ -788,41 +734,31 @@ namespace MarbleBot.Modules
                     IGuildUser[] users = { Doc671, FlameVapour, BradyForrest, DannyPlayz, George012, Kenlimepie };
                     string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname };
                     string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString() };
-                    for (int i = 0; i < users.Length; i++)
-                    {
-                        if (nicks[i].IsEmpty())
-                        {
+                    for (int i = 0; i < users.Length; i++) {
+                        if (nicks[i].IsEmpty()) {
                             nicks[i] = users[i].Username;
                         }
-                        if (statuses[i] == "DoNotDisturb")
-                        {
+                        if (statuses[i] == "DoNotDisturb") {
                             statuses[i] = "Do Not Disturb";
                         }
                         Console.WriteLine(nicks[i]);
                     }
                     await ReplyAsync("**__Overlords:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n\n**__Hat Stoar Managers:__**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n\n**__Hat Stoar Employees:__**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**");
-                }
-                else if (Context.Guild.Id == Global.MT)
-                {
+                } else if (Context.Guild.Id == Global.MT) {
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                     IGuildUser[] users = { Doc671, George012 };
                     string[] nicks = { users[0].Nickname, users[1].Nickname, };
                     string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString() };
-                    for (int i = 0; i < users.Length; i++)
-                    {
-                        if (nicks[i].IsEmpty())
-                        {
+                    for (int i = 0; i < users.Length; i++) {
+                        if (nicks[i].IsEmpty()) {
                             nicks[i] = users[i].Username;
                         }
-                        if (statuses[i] == "DoNotDisturb")
-                        {
+                        if (statuses[i] == "DoNotDisturb") {
                             statuses[i] = "Do Not Disturb";
                         }
                     }
                     await ReplyAsync(nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
-                }
-                else if (Context.Guild.Id == Global.VFC)
-                {
+                } else if (Context.Guild.Id == Global.VFC) {
                     IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                     IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
@@ -884,25 +820,15 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             EmbedBuilder builder = new EmbedBuilder();
-            Color coloure = Color.LightGrey;
             SocketGuildUser user = Context.Guild.GetUser(Context.User.Id);
-            switch (Context.Guild.Id)
-            {
-                case Global.CM: coloure = Color.Teal; break;
-                case Global.THS: coloure = Color.Orange; break;
-                case Global.MT: coloure = Color.DarkGrey; break;
-                case Global.VFC: coloure = Color.Blue; break;
-            }
             char[] userCharArray = username.ToCharArray();
             //int likeness = 0;
             //bool chosen = false;
-            if (username.Substring(0, 1) == "<")
-            {
-                ulong ID = 0;
-                if (ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ID) == true)
-                {
+            if (username.Substring(0, 1) == "<") {
+                if (ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID) == true) {
                     ID = ulong.Parse(username.Trim('<').Trim('>').Trim('@'));
-                } else Console.WriteLine("[" + DateTime.UtcNow + "] mb/userinfo - Parsing failed!");
+                }
+                else Console.WriteLine("[" + DateTime.UtcNow + "] mb/userinfo - Parsing failed!");
                 user = Context.Guild.GetUser(ID);
             }
 
@@ -926,7 +852,7 @@ namespace MarbleBot.Modules
                 .AddField("Registered", user.CreatedAt)
                 .AddInlineField("Joined", user.JoinedAt)
                 .AddField("Roles", user.Roles)
-                .WithColor(coloure)
+                .WithColor(Global.GetColor(Context))
                 .WithTimestamp(DateTime.UtcNow)
                 .WithFooter(Context.Guild.Id.ToString());
 
@@ -943,12 +869,9 @@ namespace MarbleBot.Modules
             string[] invList = new string[100];
             string[] descList = new string[100];
             int a = 0;
-            if (word == "")
-            {
-                using (StreamReader stream = new StreamReader("Vinhglish.csv"))
-                {
-                    while (!stream.EndOfStream)
-                    {
+            if (word == "") {
+                using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
+                    while (!stream.EndOfStream) {
                         string list = stream.ReadLine();
                         string[] vocab = list.Split(',');
                         wordList[a] = vocab[0];
@@ -958,20 +881,15 @@ namespace MarbleBot.Modules
                     }
                 }
                 randNo = Global.rand.Next(1, a);
-            }
-            else
-            {
-                using (StreamReader stream = new StreamReader("Vinhglish.csv"))
-                {
-                    while (!stream.EndOfStream)
-                    {
+            } else {
+                using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
+                    while (!stream.EndOfStream) {
                         string list = stream.ReadLine();
                         string[] vocab = list.Split(',');
                         wordList[a] = vocab[0];
                         invList[a] = vocab[1];
                         descList[a] = vocab[2];
-                        if (wordList[a].ToLower() == word.ToLower())
-                        {
+                        if (wordList[a].ToLower() == word.ToLower()) {
                             randNo = a;
                             stream.Close();
                             wordSet = true;
@@ -988,22 +906,23 @@ namespace MarbleBot.Modules
 
         [Command("melmon")]
         [Summary("melmon")]
+        [RequireOwner]
         public async Task _melmon(string melmon, [Remainder] string msg)
         {
-            if (Context.User.Id == 224267581370925056) {
-                SocketGuild srvr = Program._client.GetGuild(Global.THS);
-                ISocketMessageChannel chnl = srvr.GetTextChannel(Global.THS);
-                Console.WriteLine("Time For MElmonry >:)");
-                switch(melmon) {
-                    case "desk": await chnl.SendMessageAsync(msg); break;
-                    case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
-                    case "ken": srvr = Program._client.GetGuild(Global.CM); chnl = srvr.GetTextChannel(Global.CM); await chnl.SendMessageAsync(msg); break;
-                    case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
-                }
+            SocketGuild srvr = Program._client.GetGuild(Global.THS);
+            ISocketMessageChannel chnl = srvr.GetTextChannel(Global.THS);
+            Console.WriteLine("Time For MElmonry >:)");
+            switch(melmon) {
+                case "desk": await chnl.SendMessageAsync(msg); break;
+                case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
+                case "ken": srvr = Program._client.GetGuild(Global.CM); chnl = srvr.GetTextChannel(Global.CM); await chnl.SendMessageAsync(msg); break;
+                case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
+                case "brady": chnl = srvr.GetTextChannel(237158048282443776); await chnl.SendMessageAsync(msg); break;
             }
         }
 
-        [Command("domybidding")]
+        /*[Command("domybidding")]
+        [RequireOwner]
         public async Task _domybidding()
         {
             if (Context.User.Id == 224267581370925056) {
@@ -1016,6 +935,6 @@ namespace MarbleBot.Modules
                     .WithFooter("User ID: 224267581370925056 • Yesterday at 18:40");
                 await ReplyAsync("", false, builder.Build());
             }
-        }
+        }*/
     }
 }
