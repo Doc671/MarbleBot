@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Discord;
 using Discord.Commands;
 
@@ -41,6 +42,24 @@ namespace MarbleBot
                 default: coloure = Color.DarkerGrey; break;
             }
             return coloure;
+        }
+
+        internal static string GetDateString(TimeSpan dateTime) {
+            var output = new StringBuilder();
+            if (dateTime.Days > 1) output.Append(dateTime.Days + " days, ");
+            else if (dateTime.Days > 0) output.Append(dateTime.Days + " day, ");
+            if (dateTime.Hours > 1) output.Append(dateTime.Hours + " hours, ");
+            else if (dateTime.Hours > 0) output.Append(dateTime.Hours + " hour, ");
+            if (dateTime.Minutes > 1) output.Append(dateTime.Minutes + " minutes ");
+            else if (dateTime.Minutes > 0) output.Append(dateTime.Minutes + " minute ");
+            if (dateTime.Seconds > 1) {
+                if (dateTime.Minutes > 0) output.Append("and " + dateTime.Seconds + " seconds");
+                else output.Append(dateTime.Seconds + " seconds");
+            } else if (dateTime.Seconds > 0) {
+                if (dateTime.Minutes > 0) output.Append("and " + dateTime.Seconds + " second");
+                else output.Append(dateTime.Seconds + " second");
+            }
+            return output.ToString();
         }
     }
 }

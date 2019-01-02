@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Text;
 
 namespace MarbleBot.Extensions
 {
     /// <summary>
-    /// An extension method...
+    /// Extension methods
     /// </summary>
     
     public static class Extensions
@@ -25,6 +26,20 @@ namespace MarbleBot.Extensions
                 default: ord = "th"; break;
             }
             return ord;
+        }
+
+        public static int ToInt(this String raw)  {
+            var rawNo = raw.Trim().Split(',');
+            var rawNo2 = new StringBuilder();
+            foreach (var nono in rawNo) rawNo2.Append(nono);
+            return int.Parse(rawNo2.ToString());
+        }
+
+        public static decimal ToDecimal(this String raw) {
+            var rawNo = raw.Trim().Split(',');
+            var rawNo2 = new StringBuilder();
+            foreach (var nono in rawNo) rawNo2.Append(nono);
+            return decimal.Parse(rawNo2.ToString());
         }
     }
 }
