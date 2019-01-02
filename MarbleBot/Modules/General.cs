@@ -32,7 +32,7 @@ namespace MarbleBot.Modules
                     builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
                     .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)")
                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                    .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                    .AddField("Games", "\nrace (participate in a marble race)")
                     .WithColor(Color.DarkerGrey);
                 } else {
                     switch (Context.Guild.Id)
@@ -43,7 +43,7 @@ namespace MarbleBot.Modules
                                 .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)")
                                 .AddField("Note", "Command best is broken.")
                                 .WithColor(Color.Teal);
                             break;
@@ -54,7 +54,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)")
                                 .WithColor(Color.Orange);
                             break;
                         case Global.THSC:
@@ -64,7 +64,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)")
                                 .WithColor(Color.Orange);
                             break;
                         case Global.MT:
@@ -74,7 +74,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)")
                                 .WithColor(Color.DarkGrey);
                             break;
                         case Global.VFC:
@@ -84,7 +84,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\njumble (doesn't work yet)\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)")
                                 .WithColor(Color.Blue);
                             break;
                         default:
@@ -102,9 +102,9 @@ namespace MarbleBot.Modules
                     case "7ball": bCommand.Desc = "Predicts an outcome to an event."; bCommand.Usage = "mb/7ball <condition>"; bCommand.Example = "mb/7ball Will I break?"; break;
                     case "best": bCommand.Desc = "Picks a random user in the server to call the best."; bCommand.Usage = "mb/best"; bCommand.Warning = "This doesn't work on Community Marble for some reason!"; break;
                     case "bet": bCommand.Desc = "Bets on a marble to win from a list of up to 100."; bCommand.Usage = "mb/bet [number of marbles]"; bCommand.Example = "mb/bet 30"; break;
-                    case "buyhat": bCommand.Desc = "Picks a Global.random user in the server to call the best."; bCommand.Usage = "mb/buyhat"; bCommand.Warning = THSOnly; break;
+                    case "buyhat": bCommand.Desc = "Picks a random user in the server to call the best."; bCommand.Usage = "mb/buyhat"; bCommand.Warning = THSOnly; break;
                     case "choose": bCommand.Desc = "Chooses between several choices"; bCommand.Usage = "mb/choose <choice1> | <choice2>"; bCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
-                    case "orange": bCommand.Desc = "Gives a Global.random statement in Orange Language."; bCommand.Usage = "mb/orange"; bCommand.Warning = THSOnly; break;
+                    case "orange": bCommand.Desc = "Gives a random statement in Orange Language."; bCommand.Usage = "mb/orange"; bCommand.Warning = THSOnly; break;
                     case "orangeify": bCommand.Desc = "Translates text into Orange Language."; bCommand.Usage = "mb/orangeify <text>"; bCommand.Example = "mb/orangeify Drink Poup Soop!"; bCommand.Warning = THSOnly; break;
                     case "override": bCommand.Desc = "Nothing."; bCommand.Usage = "Don't even think about it."; break;
                     case "random": bCommand.Desc = "Gives a random number between user-defined bounds."; bCommand.Usage = "mb/random <number1> <number2>"; bCommand.Example = "mb/random 1 5"; break;
@@ -134,7 +134,6 @@ namespace MarbleBot.Modules
                     case "searchvideo": bCommand.Desc = "Displays a list of videos that match the search critera."; bCommand.Usage = "mb/searchvideo <videoname>"; bCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
 
                     // Games
-                    case "jumble": bCommand.Desc = "Does not work."; bCommand.Usage = "mb/jumble"; bCommand.Warning = "This command is completely dysfunctional!"; break;
                     case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race start, mb/race leaderboards <winners/mostUsed>"; break;
                 }
 
@@ -170,7 +169,7 @@ namespace MarbleBot.Modules
         public async Task _7ball([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
-            int choice = Global.rand.Next(0, 13);
+            int choice = Global.Rand.Next(0, 13);
             string outcome = "";
             switch (choice) {
                 case 0: outcome = "no."; break;
@@ -224,7 +223,7 @@ namespace MarbleBot.Modules
                     for (int i = 0; i < Context.Guild.MemberCount - 1; i++) {
                         names[i] = users[i].Username;
                     }
-                    await ReplyAsync("**" + names[Global.rand.Next(0, Context.Guild.MemberCount - 1)] + "** is the best!");
+                    await ReplyAsync("**" + names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)] + "** is the best!");
                 } else Console.WriteLine("oof");
             } else await ReplyAsync("That command doesn't work here!");
         }
@@ -248,7 +247,7 @@ namespace MarbleBot.Modules
                     a++;
                 }
             }
-            int choice = Global.rand.Next(0, noOfMarbles);
+            int choice = Global.Rand.Next(0, noOfMarbles);
             int d = choice / 10;
             int c = choice - (d * 10);
             await ReplyAsync("**" + Context.User.Username + "**, I bet that **" + marbles[(d - 1), (c - 1)] + "** will win!");
@@ -260,7 +259,7 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.THSC || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) {
-                await ReplyAsync("That'll be " + (Global.rand.Next(0, 10000000)).ToString() + " units of money please. Thank you for buying Uglee Hat #" + (Global.rand.Next(0, 69042)).ToString() + "!");
+                await ReplyAsync("That'll be " + (Global.Rand.Next(0, 10000000)).ToString() + " units of money please. Thank you for buying Uglee Hat #" + (Global.Rand.Next(0, 69042)).ToString() + "!");
             }
         }
 
@@ -270,7 +269,7 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             string[] choices = input.Split('|');
-            int choice = Global.rand.Next(0, choices.Length);
+            int choice = Global.Rand.Next(0, choices.Length);
             if (Moderation._checkSwear(input) || Moderation._checkSwear(choices[choice])) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
@@ -283,11 +282,11 @@ namespace MarbleBot.Modules
         }
 
         [Command("orange")]
-        [Summary("Gives the user a Global.random statement in Orange Language.")]
+        [Summary("Gives the user a random statement in Orange Language.")]
         public async Task _orange()
         {
             await Context.Channel.TriggerTypingAsync();
-            int choice = Global.rand.Next(1, 6);
+            int choice = Global.Rand.Next(1, 6);
             string egnaro = "";
             switch (choice){
                 case 1: egnaro = "!olleH"; break;
@@ -301,7 +300,7 @@ namespace MarbleBot.Modules
         }
 
         [Command("orangeify")]
-        [Summary("Gives the user a Global.random statement in Orange Language.")]
+        [Summary("Gives the user a random statement in Orange Language.")]
         public async Task _orangeify([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
@@ -362,7 +361,7 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Only use positive numbers!");
             } else if (start > end) {
                 try  {
-                    int randNumber = Global.rand.Next(end, start);
+                    int randNumber = Global.Rand.Next(end, start);
                     await ReplyAsync(randNumber.ToString());
                 } catch (FormatException) {
                     await ReplyAsync("Number too large/small.");
@@ -370,7 +369,7 @@ namespace MarbleBot.Modules
                 }
             } else {
                 try {
-                    int randNumber = Global.rand.Next(start, end);
+                    int randNumber = Global.Rand.Next(start, end);
                     await ReplyAsync(randNumber.ToString());
                 } catch (FormatException) {
                     await ReplyAsync("Number too large/small.");
@@ -385,36 +384,36 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             EmbedBuilder builder = new EmbedBuilder();
-            byte level = Convert.ToByte(Global.rand.Next(0, 25));
+            byte level = Convert.ToByte(Global.Rand.Next(0, 25));
             int xp = 0;
 
             switch (level) {
-                case 0: xp = Global.rand.Next(0, 99); break;
-                case 1: xp = Global.rand.Next(100, 254); break;
-                case 2: xp = Global.rand.Next(255, 474); break;
-                case 3: xp = Global.rand.Next(475, 769); break;
-                case 4: xp = Global.rand.Next(770, 1149); break;
-                case 5: xp = Global.rand.Next(1150, 1624); break;
-                case 6: xp = Global.rand.Next(1625, 2204); break;
-                case 7: xp = Global.rand.Next(2205, 2899); break;
-                case 8: xp = Global.rand.Next(2900, 3719); break;
-                case 9: xp = Global.rand.Next(3720, 4674); break;
-                case 10: xp = Global.rand.Next(4674, 5774); break;
-                case 11: xp = Global.rand.Next(5575, 7029); break;
-                case 12: xp = Global.rand.Next(7030, 8449); break;
-                case 13: xp = Global.rand.Next(8450, 10044); break;
-                case 14: xp = Global.rand.Next(10045, 11824); break;
-                case 15: xp = Global.rand.Next(11825, 13799); break;
-                case 16: xp = Global.rand.Next(13800, 15979); break;
-                case 17: xp = Global.rand.Next(15980, 18374); break;
-                case 18: xp = Global.rand.Next(18735, 20994); break;
-                case 19: xp = Global.rand.Next(20995, 23849); break;
-                case 20: xp = Global.rand.Next(23850, 26949); break;
-                case 21: xp = Global.rand.Next(26950, 30304); break;
-                case 22: xp = Global.rand.Next(30305, 33924); break;
-                case 23: xp = Global.rand.Next(33925, 37819); break;
-                case 24: xp = Global.rand.Next(37820, 41999); break;
-                case 25: xp = Global.rand.Next(42000, 46474); break;
+                case 0: xp = Global.Rand.Next(0, 99); break;
+                case 1: xp = Global.Rand.Next(100, 254); break;
+                case 2: xp = Global.Rand.Next(255, 474); break;
+                case 3: xp = Global.Rand.Next(475, 769); break;
+                case 4: xp = Global.Rand.Next(770, 1149); break;
+                case 5: xp = Global.Rand.Next(1150, 1624); break;
+                case 6: xp = Global.Rand.Next(1625, 2204); break;
+                case 7: xp = Global.Rand.Next(2205, 2899); break;
+                case 8: xp = Global.Rand.Next(2900, 3719); break;
+                case 9: xp = Global.Rand.Next(3720, 4674); break;
+                case 10: xp = Global.Rand.Next(4674, 5774); break;
+                case 11: xp = Global.Rand.Next(5575, 7029); break;
+                case 12: xp = Global.Rand.Next(7030, 8449); break;
+                case 13: xp = Global.Rand.Next(8450, 10044); break;
+                case 14: xp = Global.Rand.Next(10045, 11824); break;
+                case 15: xp = Global.Rand.Next(11825, 13799); break;
+                case 16: xp = Global.Rand.Next(13800, 15979); break;
+                case 17: xp = Global.Rand.Next(15980, 18374); break;
+                case 18: xp = Global.Rand.Next(18735, 20994); break;
+                case 19: xp = Global.Rand.Next(20995, 23849); break;
+                case 20: xp = Global.Rand.Next(23850, 26949); break;
+                case 21: xp = Global.Rand.Next(26950, 30304); break;
+                case 22: xp = Global.Rand.Next(30305, 33924); break;
+                case 23: xp = Global.Rand.Next(33925, 37819); break;
+                case 24: xp = Global.Rand.Next(37820, 41999); break;
+                case 25: xp = Global.Rand.Next(42000, 46474); break;
             }
 
             var msgs = await Context.Channel.GetMessagesAsync(100).Flatten();
@@ -499,7 +498,7 @@ namespace MarbleBot.Modules
                 case "tables": rating = -999; message = "do not mention those unholy creatures near me"; input = "dGFibGVz"; break;
                 case "the hat stoar": rating = 10; message = "!raotS taH ehT owt oG"; break;
                 case "vinh": rating = 10; message = "Henlo Cooooooooool Vinh"; break;
-                default: rating = Global.rand.Next(0, 11); break;
+                default: rating = Global.Rand.Next(0, 11); break;
             }
             switch (input.ToLower()) {
                 // These have custom messages but no preset ratings:
@@ -535,10 +534,10 @@ namespace MarbleBot.Modules
             }
             // Dann Annoy Me >:((((
             if (input.ToLower() == "dann" || input.ToLower() == "danny playz") {
-                int choice = Global.rand.Next(0, 2);
+                int choice = Global.Rand.Next(0, 2);
                 if (choice == 1)  message = "you guys, are a rat kids";
                 else message = "I don’t know who you are I don’t know what you want but if I don’t get my t-shirt tomorrow i will find you and I will rob you.";
-                rating = Global.rand.Next(9, 11);
+                rating = Global.Rand.Next(9, 11);
             }
             switch (rating) {
                 // Emoji time!
@@ -606,7 +605,7 @@ namespace MarbleBot.Modules
         }
 
         [Command("reverse")]
-        [Summary("Gives the user a Global.random statement in Orange Language.")]
+        [Summary("Gives the user a random statement in Orange Language.")]
         public async Task _reverse([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
@@ -839,7 +838,7 @@ namespace MarbleBot.Modules
                         a++;
                     }
                 }
-                randNo = Global.rand.Next(1, a);
+                randNo = Global.Rand.Next(1, a);
             } else {
                 using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
                     while (!stream.EndOfStream) {
@@ -857,7 +856,7 @@ namespace MarbleBot.Modules
                         //JGeoroegeos
                         a++;
                     }
-                    if (!wordSet) randNo = Global.rand.Next(1, a);
+                    if (!wordSet) randNo = Global.Rand.Next(1, a);
                 }
             }
             if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) await ReplyAsync("**__" + wordList[randNo] + "__**\nInventor: " + invList[randNo] + "\nDescription: " + descList[randNo]);

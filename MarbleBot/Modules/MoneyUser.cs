@@ -10,5 +10,6 @@ namespace MarbleBot.Modules
         public ulong Money { get; set; }
         public uint DailyStreak { get; set; }
         public DateTime LastDaily { get; set; }
+        public DateTime LastRaceWin { get; set;}
     }
 }

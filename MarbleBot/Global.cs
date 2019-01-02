@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Discord;
 using Discord.Commands;
+using MarbleBot.Modules;
+using Newtonsoft.Json.Linq;
 
 namespace MarbleBot
 {
@@ -12,7 +15,7 @@ namespace MarbleBot
         /// Contains global variables
         /// </summary>
 
-        internal static Random rand = new Random();
+        internal static Random Rand = new Random();
         internal static DateTime StartTime = new DateTime();
         internal static string YTKey = "";
         internal static ulong BotId = 286228526234075136;
@@ -27,13 +30,15 @@ namespace MarbleBot
         internal const ulong MT = 408694288604463114; // Melmon Test
 
         // Games
-        internal static bool jumbleActive = false;
-        internal static bool raceActive = false;
+        internal static bool RaceActive = false;
         internal static Dictionary<ulong, byte> Alive = new Dictionary<ulong, byte>();
 
+        // Gets colour for embed depending on server
         internal static Color GetColor(SocketCommandContext Context) {
             Color coloure = Color.DarkerGrey;
-            switch (Context.Guild.Id) {
+            var id = 0ul;
+            if (!Context.IsPrivate) id = Context.Guild.Id;
+            switch (id) {
                 case CM: coloure = Color.Teal; break;
                 case THS: coloure = Color.Orange; break;
                 case MT: coloure = Color.DarkGrey; break;
@@ -44,6 +49,7 @@ namespace MarbleBot
             return coloure;
         }
 
+        // Gets a date string
         internal static string GetDateString(TimeSpan dateTime) {
             var output = new StringBuilder();
             if (dateTime.Days > 1) output.Append(dateTime.Days + " days, ");
@@ -60,6 +66,71 @@ namespace MarbleBot
                 else output.Append(dateTime.Seconds + " second");
             }
             return output.ToString();
+        }
+
+        // Returns a MoneyUser with the ID of the user
+        internal static MoneyUser GetUser(SocketCommandContext Context) {
+            var json = "";
+            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+            var obj = JObject.Parse(json);
+            var User = new MoneyUser();
+            if (obj.ContainsKey(Context.User.Id.ToString())) {
+                User = obj[(Context.User.Id.ToString())].ToObject<MoneyUser>();
+            } else {
+                User = new MoneyUser() {
+                    Name = Context.User.Username,
+                    Discriminator = Context.User.DiscriminatorValue,
+                    Money = 0,
+                    DailyStreak = 0,
+                    LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
+                    LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
+                };
+            }
+            return User;
+        }
+
+        internal static MoneyUser GetUser(SocketCommandContext Context, JObject obj) {
+            var User = new MoneyUser();
+            if (obj.ContainsKey(Context.User.Id.ToString())) {
+                User = obj[(Context.User.Id.ToString())].ToObject<MoneyUser>();
+            } else {
+                User = new MoneyUser() {
+                    Name = Context.User.Username,
+                    Discriminator = Context.User.DiscriminatorValue,
+                    Money = 0,
+                    DailyStreak = 0,
+                    LastDaily = DateTime.Parse("2019-01-01 00:00:00")
+                };
+            }
+            return User;
+        }
+
+        internal static MoneyUser GetUser(SocketCommandContext Context, JObject obj, ulong id) {
+            var User = new MoneyUser();
+            if (obj.ContainsKey(id.ToString())) {
+                User = obj[(id.ToString())].ToObject<MoneyUser>();
+            } else {
+                if (Context.IsPrivate) {
+                    User = new MoneyUser() {
+                        Name = Context.User.Username,
+                        Discriminator = Context.User.DiscriminatorValue,
+                        Money = 0,
+                        DailyStreak = 0,
+                        LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
+                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
+                    };
+                } else {
+                    User = new MoneyUser() {
+                        Name = Context.Guild.GetUser(id).Username,
+                        Discriminator = Context.Guild.GetUser(id).DiscriminatorValue,
+                        Money = 0,
+                        DailyStreak = 0,
+                        LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
+                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
+                    };
+                }
+            }
+            return User;
         }
     }
 }
