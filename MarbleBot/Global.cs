@@ -79,7 +79,7 @@ namespace MarbleBot
             } else {
                 User = new MoneyUser() {
                     Name = Context.User.Username,
-                    Discriminator = Context.User.DiscriminatorValue,
+                    Discriminator = Context.User.Discriminator,
                     Money = 0,
                     DailyStreak = 0,
                     LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
@@ -96,7 +96,7 @@ namespace MarbleBot
             } else {
                 User = new MoneyUser() {
                     Name = Context.User.Username,
-                    Discriminator = Context.User.DiscriminatorValue,
+                    Discriminator = Context.User.Discriminator,
                     Money = 0,
                     DailyStreak = 0,
                     LastDaily = DateTime.Parse("2019-01-01 00:00:00")
@@ -113,7 +113,7 @@ namespace MarbleBot
                 if (Context.IsPrivate) {
                     User = new MoneyUser() {
                         Name = Context.User.Username,
-                        Discriminator = Context.User.DiscriminatorValue,
+                        Discriminator = Context.User.Discriminator,
                         Money = 0,
                         DailyStreak = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
@@ -122,7 +122,7 @@ namespace MarbleBot
                 } else {
                     User = new MoneyUser() {
                         Name = Context.Guild.GetUser(id).Username,
-                        Discriminator = Context.Guild.GetUser(id).DiscriminatorValue,
+                        Discriminator = Context.Guild.GetUser(id).Discriminator,
                         Money = 0,
                         DailyStreak = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),

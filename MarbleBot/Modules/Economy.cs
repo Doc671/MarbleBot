@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -90,6 +93,33 @@ namespace MarbleBot.Modules {
                 builder.AddField(type + " x" + no, string.Format("Cost: <:unitofmoney:372385317581488128>{0:n}", subtot));
             }
             builder.AddField("Total Cost", string.Format("<:unitofmoney:372385317581488128>{0:n}", totalCost));
+            await ReplyAsync("", false, builder.Build());
+        }
+
+        [Command("richlist")]
+        [Summary("Shows the top 10 richest people")]
+        public async Task _richlist() {
+            var json = "";
+            using (var userFile = new StreamReader("Users.json")) json = userFile.ReadToEnd();
+            var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MoneyUser>>(json);
+            var users = new List<Tuple<string, MoneyUser>>();
+            foreach (var user in rawUsers) users.Add(Tuple.Create(user.Key, user.Value));
+            var richList = (from user in users orderby user.Item2.Money descending select user.Item2).ToList();
+            int i = 1, j = 1;
+            var output = new StringBuilder();
+            foreach (var user in richList) {
+                if (i < 11) {
+                    output.Append(string.Format("**{0}{1}:** {2}#{3} - <:unitofmoney:372385317581488128>**{4}**\n", i, i.Ordinal(), user.Name, user.Discriminator, user.Money));
+                    if (j < richList.Count) if (richList[j].Money != user.Money) i++;
+                    j++;
+                }
+                else break;
+            }
+            var builder = new EmbedBuilder()
+                .WithColor(Global.GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithTitle("Top 10 Richest Users")
+                .WithDescription(output.ToString());
             await ReplyAsync("", false, builder.Build());
         }
     }

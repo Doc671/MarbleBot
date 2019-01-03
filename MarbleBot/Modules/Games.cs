@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
@@ -29,10 +30,10 @@ namespace MarbleBot.Modules
             EmbedBuilder builder = new EmbedBuilder()
                 .WithColor(Global.GetColor(Context))
                 .WithCurrentTimestamp();
-            switch (command) {
+            switch (command.ToLower()) {
                 case "signup": { 
                     var name = "";
-                    if (option.IsEmpty()) name = Context.User.Username;
+                    if (option.IsEmpty() || option.Contains("@")) name = Context.User.Username;
                     else if (option.Length > 100) await ReplyAsync("Your entry exceeds the 100 character limit.");
                     else option = option.Replace("\n", " "); name = option;
                     builder.AddField("Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
@@ -181,15 +182,16 @@ namespace MarbleBot.Modules
                     break;
                 }
                 case "contestants": {
-                    var marbles = "";
+                    var marbles = new StringBuilder();
                     using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
                         while (!marbleList.EndOfStream) {
-                            marbles = (await marbleList.ReadLineAsync()).Split(',')[0];
+                            var allMarbles = (await marbleList.ReadLineAsync()).Split('\n');
+                            foreach (var marble in allMarbles) marbles.Append(marble.Split(',')[0] + "\n");
                         }
                     }
-                    if (marbles.IsEmpty()) await ReplyAsync("It looks like there aren't any contestants...");
+                    if (marbles.ToString().IsEmpty()) await ReplyAsync("It looks like there aren't any contestants...");
                     else {
-                        builder.AddField("Contestants", marbles);
+                        builder.AddField("Contestants", marbles.ToString());
                         await ReplyAsync("", false, builder.Build());
                     }
                     break;
@@ -213,16 +215,16 @@ namespace MarbleBot.Modules
                             }
                             winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
                             int i = 1, j = 1;
-                            var desc = "";
+                            var desc = new StringBuilder();
                             foreach (var winner in winList) {
                                 if (i < 11) {
-                                    desc += string.Format("{0}{1}: {2} {3}\n", new string[] { i.ToString(), i.Ordinal(), winner.Item1, winner.Item2.ToString() });
+                                    desc.Append(string.Format("{0}{1}: {2} {3}\n", new string[] { i.ToString(), i.Ordinal(), winner.Item1, winner.Item2.ToString() }));
                                     if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
                                     j++;
                                 } else break;
                             }
                             builder.WithTitle("Race Leaderboard: Winners")
-                                .WithDescription(desc);
+                                .WithDescription(desc.ToString());
                             await ReplyAsync("", false, builder.Build());
                             break;
                         }
@@ -241,21 +243,32 @@ namespace MarbleBot.Modules
                             }
                             winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
                             int i = 1, j = 1;
-                            var desc = "";
+                            var desc = new StringBuilder();
                             foreach (var winner in winList) {
                                 if (i < 11) {
-                                    desc += string.Format("{0}{1}: {2} {3}\n", new string[] { i.ToString(), i.Ordinal(), winner.Item1, winner.Item2.ToString() });
+                                    desc.Append(string.Format("{0}{1}: {2} {3}\n", new string[] { i.ToString(), i.Ordinal(), winner.Item1, winner.Item2.ToString() }));
                                     if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
                                     j++;
                                 }
                                 else break;
                             }
                             builder.WithTitle("Race Leaderboard: Most Used")
-                                .WithDescription(desc);
+                                .WithDescription(desc.ToString());
                             await ReplyAsync("", false, builder.Build());
                             break;
                         }
                     }
+                    break;
+                }
+                case "checkearn": {
+                    var User = Global.GetUser(Context);
+                    var nextDaily = DateTime.UtcNow.Subtract(User.LastRaceWin);
+                    var output = "";
+                    if (nextDaily.TotalHours < 6) output = string.Format("You can earn money from racing in **{0}**!", Global.GetDateString(User.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6))));
+                    else output = "You can earn money from racing now!";
+                    builder.WithAuthor(Context.User)
+                        .WithDescription(output);
+                    await ReplyAsync("", false, builder.Build());
                     break;
                 }
                 default: {
