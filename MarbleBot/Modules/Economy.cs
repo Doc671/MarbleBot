@@ -17,19 +17,31 @@ namespace MarbleBot.Modules {
         /// </summary>
 
         [Command("balance")]
-        [Summary("Check your balance")]
-        public async Task _balance() {
-            var User = Global.GetUser(Context);
+        [Summary("Check your balance or the balance of someone else")]
+        public async Task _balance([Remainder] string searchTerm = "") {
+            var User = new MoneyUser();
+            var id = Context.User.Id;
+            if (searchTerm.IsEmpty()) User = Global.GetUser(Context);
+            else {
+                var json = "";
+                using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MoneyUser>>(json);
+                var search = from user in rawUsers where searchTerm.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchTerm.ToLower()) || searchTerm.ToLower().Contains(user.Value.Discriminator) select user;
+                var foundUser = search.FirstOrDefault();
+                id = ulong.Parse(foundUser.Key);
+                User = foundUser.Value;
+            }
             var lastDaily = User.LastDaily.ToString();
-            if (User.LastDaily.ToString("dd/MM/yyyy hh:mm:ss") == "01/01/2019 00:00:00") lastDaily = "N/A";
+            if (User.LastDaily.ToString("dd/MM/yyyy") == "01/01/2019") lastDaily = "N/A";
             var lastRaceWin = User.LastRaceWin.ToString();
-            if (User.LastRaceWin.ToString("dd/MM/yyyy hh:mm:ss") == "01/01/2019 00:00:00") lastRaceWin = "N/A";
+            if (User.LastRaceWin.ToString("dd/MM/yyyy") == "01/01/2019") lastRaceWin = "N/A";
+            var author = Context.Client.GetUser(id);
             var builder = new EmbedBuilder()
-                .WithAuthor(Context.User)
+                .WithAuthor(author)
                 .WithCurrentTimestamp()
                 .WithColor(Global.GetColor(Context))
                 .WithFooter("All times in UTC, all dates DD/MM/YYYY.")
-                .AddInlineField("Money", "<:unitofmoney:372385317581488128>" + User.Money)
+                .AddInlineField("Money", "<:unitofmoney:372385317581488128>" + string.Format("{0:n}", User.Money))
                 .AddInlineField("Daily Streak", User.DailyStreak)
                 .AddInlineField("Last Daily", lastDaily)
                 .AddInlineField("Last Race Win", lastRaceWin);
@@ -44,7 +56,7 @@ namespace MarbleBot.Modules {
             var obj = JObject.Parse(json);
             var User = Global.GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 24) {
-                var gift = Convert.ToUInt64(Math.Round(Math.Pow(200, (1 + (Convert.ToDouble(User.DailyStreak) / 100)))));
+                var gift = Convert.ToDecimal(Math.Round(Math.Pow(200, (1 + (Convert.ToDouble(User.DailyStreak) / 100))), 2));
                 User.Money += gift;
                 if (User.LastDaily.Subtract(DateTime.UtcNow).TotalHours < 48) User.DailyStreak++;
                 else User.DailyStreak = 1;
@@ -63,6 +75,22 @@ namespace MarbleBot.Modules {
                 await ReplyAsync(string.Format("You need to wait for **{0}** until you can get your daily gift again!", Global.GetDateString(User.LastDaily.Subtract(ADayAgo))));
             }
         }
+
+        /*[Command("donate")]
+        [Summary("Donate money to others")]
+        public async Task _donate(string money, [Remainder] string searchUser = "") {
+            if (money == "accept") {
+
+            } else {
+                var gift = ulong.Parse(money.Trim());
+                var json = "";
+                using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MoneyUser>>(json);
+                var search = from user in rawUsers where searchUser.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchUser.ToLower()) || searchUser.ToLower().Contains(user.Value.Discriminator) select user;
+                var foundUser = search.FirstOrDefault();
+
+            }
+        }*/
 
         [Command("poupsoop")]
         [Summary("Calculates total value of Poup Soop")]
@@ -109,7 +137,7 @@ namespace MarbleBot.Modules {
             var output = new StringBuilder();
             foreach (var user in richList) {
                 if (i < 11) {
-                    output.Append(string.Format("**{0}{1}:** {2}#{3} - <:unitofmoney:372385317581488128>**{4}**\n", i, i.Ordinal(), user.Name, user.Discriminator, user.Money));
+                    output.Append(string.Format("**{0}{1}:** {2}#{3} - <:unitofmoney:372385317581488128>**{4}**\n", i, i.Ordinal(), user.Name, user.Discriminator, string.Format("{0:n}", user.Money)));
                     if (j < richList.Count) if (richList[j].Money != user.Money) i++;
                     j++;
                 }

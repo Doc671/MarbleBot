@@ -133,7 +133,7 @@ namespace MarbleBot.Modules
                         if (DateTime.UtcNow.Subtract(User.LastRaceWin).TotalHours > 6) {
                             var noOfSameUser = 0;
                             foreach (var marble in marbles) if (marble.Item2 == winnerID) noOfSameUser++;
-                            var gift = Convert.ToUInt64(Math.Round(((Convert.ToDouble(id) / noOfSameUser) - 1) * 100));
+                            var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(id) / noOfSameUser) - 1) * 100, 2));
                             if (gift > 0) {
                                 User.Money += gift;
                                 User.LastRaceWin = DateTime.UtcNow;
@@ -145,7 +145,7 @@ namespace MarbleBot.Modules
                                         Serialiser.Serialize(users2, obj);
                                     }
                                 }
-                                await ReplyAsync("**" + User.Name + "** won <:unitofmoney:372385317581488128>**" + gift + "** for winning the race!");
+                                await ReplyAsync("**" + User.Name + "** won <:unitofmoney:372385317581488128>**" + string.Format("{0:n}", gift) + "** for winning the race!");
                             }
                         }
                         using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {

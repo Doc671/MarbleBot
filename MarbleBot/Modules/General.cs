@@ -30,7 +30,7 @@ namespace MarbleBot.Modules
                     .WithTimestamp(DateTime.UtcNow);
                 if (Context.IsPrivate) {
                     builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                    .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
+                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                     .AddField("Games", "\nrace (participate in a marble race)")
                     .WithColor(Color.DarkerGrey);
@@ -40,7 +40,7 @@ namespace MarbleBot.Modules
                         case Global.CM:
                             builder.AddField("Command List", "help (should be fairly obvious)")
                                 .AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)\nuptime (shows how long the bot has been running)")
-                                .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
+                                .AddField("Economy Commands", "balance (returns how much money you or someone else havs)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                                 .AddField("Games", "\nrace (participate in a marble race)")
@@ -50,7 +50,7 @@ namespace MarbleBot.Modules
                         case Global.THS:
                             builder.AddField("Command List", "help (should be fairly obvious)")
                                 .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
+                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -60,7 +60,7 @@ namespace MarbleBot.Modules
                         case Global.THSC:
                             builder.AddField("Command List", "help (should be fairly obvious)")
                                 .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
+                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -70,7 +70,7 @@ namespace MarbleBot.Modules
                         case Global.MT:
                             builder.AddField("Command List", "help (should be fairly obvious)")
                                 .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
+                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -80,7 +80,7 @@ namespace MarbleBot.Modules
                         case Global.VFC:
                             builder.AddField("Command List", "help (should be fairly obvious)")
                                 .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you have)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
+                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\ndaily (gives daily money)\npoupsoop (calculates price total)\nrichlist (shows 10 richest people)")
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -119,7 +119,7 @@ namespace MarbleBot.Modules
                     case "vinhglish": bCommand.Desc = "Displays information about a Vinhglish word."; bCommand.Usage = "mb/vinglish OR mb/vinhglish <word>"; bCommand.Example = "mb/vinhglish Am Will You"; bCommand.Warning = THSOnly; break;
 
                     // Economy
-                    case "balance": bCommand.Desc = "Returns how much money you have."; bCommand.Usage = "mb/balance"; break;
+                    case "balance": bCommand.Desc = "Returns how much money you or someone else has."; bCommand.Usage = "mb/balance <optional user>"; break;
                     case "daily": bCommand.Desc = "Gives daily Units of Money (200 to the power of your streak minus one). You can only do this every 24 hours."; bCommand.Usage = "mb/balance"; break;
                     case "poupsoop": bCommand.Desc = "Calculates the total price of Poup Soop."; bCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; bCommand.Example = "mb/poupsoop 3 | 1"; break;
                     case "richlist": bCommand.Desc = "Shows the ten richest people globally."; bCommand.Usage = "mb/richlist"; break;
@@ -130,12 +130,12 @@ namespace MarbleBot.Modules
                     case "take": bCommand.Desc = "Takes a role if it is on the rolelist"; bCommand.Usage = "mb/take <role>"; bCommand.Example = "mb/take Criminal"; break;
 
                     // YT
-                    case "cv": bCommand.Desc = "Posts a video in #community-videos"; bCommand.Usage = "mb/cv <video link> <optional description>"; bCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; bCommand.Warning = "This command only works in DMs!"; break;
+                    case "cv": bCommand.Desc = "Posts a video in #community-videos."; bCommand.Usage = "mb/cv <video link> <optional description>"; bCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; bCommand.Warning = "This command only works in DMs!"; break;
                     case "searchchannel": bCommand.Desc = "Displays a list of channels that match the search criteria."; bCommand.Usage = "mb/searchchannel <channelname>"; bCommand.Example = "mb/searchchannel carykh"; break;
                     case "searchvideo": bCommand.Desc = "Displays a list of videos that match the search critera."; bCommand.Usage = "mb/searchvideo <videoname>"; bCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
 
                     // Games
-                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race start, mb/race leaderboards <winners/mostUsed>"; break;
+                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkEarn"; break;
                 }
 
                 var message = new StringBuilder();
