@@ -135,17 +135,18 @@ namespace MarbleBot.Modules
                             foreach (var marble in marbles) if (marble.Item2 == winnerID) noOfSameUser++;
                             var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(id) / noOfSameUser) - 1) * 100, 2));
                             if (gift > 0) {
-                                User.Money += gift;
+                                User.Balance += gift;
+                                User.NetWorth += gift;
                                 User.LastRaceWin = DateTime.UtcNow;
                                 obj.Remove(winnerID.ToString());
                                 obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(User)));
                                 using (var users = new StreamWriter("Users.json")) {
                                     using (var users2 = new JsonTextWriter(users)) {
-                                        var Serialiser = new JsonSerializer();
+                                        var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
                                         Serialiser.Serialize(users2, obj);
                                     }
                                 }
-                                await ReplyAsync("**" + User.Name + "** won <:unitofmoney:372385317581488128>**" + string.Format("{0:n}", gift) + "** for winning the race!");
+                                await ReplyAsync(string.Format("**{0}** won <:unitofmoney:372385317581488128>**{1:n}** for winning the race!", User.Name, gift));
                             }
                         }
                         using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {
@@ -154,6 +155,12 @@ namespace MarbleBot.Modules
                         }
                         Global.RaceActive = false;
                     }
+                    break;
+                }
+                case "bet": {
+                    /*using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
+                        var marble = await marbleList.ReadLineAsync();
+                    }*/
                     break;
                 }
                 case "clear": {
@@ -175,7 +182,7 @@ namespace MarbleBot.Modules
                             await ReplyAsync("Changed the contestant count to " + newcount + ".");
                         } else {
                             if (Global.Alive.ContainsKey(Context.Guild.Id)) Global.Alive[Context.Guild.Id] = newcount;
-                            else Global.Alive.Add(Context.User.Id, newcount);
+                            else Global.Alive.Add(Context.Guild.Id, newcount);
                             await ReplyAsync("Changed the contestant count to " + newcount + ".");
                         }
                     }

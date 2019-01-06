@@ -675,60 +675,68 @@ namespace MarbleBot.Modules
         public async Task _staffCheck()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (!Context.IsPrivate)
-            {
+            if (!Context.IsPrivate) {
                 IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                if (Context.Guild.Id == Global.CM)
-                {
+                if (Context.Guild.Id == Global.CM) {
                     IGuildUser Erikfassett = Context.Guild.GetUser(161258738429329408);
                     IGuildUser JohnDubuc = Context.Guild.GetUser(161247044713840642);
                     IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
-                    IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
                     IGuildUser Algorox = Context.Guild.GetUser(323680030724980736);
                     IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
-                    IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, BradyForrest, FlameVapour};
-                    string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname, users[6].Nickname, users[7].Nickname };
-                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString(), users[6].Status.ToString() };
-                    for (int i = 0; i < users.Length; i++) {
-                        if (nicks[i].IsEmpty()) {
-                            nicks[i] = users[i].Username;
-                        }
-                        if (statuses[i] == "DoNotDisturb") {
-                            statuses[i] = "Do Not Disturb";
-                        }
+                    IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, FlameVapour};
+                    string[] nicks = new string[users.Length];
+                    string[] statuses = new string[users.Length];
+                    int h = 0;
+                    foreach (var user in users) {
+                        nicks[h] = user.Nickname;
+                        statuses[h] = user.Status.ToString();
+                        h++;
                     }
-                    await ReplyAsync("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n\n**__Mods:__**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6] + "**");
+                    for (int i = 0; i < users.Length - 1; i++) {
+                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
+                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
+                    }
+                    var output = new StringBuilder();
+                    output.Append("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0]);
+                    output.Append("**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1]);
+                    output.Append("**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2]);
+                    output.Append("**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3]);
+                    output.Append("\n\n**__Mods:__** \n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4]);
+                    output.Append("**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5]);
+                    await ReplyAsync(output.ToString());
                 } else if (Context.Guild.Id == Global.THS) {
                     IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
-                    IGuildUser BradyForrest = Context.Guild.GetUser(211110948566597633);
                     IGuildUser DannyPlayz = Context.Guild.GetUser(329532528031563777);
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                     IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
-                    IGuildUser[] users = { Doc671, FlameVapour, BradyForrest, DannyPlayz, George012, Kenlimepie };
-                    string[] nicks = { users[0].Nickname, users[1].Nickname, users[2].Nickname, users[3].Nickname, users[4].Nickname, users[5].Nickname };
-                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString(), users[2].Status.ToString(), users[3].Status.ToString(), users[4].Status.ToString(), users[5].Status.ToString() };
-                    for (int i = 0; i < users.Length; i++) {
-                        if (nicks[i].IsEmpty()) {
-                            nicks[i] = users[i].Username;
-                        }
-                        if (statuses[i] == "DoNotDisturb") {
-                            statuses[i] = "Do Not Disturb";
-                        }
-                        Console.WriteLine(nicks[i]);
+                    IGuildUser[] users = { Doc671, FlameVapour, DannyPlayz, George012, Kenlimepie };
+                    string[] nicks = new string[users.Length];
+                    string[] statuses = new string[users.Length];
+                    int h = 0;
+                    foreach (var user in users) {
+                        nicks[h] = user.Nickname;
+                        statuses[h] = user.Status.ToString();
+                        h++;
                     }
-                    await ReplyAsync("**__Overlords:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**\n\n**__Hat Stoar Managers:__**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**\n\n**__Hat Stoar Employees:__**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**");
+                    for (int i = 0; i < users.Length - 1; i++) {
+                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
+                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
+                    }
+                    var output = new StringBuilder();
+                    output.Append("**__Overlords:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0]);
+                    output.Append("**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1]);
+                    output.Append("\n\n**__Hat Stoar Employees:__** \n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2]);
+                    output.Append("**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3]);
+                    output.Append("**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4]);
+                    await ReplyAsync(output.ToString());
                 } else if (Context.Guild.Id == Global.MT) {
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                     IGuildUser[] users = { Doc671, George012 };
                     string[] nicks = { users[0].Nickname, users[1].Nickname, };
                     string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString() };
                     for (int i = 0; i < users.Length; i++) {
-                        if (nicks[i].IsEmpty()) {
-                            nicks[i] = users[i].Username;
-                        }
-                        if (statuses[i] == "DoNotDisturb") {
-                            statuses[i] = "Do Not Disturb";
-                        }
+                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
+                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
                     }
                     await ReplyAsync(nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
                 } else if (Context.Guild.Id == Global.VFC) {
@@ -739,7 +747,7 @@ namespace MarbleBot.Modules
                     IGuildUser Ayumi = Context.Guild.GetUser(189713815414374404);
                     IGuildUser BlueIce57 = Context.Guild.GetUser(310960432909254667);
                     IGuildUser Miles = Context.Guild.GetUser(170804546438692864);
-                    IGuildUser[] users = { Vinh, Kenlimepie, Doc671, Meadow, Ayumi, BlueIce57, Miles };
+                    IGuildUser[] users = { Vinh, Kenlimepie, Doc671, George012, Meadow, Ayumi, BlueIce57, Miles };
                     string[] nicks = new string[users.Length];
                     string[] statuses = new string[users.Length];
                     int h = 0;

@@ -19,6 +19,7 @@ namespace MarbleBot.Modules {
         [Command("balance")]
         [Summary("Check your balance or the balance of someone else")]
         public async Task _balance([Remainder] string searchTerm = "") {
+            await Context.Channel.TriggerTypingAsync();
             var User = new MoneyUser();
             var id = Context.User.Id;
             if (searchTerm.IsEmpty()) User = Global.GetUser(Context);
@@ -41,7 +42,8 @@ namespace MarbleBot.Modules {
                 .WithCurrentTimestamp()
                 .WithColor(Global.GetColor(Context))
                 .WithFooter("All times in UTC, all dates DD/MM/YYYY.")
-                .AddInlineField("Money", "<:unitofmoney:372385317581488128>" + string.Format("{0:n}", User.Money))
+                .AddInlineField("Balance", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.Balance))
+                .AddInlineField("Net Worth", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.NetWorth))
                 .AddInlineField("Daily Streak", User.DailyStreak)
                 .AddInlineField("Last Daily", lastDaily)
                 .AddInlineField("Last Race Win", lastRaceWin);
@@ -51,13 +53,15 @@ namespace MarbleBot.Modules {
         [Command("daily")]
         [Summary("Get daily money")]
         public async Task _daily() {
+            await Context.Channel.TriggerTypingAsync();
             var json = "";
             using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
             var obj = JObject.Parse(json);
             var User = Global.GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 24) {
                 var gift = Convert.ToDecimal(Math.Round(Math.Pow(200, (1 + (Convert.ToDouble(User.DailyStreak) / 100))), 2));
-                User.Money += gift;
+                User.Balance += gift;
+                User.NetWorth += gift;
                 if (User.LastDaily.Subtract(DateTime.UtcNow).TotalHours < 48) User.DailyStreak++;
                 else User.DailyStreak = 1;
                 User.LastDaily = DateTime.UtcNow;
@@ -65,7 +69,7 @@ namespace MarbleBot.Modules {
                 obj.Add(new JProperty(Context.User.Id.ToString(), JObject.FromObject(User)));
                 using (var users = new StreamWriter("Users.json")) {
                     using (var users2 = new JsonTextWriter(users)) {
-                        var Serialiser = new JsonSerializer();
+                        var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
                         Serialiser.Serialize(users2, obj);
                     }
                 }
@@ -95,6 +99,7 @@ namespace MarbleBot.Modules {
         [Command("poupsoop")]
         [Summary("Calculates total value of Poup Soop")]
         public async Task _poupsoop([Remainder] string msg) {
+            await Context.Channel.TriggerTypingAsync();
             var splitMsg = msg.Split('|');
             var totalCost = 0m;
             var builder = new EmbedBuilder()
@@ -127,21 +132,21 @@ namespace MarbleBot.Modules {
         [Command("richlist")]
         [Summary("Shows the top 10 richest people")]
         public async Task _richlist() {
+            await Context.Channel.TriggerTypingAsync();
             var json = "";
             using (var userFile = new StreamReader("Users.json")) json = userFile.ReadToEnd();
             var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MoneyUser>>(json);
             var users = new List<Tuple<string, MoneyUser>>();
             foreach (var user in rawUsers) users.Add(Tuple.Create(user.Key, user.Value));
-            var richList = (from user in users orderby user.Item2.Money descending select user.Item2).ToList();
+            var richList = (from user in users orderby user.Item2.NetWorth descending select user.Item2).ToList();
             int i = 1, j = 1;
             var output = new StringBuilder();
             foreach (var user in richList) {
                 if (i < 11) {
-                    output.Append(string.Format("**{0}{1}:** {2}#{3} - <:unitofmoney:372385317581488128>**{4}**\n", i, i.Ordinal(), user.Name, user.Discriminator, string.Format("{0:n}", user.Money)));
-                    if (j < richList.Count) if (richList[j].Money != user.Money) i++;
+                    output.Append(string.Format("**{0}{1}:** {2}#{3} - <:unitofmoney:372385317581488128>**{4}**\n", i, i.Ordinal(), user.Name, user.Discriminator, string.Format("{0:n}", user.NetWorth)));
+                    if (j < richList.Count) if (richList[j].NetWorth != user.NetWorth) i++;
                     j++;
-                }
-                else break;
+                } else break;
             }
             var builder = new EmbedBuilder()
                 .WithColor(Global.GetColor(Context))

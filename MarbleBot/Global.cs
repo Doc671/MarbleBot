@@ -80,7 +80,8 @@ namespace MarbleBot
                 User = new MoneyUser() {
                     Name = Context.User.Username,
                     Discriminator = Context.User.Discriminator,
-                    Money = 0,
+                    Balance = 0,
+                    NetWorth = 0,
                     DailyStreak = 0,
                     LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
                     LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
@@ -97,7 +98,8 @@ namespace MarbleBot
                 User = new MoneyUser() {
                     Name = Context.User.Username,
                     Discriminator = Context.User.Discriminator,
-                    Money = 0,
+                    Balance = 0,
+                    NetWorth = 0,
                     DailyStreak = 0,
                     LastDaily = DateTime.Parse("2019-01-01 00:00:00")
                 };
@@ -114,7 +116,8 @@ namespace MarbleBot
                     User = new MoneyUser() {
                         Name = Context.User.Username,
                         Discriminator = Context.User.Discriminator,
-                        Money = 0,
+                        Balance = 0,
+                        NetWorth = 0,
                         DailyStreak = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
                         LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
@@ -123,7 +126,8 @@ namespace MarbleBot
                     User = new MoneyUser() {
                         Name = Context.Guild.GetUser(id).Username,
                         Discriminator = Context.Guild.GetUser(id).Discriminator,
-                        Money = 0,
+                        Balance = 0,
+                        NetWorth = 0,
                         DailyStreak = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
                         LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
