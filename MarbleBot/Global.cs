@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Discord;
 using Discord.Commands;
+using MarbleBot.Extensions;
 using MarbleBot.Modules;
 using Newtonsoft.Json.Linq;
 
@@ -21,6 +22,7 @@ namespace MarbleBot
         internal static ulong BotId = 286228526234075136;
         internal static Dictionary<string, string> Autoresponses = new Dictionary<string, string>();
         internal static DateTime ARLastUse = new DateTime();
+        internal static ulong[] BotChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016 };
 
         // Server IDs
         internal const ulong CM = 223616088263491595; // Community Marble
@@ -76,6 +78,7 @@ namespace MarbleBot
             var User = new MoneyUser();
             if (obj.ContainsKey(Context.User.Id.ToString())) {
                 User = obj[(Context.User.Id.ToString())].ToObject<MoneyUser>();
+                if (string.IsNullOrEmpty(obj[(Context.User.Id.ToString())]?.ToString())) User.Items = new Dictionary<int, int>();
             } else {
                 User = new MoneyUser() {
                     Name = Context.User.Username,
@@ -83,8 +86,10 @@ namespace MarbleBot
                     Balance = 0,
                     NetWorth = 0,
                     DailyStreak = 0,
+                    RaceWins = 0,
                     LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
-                    LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
+                    LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                    Items = new Dictionary<int, int>()
                 };
             }
             return User;
@@ -94,6 +99,7 @@ namespace MarbleBot
             var User = new MoneyUser();
             if (obj.ContainsKey(Context.User.Id.ToString())) {
                 User = obj[(Context.User.Id.ToString())].ToObject<MoneyUser>();
+                if (string.IsNullOrEmpty(obj[(Context.User.Id.ToString())]?.ToString())) User.Items = new Dictionary<int, int>();
             } else {
                 User = new MoneyUser() {
                     Name = Context.User.Username,
@@ -101,7 +107,10 @@ namespace MarbleBot
                     Balance = 0,
                     NetWorth = 0,
                     DailyStreak = 0,
-                    LastDaily = DateTime.Parse("2019-01-01 00:00:00")
+                    RaceWins = 0,
+                    LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
+                    LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                    Items = new Dictionary<int, int>()
                 };
             }
             return User;
@@ -111,6 +120,7 @@ namespace MarbleBot
             var User = new MoneyUser();
             if (obj.ContainsKey(id.ToString())) {
                 User = obj[(id.ToString())].ToObject<MoneyUser>();
+                if (string.IsNullOrEmpty(obj[(Context.User.Id.ToString())]?.ToString())) User.Items = new Dictionary<int, int>();
             } else {
                 if (Context.IsPrivate) {
                     User = new MoneyUser() {
@@ -119,8 +129,10 @@ namespace MarbleBot
                         Balance = 0,
                         NetWorth = 0,
                         DailyStreak = 0,
+                        RaceWins = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
-                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
+                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                        Items = new Dictionary<int, int>()
                     };
                 } else {
                     User = new MoneyUser() {
@@ -129,12 +141,43 @@ namespace MarbleBot
                         Balance = 0,
                         NetWorth = 0,
                         DailyStreak = 0,
+                        RaceWins = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
-                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00")
+                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                        Items = new Dictionary<int, int>()
                     };
                 }
             }
             return User;
+        }
+
+        // Returns an item using its ID
+        internal static MoneyItem GetItem(string searchTerm) {
+            var item = new MoneyItem();
+            if (int.TryParse(searchTerm, out int itemID)) {
+                var itemFound = false;
+                using (var items = new StreamReader("ShopItems.csv")) {
+                    while (!items.EndOfStream) {
+                        var properties = items.ReadLine().Split(',');
+                        if (properties[0].ToInt() == itemID) {
+                            itemFound = true;
+                            item.Id = properties[0].ToInt();
+                            item.Name = properties[1];
+                            item.Price = properties[2].ToDecimal();
+                            item.Description = properties[3];
+                            item.OnSale = bool.Parse(properties[4]);
+                        }
+                    }
+                }
+                if (itemFound) return item;
+                else {
+                    item.Id = -1;
+                    return item;
+                }
+            } else {
+                item.Id = -2;
+                return item;
+            }
         }
     }
 }

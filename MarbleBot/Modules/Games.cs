@@ -34,8 +34,10 @@ namespace MarbleBot.Modules
                 case "signup": { 
                     var name = "";
                     if (option.IsEmpty() || option.Contains("@")) name = Context.User.Username;
-                    else if (option.Length > 100) await ReplyAsync("Your entry exceeds the 100 character limit.");
-                    else option = option.Replace("\n", " "); name = option;
+                    else if (option.Length > 100) {
+                        await ReplyAsync("Your entry exceeds the 100 character limit.");
+                        break;
+                    } else option = option.Replace("\n", " "); name = option;
                     builder.AddField("Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
                     using (var racers = new StreamWriter("RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
                     if (!File.Exists(fileID.ToString() + "race.csv")) File.Create(fileID.ToString() + "race.csv");
@@ -72,6 +74,22 @@ namespace MarbleBot.Modules
                     var canStart = false;
                     if (Context.IsPrivate) canStart = Global.Alive.ContainsKey(Context.User.Id);
                     else canStart = Global.Alive.ContainsKey(Context.Guild.Id);
+                    byte marbleCount = 0;
+                    using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
+                        while (!marbleList.EndOfStream) {
+                            var line = await marbleList.ReadLineAsync();
+                            if (!line.IsEmpty()) marbleCount++;
+                        }
+                    }
+                    if (marbleCount != 0) {
+                        byte oldCount = 255;
+                        if (Global.Alive.ContainsKey(fileID)) {
+                            oldCount = Global.Alive[fileID];
+                            Global.Alive[fileID] = marbleCount;
+                        } else Global.Alive.Add(fileID, marbleCount);
+                        if (marbleCount != oldCount) await ReplyAsync("Changed the contestant count to " + marbleCount + ".");
+                        canStart = true;
+                    }
                     if (!canStart) {
                         await ReplyAsync("It doesn't look like anyone has signed up!");
                     } else {
@@ -138,6 +156,7 @@ namespace MarbleBot.Modules
                                 User.Balance += gift;
                                 User.NetWorth += gift;
                                 User.LastRaceWin = DateTime.UtcNow;
+                                User.RaceWins++;
                                 obj.Remove(winnerID.ToString());
                                 obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(User)));
                                 using (var users = new StreamWriter("Users.json")) {
@@ -157,12 +176,6 @@ namespace MarbleBot.Modules
                     }
                     break;
                 }
-                case "bet": {
-                    /*using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
-                        var marble = await marbleList.ReadLineAsync();
-                    }*/
-                    break;
-                }
                 case "clear": {
                     if (Context.User.Id == 224267581370925056 || Context.IsPrivate) {
                         using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {
@@ -174,17 +187,22 @@ namespace MarbleBot.Modules
                     break;
                 }
                 case "setcount": {
-                    if (Context.User.Id == 224267581370925056 || Context.IsPrivate) {
-                        var newcount = byte.Parse(option);
-                        if (Context.IsPrivate) {
-                            if (Global.Alive.ContainsKey(Context.User.Id)) Global.Alive[Context.User.Id] = newcount;
-                            else Global.Alive.Add(Context.User.Id, newcount);
-                            await ReplyAsync("Changed the contestant count to " + newcount + ".");
-                        } else {
-                            if (Global.Alive.ContainsKey(Context.Guild.Id)) Global.Alive[Context.Guild.Id] = newcount;
-                            else Global.Alive.Add(Context.Guild.Id, newcount);
-                            await ReplyAsync("Changed the contestant count to " + newcount + ".");
+                    if (option == "auto") {
+                        byte marbleCount = 0;
+                        using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
+                            while (!marbleList.EndOfStream) {
+                                var line = await marbleList.ReadLineAsync();
+                                if (!line.IsEmpty()) marbleCount++;
+                            }
                         }
+                        if (Global.Alive.ContainsKey(fileID)) Global.Alive[fileID] = marbleCount;
+                        else Global.Alive.Add(fileID, marbleCount);
+                        await ReplyAsync("Changed the contestant count to " + marbleCount + ".");
+                    } else if (Context.User.Id == 224267581370925056 || Context.IsPrivate) {
+                        var newcount = byte.Parse(option);
+                        if (Global.Alive.ContainsKey(fileID)) Global.Alive[fileID] = newcount;
+                        else Global.Alive.Add(fileID, newcount);
+                        await ReplyAsync("Changed the contestant count to " + newcount + ".");
                     }
                     break;
                 }
@@ -199,6 +217,10 @@ namespace MarbleBot.Modules
                     if (marbles.ToString().IsEmpty()) await ReplyAsync("It looks like there aren't any contestants...");
                     else {
                         builder.AddField("Contestants", marbles.ToString());
+                        byte cCount = 0;
+                        if (Global.Alive.ContainsKey(fileID)) cCount = Global.Alive[fileID];
+                        else await _race("setcount", "auto");
+                        builder.WithFooter("Contestant count: " + cCount);
                         await ReplyAsync("", false, builder.Build());
                     }
                     break;
@@ -279,7 +301,7 @@ namespace MarbleBot.Modules
                     break;
                 }
                 default: {
-                    builder.AddField("How to play", "Use `mb/race signup [marble name]` to sign up as a marble!\nWhen everyone's done (or when 10 people have signed up), use `mb/race start`!\n\nCheck who's participating with `mb/race contestants`!\n\nYou can earn Units of Money if you win! (6 hour cooldown)")
+                    builder.AddField("How to play", "Use `mb/race signup [marble name]` to sign up as a marble!\nWhen everyone's done (or when 10 people have signed up), use `mb/race start`!\n\nCheck who's participating with `mb/race contestants`!\n(use `mb/setcount auto` if the contestant count isn't right)\n\nYou can earn Units of Money if you win! (6 hour cooldown)")
                         .WithTitle("Marble Race!");
                     await ReplyAsync("", false, builder.Build());
                     break;

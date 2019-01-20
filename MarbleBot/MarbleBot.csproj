@@ -167,12 +167,13 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="Modules\Games.cs" />
     <Compile Include="Modules\General.cs" />
-    <Compile Include="Modules\MBCommand.cs" />
+    <Compile Include="BaseClasses\MBCommand.cs" />
     <Compile Include="Modules\Moderation.cs" />
+    <Compile Include="BaseClasses\MoneyItem.cs" />
     <Compile Include="Modules\Roles.cs" />
     <Compile Include="Modules\YT.cs" />
     <Compile Include="Modules\Economy.cs" />
-    <Compile Include="Modules\MoneyUser.cs" />
+    <Compile Include="BaseClasses\MoneyUser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
