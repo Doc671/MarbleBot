@@ -9,7 +9,7 @@ namespace MarbleBot
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         => new Program().StartAsync().GetAwaiter().GetResult();
 
         public static DiscordSocketClient _client;

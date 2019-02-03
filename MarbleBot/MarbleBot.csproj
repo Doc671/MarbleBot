@@ -34,23 +34,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Discord.Net.Commands, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Commands.1.0.2\lib\netstandard1.1\Discord.Net.Commands.dll</HintPath>
+    <Reference Include="Discord.Net.Commands, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.Commands.2.0.1\lib\net46\Discord.Net.Commands.dll</HintPath>
     </Reference>
-    <Reference Include="Discord.Net.Core, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Core.1.0.2\lib\net45\Discord.Net.Core.dll</HintPath>
+    <Reference Include="Discord.Net.Core, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.Core.2.0.1\lib\net46\Discord.Net.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Discord.Net.Rest, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Rest.1.0.2\lib\net45\Discord.Net.Rest.dll</HintPath>
+    <Reference Include="Discord.Net.Rest, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.Rest.2.0.1\lib\net46\Discord.Net.Rest.dll</HintPath>
     </Reference>
     <Reference Include="Discord.Net.Rpc, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Discord.Net.Rpc.1.0.2\lib\net45\Discord.Net.Rpc.dll</HintPath>
     </Reference>
-    <Reference Include="Discord.Net.Webhook, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.Webhook.1.0.2\lib\netstandard1.1\Discord.Net.Webhook.dll</HintPath>
+    <Reference Include="Discord.Net.Webhook, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.Webhook.2.0.1\lib\netstandard1.3\Discord.Net.Webhook.dll</HintPath>
     </Reference>
-    <Reference Include="Discord.Net.WebSocket, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Discord.Net.WebSocket.1.0.2\lib\net45\Discord.Net.WebSocket.dll</HintPath>
+    <Reference Include="Discord.Net.WebSocket, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Discord.Net.WebSocket.2.0.1\lib\net46\Discord.Net.WebSocket.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis, Version=1.34.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
       <HintPath>..\packages\Google.Apis.1.34.0\lib\net45\Google.Apis.dll</HintPath>
@@ -162,6 +162,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseClasses\Marble.cs" />
+    <Compile Include="BaseClasses\Siege.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Extensions.cs" />
@@ -169,17 +171,55 @@
     <Compile Include="Modules\General.cs" />
     <Compile Include="BaseClasses\MBCommand.cs" />
     <Compile Include="Modules\Moderation.cs" />
-    <Compile Include="BaseClasses\MoneyItem.cs" />
+    <Compile Include="BaseClasses\Item.cs" />
+    <Compile Include="BaseClasses\Boss.cs" />
+    <Compile Include="BaseClasses\Difficulty.cs" />
+    <Compile Include="BaseClasses\Attack.cs" />
     <Compile Include="Modules\Roles.cs" />
     <Compile Include="Modules\YT.cs" />
     <Compile Include="Modules\Economy.cs" />
-    <Compile Include="BaseClasses\MoneyUser.cs" />
+    <Compile Include="BaseClasses\MBUser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\BossDestroyer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BossGreen.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BossHATTMANN.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BossOrange.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BossPreeTheTree.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PUClone.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PUCure.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PUHeal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PUMoraleBoost.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PUOverclock.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PUSummon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />

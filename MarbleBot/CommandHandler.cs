@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
@@ -9,9 +10,9 @@ namespace MarbleBot
 {
     public class CommandHandler
     {
-        private DiscordSocketClient _client;
+        private readonly DiscordSocketClient _client;
 
-        private CommandService _service;
+        private readonly CommandService _service;
 
         public CommandHandler(DiscordSocketClient client)
         {
@@ -19,7 +20,7 @@ namespace MarbleBot
 
             _service = new CommandService();
 
-            _service.AddModulesAsync(Assembly.GetEntryAssembly());
+            _service.AddModulesAsync(Assembly.GetEntryAssembly(), null);
 
             _client.MessageReceived += HandleCommandAsync;
         }
@@ -28,8 +29,7 @@ namespace MarbleBot
 
         private async Task HandleCommandAsync(SocketMessage s)
         {
-            var msg = s as SocketUserMessage;
-            if (msg == null) return;
+            if (!(s is SocketUserMessage msg)) return;
 
             var Context = new SocketCommandContext(_client, msg);
 
@@ -38,16 +38,16 @@ namespace MarbleBot
             int argPos = 0;
 
 
-            var IsLett = !(char.TryParse(msg.Content.Trim('`'), out char e));
-            if (!IsLett) IsLett = (char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e));
+            var IsLett = !char.TryParse(msg.Content.Trim('`'), out char e);
+            if (!IsLett) IsLett = char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e);
 
-            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false) {
-                var result = await _service.ExecuteAsync(Context, argPos);
+            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (Global.UsableChannels.Any(chnl => chnl == Context.Channel.Id) || Context.IsPrivate)) {
+                var result = await _service.ExecuteAsync(Context, argPos, null);
                 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                     Console.WriteLine("[" + DateTime.UtcNow + "] " + result.Error.Value + ": " + result.ErrorReason);
             } else if (msg.HasMentionPrefix(await Context.Channel.GetUserAsync(Global.BotId), ref argPos) && msg.Content.ToLower().Contains("no u")) {
-                var msgs = await Context.Channel.GetMessagesAsync().Flatten();
+                var msgs = await Context.Channel.GetMessagesAsync().FlattenAsync();
                 foreach (var mesg in msgs) if (mesg.Content.ToLower().Contains("no your")) await Context.Channel.SendMessageAsync(":warning: A No Your has been detected in the past 100 messages! The No U has been nullified!");
 
             } else if (!(IsLett) && Context.Channel.Id != 252481530130202624 && (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.CM)) {

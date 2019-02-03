@@ -19,8 +19,8 @@ namespace MarbleBot.Modules
         public async Task _clear(uint amount)
         {
             await Context.Channel.TriggerTypingAsync();
-            var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).Flatten();
-            await Context.Channel.DeleteMessagesAsync(messages);
+            var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).FlattenAsync();
+            foreach (var msg in messages) await Context.Channel.DeleteMessageAsync(msg);
             const int delay = 5000;
             var m = await ReplyAsync($"{amount} message(s) have been deleted. This message will be deleted in {delay / 1000} seconds.");
             await Task.Delay(delay);
@@ -34,7 +34,7 @@ namespace MarbleBot.Modules
             Console.WriteLine("hi");
             var server = ulong.Parse(rserver);
             var channel = ulong.Parse(rchannel);
-            var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).Flatten();
+            var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
             var srvr = new EmbedAuthorBuilder();
             if (server == Global.THS){
                 var THS = Context.Client.GetGuild(Global.THS);

@@ -23,7 +23,7 @@ namespace MarbleBot.Modules
         public async Task _channelinfo([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
-            Channel display = new Channel();
+            Channel display;
 
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
@@ -50,11 +50,11 @@ namespace MarbleBot.Modules
                 .WithCurrentTimestamp()
                 .WithFooter(display.ETag)
                 .WithThumbnailUrl(display.Snippet.Thumbnails.Default__.Url)
-                .AddInlineField("Subscribers", display.Statistics.SubscriberCount)
-                .AddInlineField("Views", display.Statistics.ViewCount)
-                .AddInlineField("Videos", display.Statistics.VideoCount)
-                .AddInlineField("Country", display.Snippet.Country)
-                .AddInlineField("Description", display.Snippet.Description);
+                .AddField("Subscribers", display.Statistics.SubscriberCount, true)
+                .AddField("Views", display.Statistics.ViewCount, true)
+                .AddField("Videos", display.Statistics.VideoCount, true)
+                .AddField("Country", display.Snippet.Country, true)
+                .AddField("Description", display.Snippet.Description, true);
 
             await ReplyAsync("", false, builder.Build());
         }
@@ -106,7 +106,7 @@ namespace MarbleBot.Modules
                             if (desc.Length > 200) await ReplyAsync("Your description length is too long!");
                             else {
                                 var CV = (IMessageChannel)Context.Client.GetGuild(Global.CM).GetChannel(442474624417005589);
-                                var msgs = await CV.GetMessagesAsync(100).Flatten();
+                                var msgs = await CV.GetMessagesAsync(100).FlattenAsync();
                                 var already = false;
                                 foreach (var msg in msgs) {
                                     if (msg.Content.Contains(url)) already = true; break;

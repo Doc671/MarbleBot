@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MarbleBot.BaseClasses;
 using MarbleBot.Extensions;
 
 namespace MarbleBot.Modules
@@ -32,7 +32,7 @@ namespace MarbleBot.Modules
                     builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
                     .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                    .AddField("Games", "\nrace (participate in a marble race)")
+                    .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
                     .WithColor(Color.DarkerGrey);
                 } else {
                     switch (Context.Guild.Id) {
@@ -42,7 +42,7 @@ namespace MarbleBot.Modules
                                 .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
                                 .WithColor(Color.Teal);
                             break;
                         case Global.THS:
@@ -52,7 +52,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
                                 .WithColor(Color.Orange);
                             break;
                         case Global.THSC:
@@ -62,7 +62,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
                                 .WithColor(Color.Orange);
                             break;
                         case Global.MT:
@@ -72,7 +72,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
                                 .WithColor(Color.DarkGrey);
                             break;
                         case Global.VFC:
@@ -82,7 +82,7 @@ namespace MarbleBot.Modules
                                 .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)")
+                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
                                 .WithColor(Color.Blue);
                             break;
                         default:
@@ -138,7 +138,8 @@ namespace MarbleBot.Modules
                     case "searchvideo": bCommand.Desc = "Displays a list of videos that match the search critera."; bCommand.Usage = "mb/searchvideo <videoname>"; bCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
 
                     // Games
-                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkEarn"; break;
+                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race setcount auto, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
+                    case "siege": bCommand.Desc = "Participate in a Marble Siege boss battle!"; bCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege boss <boss name>, mb/siege powerup <power-up name>"; break;
                 }
 
                 var message = new StringBuilder();
@@ -332,11 +333,11 @@ namespace MarbleBot.Modules
         {
             if (Context.User.Id == 224267581370925056) {
                 await ReplyAsync("Overriding command blockages...");
-                Thread.Sleep(3000);
+                await Task.Delay(3000);
                 await ReplyAsync("Overriding complete!");
-                Thread.Sleep(1000);
+                await Task.Delay(1000);
                 await ReplyAsync("Performing " + command + " command...");
-                Thread.Sleep(2000);
+                await Task.Delay(2000);
                 switch(command) {
                     case "buyhat": await _buyHat(); break;
                     case "orange": await _orange(); break;
@@ -420,9 +421,9 @@ namespace MarbleBot.Modules
                 case 25: xp = Global.Rand.Next(42000, 46474); break;
             }
 
-            var msgs = await Context.Channel.GetMessagesAsync(100).Flatten();
+            var msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
             byte ranks = 0;
-            string flavour = "";
+            string flavour;
 
             foreach (IMessage msg in msgs) {
                 if (msg != null && msg.Content == "mb/rank" && msg.Author == Context.Message.Author) {
@@ -462,8 +463,8 @@ namespace MarbleBot.Modules
                 default: flavour = ""; break;
             }
 
-            builder.AddInlineField("Level", level)
-                .AddInlineField("Total XP", xp)
+            builder.AddField("Level", level, true)
+                .AddField("Total XP", xp, true)
                 .WithColor(Global.GetColor(Context))
                 .WithTimestamp(DateTime.UtcNow)
                 .WithTitle(Context.User.Username + "#" + Context.User.Discriminator)
@@ -477,10 +478,10 @@ namespace MarbleBot.Modules
         public async Task _rate([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
-            int rating = 0;
             string message = "";
-            string emoji = "";
-            switch (input.ToLower()) {
+            int rating;
+            switch (input.ToLower())
+            {
                 // These inputs have custom ratings and messages:
                 case "256 mg": rating = -2; message = "I Am In Confusial Why"; break;
                 case "ddsc": rating = 0; break;
@@ -543,7 +544,10 @@ namespace MarbleBot.Modules
                 else message = "I don’t know who you are I don’t know what you want but if I don’t get my t-shirt tomorrow i will find you and I will rob you.";
                 rating = Global.Rand.Next(9, 11);
             }
-            switch (rating) {
+
+            string emoji;
+            switch (rating)
+            {
                 // Emoji time!
                 case -999: emoji = ":gun: :dagger: :bomb:"; break;
                 case -1: emoji = ":gun:"; break;
@@ -647,14 +651,14 @@ namespace MarbleBot.Modules
                 }
                 builder.WithThumbnailUrl(Context.Guild.IconUrl)
                     .WithTitle(Context.Guild.Name)
-                    .AddInlineField("Owner", Context.Guild.GetUser(Context.Guild.OwnerId).Username + "#" + Context.Guild.GetUser(Context.Guild.OwnerId).Discriminator)
-                    .AddInlineField("Voice Region", Context.Guild.VoiceRegionId)
-                    .AddInlineField("Text Channels", Context.Guild.TextChannels.Count)
-                    .AddInlineField("Voice Channels", Context.Guild.VoiceChannels.Count)
-                    .AddInlineField("Members", Context.Guild.Users.Count)
-                    .AddInlineField("Bots", botUsers)
-                    .AddInlineField("Online", onlineUsers)
-                    .AddInlineField("Roles", Context.Guild.Roles.Count)
+                    .AddField("Owner", Context.Guild.GetUser(Context.Guild.OwnerId).Username + "#" + Context.Guild.GetUser(Context.Guild.OwnerId).Discriminator, true)
+                    .AddField("Voice Region", Context.Guild.VoiceRegionId, true)
+                    .AddField("Text Channels", Context.Guild.TextChannels.Count, true)
+                    .AddField("Voice Channels", Context.Guild.VoiceChannels.Count, true)
+                    .AddField("Members", Context.Guild.Users.Count, true)
+                    .AddField("Bots", botUsers, true)
+                    .AddField("Online", onlineUsers)
+                    .AddField("Roles", Context.Guild.Roles.Count, true)
                     .WithColor(Global.GetColor(Context))
                     .WithTimestamp(DateTime.UtcNow)
                     .WithFooter(Context.Guild.Id.ToString());
@@ -668,7 +672,7 @@ namespace MarbleBot.Modules
         {
             string mensage = "";
             SocketGuildChannel[] channels = Context.Guild.TextChannels.ToArray();
-            Array.Sort(channels, (x, y) => String.Compare(x.Name, y.Name));
+            Array.Sort(channels, (x, y) => string.Compare(x.Name, y.Name));
             for (int i = 0; i < Context.Guild.Channels.Count - 1; i++) mensage += channels[i] + " ";
             await ReplyAsync(mensage);
         }
@@ -811,16 +815,16 @@ namespace MarbleBot.Modules
                 case "offline": status = "Offline"; break;
             }
 
-            string nickname = "";
+            string nickname;
             if (user.Nickname.IsEmpty()) nickname = "None";
             else nickname = user.Nickname;
 
             builder.WithThumbnailUrl(Context.User.GetAvatarUrl())
                 .WithTitle(Context.User.Username + "#" + Context.User.Discriminator)
                 .AddField("Status", status)
-                .AddInlineField("Nickname", nickname)
+                .AddField("Nickname", nickname, true)
                 .AddField("Registered", user.CreatedAt)
-                .AddInlineField("Joined", user.JoinedAt)
+                .AddField("Joined", user.JoinedAt, true)
                 .AddField("Roles", user.Roles)
                 .WithColor(Global.GetColor(Context))
                 .WithTimestamp(DateTime.UtcNow)
@@ -920,6 +924,27 @@ namespace MarbleBot.Modules
             chnl = Context.Client.GetGuild(Global.MT).GetTextChannel(Global.BotChannels[4]);
             msg = await chnl.SendMessageAsync("", false, builder.Build());
             await msg.PinAsync();
+        }
+
+        [Command("Uh")]
+        [RequireOwner]
+        public async Task _uh()
+        {
+            await Context.Channel.SendFileAsync("Images/BossPreeTheTree.png");
+            await Context.Channel.SendFileAsync("Images/BossHATTMANN.png");
+            await Context.Channel.SendFileAsync("Images/BossOrange.png");
+            await Context.Channel.SendFileAsync("Images/BossGreen.png");
+            await Context.Channel.SendFileAsync("Images/BossDestroyer.png");
+            /*await Context.Channel.SendFileAsync("Images/PUClone.png");
+            await Context.Channel.SendFileAsync("Images/PUCure.png");
+            await Context.Channel.SendFileAsync("Images/PUHeal.png");
+            await Context.Channel.SendFileAsync("Images/PUMoraleBoost.png");
+            await Context.Channel.SendFileAsync("Images/PUOverclock.png");
+            await Context.Channel.SendFileAsync("Images/PUSummon.png");
+            var builder = new EmbedBuilder()
+                .WithImageUrl("attachment://PUCure.png")
+                .WithTitle("Hi");
+            await Context.Channel.SendFileAsync("attachment://PUCure.png", embed: builder.Build());*/
         }
 
         /*[Command("domybidding")]

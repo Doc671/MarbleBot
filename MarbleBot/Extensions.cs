@@ -10,7 +10,7 @@ namespace MarbleBot.Extensions
     public static class Extensions
     {
         public static bool IsEmpty(this String str) {
-            return (str == "" || str == " " || str == null || str == string.Empty);
+            return (str == "" || str == " " || str == null || str == string.Empty || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str));
         }
 
         public static string Ordinal(this int no) {
@@ -18,7 +18,7 @@ namespace MarbleBot.Extensions
             if (ns.Length > 2) ns.Substring((ns.Length - 3));
             no = int.Parse(ns);
             if (no > 20) no = no % 10;
-            var ord = "";
+            string ord;
             switch (no) {
                 case 1: ord = "st"; break;
                 case 2: ord = "nd"; break;
@@ -26,6 +26,15 @@ namespace MarbleBot.Extensions
                 default: ord = "th"; break;
             }
             return ord;
+        }
+
+        public static string RemoveChar(this String str, char charToRemove) {
+            var chr = str.ToCharArray();
+            var output = new StringBuilder();
+            foreach (var c in chr) {
+                if (c != charToRemove) output.Append(c);
+            }
+            return output.ToString();
         }
 
         public static int ToInt(this String raw)  {

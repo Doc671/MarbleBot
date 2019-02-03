@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MarbleBot.Modules
+﻿namespace MarbleBot.BaseClasses
 {
     struct MBCommand // Used to make stuff in the help command more readable
     {
