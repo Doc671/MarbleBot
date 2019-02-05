@@ -37,7 +37,6 @@ namespace MarbleBot
 
             int argPos = 0;
 
-
             var IsLett = !char.TryParse(msg.Content.Trim('`'), out char e);
             if (!IsLett) IsLett = char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e);
 
@@ -74,7 +73,7 @@ namespace MarbleBot
                     }
                 }
             }
-            if (Context.IsPrivate) Console.WriteLine(string.Format("[{0}] {1}: {2}", DateTime.UtcNow, Context.User, Context.Message));
+            if (Context.IsPrivate) Console.WriteLine(string.Format("[{0}] {1}: {2}", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), Context.User, Context.Message));
         }
     }
 }

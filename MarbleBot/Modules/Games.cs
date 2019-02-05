@@ -357,7 +357,7 @@ namespace MarbleBot.Modules
                     using (var marbleList = new StreamReader(fileID.ToString() + "siege.csv")) {
                         while (!marbleList.EndOfStream) {
                             var line = (await marbleList.ReadLineAsync()).Split(',');
-                            found = line[1].Contains(Context.User.Id.ToString());
+                            found = line[1].Contains(Context.User.Id.ToString()) || line[1] == Context.User.Id.ToString();
                         }
                     }
                     if (found) {
@@ -445,7 +445,7 @@ namespace MarbleBot.Modules
                         foreach (var marble in Global.SiegeInfo[fileID].Marbles) allIDs.Add(marble.Id);
                         if (allIDs.Contains(Context.User.Id)) {
                             var marble = Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id);
-                            if (marble.HP > 1) {
+                            if (marble.HP > 0) {
                                 if (DateTime.UtcNow.Subtract(Global.SiegeInfo[fileID].LastMorale).TotalSeconds > 20 && Global.SiegeInfo[fileID].Morales > 0) {
                                     Global.SiegeInfo[fileID].Morales--;
                                     Global.SiegeInfo[fileID].DMGMultiplier /= 2;
@@ -488,29 +488,32 @@ namespace MarbleBot.Modules
                 }
                 case "bonk": goto case "attack";
                 case "grab": {
-                    if (Global.SiegeInfo[fileID].PowerUp.IsEmpty()) await ReplyAsync("There is no power-up to grab!");
-                    else {
-                        if (Global.Rand.Next(0, 3) == 0) {
-                            Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).PUHits++;
-                            switch (Global.SiegeInfo[fileID].PowerUp) {
-                                case "Morale Boost":
-                                    Global.SiegeInfo[fileID].DMGMultiplier *= 2;
-                                    builder.WithTitle("POWER-UP ACTIVATED!")
-                                        .WithDescription(string.Format("**{0}** activated **{1}**! Damage multiplier increased to **{2}**!", Global.SiegeInfo[fileID].Marbles.TakeWhile(m => m.Id == Context.User.Id).First().Name, Global.SiegeInfo[fileID].PowerUp, Global.SiegeInfo[fileID].DMGMultiplier));
-                                    await ReplyAsync("", false, builder.Build());
-                                    Global.SiegeInfo[fileID].SetPowerUp("");
-                                    Global.SiegeInfo[fileID].Morales++;
-                                    break;
-                                case "Clone":
-                                    Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Cloned = true;
-                                    builder.WithTitle("POWER-UP ACTIVATED!")
-                                        .WithDescription(string.Format("**{0}** activated **{1}**! Five clones of {0} appeared!", Global.SiegeInfo[fileID].Marbles.TakeWhile(m => m.Id == Context.User.Id).First().Name, Global.SiegeInfo[fileID].PowerUp));
-                                    await ReplyAsync("", false, builder.Build());
-                                    Global.SiegeInfo[fileID].SetPowerUp("");
-                                    break;
-                            }
-                        } else await ReplyAsync("You failed to grab the power-up!");
-                    }
+                    if (Global.SiegeInfo[fileID].Marbles.Any(m => m.Id == Context.User.Id)) {
+                        if (Global.SiegeInfo[fileID].PowerUp.IsEmpty()) await ReplyAsync("There is no power-up to grab!");
+                        else {
+                            if (Global.Rand.Next(0, 3) == 0) {
+                                Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).PUHits++;
+                                switch (Global.SiegeInfo[fileID].PowerUp) {
+                                    case "Morale Boost":
+                                        Global.SiegeInfo[fileID].DMGMultiplier *= 2;
+                                        builder.WithTitle("POWER-UP ACTIVATED!")
+                                            .WithDescription(string.Format("**{0}** activated **{1}**! Damage multiplier increased to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, Global.SiegeInfo[fileID].PowerUp, Global.SiegeInfo[fileID].DMGMultiplier));
+                                        await ReplyAsync("", false, builder.Build());
+                                        Global.SiegeInfo[fileID].SetPowerUp("");
+                                        Global.SiegeInfo[fileID].Morales++;
+                                        Global.SiegeInfo[fileID].LastMorale = DateTime.UtcNow;
+                                        break;
+                                    case "Clone":
+                                        Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Cloned = true;
+                                        builder.WithTitle("POWER-UP ACTIVATED!")
+                                            .WithDescription(string.Format("**{0}** activated **{1}**! Five clones of {0} appeared!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, Global.SiegeInfo[fileID].PowerUp));
+                                        await ReplyAsync("", false, builder.Build());
+                                        Global.SiegeInfo[fileID].SetPowerUp("");
+                                        break;
+                                }
+                            } else await ReplyAsync("You failed to grab the power-up!");
+                        }
+                    } else await ReplyAsync($"**{Context.User.Username}**, you aren't in this Siege!");
                     break;
                 }
                 case "clear": {
@@ -592,8 +595,8 @@ namespace MarbleBot.Modules
                     if (found) {
                         var attacks = new StringBuilder();
                         foreach (var attack in boss.Attacks) attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}]");
-                        builder.AddField("HP", boss.MaxHP)
-                            .AddField("Attacks", $"**{attacks.ToString()}**")
+                        builder.AddField("HP", $"**{boss.MaxHP}**")
+                            .AddField("Attacks", attacks.ToString())
                             .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)}** {(int)boss.Difficulty}/10")
                             .WithThumbnailUrl(boss.ImageUrl)
                             .WithTitle(boss.Name);
@@ -667,7 +670,7 @@ namespace MarbleBot.Modules
                         .WithTitle($"WARNING: {atk.Name.ToUpper()} INBOUND!");
                     var hits = 0;
                     foreach (var marble in Global.SiegeInfo[Id].Marbles) {
-                        if (marble.HP > 1) {
+                        if (marble.HP > 0) {
                             var likelihood = Global.Rand.Next(0, 100);
                             if (!(likelihood > atk.Accuracy)) {
                                 marble.HP -= atk.Damage;
@@ -682,6 +685,7 @@ namespace MarbleBot.Modules
                     if (hits < 1) builder.AddField("Missed!", "No-one got hurt!");
                     await Context.Channel.SendMessageAsync("", false, builder.Build());
                     if (DateTime.UtcNow.Subtract(Global.SiegeInfo[Id].LastMorale).TotalSeconds > 20 && Global.SiegeInfo[Id].Morales > 0) {
+                        Console.WriteLine(DateTime.UtcNow.Subtract(Global.SiegeInfo[Id].LastMorale).TotalSeconds);
                         Global.SiegeInfo[Id].Morales--;
                         Global.SiegeInfo[Id].DMGMultiplier /= 2;
                         await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[Id].DMGMultiplier}**!");
@@ -751,7 +755,7 @@ namespace MarbleBot.Modules
                 var obj = JObject.Parse(json);
                 var User = Global.GetUser(Context, obj, marble.Id);
                 int earnings = marble.BossHits + (marble.PUHits * 50);
-                if (DateTime.UtcNow.Subtract(User.LastSiegeWin).TotalHours > 1) {
+                if (DateTime.UtcNow.Subtract(User.LastSiegeWin).TotalHours > 6) {
                     var output = new StringBuilder();
                     output.AppendLine($"Damage dealt: {Global.UoM}**{marble.BossHits:n}**");
                     if (marble.PUHits > 0) output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PUHits * 50:n}**");
