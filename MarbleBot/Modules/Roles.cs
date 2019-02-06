@@ -12,6 +12,7 @@ namespace MarbleBot.Modules
         /// </summary>
 
         [Command("give")]
+        [Alias("giverole")]
         [Summary("Gives a role")]
         public async Task _roleGive(string roleName)
         {
@@ -94,6 +95,7 @@ namespace MarbleBot.Modules
         }
 
         [Command("take")]
+        [Alias("removerole, takerole")]
         [Summary("Takes a role from someone.")]
         public async Task _roleTake(string roleName)
         {
@@ -179,6 +181,7 @@ namespace MarbleBot.Modules
         }
 
         [Command("rolelist")]
+        [Alias("roles")]
         [Summary("Shows a list of all roles")]
         public async Task _roleList()
         {

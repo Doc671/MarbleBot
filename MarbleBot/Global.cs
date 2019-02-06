@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
@@ -25,8 +24,8 @@ namespace MarbleBot
         internal static ulong BotId = 286228526234075136;
         internal static Dictionary<string, string> Autoresponses = new Dictionary<string, string>();
         internal static DateTime ARLastUse = new DateTime();
-        internal static ulong[] BotChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016 };
-        internal static ulong[] UsableChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 252481530130202624, 224478087046234112, 293837572130603008 };
+        internal static ulong[] BotChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 540638882740305932 };
+        internal static ulong[] UsableChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 540638882740305932, 252481530130202624, 224478087046234112, 293837572130603008 };
 
         // Server IDs
         internal const ulong CM = 223616088263491595; // Community Marble
