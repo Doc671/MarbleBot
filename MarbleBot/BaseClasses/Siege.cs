@@ -32,7 +32,7 @@ namespace MarbleBot.BaseClasses
         {
             Active = false;
             Boss = boss;
-            DMGMultiplier = 1;
+            DMGMultiplier = 1; 
             LastMorale = DateTime.Parse("01/01/2019 00:00:00");
             Marbles = new List<Marble>(marbles);
             Morales = 0;

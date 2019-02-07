@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Discord;
@@ -25,8 +24,8 @@ namespace MarbleBot
         internal static ulong BotId = 286228526234075136;
         internal static Dictionary<string, string> Autoresponses = new Dictionary<string, string>();
         internal static DateTime ARLastUse = new DateTime();
-        internal static ulong[] BotChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016 };
-        internal static ulong[] UsableChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 252481530130202624, 224478087046234112, 293837572130603008 };
+        internal static ulong[] BotChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 540638882740305932 };
+        internal static ulong[] UsableChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 540638882740305932, 252481530130202624, 224478087046234112, 293837572130603008 };
 
         // Server IDs
         internal const ulong CM = 223616088263491595; // Community Marble
@@ -40,28 +39,28 @@ namespace MarbleBot
         internal static Dictionary<ulong, Siege> SiegeInfo = new Dictionary<ulong, Siege>();
         internal static List<Task> Sieges = new List<Task>();
         internal static Boss PreeTheTree = new Boss("Pree the Tree", 300, Difficulty.Simple, "https://cdn.discordapp.com/attachments/296376584238137355/541383182197719040/BossPreeTheTree.png", new Attack[] {
-            new Attack("Falling Leaves", 3, 35),
-            new Attack("Spinning Leaves", 3, 40),
-            new Attack("Acorn Bomb", 5, 45),
-            new Attack("Floating Twigs", 2, 55)
+            new Attack("Falling Leaves", 3, 40),
+            new Attack("Spinning Leaves", 3, 50),
+            new Attack("Acorn Bomb", 5, 55),
+            new Attack("Floating Twigs", 2, 65)
         });
         internal static Boss HATTMANN = new Boss("HATT MANN", 600, Difficulty.Easy, "https://cdn.discordapp.com/attachments/296376584238137355/541383185481596940/BossHATTMANN.png", new Attack[] {
             new Attack("Hat Trap", 4, 45),
-            new Attack("Inverted Hat", 3, 50),
-            new Attack("HATT GUNN", 6, 35),
+            new Attack("Inverted Hat", 3, 45),
+            new Attack("HATT GUNN", 6, 40),
             new Attack("Hat Spawner", 2, 90)
         });
         internal static Boss Orange = new Boss("Orange", 1200, Difficulty.Decent, "https://cdn.discordapp.com/attachments/296376584238137355/541383189114126339/BossOrange.png", new Attack[] {
-            new Attack("Poup Soop Barrel", 4, 40),
+            new Attack("Poup Soop Barrel", 4, 45),
             new Attack("Poup Krumb", 8, 50),
             new Attack("ORANGE HEDDS", 5, 40),
             new Attack("How To Be An Idiot Vol. 3", 3, 45)
         });
         internal static Boss Green = new Boss("Green", 1500, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png", new Attack[] {
             new Attack("Wobbly Toxicut", 7, 45),
-            new Attack("Falling Hellslash", 8, 40),
+            new Attack("Falling Hellslash", 8, 45),
             new Attack("Attractive Domesday", 15, 20),
-            new Attack("Spinning Pyroclash", 5, 70),
+            new Attack("Spinning Pyroclash", 5, 75),
             new Attack("Accurate Flarer", 3, 95)
         });
         internal static Boss Destroyer = new Boss("Destroyer", 3720, Difficulty.Extreme, "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png", new Attack[] {
@@ -124,8 +123,10 @@ namespace MarbleBot
                     NetWorth = 0,
                     DailyStreak = 0,
                     RaceWins = 0,
+                    SiegeWins = 0,
                     LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
                     LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                    LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
                     Items = new Dictionary<int, int>()
                 };
             }
@@ -145,8 +146,10 @@ namespace MarbleBot
                     NetWorth = 0,
                     DailyStreak = 0,
                     RaceWins = 0,
+                    SiegeWins = 0,
                     LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
                     LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                    LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
                     Items = new Dictionary<int, int>()
                 };
             }
@@ -167,8 +170,10 @@ namespace MarbleBot
                         NetWorth = 0,
                         DailyStreak = 0,
                         RaceWins = 0,
+                        SiegeWins = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
                         LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                        LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
                         Items = new Dictionary<int, int>()
                     };
                 } else {
@@ -179,8 +184,10 @@ namespace MarbleBot
                         NetWorth = 0,
                         DailyStreak = 0,
                         RaceWins = 0,
+                        SiegeWins = 0,
                         LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
                         LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
+                        LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
                         Items = new Dictionary<int, int>()
                     };
                 }

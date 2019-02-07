@@ -23,3 +23,8 @@ disconnected
 caused Algodoo to lag
 was deleted by Algodoo
 got defenestrated
+failed as badly as Sand Dollar
+somehow broke the law
+self-destructed
+was not a marble
+`ERROR - Body::IsBad`

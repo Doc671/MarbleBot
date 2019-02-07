@@ -35,6 +35,7 @@ namespace MarbleBot.Modules
                     .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
                     .WithColor(Color.DarkerGrey);
                 } else {
+                    builder.WithColor(Global.GetColor(Context));
                     switch (Context.Guild.Id) {
                         case Global.CM:
                             builder.AddField("Command List", "help (should be fairly obvious)")
@@ -42,50 +43,16 @@ namespace MarbleBot.Modules
                                 .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                                 .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                 .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
-                                .WithColor(Color.Teal);
-                            break;
-                        case Global.THS:
-                            builder.AddField("Command List", "help (should be fairly obvious)")
-                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
-                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
-                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
-                                .WithColor(Color.Orange);
-                            break;
-                        case Global.THSC:
-                            builder.AddField("Command List", "help (should be fairly obvious)")
-                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
-                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
-                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
-                                .WithColor(Color.Orange);
-                            break;
-                        case Global.MT:
-                            builder.AddField("Command List", "help (should be fairly obvious)")
-                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
-                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
-                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
-                                .WithColor(Color.DarkGrey);
-                            break;
-                        case Global.VFC:
-                            builder.AddField("Command List", "help (should be fairly obvious)")
-                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
-                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
-                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
-                                .WithColor(Color.Blue);
+                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)");
                             break;
                         default:
+                            builder.AddField("Command List", "help (should be fairly obvious)")
+                                .AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
+                                .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                                .AddField("Utility Commands", "serverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members.")
+                                .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
+                                .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
+                                .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)");
                             break;
                     }
                 }
@@ -138,8 +105,8 @@ namespace MarbleBot.Modules
                     case "searchvideo": bCommand.Desc = "Displays a list of videos that match the search critera."; bCommand.Usage = "mb/searchvideo <videoname>"; bCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
 
                     // Games
-                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race setcount auto, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
-                    case "siege": bCommand.Desc = "Participate in a Marble Siege boss battle!"; bCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege boss <boss name>, mb/siege powerup <power-up name>"; break;
+                    case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
+                    case "siege": bCommand.Desc = "Participate in a Marble Siege boss battle!"; bCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege powerup <power-up name>"; break;
                 }
 
                 var message = new StringBuilder();
@@ -353,6 +320,8 @@ namespace MarbleBot.Modules
         public async Task _repeat()
         {
             await ReplyAsync("INITIATING ANTI-RAID PROTOCOL.");
+            await Task.Delay(1000);
+            await ReplyAsync("FAILURE.");
         }
 
         [Command("random")]
@@ -362,10 +331,9 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var start = rStart.ToInt();
             var end = rEnd.ToInt();
-            if (start < 0 || end < 0) {
-                await ReplyAsync("Only use positive numbers!");
-            } else if (start > end) {
-                try  {
+            if (start < 0 || end < 0) await ReplyAsync("Only use positive numbers!");
+            else if (start > end) {
+                try {
                     int randNumber = Global.Rand.Next(end, start);
                     await ReplyAsync(randNumber.ToString());
                 } catch (FormatException) {
@@ -439,27 +407,28 @@ namespace MarbleBot.Modules
                 case 2: flavour = "100% legitimate"; break;
                 case 3: flavour = "I have a feeling you doubt me. Why is that?"; break;
                 case 4: flavour = "What? I'm telling the truth, I swear!"; break;
-                case 5: flavour = "What do you mean: \"The level's going down!\"?"; break;
+                case 5: flavour = "What do you mean: \"This is random!\"?"; break;
                 case 6: flavour = "Stop! Now!"; break;
                 case 7: flavour = "I mean, you're probably breaking a no-spam rule!"; break;
                 case 8: flavour = "...or you're using this in a spam channel..."; break;
-                case 9: flavour = "Please... don't expose me... ;-;"; break;
-                case 10: flavour = "At least I tried to generate a level..."; break;
-                case 11: flavour = ";;--;;"; break;
-                case 12: flavour = "I want to cry now. I really do."; break;
-                case 13: flavour = "...and I cry acid."; break;
-                case 14: flavour = "Just kidding, I actually cry Poup Soop..."; break;
-                case 15: flavour = "...which has acid in it..."; break;
-                case 16: flavour = "agh"; break;
-                case 17: flavour = "Why are you still going on?"; break;
-                case 18: flavour = "Aren't you bored?"; break;
-                case 19: flavour = "Don't you have anything better to do?"; break;
-                case 20: flavour = "No? I suppose not. You've used this command 20 times in the past 100 messages, after all."; break;
-                case 21: flavour = "Do you just want to see how far I'll go?"; break;
-                case 22: flavour = "Fine. I'll stop then."; break;
-                case 23: flavour = "Bye."; break;
-                case 24: flavour = "Wasn't fun talking to you."; break;
-                case 25: flavour = "ok really this is the last message"; break;
+                case 9: flavour = "...or slowmode is on..."; break;
+                case 10: flavour = "Please... don't expose me... ;-;"; break;
+                case 11: flavour = "At least I tried to generate a level..."; break;
+                case 12: flavour = ";;--;;"; break;
+                case 13: flavour = "I want to cry now. I really do."; break;
+                case 14: flavour = "...and I cry acid."; break;
+                case 15: flavour = "Just kidding, I actually cry Poup Soop..."; break;
+                case 16: flavour = "...which has acid in it..."; break;
+                case 17: flavour = "agh"; break;
+                case 18: flavour = "Why are you still going on?"; break;
+                case 19: flavour = "Aren't you bored?"; break;
+                case 20: flavour = "Don't you have anything better to do?"; break;
+                case 21: flavour = "No? I suppose not. You've used this command 21 times in the past 100 messages, after all."; break;
+                case 22: flavour = "Do you just want to see how far I'll go?"; break;
+                case 23: flavour = "Fine. I'll stop then."; break;
+                case 24: flavour = "Bye."; break;
+                case 25: flavour = "Wasn't fun talking to you."; break;
+                case 26: flavour = "ok really this is the last message"; break;
                 default: flavour = ""; break;
             }
 
@@ -467,7 +436,7 @@ namespace MarbleBot.Modules
                 .AddField("Total XP", xp, true)
                 .WithColor(Global.GetColor(Context))
                 .WithTimestamp(DateTime.UtcNow)
-                .WithTitle(Context.User.Username + "#" + Context.User.Discriminator)
+                .WithAuthor(Context.User)
                 .WithFooter(flavour);
 
             await ReplyAsync("", false, builder.Build());

@@ -92,11 +92,15 @@ namespace MarbleBot.Modules {
             var obj = JObject.Parse(json);
             var User = Global.GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 24) {
-                if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48) User.DailyStreak = 1;
+                var reset = false;
+                if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48) {
+                    User.DailyStreak = 1;
+                    reset = true;
+                }
                 var gift = Convert.ToDecimal(Math.Round(Math.Pow(200, (1 + (Convert.ToDouble(User.DailyStreak) / 100))), 2));
                 User.Balance += gift;
                 User.NetWorth += gift;
-                if (!(DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48)) User.DailyStreak++;
+                if (!(DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48) && !reset) User.DailyStreak++;
                 User.LastDaily = DateTime.UtcNow;
                 obj.Remove(Context.User.Id.ToString());
                 obj.Add(new JProperty(Context.User.Id.ToString(), JObject.FromObject(User)));
