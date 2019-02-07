@@ -211,7 +211,9 @@ namespace MarbleBot.Modules
                         var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
                         foreach (var marble in allMarbles) {
                             if (marble.Length > 16) {
-                                marbles.AppendLine(marble.Split(',')[0]);
+                                var mSplit = marble.Split(',');
+                                var user = Context.Client.GetUser(ulong.Parse(mSplit[1].Trim('\n')));
+                                marbles.AppendLine($"**{mSplit[0].Trim('\n')}** [{user.Username}#{user.Discriminator}]");
                                 count++;
                             }
                         }
@@ -303,18 +305,24 @@ namespace MarbleBot.Modules
                 case "remove": {
                     var found = false;
                     var wholeFile = new StringBuilder();
+                    var id = 0ul;
                     using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
                         while (!marbleList.EndOfStream) {
                             var line = await marbleList.ReadLineAsync();
-                            if (line.Split(',')[0] == option) found = true;
-                            else wholeFile.AppendLine(line);
+                            if (line.Split(',')[0] == option) {
+                                found = true;
+                                id = ulong.Parse(line.Split(',')[1]);
+                            } else wholeFile.AppendLine(line);
                         }
                     }
                     if (found) {
-                        using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {
-                            await marbleList.WriteAsync(wholeFile.ToString());
-                            Global.RaceAlive[fileID]--;
-                            await ReplyAsync("Removed contestant **" + option + "**!");
+                        if (id != Context.User.Id) await ReplyAsync("This is not your marble!");
+                        else {
+                            using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {
+                                await marbleList.WriteAsync(wholeFile.ToString());
+                                Global.RaceAlive[fileID]--;
+                                await ReplyAsync("Removed contestant **" + option + "**!");
+                            }
                         }
                     }
                     else await ReplyAsync("Could not find the requested racer!");
@@ -526,6 +534,17 @@ namespace MarbleBot.Modules
                     }
                     break;
                 }
+                case "checkearn": {
+                    var User = Global.GetUser(Context);
+                    var nextDaily = DateTime.UtcNow.Subtract(User.LastSiegeWin);
+                    var output = "";
+                    if (nextDaily.TotalHours < 6) output = string.Format("You can earn money from racing in **{0}**!", Global.GetDateString(User.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6))));
+                    else output = "You can earn money from racing now!";
+                    builder.WithAuthor(Context.User)
+                        .WithDescription(output);
+                    await ReplyAsync("", false, builder.Build());
+                    break;
+                }
                 case "contestants": {
                     var marbles = new StringBuilder();
                     byte cCount = 0;
@@ -685,7 +704,6 @@ namespace MarbleBot.Modules
                     if (hits < 1) builder.AddField("Missed!", "No-one got hurt!");
                     await Context.Channel.SendMessageAsync("", false, builder.Build());
                     if (DateTime.UtcNow.Subtract(Global.SiegeInfo[Id].LastMorale).TotalSeconds > 20 && Global.SiegeInfo[Id].Morales > 0) {
-                        Console.WriteLine(DateTime.UtcNow.Subtract(Global.SiegeInfo[Id].LastMorale).TotalSeconds);
                         Global.SiegeInfo[Id].Morales--;
                         Global.SiegeInfo[Id].DMGMultiplier /= 2;
                         await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[Id].DMGMultiplier}**!");
@@ -757,7 +775,7 @@ namespace MarbleBot.Modules
                 int earnings = marble.BossHits + (marble.PUHits * 50);
                 if (DateTime.UtcNow.Subtract(User.LastSiegeWin).TotalHours > 6) {
                     var output = new StringBuilder();
-                    output.AppendLine($"Damage dealt: {Global.UoM}**{marble.BossHits:n}**");
+                    if (marble.BossHits > 0) output.AppendLine($"Damage dealt: {Global.UoM}**{marble.BossHits:n}**");
                     if (marble.PUHits > 0) output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PUHits * 50:n}**");
                     if (marble.HP > 0) {
                         earnings += 200;
@@ -768,10 +786,12 @@ namespace MarbleBot.Modules
                             output.AppendLine($"Did nothing: {Global.UoM}**-{200:n}**");
                         }
                     }
-                    output.AppendLine($"__**Total: {Global.UoM}{earnings:n}**__");
-                    User.Balance += earnings;
-                    User.NetWorth += earnings;
-                    builder.AddField($"**{Context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
+                    if (output.Length > 0) {
+                        output.AppendLine($"__**Total: {Global.UoM}{earnings:n}**__");
+                        User.Balance += earnings;
+                        User.NetWorth += earnings;
+                        builder.AddField($"**{Context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
+                    }
                 }
                 if (marble.HP > 0 && earnings > 0) User.LastSiegeWin = DateTime.UtcNow;
                 obj.Remove(marble.Id.ToString());

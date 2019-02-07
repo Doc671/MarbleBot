@@ -44,7 +44,7 @@ namespace MarbleBot
                 var result = await _service.ExecuteAsync(Context, argPos, null);
                 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
-                    Console.WriteLine("[" + DateTime.UtcNow + "] " + result.Error.Value + ": " + result.ErrorReason);
+                    Console.WriteLine($"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {result.Error.Value}: {result.ErrorReason}");
             } else if (msg.HasMentionPrefix(await Context.Channel.GetUserAsync(Global.BotId), ref argPos) && msg.Content.ToLower().Contains("no u")) {
                 var msgs = await Context.Channel.GetMessagesAsync().FlattenAsync();
                 foreach (var mesg in msgs) if (mesg.Content.ToLower().Contains("no your")) await Context.Channel.SendMessageAsync(":warning: A No Your has been detected in the past 100 messages! The No U has been nullified!");
