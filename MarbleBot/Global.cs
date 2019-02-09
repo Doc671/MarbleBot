@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MarbleBot
 {
-    class Global
+    static class Global
     {
         /// <summary>
         /// Contains global variables
@@ -60,15 +60,15 @@ namespace MarbleBot
             new Attack("Wobbly Toxicut", 7, 45),
             new Attack("Falling Hellslash", 8, 45),
             new Attack("Attractive Domesday", 15, 20),
-            new Attack("Spinning Pyroclash", 5, 75),
-            new Attack("Accurate Flarer", 3, 95)
+            new Attack("Spinning Pyroclash", 5, 65),
+            new Attack("Accurate Flarer", 3, 90)
         });
         internal static Boss Destroyer = new Boss("Destroyer", 3720, Difficulty.Extreme, "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png", new Attack[] {
-            new Attack("Antimatter Missile", 12, 55),
-            new Attack("Annihilator-A", 10, 50),
-            new Attack("Flamethrower", 9, 60),
-            new Attack("Black Hole", 13, 60),
-            new Attack("Repulsor Blast", 6, 75)
+            new Attack("Antimatter Missile", 11, 45),
+            new Attack("Annihilator-A", 9, 40),
+            new Attack("Flamethrower", 8, 50),
+            new Attack("Black Hole", 12, 50),
+            new Attack("Repulsor Blast", 6, 65)
         });
 
         // Gets colour for embed depending on server
@@ -113,8 +113,8 @@ namespace MarbleBot
             var obj = JObject.Parse(json);
             MBUser User;
             if (obj.ContainsKey(Context.User.Id.ToString())) {
-                User = obj[(Context.User.Id.ToString())].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[(Context.User.Id.ToString())]?.ToString())) User.Items = new Dictionary<int, int>();
+                User = obj[Context.User.Id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[Context.User.Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
             } else {
                 User = new MBUser() {
                     Name = Context.User.Username,
@@ -136,8 +136,8 @@ namespace MarbleBot
         internal static MBUser GetUser(SocketCommandContext Context, JObject obj) {
             MBUser User;
             if (obj.ContainsKey(Context.User.Id.ToString())) {
-                User = obj[(Context.User.Id.ToString())].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[(Context.User.Id.ToString())]?.ToString())) User.Items = new Dictionary<int, int>();
+                User = obj[Context.User.Id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[Context.User.Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
             } else {
                 User = new MBUser() {
                     Name = Context.User.Username,
@@ -159,8 +159,8 @@ namespace MarbleBot
         internal static MBUser GetUser(SocketCommandContext Context, JObject obj, ulong id) {
             MBUser User;
             if (obj.ContainsKey(id.ToString())) {
-                User = obj[(id.ToString())].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[(Context.User.Id.ToString())]?.ToString())) User.Items = new Dictionary<int, int>();
+                User = obj[id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[Context.User.Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
             } else {
                 if (Context.IsPrivate) {
                     User = new MBUser() {

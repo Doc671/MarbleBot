@@ -156,3 +156,5 @@ C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossGreen.png
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossHATTMANN.png
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossOrange.png
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossPreeTheTree.png
+C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossFrigidium.png
+C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossNeptune.png

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
 using System.Threading.Tasks;
+using Discord;
+using Discord.WebSocket;
 
 namespace MarbleBot
 {
@@ -37,7 +36,6 @@ namespace MarbleBot
                     Global.Autoresponses.Add(arar[0], arar[1]);
                 }
             }
-
 
             await _client.LoginAsync(TokenType.Bot, token);
 

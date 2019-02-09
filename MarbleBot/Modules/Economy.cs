@@ -209,9 +209,9 @@ namespace MarbleBot.Modules {
             if (User.LastRaceWin.ToString("dd/MM/yyyy") == "01/01/2019") lastRaceWin = "N/A";
             var author = Context.Client.GetUser(id);
             var itemOutput = new StringBuilder();
-            if (User.Items != null) {
+            if (User.Items.Count > 0) {
                 foreach (var item in User.Items) {
-                    itemOutput.AppendLine(Global.GetItem(item.Key.ToString()).Name + ": " + item.Value);
+                    itemOutput.AppendLine(Global.GetItem(item.Key.ToString()).Name + ": " + string.Format("{0:n}", item.Value));
                 }
             } else itemOutput.Append("None");
             var builder = new EmbedBuilder()

@@ -1,5 +1,3 @@
-using System;
-
 namespace MarbleBot.BaseClasses
 {
     public class Attack {
