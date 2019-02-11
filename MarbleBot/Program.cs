@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Discord;
@@ -18,16 +19,35 @@ namespace MarbleBot
         public async Task StartAsync()
         {
             Console.Title = "MarbleBot";
+
+            var logPath = "MBLog-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss") + ".txt";
+            File.Create(logPath).Close();
+
+            Trace.Listeners.Clear();
+
+            TextWriterTraceListener twtl = new TextWriterTraceListener(logPath) {
+                Name = "TextLogger",
+                TraceOutputOptions = TraceOptions.ThreadId | TraceOptions.DateTime
+            };
+
+            ConsoleTraceListener ctl = new ConsoleTraceListener() {
+                TraceOutputOptions = TraceOptions.DateTime
+            };
+
+            Trace.Listeners.Add(twtl);
+            Trace.Listeners.Add(ctl);
+            Trace.AutoFlush = true;
+
             Global.StartTime = DateTime.UtcNow;
             _client = new DiscordSocketClient();
 
             string token = "";
-            using (var stream = new StreamReader("C:/Folder/MBT.txt")) {
-                token = stream.ReadLine();
-            }
-
-            using (var stream = new StreamReader("C:/Folder/MBK.txt")) {
-                Global.YTKey = stream.ReadLine();
+            if (File.Exists("C:/Folder/MBT.txt")) {
+                using (var stream = new StreamReader("C:/Folder/MBT.txt")) token = stream.ReadLine();
+                using (var stream = new StreamReader("C:/Folder/MBK.txt")) Global.YTKey = stream.ReadLine();
+            } else {
+                using (var stream = new StreamReader("MBT.txt")) token = stream.ReadLine();
+                using (var stream = new StreamReader("MBK.txt")) Global.YTKey = stream.ReadLine();
             }
 
             using (var ar = new StreamReader("Autoresponses.txt")) {
@@ -41,6 +61,8 @@ namespace MarbleBot
 
             await _client.StartAsync();
 
+            Trace.WriteLine("MarbleBot by Doc671\nStarted running: " + Global.StartTime.ToString("yyyy-MM-dd HH:mm:ss") + "\n");
+
             _handler = new CommandHandler(_client);
 
             // Block this task until the program is closed.
@@ -49,7 +71,7 @@ namespace MarbleBot
 
         private Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            Trace.WriteLine(msg.ToString());
             return Task.CompletedTask;
         }
     }

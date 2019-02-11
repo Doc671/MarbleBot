@@ -207,7 +207,8 @@ namespace MarbleBot
                             itemFound = true;
                             item.Id = properties[0].ToInt();
                             item.Name = properties[1];
-                            item.Price = properties[2].ToDecimal();
+                            if (properties[2].ToLower().Contains("unsellable")) item.Price = -1;
+                            else item.Price = properties[2].ToDecimal();
                             item.Description = properties[3];
                             item.OnSale = bool.Parse(properties[4]);
                         }

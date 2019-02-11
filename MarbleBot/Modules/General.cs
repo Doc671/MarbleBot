@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,6 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             if (command == "") {
                 EmbedBuilder builder = new EmbedBuilder();
-
                 builder.AddField("MarbleBot Help", "*by Doc671#1965*\nUse mb/help followed by a command name for more info!")
                     .WithTimestamp(DateTime.UtcNow);
                 if (Context.IsPrivate) {
@@ -197,7 +197,7 @@ namespace MarbleBot.Modules
                         names[i] = users[i].Username;
                     }
                     await ReplyAsync("**" + names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)] + "** is the best!");
-                } else Console.WriteLine("oof");
+                } else Trace.WriteLine("oof");
             } else await ReplyAsync("That command doesn't work here!");
         }
 
@@ -248,7 +248,7 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
                 }
-                else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
+                else Trace.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
             } else {
                 await ReplyAsync("**" + Context.User.Username + "**, I choose **" + choices[choice].Trim() + "**!");
             }
@@ -288,7 +288,7 @@ namespace MarbleBot.Modules
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync("Profanity detected. " + Doc671.Mention);
-                    } else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
+                    } else Trace.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
                 } else {
                     await ReplyAsync(orangeified);
                 }
@@ -558,7 +558,7 @@ namespace MarbleBot.Modules
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync("Profanity detected. " + Doc671.Mention);
-                    } else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
+                    } else Trace.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
                 }
                 else await ReplyAsync("**" + Context.User.Username + "**, I rate " + input + " **" + rating + "**/10. " + emoji + "\n(" + message + ")");
             }
@@ -576,7 +576,7 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
                 }
-                else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + repeat);
+                else Trace.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + repeat);
             } else {
                 await ReplyAsync(repeat);
             }
@@ -598,7 +598,7 @@ namespace MarbleBot.Modules
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
-                } else Console.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
+                } else Trace.WriteLine("[" + DateTime.UtcNow + "] Profanity detected: " + input);
             } else {
                 await ReplyAsync(reverse);
             }
@@ -772,7 +772,7 @@ namespace MarbleBot.Modules
                 if (ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID) == true) {
                     ID = ulong.Parse(username.Trim('<').Trim('>').Trim('@'));
                 }
-                else Console.WriteLine("[" + DateTime.UtcNow + "] mb/userinfo - Parsing failed!");
+                else Trace.WriteLine("[" + DateTime.UtcNow + "] mb/userinfo - Parsing failed!");
                 user = Context.Guild.GetUser(ID);
             }
 
@@ -855,7 +855,7 @@ namespace MarbleBot.Modules
         {
             SocketGuild srvr = Context.Client.GetGuild(Global.THS);
             ISocketMessageChannel chnl = srvr.GetTextChannel(Global.THS);
-            Console.WriteLine("Time For MElmonry >:)");
+            Trace.WriteLine("Time For MElmonry >:)");
             switch(melmon) {
                 case "desk": await chnl.SendMessageAsync(msg); break;
                 case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;

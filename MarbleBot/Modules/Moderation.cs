@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Commands;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using System;
 
 namespace MarbleBot.Modules
 {
@@ -31,7 +31,7 @@ namespace MarbleBot.Modules
         [Summary("Clears recent empty messages")]
         [RequireOwner]
         public async Task _clearRecentSpam(string rserver, string rchannel) {
-            Console.WriteLine("hi");
+            Trace.WriteLine("hi");
             var server = ulong.Parse(rserver);
             var channel = ulong.Parse(rchannel);
             var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
@@ -95,7 +95,7 @@ namespace MarbleBot.Modules
                     }
                     if (chars >= swear.Length && pos[0] == true && pos[1] == true && pos[2] == true)
                     {
-                        Console.WriteLine("Profanity detected, violation: " + word);
+                        Trace.WriteLine("Profanity detected, violation: " + word);
                         swearPresent = true;
                     }
                 }

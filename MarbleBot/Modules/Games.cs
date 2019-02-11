@@ -39,7 +39,7 @@ namespace MarbleBot.Modules
                     } else option = option.Replace("\n", " "); name = option;
                     builder.AddField("Marble Race: Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
                     using (var racers = new StreamWriter("RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
-                    if (!File.Exists(fileID.ToString() + "race.csv")) File.Create(fileID.ToString() + "race.csv");
+                    if (!File.Exists(fileID.ToString() + "race.csv")) File.Create(fileID.ToString() + "race.csv").Close();
                     byte alive = 0;
                     if (Context.IsPrivate) {
                         if (!Global.RaceAlive.ContainsKey(Context.User.Id)) Global.RaceAlive.Add(Context.User.Id, 1);
@@ -359,7 +359,7 @@ namespace MarbleBot.Modules
                             break;
                         }
                     }
-                    if (!File.Exists(fileID.ToString() + "siege.csv")) File.Create(fileID.ToString() + "siege.csv");
+                    if (!File.Exists(fileID.ToString() + "siege.csv")) File.Create(fileID.ToString() + "siege.csv").Close();
                     var found = false;
                     using (var marbleList = new StreamReader(fileID.ToString() + "siege.csv")) {
                         while (!marbleList.EndOfStream) {
@@ -672,6 +672,37 @@ namespace MarbleBot.Modules
                     await ReplyAsync("", false, builder.Build());
                     break;
                 }
+                case "leaderboard": {
+                    var winners = new SortedDictionary<string, int>();
+                    using (var win = new StreamReader("SiegeMostUsed.txt")) {
+                        while (!win.EndOfStream) {
+                            var racerInfo = await win.ReadLineAsync();
+                            if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
+                            else winners.Add(racerInfo, 1);
+                        }
+                    }
+                    var winList = new List<Tuple<string, int>>();
+                    foreach (var winner in winners) {
+                        winList.Add(Tuple.Create(winner.Key, winner.Value));
+                    }
+                    winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                    int i = 1, j = 1;
+                    var desc = new StringBuilder();
+                    foreach (var winner in winList) {
+                        if (i < 11) {
+                            desc.Append(string.Format("{0}{1}: {2} {3}\n", new string[] { i.ToString(), i.Ordinal(), winner.Item1, winner.Item2.ToString() }));
+                            if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
+                            j++;
+                        }
+                        else break;
+                    }
+                    builder.WithTitle("Siege Leaderboard: Most Used")
+                        .WithDescription(desc.ToString());
+                    await ReplyAsync("", false, builder.Build());
+                    break;
+                }
+                case "leaderboard mostused": goto case "leaderboard";
+                case "mostused": goto case "leaderboard";
                 case "boss": {
                     var boss = Boss.Empty;
                     var state = 1;

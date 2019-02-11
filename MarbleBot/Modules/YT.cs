@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -119,7 +120,7 @@ namespace MarbleBot.Modules
                             }
                         }
                     } else await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
-                    if (!validUser) Console.WriteLine("[0]: Failed operation of mb/cv. Channel Title: {1}; Video Channel Title: {2}.", DateTime.UtcNow, channel.Title, video.ChannelTitle);
+                    if (!validUser) Trace.WriteLine($"[{DateTime.UtcNow}]: Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
                 } else {
                     var output = new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n");
                     output.Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n");

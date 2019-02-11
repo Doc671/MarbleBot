@@ -52,6 +52,7 @@ namespace MarbleBot.Modules {
                 var item = Global.GetItem(rawID);
                 if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
                 else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else if (item.OnSale) {
                     var json = "";
                     using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
@@ -75,9 +76,9 @@ namespace MarbleBot.Modules {
                                 Serialiser.Serialize(users2, obj);
                             }
                         }
-                        await ReplyAsync(string.Format("**{0}** has successfully purchased **{1}** x**{2}** for <:unitofmoney:372385317581488128>**{3:n}** each!\n(total <:unitofmoney:372385317581488128>**{4:n}**)\nNew balance: <:unitofmoney:372385317581488128>**{5:n}**.", user.Name, item.Name, noOfItems, item.Price, item.Price * noOfItems, user.Balance));
+                        await ReplyAsync(string.Format("**{0}** has successfully purchased **{1}** x**{2}** for <:unitofmoney:372385317581488128>**{3:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{4:n}**\nNew balance: <:unitofmoney:372385317581488128>**{5:n}**.", user.Name, item.Name, noOfItems, item.Price, item.Price * noOfItems, user.Balance));
                     }
-                    else await ReplyAsync(":warning: | You can't afford this item!");
+                    else await ReplyAsync(":warning: | You can't afford this!");
                 }
                 else await ReplyAsync(":warning: | This item is not on sale!");
             } else await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
@@ -92,16 +93,17 @@ namespace MarbleBot.Modules {
             var obj = JObject.Parse(json);
             var User = Global.GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 24) {
-                var reset = false;
-                if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48) {
-                    User.DailyStreak = 1;
-                    reset = true;
-                }
-                var gift = Convert.ToDecimal(Math.Round(Math.Pow(200, (1 + (Convert.ToDouble(User.DailyStreak) / 100))), 2));
+                if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48) User.DailyStreak = 0;
+                var gift = Convert.ToDecimal(Math.Round(Math.Pow(200, 1 + (Convert.ToDouble(User.DailyStreak) / 100)), 2));
                 User.Balance += gift;
                 User.NetWorth += gift;
-                if (!(DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48) && !reset) User.DailyStreak++;
+                User.DailyStreak++;
                 User.LastDaily = DateTime.UtcNow;
+                var orange = false;
+                if (!User.Items.ContainsKey(10) && DateTime.UtcNow.DayOfYear < 51 && DateTime.UtcNow.DayOfYear > 42) {
+                    orange = true;
+                    User.Items.Add(10, 1);
+                }
                 obj.Remove(Context.User.Id.ToString());
                 obj.Add(new JProperty(Context.User.Id.ToString(), JObject.FromObject(User)));
                 using (var users = new StreamWriter("Users.json")) {
@@ -110,7 +112,8 @@ namespace MarbleBot.Modules {
                         Serialiser.Serialize(users2, obj);
                     }
                 }
-                await ReplyAsync(string.Format("**{0}**, you have received <:unitofmoney:372385317581488128>**{1}**!\n(Streak: **{2}**)", Context.User.Username, gift, User.DailyStreak));
+                await ReplyAsync(string.Format("**{0}**, you have received <:unitofmoney:372385317581488128>**{1:n}**!\n(Streak: **{2}**)", Context.User.Username, gift, User.DailyStreak));
+                if (orange) await ReplyAsync("You have been given a **Qefpedun Charm**!");
             } else {
                 var ADayAgo = DateTime.UtcNow.AddDays(-1);
                 await ReplyAsync(string.Format("You need to wait for **{0}** until you can get your daily gift again!", Global.GetDateString(User.LastDaily.Subtract(ADayAgo))));
@@ -141,13 +144,14 @@ namespace MarbleBot.Modules {
             if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
             else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
             else {
+                var price = item.Price == -1 ? "N/A: Event" : string.Format("<:unitofmoney:372385317581488128>{0:n}", item.Price);
                 var builder = new EmbedBuilder()
                     .WithColor(Global.GetColor(Context))
                     .WithCurrentTimestamp()
                     .WithDescription(item.Description)
                     .WithTitle(item.Name)
                     .AddField("ID", string.Format("{0:000}", item.Id), true)
-                    .AddField("Price", string.Format("<:unitofmoney:372385317581488128>{0:n}", item.Price), true)
+                    .AddField("Price", price, true)
                     .AddField("For Sale", item.OnSale ? "Yes" : "No", true);
                 await ReplyAsync("", false, builder.Build());
             }
@@ -211,7 +215,7 @@ namespace MarbleBot.Modules {
             var itemOutput = new StringBuilder();
             if (User.Items.Count > 0) {
                 foreach (var item in User.Items) {
-                    itemOutput.AppendLine(Global.GetItem(item.Key.ToString()).Name + ": " + string.Format("{0:n}", item.Value));
+                    itemOutput.AppendLine($"{Global.GetItem(item.Key.ToString()).Name}: {item.Value}");
                 }
             } else itemOutput.Append("None");
             var builder = new EmbedBuilder()
@@ -232,37 +236,41 @@ namespace MarbleBot.Modules {
         }
 
         [Command("richlist")]
-        [Alias("richest", "top10")]
+        [Alias("richest", "top10", "leaderboard")]
         [Summary("Shows the top 10 richest people")]
-        public async Task _richlist() {
+        public async Task _richlist(string rawNo = "1") {
             await Context.Channel.TriggerTypingAsync();
-            var json = "";
-            using (var userFile = new StreamReader("Users.json")) json = userFile.ReadToEnd();
-            var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
-            var users = new List<Tuple<string, MBUser>>();
-            foreach (var user in rawUsers) users.Add(Tuple.Create(user.Key, user.Value));
-            var richList = (from user in users orderby user.Item2.NetWorth descending select user.Item2).ToList();
-            int i = 1, j = 1, yourPos = 0;
-            var output = new StringBuilder();
-            foreach (var user in richList) {
-                if (i < 11) {
-                    output.Append(string.Format("**{0}{1}:** {2}#{3} - <:unitofmoney:372385317581488128>**{4}**\n", i, i.Ordinal(), user.Name, user.Discriminator, string.Format("{0:n}", user.NetWorth)));
-                    if (j < richList.Count) if (richList[j].NetWorth != user.NetWorth) i++;
-                    if (user.Name == Context.User.Username && user.Discriminator == Context.User.Discriminator) yourPos = i - 1;
-                } else {
-                    if (yourPos != 0) break;
-                    else if (user.Name == Context.User.Username && user.Discriminator == Context.User.Discriminator) yourPos = i - 1; break;
+            if (!int.TryParse(rawNo, out int no)) await ReplyAsync("This is not a valid integer!");
+            else {
+                var json = "";
+                using (var userFile = new StreamReader("Users.json")) json = userFile.ReadToEnd();
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
+                var users = new List<Tuple<string, MBUser>>();
+                foreach (var user in rawUsers) users.Add(Tuple.Create(user.Key, user.Value));
+                var richList = (from user in users orderby user.Item2.NetWorth descending select user.Item2).ToList();
+                int i = 1, j = 1, yourPos = 0, minValue = (no - 1) * 10 + 1, maxValue = no * 10;
+                var output = new StringBuilder();
+                foreach (var user in richList) {
+                    if (i < maxValue + 1 && i >= minValue) {
+                        output.Append(string.Format("**{0}{1}:** {2}#{3} - <:unitofmoney:372385317581488128>**{4:n}**\n", i, i.Ordinal(), user.Name, user.Discriminator, user.NetWorth));
+                        if (j < richList.Count) if (richList[j].NetWorth != user.NetWorth) i++;
+                        if (user.Name == Context.User.Username && user.Discriminator == Context.User.Discriminator) yourPos = i - 1;
+                    } else {
+                        if (yourPos != 0) break;
+                        else if (user.Name == Context.User.Username && user.Discriminator == Context.User.Discriminator) yourPos = i - 1; break;
+                    }
+                    if (!(i < maxValue + 1) && i >= minValue) i++;
+                    j++;
                 }
-                j++;
+                var builder = new EmbedBuilder()
+                    .WithColor(Global.GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithTitle("Top 10 Richest Users")
+                    .WithDescription(output.ToString());
+                if (yourPos != 0) builder.WithFooter(string.Format("Requested by {2}#{3} ({0}{1})", yourPos, yourPos.Ordinal(), Context.User.Username, Context.User.Discriminator), Context.User.GetAvatarUrl());
+                else builder.WithFooter(string.Format("Requested by {0}#{1}", Context.User.Username, Context.User.Discriminator));
+                await ReplyAsync("", false, builder.Build());
             }
-            var builder = new EmbedBuilder()
-                .WithColor(Global.GetColor(Context))
-                .WithCurrentTimestamp()
-                .WithTitle("Top 10 Richest Users")
-                .WithDescription(output.ToString());
-            if (yourPos != 0) builder.WithFooter(string.Format("Requested by {2}#{3} ({0}{1})", yourPos, yourPos.Ordinal(), Context.User.Username, Context.User.Discriminator), Context.User.GetAvatarUrl());
-            else builder.WithFooter(string.Format("Requested by {0}#{1}", Context.User.Username, Context.User.Discriminator));
-            await ReplyAsync("", false, builder.Build());
         }
 
         [Command("sell")]
@@ -273,6 +281,7 @@ namespace MarbleBot.Modules {
                 var item = Global.GetItem(rawID);
                 if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
                 else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else {
                     var json = "";
                     using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
@@ -289,13 +298,14 @@ namespace MarbleBot.Modules {
                                 Serialiser.Serialize(users2, obj);
                             }
                         }
-                        await ReplyAsync(string.Format("**{0}** has successfully sold **{1}** x**{2}** for <:unitofmoney:372385317581488128>**{3:n}** each!\n(total <:unitofmoney:372385317581488128>**{4:n}**)\nNew balance: <:unitofmoney:372385317581488128>**{5:n}**.", user.Name, item.Name, noOfItems, item.Price, item.Price * noOfItems, user.Balance));
+                        await ReplyAsync(string.Format("**{0}** has successfully sold **{1}** x**{2}** for <:unitofmoney:372385317581488128>**{3:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{4:n}**\nNew balance: <:unitofmoney:372385317581488128>**{5:n}**.", user.Name, item.Name, noOfItems, item.Price, item.Price * noOfItems, user.Balance));
                     } else await ReplyAsync(":warning: | You don't have enough of this item!");
                 }
             } else await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
         }
 
         [Command("shop")]
+        [Alias("items")]
         [Summary("Shows all available items")]
         public async Task _shop() {
             await Context.Channel.TriggerTypingAsync();
@@ -303,7 +313,7 @@ namespace MarbleBot.Modules {
             using (var itemFile = new StreamReader("ShopItems.csv")){
                 while (!itemFile.EndOfStream) {
                     var properties = (await itemFile.ReadLineAsync()).Split(',');
-                    if (bool.Parse(properties[4]) == true) output.AppendLine(string.Format("[{0:000}] {1} - <:unitofmoney:372385317581488128>{2:n}", properties[0].ToInt(), properties[1], properties[2].ToDecimal()));
+                    if (bool.Parse(properties[4]) == true) output.AppendLine(string.Format("`[{0:000}]` **{1}** - <:unitofmoney:372385317581488128>**{2:n}**", properties[0].ToInt(), properties[1], properties[2].ToDecimal()));
                 }
             }
             var builder = new EmbedBuilder()
