@@ -1,0 +1,17 @@
+MarbleBot by Doc671
+Started running: 2019-02-15 07:57:22
+
+[2019-02-15 08:51:59] Exception: Object reference not set to an instance of an object.
+[2019-02-15 08:52:32] Exception: Object reference not set to an instance of an object.
+[2019-02-15 14:07:15] BadArgCount: The input text has too few parameters.
+[2019-02-15 14:19:31] Prototype#5258: mb/help
+[2019-02-15 14:19:31] MarbleBot#7194: 
+[2019-02-15 14:19:31] MarbleBot#7194: 
+[2019-02-15 14:19:48] Prototype#5258: mb/balance
+[2019-02-15 14:19:48] MarbleBot#7194: 
+[2019-02-15 14:19:48] MarbleBot#7194: 
+[2019-02-15 15:15:27] Exception: Object reference not set to an instance of an object.
+[2019-02-15 15:47:02] Exception: The given key was not present in the dictionary.
+[2019-02-15 15:47:08] Exception: The given key was not present in the dictionary.
+[2019-02-15 15:50:47] Exception: The given key was not present in the dictionary.
+[2019-02-15 19:00:03] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\RaceMostUsed.txt' because it is being used by another process.

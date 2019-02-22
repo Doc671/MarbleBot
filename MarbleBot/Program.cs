@@ -68,11 +68,5 @@ namespace MarbleBot
             // Block this task until the program is closed.
             await Task.Delay(-1);
         }
-
-        private Task Log(LogMessage msg)
-        {
-            Trace.WriteLine(msg.ToString());
-            return Task.CompletedTask;
-        }
     }
 }

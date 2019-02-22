@@ -243,7 +243,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             string[] choices = input.Split('|');
             int choice = Global.Rand.Next(0, choices.Length);
-            if (Moderation._checkSwear(input) || Moderation._checkSwear(choices[choice])) {
+            if (Moderation.CheckSwear(input) || Moderation.CheckSwear(choices[choice])) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
@@ -284,7 +284,7 @@ namespace MarbleBot.Modules
                 length--;
             }
             if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) {
-                if (Moderation._checkSwear(input) || Moderation._checkSwear(orangeified)) {
+                if (Moderation.CheckSwear(input) || Moderation.CheckSwear(orangeified)) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync("Profanity detected. " + Doc671.Mention);
@@ -458,21 +458,27 @@ namespace MarbleBot.Modules
                 case "desk": rating = 11; message = "what did you expect?"; break;
                 case "desk176": rating = 11; message = "what did you expect?"; break;
                 case "desks": goto case "desk";
+                case "dGFibGU=": rating = -999; message = "do not mention that unholy creature near me"; break;
+                case "dGFibGVz": rating = -999; message = "do not mention those unholy creatures near me"; break;
                 case "doc671": rating = -1; message = "terrible at everything"; break;
                 case "dockque the rockque": rating = -1; message = "AM NOT ROCKQUE YOU MELMON"; break;
+                case "egnaro":  rating = 10; message = "!egnarO"; break;
                 case "erango": rating = 0; message = "stoP noW"; break;
                 case "marblebot's creator": input = "Doc671"; goto case "doc671";
                 case "marblebot's dad": input = "Doc671"; goto case "doc671";
                 case "my creator": input = "Doc671"; goto case "doc671";
                 case "my dad": input = "Doc671"; goto case "doc671";
-                case "orange": rating = 10; message = "!egnarO"; break;
-                case "poup soop": rating = 10; message = "!pooS puoP knirD"; break;
+                case "orange": goto case "egnaro";
+                case "orange day": rating = 10; message = "!yaD egnarO"; break;
+                case "poos puop": rating = 10; message = "!pooS puoP knirD"; break;
+                case "poup soop": goto case "poos puop";
                 case "rockque": rating = -1; message = "I Hate Rocks"; break;
                 case "rockques": goto case "rockque";
                 case "table": rating = -999; message = "do not mention that unholy creature near me"; input = "dGFibGU="; break;
                 case "tables": rating = -999; message = "do not mention those unholy creatures near me"; input = "dGFibGVz"; break;
                 case "the hat stoar": rating = 10; message = "!raotS taH ehT owt oG"; break;
                 case "vinh": rating = 10; message = "Henlo Cooooooooool Vinh"; break;
+                case "yad egnaro": goto case "orange day";
                 default: rating = Global.Rand.Next(0, 11); break;
             }
             switch (input.ToLower()) {
@@ -488,22 +494,26 @@ namespace MarbleBot.Modules
                 case "icce": goto case "blueice57";
                 case "+inf": message = "marbles will realize in +inf"; break;
                 case "jgeoroegeos": goto case "george012";
+                case "john": message = "Algodoo Marble for TROC!"; break;
+                case "john dubuc": goto case "john";
                 case "jorj": goto case "george012";
                 case "ken": message = "#kenismelmon"; break;
                 case "kenlimepie": goto case "ken";
                 case "keylimepie": goto case "ken";
+                case "luka": message = "LUKA\nYOU BLUMT"; break;
                 case "marblebot": input = "myself"; goto case "myself";
                 case "myself": message = "who am I?"; break;
                 case "matheus": message = "marbles will realize in +inf"; break;
                 case "matheus fazzion": goto case "matheus";
                 case "meadow": message = "somebody toucha mei doe"; break;
                 case "mei doe": goto case "meadow";
-                case "melmon": message = "Wnhy Arey Yoou A Melmon"; break;
+                case "melmon": message = "Whyn Arey Yoou A Melmon"; break;
                 case "no u": message = "No Your"; break;
                 case "no your": message = "No You're"; break;
                 case "no you're": message = "N'Yuroe"; break;
                 case "oh so muches": message = "Is To Much"; break;
                 case "rackquette":  message = "WHACC"; break;
+                case "sand dollar": message = "XXX"; break;
                 case "shotgun": message = "Vinh Shotgun All"; break;
                 case "you silly desk": message = "Now I\nCry"; break;
             }
@@ -554,7 +564,7 @@ namespace MarbleBot.Modules
             }
             if (rating == -2)  await ReplyAsync("**" + Context.User.Username + "**, I rATE " + input + " UNd3FINED10. " + emoji + "\n(" + message + ")");
             else {
-                if (Moderation._checkSwear(input)) {
+                if (Moderation.CheckSwear(input)) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync("Profanity detected. " + Doc671.Mention);
@@ -571,7 +581,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             if (repeat == "Am Melmon" && (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT)) {
                 await ReplyAsync("No U");
-            } else if (Moderation._checkSwear(repeat)) {
+            } else if (Moderation.CheckSwear(repeat)) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
@@ -594,7 +604,7 @@ namespace MarbleBot.Modules
                 reverse += input[length];
                 length--;
             }
-            if (Moderation._checkSwear(input) || Moderation._checkSwear(reverse)) {
+            if (Moderation.CheckSwear(input) || Moderation.CheckSwear(reverse)) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync("Profanity detected. " + Doc671.Mention);
@@ -868,7 +878,9 @@ namespace MarbleBot.Modules
         [Command("update")]
         [Summary("Releases update info to all bot channels")]
         [RequireOwner]
-        public async Task _update([Remainder] string info) {
+        public async Task _update(string _major, [Remainder] string info) {
+            var major = _major == "major";
+
             var builder = new EmbedBuilder()
                 .WithColor(Color.Red)
                 .WithCurrentTimestamp()
@@ -877,60 +889,36 @@ namespace MarbleBot.Modules
 
             ISocketMessageChannel chnl = Context.Client.GetGuild(Global.CM).GetTextChannel(Global.BotChannels[1]);
             var msg = await chnl.SendMessageAsync("", false, builder.Build());
-            await msg.PinAsync();
+            if (major) await msg.PinAsync();
 
             chnl = Context.Client.GetGuild(Global.THS).GetTextChannel(Global.BotChannels[0]);
             msg = await chnl.SendMessageAsync("", false, builder.Build());
-            await msg.PinAsync();
+            if (major) await msg.PinAsync();
 
             chnl = Context.Client.GetGuild(Global.THSC).GetTextChannel(Global.BotChannels[2]);
             msg = await chnl.SendMessageAsync("", false, builder.Build());
-            await msg.PinAsync();
+            if (major) await msg.PinAsync();
 
             chnl = Context.Client.GetGuild(Global.VFC).GetTextChannel(Global.BotChannels[3]);
             msg = await chnl.SendMessageAsync("", false, builder.Build());
-            await msg.PinAsync();
+            if (major) await msg.PinAsync();
 
             chnl = Context.Client.GetGuild(Global.MT).GetTextChannel(Global.BotChannels[4]);
             msg = await chnl.SendMessageAsync("", false, builder.Build());
-            await msg.PinAsync();
+            if (major) await msg.PinAsync();
         }
 
-        [Command("Uh")]
+        [Command("setstatus")]
         [RequireOwner]
-        public async Task _uh()
+        public async Task _setstatus(string status)
         {
-            await Context.Channel.SendFileAsync("Images/BossPreeTheTree.png");
-            await Context.Channel.SendFileAsync("Images/BossHATTMANN.png");
-            await Context.Channel.SendFileAsync("Images/BossOrange.png");
-            await Context.Channel.SendFileAsync("Images/BossGreen.png");
-            await Context.Channel.SendFileAsync("Images/BossDestroyer.png");
-            /*await Context.Channel.SendFileAsync("Images/PUClone.png");
-            await Context.Channel.SendFileAsync("Images/PUCure.png");
-            await Context.Channel.SendFileAsync("Images/PUHeal.png");
-            await Context.Channel.SendFileAsync("Images/PUMoraleBoost.png");
-            await Context.Channel.SendFileAsync("Images/PUOverclock.png");
-            await Context.Channel.SendFileAsync("Images/PUSummon.png");
-            var builder = new EmbedBuilder()
-                .WithImageUrl("attachment://PUCure.png")
-                .WithTitle("Hi");
-            await Context.Channel.SendFileAsync("attachment://PUCure.png", embed: builder.Build());*/
-        }
-
-        /*[Command("domybidding")]
-        [RequireOwner]
-        public async Task _domybidding()
-        {
-            if (Context.User.Id == 224267581370925056) {
-                EmbedBuilder builder = new EmbedBuilder();
-                builder.WithAuthor(Context.User)
-                    .WithDescription("**Message edited in <#224277892182310912>**")
-                    .AddField("Before", "update video eventulaly")
-                    .AddField("After", "update video eventually")
-                    .WithColor(Color.DarkBlue)
-                    .WithFooter("User ID: 224267581370925056 • Yesterday at 18:40");
-                await ReplyAsync("", false, builder.Build());
+            switch (status) {
+                case "online": await Context.Client.SetStatusAsync(UserStatus.Online); break;
+                case "idle": await Context.Client.SetStatusAsync(UserStatus.Idle); break;
+                case "dnd": await Context.Client.SetStatusAsync(UserStatus.DoNotDisturb); break;
+                case "donotdisturb": goto case "dnd";
+                case "invisible": await Context.Client.SetStatusAsync(UserStatus.Invisible); break;
             }
-        }*/
+        }
     }
 }

@@ -1,0 +1,8 @@
+MarbleBot by Doc671
+Started running: 2019-02-12 21:05:18
+
+[2019-02-12 21:06:03] Exception: The server responded with error 500: InternalServerError
+[2019-02-12 21:06:03] Doc671#1965: mb/repeat a
+[2019-02-12 21:08:53] Exception: The operation has timed out.
+[2019-02-12 21:08:53] Doc671#1965: mb/repeat a
+[2019-02-12 21:11:44] Exception: The server responded with error 500: InternalServerError

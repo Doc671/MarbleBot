@@ -1,4 +1,6 @@
-﻿namespace MarbleBot.BaseClasses
+﻿using System;
+
+namespace MarbleBot.BaseClasses
 {
     public class Marble
     {
@@ -9,6 +11,21 @@
         public int BossHits { get; set; }
         public int PUHits { get; set; }
         public bool Cloned { get; set; }
+        public MSE StatusEffect { get; set; }
+        public DateTime DoomStart { get; set; }
+        public DateTime LastPoisonTick { get; set; }
+        public DateTime LastStun { get; set; }
+
+        public Marble()
+        {
+            BossHits = 0;
+            PUHits = 0;
+            Cloned = false;
+            StatusEffect = MSE.None;
+            DoomStart = DateTime.Parse("2019-01-01 00:00:00");
+            LastStun = DateTime.Parse("2019-01-01 00:00:00");
+            LastPoisonTick = DateTime.Parse("2019-01-01 00:00:00");
+        }
 
         public override string ToString()
         {

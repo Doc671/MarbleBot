@@ -1,0 +1,18 @@
+MarbleBot by Doc671
+Started running: 2019-02-20 11:13:41
+
+[2019-02-20 15:24:39] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\224277738608001024race.csv' because it is being used by another process.
+[2019-02-20 16:14:26] BadArgCount: The input text has too few parameters.
+[2019-02-20 16:15:17] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\223616088263491595race.csv' because it is being used by another process.
+[2019-02-20 20:31:58] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Users.json' because it is being used by another process.
+[2019-02-20 20:50:41] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Users.json' because it is being used by another process.
+[2019-02-20 20:55:37] Exception: Value cannot be null.
+Parameter name: String
+[2019-02-20 20:56:32] Exception: Value cannot be null.
+Parameter name: String
+[2019-02-20 21:52:20] BadArgCount: The input text has too few parameters.
+[2019-02-20 21:55:45] BadArgCount: The input text has too few parameters.
+[2019-02-20 21:55:52] BadArgCount: The input text has too few parameters.
+[2019-02-20 21:55:59] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Users.json' because it is being used by another process.
+[2019-02-20 22:38:35] Exception: Value was either too large or too small for an Int32.
+[2019-02-20 22:40:33] Exception: Input string was not in a correct format.

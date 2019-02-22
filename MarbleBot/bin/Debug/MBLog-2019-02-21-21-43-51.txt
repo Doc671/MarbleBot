@@ -1,0 +1,6 @@
+MarbleBot by Doc671
+Started running: 2019-02-21 21:43:51
+
+[2019-02-21 21:47:36] Exception: The given key was not present in the dictionary.
+[2019-02-21 21:49:28] BadArgCount: The input text has too few parameters.
+[2019-02-21 21:50:06] Exception: Input string was not in a correct format.

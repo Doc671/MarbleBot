@@ -39,36 +39,54 @@ namespace MarbleBot
         internal static Dictionary<ulong, Siege> SiegeInfo = new Dictionary<ulong, Siege>();
         internal static List<Task> Sieges = new List<Task>();
         internal static Boss PreeTheTree = new Boss("Pree the Tree", 300, Difficulty.Simple, "https://cdn.discordapp.com/attachments/296376584238137355/541383182197719040/BossPreeTheTree.png", new Attack[] {
-            new Attack("Falling Leaves", 3, 40),
-            new Attack("Spinning Leaves", 3, 50),
-            new Attack("Acorn Bomb", 5, 55),
-            new Attack("Floating Twigs", 2, 65)
+            new Attack("Falling Leaves", 3, 40, MSE.None),
+            new Attack("Spinning Leaves", 3, 50, MSE.None),
+            new Attack("Acorn Bomb", 5, 55, MSE.None),
+            new Attack("Floating Twigs", 2, 65, MSE.None)
         });
         internal static Boss HATTMANN = new Boss("HATT MANN", 600, Difficulty.Easy, "https://cdn.discordapp.com/attachments/296376584238137355/541383185481596940/BossHATTMANN.png", new Attack[] {
-            new Attack("Hat Trap", 4, 45),
-            new Attack("Inverted Hat", 3, 45),
-            new Attack("HATT GUNN", 6, 40),
-            new Attack("Hat Spawner", 2, 90)
+            new Attack("Hat Trap", 4, 45, MSE.None),
+            new Attack("Inverted Hat", 3, 45, MSE.None),
+            new Attack("HATT GUNN", 6, 40, MSE.None),
+            new Attack("Hat Spawner", 2, 90, MSE.None)
         });
         internal static Boss Orange = new Boss("Orange", 1200, Difficulty.Decent, "https://cdn.discordapp.com/attachments/296376584238137355/541383189114126339/BossOrange.png", new Attack[] {
-            new Attack("Poup Soop Barrel", 4, 45),
-            new Attack("Poup Krumb", 8, 50),
-            new Attack("ORANGE HEDDS", 5, 40),
-            new Attack("How To Be An Idiot Vol. 3", 3, 45)
+            new Attack("Poup Soop Barrel", 4, 45, MSE.None),
+            new Attack("Poup Krumb", 8, 50, MSE.None),
+            new Attack("ORANGE HEDDS", 5, 40, MSE.None),
+            new Attack("How To Be An Idiot Vol. 3", 3, 45, MSE.None)
         });
         internal static Boss Green = new Boss("Green", 1500, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png", new Attack[] {
-            new Attack("Wobbly Toxicut", 7, 45),
-            new Attack("Falling Hellslash", 8, 45),
-            new Attack("Attractive Domesday", 15, 20),
-            new Attack("Spinning Pyroclash", 5, 65),
-            new Attack("Accurate Flarer", 3, 90)
+            new Attack("Wobbly Toxicut", 8, 45, MSE.None),
+            new Attack("Falling Hellslash", 9, 45, MSE.None),
+            new Attack("Attractive Domesday", 15, 20, MSE.None),
+            new Attack("Spinning Pyroclash", 6, 65, MSE.None),
+            new Attack("Accurate Flarer", 4, 90, MSE.None)
         });
         internal static Boss Destroyer = new Boss("Destroyer", 3720, Difficulty.Extreme, "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png", new Attack[] {
-            new Attack("Antimatter Missile", 11, 45),
-            new Attack("Annihilator-A", 9, 40),
-            new Attack("Flamethrower", 8, 50),
-            new Attack("Black Hole", 12, 50),
-            new Attack("Repulsor Blast", 6, 65)
+            new Attack("Antimatter Missile", 11, 45, MSE.None),
+            new Attack("Annihilator-A", 9, 40, MSE.None),
+            new Attack("Flamethrower", 8, 50, MSE.None),
+            new Attack("Black Hole", 12, 50, MSE.None),
+            new Attack("Repulsor Blast", 6, 65, MSE.None)
+        });
+        internal static Boss HelpMeTheTree = new Boss("Help Me the Tree", 500, Difficulty.Easy, "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png", new Attack[] {
+            new Attack("Donation Box", 5, 45, MSE.None),
+            new Attack("Cry For Help", 0, 40, MSE.Doom),
+            new Attack("Sandstorm", 3, 75, MSE.None),
+            new Attack("Decay", 2, 50, MSE.Poison)
+        });
+        internal static Boss Erango = new Boss("erangO", 1200, Difficulty.Moderate, "https://cdn.discordapp.com/attachments/296376584238137355/548221808294232071/unknown.png", new Attack[] {
+            new Attack("erangO Pellets", 5, 90, MSE.None),
+            new Attack("Doom Beam", 10, 35, MSE.Doom),
+            new Attack("Fake Poup Soop", 8, 45, MSE.None),
+            new Attack("Unapproved by Orange", 0, 45, MSE.Stun)
+        });
+        internal static Boss Octopheesh = new Boss("Octopheesh", 800, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/548220914488049665/BossOctopheesh.png", new Attack[] {
+            new Attack("Two Bipheesh", 8, 75, MSE.None),
+            new Attack("EMP Burst", 6, 45, MSE.Stun),
+            new Attack("Vile Beam", 13, 40, MSE.None),
+            new Attack("Pheesh Swarm", 6, 95, MSE.None)
         });
 
         // Gets colour for embed depending on server
@@ -102,6 +120,9 @@ namespace MarbleBot
             } else if (dateTime.Seconds > 0) {
                 if (dateTime.Minutes > 0) output.Append("and " + dateTime.Seconds + " second");
                 else output.Append(dateTime.Seconds + " second");
+            } else if (dateTime.TotalSeconds < 1) {
+                if (dateTime.Minutes > 0) output.Append("and <1 second");
+                else output.Append("<1 second");
             }
             return output.ToString();
         }

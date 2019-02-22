@@ -160,7 +160,7 @@ namespace MarbleBot.Modules
 
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (searchResult.Id.Kind == "youtube#channel" && !Moderation._checkSwear(searchResult.Snippet.Title))
+                if (searchResult.Id.Kind == "youtube#channel" && !Moderation.CheckSwear(searchResult.Snippet.Title))
                 {
                     channels.Add(String.Format("{0} (<https://www.youtube.com/channel/{1}>)", searchResult.Snippet.Title, searchResult.Id.ChannelId));
                     found = true;
@@ -211,7 +211,7 @@ namespace MarbleBot.Modules
             bool found = false;
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (searchResult.Id.Kind == "youtube#video" && Moderation._checkSwear(searchResult.Snippet.Title)) {
+                if (searchResult.Id.Kind == "youtube#video" && Moderation.CheckSwear(searchResult.Snippet.Title)) {
                     //videos.Add("(profanity detected, item not displayed)");
                     profaneCount++;
                 } else if (searchResult.Id.Kind == "youtube#video") {

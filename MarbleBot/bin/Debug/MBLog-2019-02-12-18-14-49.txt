@@ -1,0 +1,12 @@
+MarbleBot by Doc671
+Started running: 2019-02-12 18:14:49
+
+[2019-02-12 18:37:09] Exception: Value cannot be null.
+Parameter name: String
+[2019-02-12 18:37:09] Doc671#1965: mb/profile joe art marker
+[2019-02-12 18:37:15] Doc671#1965: mb/profile joe art maker
+[2019-02-12 18:37:15] MarbleBot#7194: 
+[2019-02-12 21:04:38] Exception: The server responded with error 500: InternalServerError
+[2019-02-12 21:04:49] Exception: The server responded with error 500: 500: Internal Server Error
+[2019-02-12 21:05:02] Exception: The server responded with error 500: InternalServerError
+[2019-02-12 21:05:02] Doc671#1965: mb/repeat a

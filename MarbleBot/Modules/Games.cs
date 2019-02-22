@@ -122,7 +122,7 @@ namespace MarbleBot.Modules
                                     msgs.Add(await msgFile.ReadLineAsync());
                                 }
                             }
-                            int choice = Global.Rand.Next(0, (msgCount - 1));
+                            int choice = Global.Rand.Next(0, msgCount - 1);
                             deathmsg = msgs[choice];
                             builder.AddField("**" + marbles[eliminated].Item1 + "** is eliminated!", marbles[eliminated].Item1 + " " + deathmsg + " and is now out of the competition!");
                             marbles[eliminated] = Tuple.Create("///out", marbles[eliminated].Item2);
@@ -415,8 +415,7 @@ namespace MarbleBot.Modules
                             var sLine = line.Split(',');
                             var marble = new Marble() {
                                 Id = ulong.Parse(sLine[1]),
-                                Name = sLine[0],
-                                HP = 20
+                                Name = sLine[0]
                             };
                             if (Global.SiegeInfo.ContainsKey(fileID)) {
                                 if (!Global.SiegeInfo[fileID].Marbles.Contains(marble)) Global.SiegeInfo[fileID].Marbles.Add(marble);
@@ -427,10 +426,14 @@ namespace MarbleBot.Modules
                         await ReplyAsync("It doesn't look like anyone has signed up!");
                     } else {
                         Global.SiegeInfo[fileID].Active = true;
-                        if (IsBetween(Global.SiegeInfo[fileID].Marbles.Count, 0, 3)) Global.SiegeInfo[fileID].Boss = Global.PreeTheTree;
-                        else if (IsBetween(Global.SiegeInfo[fileID].Marbles.Count, 4, 7)) Global.SiegeInfo[fileID].Boss = Global.HATTMANN;
-                        else if (IsBetween(Global.SiegeInfo[fileID].Marbles.Count, 8, 11)) Global.SiegeInfo[fileID].Boss = Global.Orange;
-                        else if (IsBetween(Global.SiegeInfo[fileID].Marbles.Count, 12, 15)) Global.SiegeInfo[fileID].Boss = Global.Green;
+                        var bossWeight = (int)Math.Round(Global.SiegeInfo[fileID].Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
+                        if (IsBetween(bossWeight, 0, 8)) Global.SiegeInfo[fileID].Boss = Global.PreeTheTree;
+                        else if (IsBetween(bossWeight, 9, 16)) Global.SiegeInfo[fileID].Boss = Global.HelpMeTheTree;
+                        else if (IsBetween(bossWeight, 17, 24)) Global.SiegeInfo[fileID].Boss = Global.HATTMANN;
+                        else if (IsBetween(bossWeight, 25, 32)) Global.SiegeInfo[fileID].Boss = Global.Orange;
+                        else if (IsBetween(bossWeight, 33, 40)) Global.SiegeInfo[fileID].Boss = Global.Erango;
+                        else if (IsBetween(bossWeight, 41, 48)) Global.SiegeInfo[fileID].Boss = Global.Octopheesh;
+                        else if (IsBetween(bossWeight, 49, 56)) Global.SiegeInfo[fileID].Boss = Global.Green;
                         else Global.SiegeInfo[fileID].Boss = Global.Destroyer;
                         int hp;
                         switch (Global.SiegeInfo[fileID].Boss.Difficulty) {
@@ -478,43 +481,56 @@ namespace MarbleBot.Modules
                         if (allIDs.Contains(Context.User.Id)) {
                             var marble = Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id);
                             if (marble.HP > 0) {
-                                if (DateTime.UtcNow.Subtract(Global.SiegeInfo[fileID].LastMorale).TotalSeconds > 20 && Global.SiegeInfo[fileID].Morales > 0) {
-                                    Global.SiegeInfo[fileID].Morales--;
-                                    Global.SiegeInfo[fileID].DMGMultiplier /= 2;
-                                    await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[fileID].DMGMultiplier}**!");
-                                }
-                                var dmg = Global.Rand.Next(1, 25);
-                                if (dmg > 20) dmg = Global.Rand.Next(21, 35);
-                                var title = "";
-                                if (IsBetween(dmg, 1, 7)) title = "Slow attack!";
-                                else if (IsBetween(dmg, 8, 14)) title = "Fast attack!";
-                                else if (IsBetween(dmg, 15, 20)) title = "Brutal attack!";
-                                else if (IsBetween(dmg, 21, 35)) title = "CRITICAL attack!";
-                                else title = "Glitch attack!";
-                                dmg = (int)Math.Round(dmg * Global.SiegeInfo[fileID].DMGMultiplier);
-                                var clone = false;
-                                if (marble.Cloned) {
-                                    clone = true;
-                                    Global.SiegeInfo[fileID].Boss.HP -= dmg * 5;
-                                    builder.AddField("Clones attack!", $"Each of the clones dealt **{dmg}** damage to the boss!");
-                                    Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Cloned = false;
-                                }
-                                Global.SiegeInfo[fileID].Boss.HP -= dmg;
-                                Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).BossHits += dmg;
-                                if (Global.SiegeInfo[fileID].Boss.HP < 1) {
-                                    Global.SiegeInfo[fileID].Boss.HP = 0;
-                                }
-                                builder.WithTitle(title)
-                                    .WithDescription(string.Format("**{0}** dealt **{1}** damage to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, dmg, Global.SiegeInfo[fileID].Boss.Name))
-                                    .AddField("Boss HP", "**" + Global.SiegeInfo[fileID].Boss.HP + "**/" + Global.SiegeInfo[fileID].Boss.MaxHP);
-                                await ReplyAsync("", false, builder.Build());
-                                if (clone && marble.Name[marble.Name.Length - 1] != 's') await ReplyAsync($"{marble.Name}'s clones disappeared!");
-                                else if (clone) await ReplyAsync($"{marble.Name}' clones disappeared!");
-                                if (Global.SiegeInfo[fileID].Boss.HP < 1) {
-                                    await SiegeVictory(fileID);
-                                }
-                            } else await ReplyAsync("**" + Context.User.Username + "**, you are out and can no longer attack!");
-                        } else await ReplyAsync("**" + Context.User.Username + "**, you aren't in this Siege!");
+                                if (marble.StatusEffect == MSE.Stun && DateTime.UtcNow.Subtract(marble.LastStun).TotalSeconds > 15) marble.StatusEffect = MSE.None;
+                                if (marble.StatusEffect != MSE.Stun) {
+                                    if (DateTime.UtcNow.Subtract(Global.SiegeInfo[fileID].LastMorale).TotalSeconds > 20 && Global.SiegeInfo[fileID].Morales > 0) {
+                                        Global.SiegeInfo[fileID].Morales--;
+                                        Global.SiegeInfo[fileID].DMGMultiplier /= 2;
+                                        await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[fileID].DMGMultiplier}**!");
+                                    }
+                                    var dmg = Global.Rand.Next(1, 25);
+                                    if (dmg > 20) dmg = Global.Rand.Next(21, 35);
+                                    var title = "";
+                                    var url = "";
+                                    if (IsBetween(dmg, 1, 7)) {
+                                        title = "Slow attack!";
+                                        url = "https://cdn.discordapp.com/attachments/296376584238137355/548217423623356418/SiegeAttackSlow.png";
+                                    } else if (IsBetween(dmg, 8, 14)) {
+                                        title = "Fast attack!";
+                                        url = "https://cdn.discordapp.com/attachments/296376584238137355/548217417847799808/SiegeAttackFast.png";
+                                    } else if (IsBetween(dmg, 15, 20)) {
+                                        title = "Brutal attack!";
+                                        url = "https://cdn.discordapp.com/attachments/296376584238137355/548217407337005067/SiegeAttackBrutal.png";
+                                    } else if (IsBetween(dmg, 21, 35)) {
+                                        title = "CRITICAL attack!";
+                                        url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
+                                    } else title = "Glitch attack!";
+                                    dmg = marble.StatusEffect == MSE.Chill ? (int)Math.Round(dmg * Global.SiegeInfo[fileID].DMGMultiplier * 0.5) : (int)Math.Round(dmg * Global.SiegeInfo[fileID].DMGMultiplier);
+                                    var clone = false;
+                                    if (marble.Cloned) {
+                                        clone = true;
+                                        Global.SiegeInfo[fileID].Boss.HP -= dmg * 5;
+                                        builder.AddField("Clones attack!", $"Each of the clones dealt **{dmg}** damage to the boss!");
+                                        Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Cloned = false;
+                                    }
+                                    Global.SiegeInfo[fileID].Boss.HP -= dmg;
+                                    Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).BossHits += dmg;
+                                    if (Global.SiegeInfo[fileID].Boss.HP < 1) {
+                                        Global.SiegeInfo[fileID].Boss.HP = 0;
+                                    }
+                                    builder.WithTitle(title)
+                                        .WithThumbnailUrl(url)
+                                        .WithDescription(string.Format("**{0}** dealt **{1}** damage to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, dmg, Global.SiegeInfo[fileID].Boss.Name))
+                                        .AddField("Boss HP", "**" + Global.SiegeInfo[fileID].Boss.HP + "**/" + Global.SiegeInfo[fileID].Boss.MaxHP);
+                                    await ReplyAsync("", false, builder.Build());
+                                    if (clone && marble.Name[marble.Name.Length - 1] != 's') await ReplyAsync($"{marble.Name}'s clones disappeared!");
+                                    else if (clone) await ReplyAsync($"{marble.Name}' clones disappeared!");
+                                    if (Global.SiegeInfo[fileID].Boss.HP < 1) {
+                                        await SiegeVictory(fileID);
+                                    }
+                                } else await ReplyAsync($"**{Context.User.Username}**, you are stunned and cannot attack!");
+                            } else await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
+                        } else await ReplyAsync($"**{Context.User.Username}**, you aren't in this Siege!");
                     } else await ReplyAsync("There is no currently ongoing Siege!");
                     break;
                 }
@@ -542,7 +558,7 @@ namespace MarbleBot.Modules
                                         await ReplyAsync("", false, builder.Build());
                                         Global.SiegeInfo[fileID].SetPowerUp("");
                                         break;
-                                    case "Summon": {
+                                    case "Summon":
                                         var choice = Global.Rand.Next(0, 2);
                                         string ally;
                                         string url;
@@ -553,6 +569,7 @@ namespace MarbleBot.Modules
                                         }
                                         var dmg = Global.Rand.Next(60, 85);
                                         Global.SiegeInfo[fileID].Boss.HP -= (int)Math.Round(dmg * Global.SiegeInfo[fileID].DMGMultiplier);
+                                        if (Global.SiegeInfo[fileID].Boss.HP < 0) Global.SiegeInfo[fileID].Boss.HP = 0;
                                         builder.WithTitle("POWER-UP ACTIVATED!")
                                             .WithThumbnailUrl(url)
                                             .AddField("Boss HP", $"**{Global.SiegeInfo[fileID].Boss.HP}**/{Global.SiegeInfo[fileID].Boss.MaxHP}")
@@ -560,7 +577,15 @@ namespace MarbleBot.Modules
                                         await ReplyAsync("", false, builder.Build());
                                         Global.SiegeInfo[fileID].SetPowerUp("");
                                         break;
-                                    }
+                                    case "Cure":
+                                        var marble = Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id);
+                                        var mse = Enum.GetName(typeof(MSE), marble.StatusEffect);
+                                        Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).StatusEffect = MSE.None;
+                                        builder.WithTitle("Cured!")
+                                            .WithDescription($"**{marble.Name}** has been cured of **{mse}**!");
+                                        await ReplyAsync("", false, builder.Build());
+                                        Global.SiegeInfo[fileID].SetPowerUp("");
+                                        break;
                                 }
                             } else await ReplyAsync("You failed to grab the power-up!");
                         }
@@ -581,8 +606,8 @@ namespace MarbleBot.Modules
                     var User = Global.GetUser(Context);
                     var nextDaily = DateTime.UtcNow.Subtract(User.LastSiegeWin);
                     var output = "";
-                    if (nextDaily.TotalHours < 6) output = string.Format("You can earn money from racing in **{0}**!", Global.GetDateString(User.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6))));
-                    else output = "You can earn money from racing now!";
+                    if (nextDaily.TotalHours < 6) output = string.Format("You can earn money from Sieges in **{0}**!", Global.GetDateString(User.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6))));
+                    else output = "You can earn money from Sieges now!";
                     builder.WithAuthor(Context.User)
                         .WithDescription(output);
                     await ReplyAsync("", false, builder.Build());
@@ -713,10 +738,10 @@ namespace MarbleBot.Modules
                         case "orange": boss = Global.Orange; break;
                         case "green": boss = Global.Green; break;
                         case "destroyer": boss = Global.Destroyer; break;
-                        case "helpmethetree": await ReplyAsync("Not yet..."); state = 2; break;
+                        case "helpmethetree": boss = Global.HelpMeTheTree; break;
                         case "helpme": goto case "helpmethetree";
-                        case "erango": goto case "helpmethetree";
-                        case "octopheesh": goto case "helpmethetree";
+                        case "erango": boss = Global.Erango; break;
+                        case "octopheesh": boss = Global.Octopheesh; break;
                         case "frigidium": await ReplyAsync("No."); state = 3; break;
                         case "neptune": goto case "frigidium";
                         case "red": goto case "frigidium";
@@ -726,17 +751,22 @@ namespace MarbleBot.Modules
                         case "marblebot": goto case "frigidium";
                         case "overlord": await ReplyAsync("*Ahahahaha...\n\nYou are sorely mistaken.*"); state = 3; break;
                         case "vinemonster": await ReplyAsync("Excuse me?"); state = 3; break;
+                        case "vinemonsters": goto case "vinemonster";
+                        case "floatingore": goto case "vinemonster";
                         case "veronica": await ReplyAsync("Woah there! Calm down!"); state = 3; break;
                         case "rockgolem": goto case "veronica";
+                        case "minideletion": goto case "veronica";
                         case "alphadeletion": goto case "veronica";
                         case "viii": goto case "veronica";
                         case "triacontapheesh": goto case "veronica";
+                        case "hyperguard": goto case "veronica";
                         case "creator": await ReplyAsync("*No...\n\nThis is wrong...*"); state = 3; break;
+                        case "doc671": await ReplyAsync("No spoilers here!"); state = 4; break;
                         default: state = 0; break;
                     }
                     if (state == 1) {
                         var attacks = new StringBuilder();
-                        foreach (var attack in boss.Attacks) attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}]");
+                        foreach (var attack in boss.Attacks) attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(MSE), attack.StatusEffect)}>");
                         builder.AddField("HP", $"**{boss.MaxHP}**")
                             .AddField("Attacks", attacks.ToString())
                             .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)}** {(int)boss.Difficulty}/10")
@@ -763,6 +793,10 @@ namespace MarbleBot.Modules
                         case "summon": powerup = "Summon";
                             desc = "Summons an ally to help against the boss.";
                             url = "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png";
+                            break;
+                        case "cure": powerup = "Cure";
+                            desc = "Cures a marble of a status effect.";
+                            url = "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png";
                             break;
                     }
                     if (powerup.IsEmpty()) await ReplyAsync("Could not find the requested power-up!");
@@ -823,8 +857,48 @@ namespace MarbleBot.Modules
                                 hits++;
                                 if (marble.HP < 1) {
                                     marble.HP = 0;
-                                    builder.AddField($"**{marble.Name}** has been killed!", $"HP: {marble.HP}/{marble.MaxHP}");
-                                } else builder.AddField($"**{marble.Name}** has been damaged!", $"HP: {marble.HP}/{marble.MaxHP}");
+                                    builder.AddField($"**{marble.Name}** has been killed!", $"HP: 0/{marble.MaxHP}");
+                                } else {
+                                    switch (atk.StatusEffect) {
+                                        case MSE.Chill:
+                                            builder.AddField($"**{marble.Name}** has been chilled! All attacks will deal half damage unless cured!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Chill**");
+                                            marble.StatusEffect = MSE.Chill;
+                                            break;
+                                        case MSE.Doom:
+                                            builder.AddField($"**{marble.Name}** has been doomed and will die in ~45 seconds if not cured!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Doom**");
+                                            marble.DoomStart = DateTime.UtcNow;
+                                            marble.StatusEffect = MSE.Doom;
+                                            break;
+                                        case MSE.Poison:
+                                            builder.AddField($"**{marble.Name}** has been poisoned and will lose HP every ~15 seconds until cured/at 1 HP!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Poison**");
+                                            marble.StatusEffect = MSE.Poison;
+                                            break;
+                                        case MSE.Stun:
+                                            builder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Poison**");
+                                            marble.LastStun = DateTime.UtcNow;
+                                            marble.StatusEffect = MSE.Poison;
+                                            break;
+                                        default: builder.AddField($"**{marble.Name}** has been damaged!", $"HP: {marble.HP}/{marble.MaxHP}"); break;
+                                    }
+                                }
+                            }
+                            switch (marble.StatusEffect) {
+                                case MSE.Doom:
+                                    if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45) {
+                                        marble.HP = 0;
+                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: 0/{marble.MaxHP}");
+                                    }
+                                    break;
+                                case MSE.Poison:
+                                    if (DateTime.UtcNow.Subtract(marble.LastPoisonTick).TotalSeconds > 15) {
+                                        if (marble.HP < 1) break;
+                                        marble.HP -= (int)Math.Round((double)marble.MaxHP / 10);
+                                        marble.LastPoisonTick = DateTime.UtcNow;
+                                        if (marble.HP < 2) marble.HP = 1;
+                                        builder.AddField($"**{marble.Name}** has taken Poison damage!", $"HP: {marble.HP}/{marble.MaxHP}");
+                                    }
+                                    marble.LastPoisonTick = DateTime.UtcNow;
+                                    break;
                             }
                         }
                     }
@@ -851,7 +925,7 @@ namespace MarbleBot.Modules
                         break;
                     }
                     if (Global.SiegeInfo[Id].PowerUp == "") {
-                        rand = Global.Rand.Next(0, 7);
+                        rand = Global.Rand.Next(0, 8);
                         switch (rand) {
                             case 0: {
                                 Global.SiegeInfo[Id].SetPowerUp("Morale Boost");
@@ -884,6 +958,19 @@ namespace MarbleBot.Modules
                                     .WithThumbnailUrl(Global.SiegeInfo[Id].PUImageUrl)
                                     .WithTitle("Power-up spawned!");
                                 await Context.Channel.SendMessageAsync("", false, builder.Build());
+                                break;
+                            }
+                            case 3: {
+                                if (Global.SiegeInfo[Id].Marbles.Any(m => m.StatusEffect != MSE.None)) {
+                                    Global.SiegeInfo[Id].SetPowerUp("Cure");
+                                    builder = new EmbedBuilder()
+                                        .WithColor(Global.GetColor(Context))
+                                        .WithCurrentTimestamp()
+                                        .WithDescription("A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                        .WithThumbnailUrl(Global.SiegeInfo[Id].PUImageUrl)
+                                        .WithTitle("Power-up spawned!");
+                                    await Context.Channel.SendMessageAsync("", false, builder.Build());
+                                }
                                 break;
                             }
                             default: break;
@@ -956,9 +1043,9 @@ namespace MarbleBot.Modules
         }
 
         [Command("boss")]
-        public async Task _boss(string searchTerm) { await _siege("boss", searchTerm); }
+        public async Task _boss([Remainder] string searchTerm) { await _siege("boss", searchTerm); }
 
         [Command("powerup")]
-        public async Task _powerup(string searchTerm) { await _siege("powerup", searchTerm); }
+        public async Task _powerup([Remainder] string searchTerm) { await _siege("powerup", searchTerm); }
     }
 }

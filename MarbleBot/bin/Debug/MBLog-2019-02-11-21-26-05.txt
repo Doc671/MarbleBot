@@ -4,3 +4,17 @@ Started running: 2019-02-11 21:26:05
 [2019-02-11 21:26:10] Doc671#1965: hi
 [2019-02-11 21:27:35] Doc671#1965: mb/siege mostused
 [2019-02-11 21:27:35] MarbleBot#7194: 
+[2019-02-11 22:18:17] BadArgCount: The input text has too few parameters.
+[2019-02-12 02:01:08] BadArgCount: The input text has too few parameters.
+[2019-02-12 02:01:32] BadArgCount: The input text has too many parameters.
+[2019-02-12 08:18:39] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\RaceMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:24:14] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\RaceMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:28:44] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\SiegeMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:34:39] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\SiegeMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:36:37] Exception: The given key was not present in the dictionary.
+Time For MElmonry >:)
+[2019-02-12 08:52:22] Doc671#1965: mb/melmon desk What's happening to me?
+Time For MElmonry >:)
+[2019-02-12 08:53:16] Doc671#1965: mb/melmon desk \:(
+Time For MElmonry >:)
+[2019-02-12 08:53:54] Doc671#1965: mb/melmon desk ;(

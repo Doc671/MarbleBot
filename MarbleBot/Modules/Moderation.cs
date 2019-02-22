@@ -71,9 +71,11 @@ namespace MarbleBot.Modules
 
 
         // Checks if a string contains a swear; returns true if profanity is present
-        public static bool _checkSwear(string word)
+        public static bool CheckSwear(string word)
         {
-            StreamReader FS = new StreamReader("C:/Folder/NarrationPt8_data/e00/d00/ListOfBand.txt");
+            StreamReader FS;
+            if (File.Exists("C:/Folder/NarrationPt8_data/e00/d00/ListOfBand.txt")) FS = new StreamReader("C:/Folder/NarrationPt8_data/e00/d00/ListOfBand.txt");
+            else FS = new StreamReader("ListOfBand.txt");
             string swears = FS.ReadLine(); // Imports list of... obscene language
             FS.Close();
             string[] swearList = swears.Split(',');

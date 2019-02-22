@@ -1,0 +1,18 @@
+MarbleBot by Doc671
+Started running: 2019-02-12 08:02:43
+
+[2019-02-12 08:18:31] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\RaceMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:23:13] Exception: The given key was not present in the dictionary.
+[2019-02-12 08:25:00] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\SiegeMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:25:12] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\SiegeMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:25:19] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\224277738608001024siege.csv' because it is being used by another process.
+[2019-02-12 08:25:24] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\SiegeMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:29:07] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Users.json' because it is being used by another process.
+[2019-02-12 08:34:15] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\RaceMostUsed.txt' because it is being used by another process.
+[2019-02-12 08:36:30] Exception: The given key was not present in the dictionary.
+Time For MElmonry >:)
+[2019-02-12 08:52:22] Doc671#1965: mb/melmon desk What's happening to me?
+Time For MElmonry >:)
+[2019-02-12 08:53:16] Doc671#1965: mb/melmon desk \:(
+Time For MElmonry >:)
+[2019-02-12 08:53:54] Doc671#1965: mb/melmon desk ;(

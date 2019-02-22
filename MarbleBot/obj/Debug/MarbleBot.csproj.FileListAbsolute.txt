@@ -145,16 +145,3 @@ C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.YouTube.v3
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.csprojAssemblyReference.cache
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.exe.config
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.csproj.CopyComplete
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\PUClone.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\PUCure.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\PUHeal.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\PUMoraleBoost.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\PUOverclock.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\PUSummon.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossDestroyer.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossGreen.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossHATTMANN.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossOrange.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossPreeTheTree.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossFrigidium.png
-C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Images\BossNeptune.png
