@@ -107,7 +107,7 @@ namespace MarbleBot.Modules
 
                     // Games
                     case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
-                    case "siege": bCommand.Desc = "Participate in a Marble Siege boss battle!"; bCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege powerup <power-up name>"; break;
+                    case "siege": bCommand.Desc = "Participate in a Marble Siege boss battle!"; bCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
                 }
 
                 var message = new StringBuilder();

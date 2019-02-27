@@ -145,3 +145,6 @@ C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.YouTube.v3
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.csprojAssemblyReference.cache
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.exe.config
 C:\Users\hesar\source\repos\MarbleBot\MarbleBot\obj\Debug\MarbleBot.csproj.CopyComplete
+C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.Docs.v1.dll
+C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.Docs.v1.pdb
+C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Google.Apis.Docs.v1.xml

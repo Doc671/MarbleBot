@@ -4,6 +4,11 @@ using System.IO;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+/*using Google.Apis.Auth.OAuth2;
+using Google.Apis.Docs.v1;
+using Google.Apis.Docs.v1.Data;
+using Google.Apis.Services;
+using Google.Apis.Util.Store;*/
 
 namespace MarbleBot
 {
@@ -18,6 +23,7 @@ namespace MarbleBot
 
         public async Task StartAsync()
         {
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.Title = "MarbleBot";
 
             var logPath = "MBLog-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss") + ".txt";
@@ -45,9 +51,11 @@ namespace MarbleBot
             if (File.Exists("C:/Folder/MBT.txt")) {
                 using (var stream = new StreamReader("C:/Folder/MBT.txt")) token = stream.ReadLine();
                 using (var stream = new StreamReader("C:/Folder/MBK.txt")) Global.YTKey = stream.ReadLine();
+                using (var stream = new StreamReader("C:/Folder/MBK2.txt")) Global.GDKey = stream.ReadLine();
             } else {
                 using (var stream = new StreamReader("MBT.txt")) token = stream.ReadLine();
                 using (var stream = new StreamReader("MBK.txt")) Global.YTKey = stream.ReadLine();
+                using (var stream = new StreamReader("MBK2.txt")) Global.GDKey = stream.ReadLine();
             }
 
             using (var ar = new StreamReader("Autoresponses.txt")) {
@@ -56,6 +64,11 @@ namespace MarbleBot
                     Global.Autoresponses.Add(arar[0], arar[1]);
                 }
             }
+
+            /*var service = new DocsService(new BaseClientService.Initializer {
+                ApiKey = Global.GDKey,
+                ApplicationName = GetType().ToString(),
+            });*/
 
             await _client.LoginAsync(TokenType.Bot, token);
 

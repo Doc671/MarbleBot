@@ -1,0 +1,76 @@
+MarbleBot by Doc671
+Started running: 2019-02-23 21:56:23
+
+[2019-02-24 06:46:18] Prototype#5258: mb/daily
+[2019-02-24 06:46:18] MarbleBot#7194: You need to wait for **9 hours, 1 minute and 17 seconds** until you can get your daily gift again!
+[2019-02-24 06:46:23] Prototype#5258: wjy
+[2019-02-24 06:46:24] Prototype#5258: why
+[2019-02-24 06:47:10] Prototype#5258: mb/attack
+[2019-02-24 06:47:22] Prototype#5258: mb/siege signup White
+[2019-02-24 06:47:22] MarbleBot#7194: 
+[2019-02-24 06:47:34] Prototype#5258: mb/siege start
+[2019-02-24 06:47:34] MarbleBot#7194: **3**
+[2019-02-24 06:47:34] Prototype#5258: mb/siege attack
+[2019-02-24 06:47:34] MarbleBot#7194: 
+[2019-02-24 06:47:34] MarbleBot#7194: 
+[2019-02-24 06:47:36] Prototype#5258: mb/siege attack
+[2019-02-24 06:47:36] MarbleBot#7194: 
+[2019-02-24 06:47:41] Prototype#5258: mb/siege attack
+[2019-02-24 06:47:41] MarbleBot#7194: 
+[2019-02-24 06:47:46] Prototype#5258: mb/siege attack
+[2019-02-24 06:47:46] MarbleBot#7194: 
+[2019-02-24 06:47:46] MarbleBot#7194: 
+[2019-02-24 06:47:49] Prototype#5258: mb/siege attack
+[2019-02-24 06:47:49] MarbleBot#7194: 
+[2019-02-24 06:47:54] Prototype#5258: mb/siege attack
+[2019-02-24 06:47:54] MarbleBot#7194: 
+[2019-02-24 06:47:57] Prototype#5258: mb/siege attack
+[2019-02-24 06:47:57] MarbleBot#7194: 
+[2019-02-24 06:48:01] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:01] MarbleBot#7194: 
+[2019-02-24 06:48:01] MarbleBot#7194: 
+[2019-02-24 06:48:01] MarbleBot#7194: 
+[2019-02-24 06:48:04] Prototype#5258: mb/siege grab
+[2019-02-24 06:48:04] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-24 06:48:14] Prototype#5258: mb/siege grab clone
+[2019-02-24 06:48:14] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-24 06:48:16] MarbleBot#7194: 
+[2019-02-24 06:48:17] Prototype#5258: how
+[2019-02-24 06:48:28] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:28] MarbleBot#7194: 
+[2019-02-24 06:48:31] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:31] MarbleBot#7194: 
+[2019-02-24 06:48:32] MarbleBot#7194: 
+[2019-02-24 06:48:37] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:37] MarbleBot#7194: 
+[2019-02-24 06:48:40] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:40] MarbleBot#7194: 
+[2019-02-24 06:48:44] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:44] MarbleBot#7194: 
+[2019-02-24 06:48:47] MarbleBot#7194: 
+[2019-02-24 06:48:51] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:51] MarbleBot#7194: 
+[2019-02-24 06:48:55] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:55] MarbleBot#7194: 
+[2019-02-24 06:48:59] Prototype#5258: mb/siege attack
+[2019-02-24 06:48:59] MarbleBot#7194: 
+[2019-02-24 06:49:02] Prototype#5258: mb/siege attack
+[2019-02-24 06:49:02] MarbleBot#7194: 
+[2019-02-24 06:49:02] MarbleBot#7194: 
+[2019-02-24 06:49:07] Prototype#5258: mb/siege attack
+[2019-02-24 06:49:07] MarbleBot#7194: 
+[2019-02-24 06:49:10] Prototype#5258: mb/siege attack
+[2019-02-24 06:49:10] MarbleBot#7194: 
+[2019-02-24 06:49:14] Prototype#5258: mb/siege attacj
+[2019-02-24 06:49:14] MarbleBot#7194: 
+[2019-02-24 06:49:17] MarbleBot#7194: 
+[2019-02-24 06:49:18] Prototype#5258: mb/siege attack
+[2019-02-24 06:49:18] MarbleBot#7194: 
+[2019-02-24 06:49:22] Prototype#5258: mb/siege attack
+[2019-02-24 06:49:22] MarbleBot#7194: 
+[2019-02-24 06:49:26] Prototype#5258: mb/siege attack
+[2019-02-24 06:49:26] MarbleBot#7194: 
+[2019-02-24 06:49:30] Prototype#5258: mb/siege attack
+[2019-02-24 06:49:30] MarbleBot#7194: 
+[2019-02-24 06:49:30] MarbleBot#7194: 
+[2019-02-24 06:49:34] Prototype#5258: yay

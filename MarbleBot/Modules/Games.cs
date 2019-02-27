@@ -36,7 +36,10 @@ namespace MarbleBot.Modules
                     else if (option.Length > 100) {
                         await ReplyAsync("Your entry exceeds the 100 character limit.");
                         break;
-                    } else option = option.Replace("\n", " "); name = option;
+                    } else {
+                        option = option.Replace("\n", " ").Replace(",", ";");
+                        name = option;
+                    }
                     builder.AddField("Marble Race: Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
                     using (var racers = new StreamWriter("RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
                     if (!File.Exists(fileID.ToString() + "race.csv")) File.Create(fileID.ToString() + "race.csv").Close();
@@ -158,16 +161,11 @@ namespace MarbleBot.Modules
                                 User.RaceWins++;
                                 obj.Remove(winnerID.ToString());
                                 obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(User)));
-                                using (var users = new StreamWriter("Users.json")) {
-                                    using (var users2 = new JsonTextWriter(users)) {
-                                        var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                                        Serialiser.Serialize(users2, obj);
-                                    }
-                                }
-                                await ReplyAsync(string.Format("**{0}** won <:unitofmoney:372385317581488128>**{1:n}** for winning the race!", User.Name, gift));
+                                Global.WriteUsers(obj);
+                                await ReplyAsync($"**{User.Name}** won <:unitofmoney:372385317581488128>**{gift:n}** for winning the race!");
                             }
                         }
-                        using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {
+                        using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
                             await marbleList.WriteAsync("");
                             marbleList.Close();
                         }
@@ -176,7 +174,7 @@ namespace MarbleBot.Modules
                 }
                 case "clear": {
                     if (Context.User.Id == 224267581370925056 || Context.IsPrivate) {
-                        using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {
+                        using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
                             await marbleList.WriteAsync("");
                             await ReplyAsync("Contestant list successfully cleared!");
                             marbleList.Close();
@@ -319,7 +317,8 @@ namespace MarbleBot.Modules
                     if (found) {
                         if (id != Context.User.Id) await ReplyAsync("This is not your marble!");
                         else {
-                            using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv")) {
+                            using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
+                                Global.RaceAlive[fileID]--;
                                 await marbleList.WriteAsync(wholeFile.ToString());
                                 await ReplyAsync("Removed contestant **" + option + "**!");
                             }
@@ -371,7 +370,8 @@ namespace MarbleBot.Modules
                         await ReplyAsync("You've already joined!");
                         break;
                     }
-                    option = option.Replace("\n", " "); name = option;
+                    option = option.Replace("\n", " ").Replace(",", ";");
+                    name = option;
                     builder.AddField("Marble Siege: Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
                     using (var Siegers = new StreamWriter("SiegeMostUsed.txt", true)) await Siegers.WriteLineAsync(name);
                     if (name.Contains(',')) {
@@ -462,8 +462,10 @@ namespace MarbleBot.Modules
                         await cdown.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
                         Global.Sieges.Add(Task.Run(async () => { await SiegeBossActions(fileID); }));
                         var marbles = new StringBuilder();
+                        var pings = new StringBuilder();
                         foreach (var marble in Global.SiegeInfo[fileID].Marbles) {
                             marbles.AppendLine($"**{marble.Name}** [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
+                            if (Global.GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
                         }
                         builder.WithTitle("The Siege has begun!")
                             .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
@@ -471,6 +473,7 @@ namespace MarbleBot.Modules
                             .AddField($"Marbles: **{Global.SiegeInfo[fileID].Marbles.Count}**", marbles.ToString())
                             .AddField($"Boss: **{Global.SiegeInfo[fileID].Boss.Name}**", string.Format("HP: **{0}**\nAttacks: **{1}**\nDifficulty: **{2}**", Global.SiegeInfo[fileID].Boss.HP, Global.SiegeInfo[fileID].Boss.Attacks.Length, Enum.GetName(typeof(Difficulty), Global.SiegeInfo[fileID].Boss.Difficulty)));
                         await ReplyAsync("", false, builder.Build());
+                        if (pings.Length != 0) await ReplyAsync(pings.ToString());
                     }
                     break;
                 }
@@ -594,7 +597,7 @@ namespace MarbleBot.Modules
                 }
                 case "clear": {
                     if (Context.User.Id == 224267581370925056 || Context.IsPrivate) {
-                        using (var marbleList = new StreamWriter(fileID.ToString() + "siege.csv")) {
+                        using (var marbleList = new StreamWriter(fileID.ToString() + "siege.csv", false)) {
                             await marbleList.WriteAsync("");
                             await ReplyAsync("Contestant list successfully cleared!");
                             marbleList.Close();
@@ -655,7 +658,7 @@ namespace MarbleBot.Modules
                     if (found) {
                         if (id != Context.User.Id || Context.User.Id == 224267581370925056) await ReplyAsync("This is not your marble!");
                         else {
-                            using (var marbleList = new StreamWriter(fileID.ToString() + "siege.csv")) {
+                            using (var marbleList = new StreamWriter(fileID.ToString() + "siege.csv", false)) {
                                 await marbleList.WriteAsync(wholeFile.ToString());
                                 Global.RaceAlive[fileID]--;
                                 await ReplyAsync("Removed contestant **" + option + "**!");
@@ -812,7 +815,24 @@ namespace MarbleBot.Modules
                 case "power-upinfo": goto case "powerup";
                 case "powerupinfo": goto case "powerup";
                 case "puinfo": goto case "powerup";
-                default: {
+                case "ping": {
+                    var json = "";
+                    using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+                    var obj = JObject.Parse(json);
+                    var user = Global.GetUser(Context, obj);
+                    switch (option) {
+                        case "on": user.SiegePing = true; break;
+                        case "off": user.SiegePing = false; break;
+                        default: user.SiegePing = !user.SiegePing; break;
+                    }
+                    obj.Remove(Context.User.Id.ToString());
+                    obj.Add(new JProperty(Context.User.Id.ToString(), JObject.FromObject(user)));
+                    Global.WriteUsers(obj);
+                    if (user.SiegePing) await ReplyAsync($"**{Context.User.Username}**, you will now be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn off)");
+                    else await ReplyAsync($"**{Context.User.Username}**, you will no longer be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn on)");
+                    break;
+                }
+                default:
                     var sb = new StringBuilder();
                     sb.AppendLine("Use `mb/siege signup <marble name>` to sign up as a marble! (you can only sign up once)");
                     sb.AppendLine("When everyone's done, use `mb/siege start`! The Siege begins automatically when 20 people have signed up.\n");
@@ -823,7 +843,6 @@ namespace MarbleBot.Modules
                         .WithTitle("Marble Siege!");
                     await ReplyAsync("", false, builder.Build());
                     break;
-                }
             }
         }
 
@@ -857,26 +876,27 @@ namespace MarbleBot.Modules
                                 hits++;
                                 if (marble.HP < 1) {
                                     marble.HP = 0;
-                                    builder.AddField($"**{marble.Name}** has been killed!", $"HP: 0/{marble.MaxHP}");
+                                    Global.SiegeInfo[Id].DMGMultiplier += 0.2;
+                                    builder.AddField($"**{marble.Name}** has been killed!", $"HP: 0/{marble.MaxHP}\nDamage Multiplier: {Global.SiegeInfo[Id].DMGMultiplier}");
                                 } else {
                                     switch (atk.StatusEffect) {
                                         case MSE.Chill:
-                                            builder.AddField($"**{marble.Name}** has been chilled! All attacks will deal half damage unless cured!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Chill**");
                                             marble.StatusEffect = MSE.Chill;
+                                            builder.AddField($"**{marble.Name}** has been chilled! All attacks will deal half damage unless cured!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Chill**");
                                             break;
                                         case MSE.Doom:
+                                            marble.StatusEffect = MSE.Doom;
                                             builder.AddField($"**{marble.Name}** has been doomed and will die in ~45 seconds if not cured!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Doom**");
                                             marble.DoomStart = DateTime.UtcNow;
-                                            marble.StatusEffect = MSE.Doom;
                                             break;
                                         case MSE.Poison:
-                                            builder.AddField($"**{marble.Name}** has been poisoned and will lose HP every ~15 seconds until cured/at 1 HP!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Poison**");
                                             marble.StatusEffect = MSE.Poison;
+                                            builder.AddField($"**{marble.Name}** has been poisoned and will lose HP every ~15 seconds until cured/at 1 HP!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Poison**");
                                             break;
                                         case MSE.Stun:
+                                            marble.StatusEffect = MSE.Stun;
                                             builder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Poison**");
                                             marble.LastStun = DateTime.UtcNow;
-                                            marble.StatusEffect = MSE.Poison;
                                             break;
                                         default: builder.AddField($"**{marble.Name}** has been damaged!", $"HP: {marble.HP}/{marble.MaxHP}"); break;
                                     }
@@ -886,7 +906,8 @@ namespace MarbleBot.Modules
                                 case MSE.Doom:
                                     if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45) {
                                         marble.HP = 0;
-                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: 0/{marble.MaxHP}");
+                                        Global.SiegeInfo[Id].DMGMultiplier += 0.2;
+                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: 0/{marble.MaxHP}\nDamage Multiplier: {Global.SiegeInfo[Id].DMGMultiplier}");
                                     }
                                     break;
                                 case MSE.Poison:
@@ -894,7 +915,10 @@ namespace MarbleBot.Modules
                                         if (marble.HP < 1) break;
                                         marble.HP -= (int)Math.Round((double)marble.MaxHP / 10);
                                         marble.LastPoisonTick = DateTime.UtcNow;
-                                        if (marble.HP < 2) marble.HP = 1;
+                                        if (marble.HP < 2) {
+                                            marble.HP = 1;
+                                            marble.StatusEffect = MSE.None;
+                                        }
                                         builder.AddField($"**{marble.Name}** has taken Poison damage!", $"HP: {marble.HP}/{marble.MaxHP}");
                                     }
                                     marble.LastPoisonTick = DateTime.UtcNow;
@@ -982,7 +1006,7 @@ namespace MarbleBot.Modules
                 Global.SiegeInfo[Id].Boss.ResetHP();
                 Global.SiegeInfo.Remove(Id);
             }
-            using (var marbleList = new StreamWriter(Id + "siege.csv")) {
+            using (var marbleList = new StreamWriter(Id + "siege.csv", false)) {
                 await marbleList.WriteAsync("");
                 marbleList.Close();
             }
@@ -1026,17 +1050,12 @@ namespace MarbleBot.Modules
                 if (marble.HP > 0 && earnings > 0) User.LastSiegeWin = DateTime.UtcNow;
                 obj.Remove(marble.Id.ToString());
                 obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(User)));
-                using (var users = new StreamWriter("Users.json")) {
-                    using (var users2 = new JsonTextWriter(users)) {
-                        var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                        Serialiser.Serialize(users2, obj);
-                    }
-                }
+                Global.WriteUsers(obj);
             }
             await ReplyAsync("", false, builder.Build());
             Global.SiegeInfo[Id].Boss.ResetHP();
             Global.SiegeInfo.Remove(Id);
-            using (var marbleList = new StreamWriter(Id.ToString() + "siege.csv")) {
+            using (var marbleList = new StreamWriter(Id.ToString() + "siege.csv", false)) {
                 await marbleList.WriteAsync("");
                 marbleList.Close();
             }

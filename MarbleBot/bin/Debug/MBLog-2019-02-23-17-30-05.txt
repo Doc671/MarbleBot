@@ -1,0 +1,7 @@
+MarbleBot by Doc671
+Started running: 2019-02-23 17:30:05
+
+[2019-02-23 17:36:41] Doc671#1965: mb/repeat a
+[2019-02-23 17:36:41] MarbleBot#7194: a
+[2019-02-23 17:36:41] MarbleBot#7194: a
+[2019-02-23 17:36:47] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\SiegeMostUsed.txt' because it is being used by another process.

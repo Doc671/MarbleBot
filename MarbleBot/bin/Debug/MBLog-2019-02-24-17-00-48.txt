@@ -1,0 +1,211 @@
+MarbleBot by Doc671
+Started running: 2019-02-24 17:00:48
+
+[2019-02-25 07:29:48] Prototype#5258: mb/daily
+[2019-02-25 07:29:48] MarbleBot#7194: **Prototype**, you have received <:unitofmoney:372385317581488128>**210.88**!
+(Streak: **2**)
+[2019-02-25 07:29:55] Prototype#5258: mb/balance
+[2019-02-25 07:29:55] MarbleBot#7194: 
+[2019-02-25 07:30:02] Prototype#5258: mb/shop
+[2019-02-25 07:30:02] MarbleBot#7194: 
+[2019-02-25 07:30:32] Prototype#5258: mb/sell 0 100
+[2019-02-25 07:30:32] MarbleBot#7194: **Prototype** has successfully sold **The Amazing Marble Race Ticket** x**100** for <:unitofmoney:372385317581488128>**0.01** each!
+Total price: <:unitofmoney:372385317581488128>**1.00**
+New balance: <:unitofmoney:372385317581488128>**1,621.88**.
+[2019-02-25 07:30:59] Prototype#5258: mb/rank
+[2019-02-25 07:30:59] MarbleBot#7194: 
+[2019-02-25 07:31:11] Prototype#5258: mb/buy 0 88
+[2019-02-25 07:31:11] MarbleBot#7194: **Prototype** has successfully purchased **The Amazing Marble Race Ticket** x**88** for <:unitofmoney:372385317581488128>**0.01** each!
+Total price: <:unitofmoney:372385317581488128>**0.88**
+New balance: <:unitofmoney:372385317581488128>**1,621.00**.
+[2019-02-25 07:31:24] Prototype#5258: mb/siege
+[2019-02-25 07:31:24] MarbleBot#7194: 
+[2019-02-25 07:31:35] Prototype#5258: mb/siege signup
+[2019-02-25 07:31:36] MarbleBot#7194: 
+[2019-02-25 07:31:48] Prototype#5258: mb/siege start
+[2019-02-25 07:31:48] MarbleBot#7194: **3**
+[2019-02-25 07:31:48] MarbleBot#7194: 
+[2019-02-25 07:31:51] Prototype#5258: mb/siege attack
+[2019-02-25 07:31:51] MarbleBot#7194: 
+[2019-02-25 07:31:57] Prototype#5258: mb/siege attack
+[2019-02-25 07:31:57] MarbleBot#7194: 
+[2019-02-25 07:32:02] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:02] MarbleBot#7194: 
+[2019-02-25 07:32:03] MarbleBot#7194: 
+[2019-02-25 07:32:04] MarbleBot#7194: 
+[2019-02-25 07:32:07] Prototype#5258: mb/siege grab
+[2019-02-25 07:32:07] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:32:17] Prototype#5258: mb/siege grab
+[2019-02-25 07:32:17] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:32:19] MarbleBot#7194: 
+[2019-02-25 07:32:22] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:22] MarbleBot#7194: 
+[2019-02-25 07:32:32] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:32] MarbleBot#7194: 
+[2019-02-25 07:32:34] MarbleBot#7194: 
+[2019-02-25 07:32:37] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:37] MarbleBot#7194: 
+[2019-02-25 07:32:40] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:40] MarbleBot#7194: 
+[2019-02-25 07:32:45] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:45] MarbleBot#7194: 
+[2019-02-25 07:32:48] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:48] MarbleBot#7194: 
+[2019-02-25 07:32:49] MarbleBot#7194: 
+[2019-02-25 07:32:54] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:54] MarbleBot#7194: 
+[2019-02-25 07:32:58] Prototype#5258: mb/siege attack
+[2019-02-25 07:32:58] MarbleBot#7194: 
+[2019-02-25 07:33:01] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:01] MarbleBot#7194: 
+[2019-02-25 07:33:04] MarbleBot#7194: 
+[2019-02-25 07:33:05] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:05] MarbleBot#7194: 
+[2019-02-25 07:33:10] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:10] MarbleBot#7194: 
+[2019-02-25 07:33:15] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:15] MarbleBot#7194: 
+[2019-02-25 07:33:19] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:19] MarbleBot#7194: 
+[2019-02-25 07:33:19] MarbleBot#7194: 
+[2019-02-25 07:33:23] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:23] MarbleBot#7194: 
+[2019-02-25 07:33:27] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:27] MarbleBot#7194: 
+[2019-02-25 07:33:30] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:30] MarbleBot#7194: 
+[2019-02-25 07:33:35] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:35] MarbleBot#7194: 
+[2019-02-25 07:33:35] MarbleBot#7194: 
+[2019-02-25 07:33:38] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:38] MarbleBot#7194: 
+[2019-02-25 07:33:41] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:41] MarbleBot#7194: 
+[2019-02-25 07:33:45] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:45] MarbleBot#7194: 
+[2019-02-25 07:33:50] MarbleBot#7194: 
+[2019-02-25 07:33:51] Prototype#5258: mb/siege attack
+[2019-02-25 07:33:51] MarbleBot#7194: 
+[2019-02-25 07:33:51] MarbleBot#7194: 
+[2019-02-25 07:34:03] Prototype#5258: mb/balance
+[2019-02-25 07:34:03] MarbleBot#7194: 
+[2019-02-25 07:34:18] Prototype#5258: mb/richlist
+[2019-02-25 07:34:18] MarbleBot#7194: 
+[2019-02-25 07:34:35] Prototype#5258: mb/race
+[2019-02-25 07:34:35] MarbleBot#7194: 
+[2019-02-25 07:34:55] Prototype#5258: mb/race signup White
+[2019-02-25 07:34:55] MarbleBot#7194: 
+[2019-02-25 07:35:04] Prototype#5258: mb/race Signup Blue
+[2019-02-25 07:35:04] MarbleBot#7194: 
+[2019-02-25 07:35:09] Prototype#5258: mb/race signup Red
+[2019-02-25 07:35:09] MarbleBot#7194: 
+[2019-02-25 07:35:14] Prototype#5258: mb/race signup White
+[2019-02-25 07:35:14] MarbleBot#7194: 
+[2019-02-25 07:35:33] Prototype#5258: mb/race start
+[2019-02-25 07:35:33] MarbleBot#7194: 
+[2019-02-25 07:35:36] MarbleBot#7194: **White** won the race!
+[2019-02-25 07:36:15] Prototype#5258: mb/siege signup White
+[2019-02-25 07:36:16] MarbleBot#7194: 
+[2019-02-25 07:36:28] Prototype#5258: mb/siege start
+[2019-02-25 07:36:28] MarbleBot#7194: **3**
+[2019-02-25 07:36:28] MarbleBot#7194: 
+[2019-02-25 07:36:30] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:30] MarbleBot#7194: 
+[2019-02-25 07:36:34] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:34] MarbleBot#7194: 
+[2019-02-25 07:36:37] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:37] MarbleBot#7194: 
+[2019-02-25 07:36:41] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:41] MarbleBot#7194: 
+[2019-02-25 07:36:43] MarbleBot#7194: 
+[2019-02-25 07:36:44] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:45] MarbleBot#7194: 
+[2019-02-25 07:36:49] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:49] MarbleBot#7194: 
+[2019-02-25 07:36:52] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:52] MarbleBot#7194: 
+[2019-02-25 07:36:57] Prototype#5258: mb/siege attack
+[2019-02-25 07:36:57] MarbleBot#7194: 
+[2019-02-25 07:36:58] MarbleBot#7194: 
+[2019-02-25 07:36:59] MarbleBot#7194: 
+[2019-02-25 07:37:00] Prototype#5258: mb/siege attack
+[2019-02-25 07:37:00] MarbleBot#7194: 
+[2019-02-25 07:37:04] Prototype#5258: mb/siege grab
+[2019-02-25 07:37:04] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:37:09] Prototype#5258: mb/siege grab
+[2019-02-25 07:37:09] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:37:13] Prototype#5258: mb/siege grab
+[2019-02-25 07:37:13] MarbleBot#7194: 
+[2019-02-25 07:37:14] MarbleBot#7194: 
+[2019-02-25 07:37:14] MarbleBot#7194: 
+[2019-02-25 07:37:20] Prototype#5258: mb/siege grab
+[2019-02-25 07:37:20] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:37:23] Prototype#5258: mb/siege grab
+[2019-02-25 07:37:23] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:37:26] Prototype#5258: mb/siege grab
+[2019-02-25 07:37:26] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:37:29] MarbleBot#7194: 
+[2019-02-25 07:37:30] Prototype#5258: mb/siege grab
+[2019-02-25 07:37:30] MarbleBot#7194: 
+[2019-02-25 07:37:35] Prototype#5258: mb/siege attack
+[2019-02-25 07:37:35] MarbleBot#7194: 
+[2019-02-25 07:37:35] MarbleBot#7194: White's clones disappeared!
+[2019-02-25 07:37:40] Prototype#5258: mb/siege attack
+[2019-02-25 07:37:40] MarbleBot#7194: 
+[2019-02-25 07:37:44] Prototype#5258: mb/siege attack
+[2019-02-25 07:37:44] MarbleBot#7194: 
+[2019-02-25 07:37:44] MarbleBot#7194: 
+[2019-02-25 07:37:47] Prototype#5258: mb/siege attack
+[2019-02-25 07:37:47] MarbleBot#7194: 
+[2019-02-25 07:37:51] Prototype#5258: mb/siege attack
+[2019-02-25 07:37:51] MarbleBot#7194: The effects of a Morale Boost power-up have worn off! The damage multiplier is now **1**!
+[2019-02-25 07:37:51] MarbleBot#7194: 
+[2019-02-25 07:37:57] Prototype#5258: mb/siege attack
+[2019-02-25 07:37:57] MarbleBot#7194: 
+[2019-02-25 07:38:00] MarbleBot#7194: 
+[2019-02-25 07:38:00] Prototype#5258: mb/siege attack
+[2019-02-25 07:38:00] MarbleBot#7194: 
+[2019-02-25 07:38:04] Prototype#5258: mb/siege attack
+[2019-02-25 07:38:04] MarbleBot#7194: 
+[2019-02-25 07:38:07] Prototype#5258: mb/siege attack
+[2019-02-25 07:38:07] MarbleBot#7194: 
+[2019-02-25 07:38:11] Prototype#5258: mb/siege attack
+[2019-02-25 07:38:11] MarbleBot#7194: 
+[2019-02-25 07:38:14] Prototype#5258: mb/siege attack
+[2019-02-25 07:38:14] MarbleBot#7194: 
+[2019-02-25 07:38:15] MarbleBot#7194: 
+[2019-02-25 07:38:15] MarbleBot#7194: 
+[2019-02-25 07:38:19] Prototype#5258: mb/siege grab
+[2019-02-25 07:38:19] MarbleBot#7194: You failed to grab the power-up!
+[2019-02-25 07:38:22] Prototype#5258: mb/siege grab
+[2019-02-25 07:38:22] MarbleBot#7194: 
+[2019-02-25 07:38:27] Prototype#5258: mb/siege attack
+[2019-02-25 07:38:27] MarbleBot#7194: 
+[2019-02-25 07:38:27] MarbleBot#7194: White's clones disappeared!
+[2019-02-25 07:38:27] MarbleBot#7194: 
+[2019-02-25 09:19:06] BadArgCount: The input text has too few parameters.
+[2019-02-25 12:03:43] Exception: Object reference not set to an instance of an object.
+[2019-02-25 12:22:24] Exception: Object reference not set to an instance of an object.
+[2019-02-25 12:41:06] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Users.json' because it is being used by another process.
+[2019-02-25 13:04:12] Exception: Object reference not set to an instance of an object.
+[2019-02-25 13:46:04] Exception: Object reference not set to an instance of an object.
+[2019-02-25 14:18:56] Exception: Object reference not set to an instance of an object.
+[2019-02-25 15:40:01] Exception: The given key was not present in the dictionary.
+[2019-02-25 20:12:25] Doc671#1965: mb/daily
+[2019-02-25 20:12:25] MarbleBot#7194: **Doc671**, you have received <:unitofmoney:372385317581488128>**1,851.24**!
+(Streak: **43**)
+[2019-02-25 21:21:21] BlueIce57#1644: mb/help
+[2019-02-25 21:21:21] MarbleBot#7194: 
+[2019-02-26 07:04:20] TheMarbleousMarbler#1852: mb/vinglish Yens
+[2019-02-26 07:04:28] TheMarbleousMarbler#1852: mb/repeat test
+[2019-02-26 07:04:28] MarbleBot#7194: test
+[2019-02-26 07:04:36] TheMarbleousMarbler#1852: mb/vinhglish Yens
+[2019-02-26 07:04:36] MarbleBot#7194: **__Litrel Carp__**
+Inventor: 256 Mg
+Description: Used as a joke insult. True meaning unknown.
+[2019-02-26 12:53:48] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Users.json' because it is being used by another process.
+[2019-02-26 13:33:14] Exception: Object reference not set to an instance of an object.
+[2019-02-26 15:31:27] Exception: Object reference not set to an instance of an object.
+[2019-02-26 15:31:54] Exception: Object reference not set to an instance of an object.
+[2019-02-26 18:37:45] Doc671#1965: mb/daily
+[2019-02-26 18:37:45] MarbleBot#7194: You need to wait for **1 hour, 34 minutes and 39 seconds** until you can get your daily gift again!

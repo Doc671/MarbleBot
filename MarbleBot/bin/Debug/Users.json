@@ -30,7 +30,7 @@
     "LastRaceWin": "2019-01-03T10:02:03.242831Z"
   },
   "190250568747450369": {
-    "Name": "‚Ä†NeptheDarkAnime‚Ä†",
+    "Name": "√¢‚?¨¬†NeptheDarkAnime√¢‚?¨¬†",
     "Discriminator": "8371",
     "Balance": 2031.58,
     "NetWorth": 2031.58,
@@ -118,7 +118,7 @@
     }
   },
   "189338046410391552": {
-    "Name": "—ïœÉŒ±œÅœÖ∆í∆í–≤Œ±‚Ñì‚Ñì",
+    "Name": "√?‚?¢√è∆?√?¬±√è¬Å√è‚?¶√?‚??√?‚??√ê¬≤√?¬±√¢‚??‚??√¢‚??‚??",
     "Discriminator": "3625",
     "Balance": 344.21,
     "NetWorth": 344.21,
@@ -227,36 +227,6 @@
       "0": 0
     }
   },
-  "328773151297372163": {
-    "Name": "HexBlue",
-    "Discriminator": "2067",
-    "Balance": 4385.17,
-    "NetWorth": 4385.17,
-    "DailyStreak": 1,
-    "RaceWins": 5,
-    "SiegeWins": 0,
-    "LastDaily": "2019-02-11T17:00:54.9662546Z",
-    "LastRaceWin": "2019-02-04T21:56:19.2031808Z",
-    "LastSiegeWin": "0001-01-01T00:00:00",
-    "Items": {
-      "0": 0
-    }
-  },
-  "311360247740760064": {
-    "Name": "therealvinh",
-    "Discriminator": "1337",
-    "Balance": 2625.29,
-    "NetWorth": 2625.3,
-    "DailyStreak": 1,
-    "RaceWins": 1,
-    "SiegeWins": 2,
-    "LastDaily": "2019-02-09T11:52:24.1675449Z",
-    "LastRaceWin": "2019-02-10T05:02:54.7609509Z",
-    "LastSiegeWin": "2019-02-09T11:51:28.4581406Z",
-    "Items": {
-      "0": 1
-    }
-  },
   "513959866809712640": {
     "Name": "Blade",
     "Discriminator": "6894",
@@ -289,33 +259,19 @@
       "0": 1
     }
   },
-  "263360499629031424": {
-    "Name": "Prototype",
-    "Discriminator": "5258",
-    "Balance": 200.0,
-    "NetWorth": 200.0,
-    "DailyStreak": 1,
-    "RaceWins": 0,
-    "SiegeWins": 0,
-    "LastDaily": "2019-02-15T14:05:22.3387743Z",
-    "LastRaceWin": "2019-01-01T00:00:00",
-    "LastSiegeWin": "2019-01-01T00:00:00",
-    "Items": {
-      "10": 1
-    }
-  },
   "257828825994362880": {
-    "Name": "Timtodile",
+    "Name": "Tim T. Dile",
     "Discriminator": "6587",
-    "Balance": 2054.46,
-    "NetWorth": 2054.46,
-    "DailyStreak": 2,
+    "Balance": 2887.7,
+    "NetWorth": 2887.7,
+    "DailyStreak": 3,
     "RaceWins": 2,
     "SiegeWins": 4,
-    "LastDaily": "2019-02-10T15:25:06.6319195Z",
+    "SiegePing": false,
+    "LastDaily": "2019-02-26T15:31:29Z",
     "LastRaceWin": "2019-02-15T15:19:41.4367048Z",
     "LastSiegeWin": "2019-02-09T15:41:34.8027121Z",
-    "Items": null
+    "Items": {}
   },
   "232618363975630849": {
     "Name": "George012",
@@ -379,37 +335,6 @@
       "10": 1
     }
   },
-  "427395690134634506": {
-    "Name": "fanglenn02",
-    "Discriminator": "1725",
-    "Balance": 5740.36,
-    "NetWorth": 5740.36,
-    "DailyStreak": 2,
-    "RaceWins": 9,
-    "SiegeWins": 0,
-    "LastDaily": "2019-02-17T11:38:48.3980487Z",
-    "LastRaceWin": "2019-02-17T12:50:22.6918696Z",
-    "LastSiegeWin": "0001-01-01T00:00:00",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
-  },
-  "482730950711836672": {
-    "Name": "chrisroberts777",
-    "Discriminator": "9395",
-    "Balance": 200.0,
-    "NetWorth": 200.0,
-    "DailyStreak": 1,
-    "RaceWins": 0,
-    "SiegeWins": 0,
-    "LastDaily": "2019-02-17T14:59:34.2053346Z",
-    "LastRaceWin": "2019-01-01T00:00:00",
-    "LastSiegeWin": "2019-01-01T00:00:00",
-    "Items": {
-      "10": 1
-    }
-  },
   "330390722706538496": {
     "Name": "Matthew_Marbler159",
     "Discriminator": "8620",
@@ -454,54 +379,6 @@
     "LastSiegeWin": "2019-02-18T14:25:10.0180987Z",
     "Items": {}
   },
-  "335849071430336514": {
-    "Name": "ACN",
-    "Discriminator": "4614",
-    "Balance": 7257.44,
-    "NetWorth": 7797.66,
-    "DailyStreak": 1,
-    "RaceWins": 13,
-    "SiegeWins": 1,
-    "LastDaily": "2019-02-18T23:10:11.2053614Z",
-    "LastRaceWin": "2019-02-04T22:49:37.3276389Z",
-    "LastSiegeWin": "2019-02-04T23:58:40.4971712Z",
-    "Items": {
-      "0": 54022,
-      "10": 1
-    }
-  },
-  "327252741074321408": {
-    "Name": "Greeny",
-    "Discriminator": "6341",
-    "Balance": 1410.88,
-    "NetWorth": 1410.88,
-    "DailyStreak": 1,
-    "RaceWins": 2,
-    "SiegeWins": 1,
-    "LastDaily": "2019-02-18T19:20:03.2133591Z",
-    "LastRaceWin": "2019-02-04T21:50:06.9552761Z",
-    "LastSiegeWin": "0001-01-01T00:00:00",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
-  },
-  "214154668044058624": {
-    "Name": "luka",
-    "Discriminator": "0001",
-    "Balance": 3869.81,
-    "NetWorth": 3869.91,
-    "DailyStreak": 1,
-    "RaceWins": 2,
-    "SiegeWins": 2,
-    "LastDaily": "2019-02-20T20:37:22.6508587Z",
-    "LastRaceWin": "2019-01-06T20:36:07.7067434Z",
-    "LastSiegeWin": "2019-02-09T15:41:34.8157033Z",
-    "Items": {
-      "0": 10,
-      "10": 1
-    }
-  },
   "339268026715078659": {
     "Name": "RedTheGamer99",
     "Discriminator": "1665",
@@ -517,158 +394,21 @@
       "0": 0
     }
   },
-  "290284201310158849": {
-    "Name": "TheMarbleousMarbler",
-    "Discriminator": "1852",
-    "Balance": 38981.61,
-    "NetWorth": 38981.61,
-    "DailyStreak": 43,
-    "RaceWins": 27,
-    "SiegeWins": 0,
-    "LastDaily": "2019-02-21T20:48:35.8894032Z",
-    "LastRaceWin": "2019-02-21T20:59:53.385801Z",
-    "LastSiegeWin": "0001-01-01T00:00:00",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
-  },
-  "225802674518360074": {
-    "Name": "Austin E",
-    "Discriminator": "2604",
-    "Balance": 0.0,
-    "NetWorth": 4481.42,
-    "DailyStreak": 7,
-    "RaceWins": 6,
+  "193247613095641090": {
+    "Name": "FlameVapour",
+    "Discriminator": "2613",
+    "Balance": -726141.6,
+    "NetWorth": 2658.46,
+    "DailyStreak": 4,
+    "RaceWins": 4,
     "SiegeWins": 3,
-    "LastDaily": "2019-02-21T20:37:25.4776656Z",
-    "LastRaceWin": "2019-02-21T21:07:28.0393885Z",
-    "LastSiegeWin": "2019-02-19T23:02:40.776065Z",
+    "LastDaily": "2019-02-22T23:44:38.4139917Z",
+    "LastRaceWin": "2019-02-21T17:58:31.8584258Z",
+    "LastSiegeWin": "2019-02-21T22:51:53.6775322Z",
     "Items": {
+      "0": 6,
       "10": 1,
-      "0": 448142
-    }
-  },
-  "195529549855850496": {
-    "Name": "Kenlimepie",
-    "Discriminator": "3559",
-    "Balance": 43217.37,
-    "NetWorth": 43218.37,
-    "DailyStreak": 42,
-    "RaceWins": 40,
-    "SiegeWins": 7,
-    "LastDaily": "2019-02-21T16:36:50.5327695Z",
-    "LastRaceWin": "2019-02-21T18:08:40.2372307Z",
-    "LastSiegeWin": "2019-02-21T22:53:25.9965962Z",
-    "Items": {
-      "0": 100,
-      "10": 1
-    }
-  },
-  "402750363226341377": {
-    "Name": "Bluetiger0824",
-    "Discriminator": "7434",
-    "Balance": 6746.06,
-    "NetWorth": 6746.06,
-    "DailyStreak": 6,
-    "RaceWins": 1,
-    "SiegeWins": 4,
-    "LastDaily": "2019-02-21T22:44:47.6690888Z",
-    "LastRaceWin": "2019-02-14T01:05:58.9705381Z",
-    "LastSiegeWin": "2019-02-21T22:53:26.0005935Z",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
-  },
-  "236329367075028993": {
-    "Name": "IloveRumania",
-    "Discriminator": "9415",
-    "Balance": 10520.1,
-    "NetWorth": 10520.1,
-    "DailyStreak": 6,
-    "RaceWins": 16,
-    "SiegeWins": 9,
-    "LastDaily": "2019-02-21T17:09:40.2396244Z",
-    "LastRaceWin": "2019-02-21T17:21:41.7501787Z",
-    "LastSiegeWin": "2019-02-21T22:59:58.1240286Z",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
-  },
-  "186599557482676224": {
-    "Name": "Joe Art Maker",
-    "Discriminator": "6225",
-    "Balance": 33717.0,
-    "NetWorth": 33717.0,
-    "DailyStreak": 41,
-    "RaceWins": 14,
-    "SiegeWins": 11,
-    "LastDaily": "2019-02-21T21:11:17.5795747Z",
-    "LastRaceWin": "2019-02-16T23:31:26.8996875Z",
-    "LastSiegeWin": "2019-02-21T23:23:58.294118Z",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
-  },
-  "224267581370925056": {
-    "Name": "Doc671",
-    "Discriminator": "1965",
-    "Balance": 33840.22,
-    "NetWorth": 33840.22,
-    "DailyStreak": 40,
-    "RaceWins": 13,
-    "SiegeWins": 11,
-    "LastDaily": "2019-02-21T11:49:22.0073613Z",
-    "LastRaceWin": "2019-02-14T20:22:25.5270565Z",
-    "LastSiegeWin": "2019-02-21T23:23:58.3370908Z",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
-  },
-  "512357211830222861": {
-    "Name": "ISDTCB",
-    "Discriminator": "2869",
-    "Balance": 0.0,
-    "NetWorth": 0.0,
-    "DailyStreak": 0,
-    "RaceWins": 0,
-    "SiegeWins": 4,
-    "LastDaily": "2019-01-01T00:00:00",
-    "LastRaceWin": "2019-01-01T00:00:00",
-    "LastSiegeWin": "2019-01-01T00:00:00",
-    "Items": {}
-  },
-  "544962851236872223": {
-    "Name": "IloveLV",
-    "Discriminator": "9216",
-    "Balance": 0.0,
-    "NetWorth": 0.0,
-    "DailyStreak": 0,
-    "RaceWins": 0,
-    "SiegeWins": 4,
-    "LastDaily": "2019-01-01T00:00:00",
-    "LastRaceWin": "2019-01-01T00:00:00",
-    "LastSiegeWin": "2019-01-01T00:00:00",
-    "Items": {}
-  },
-  "224734572481347584": {
-    "Name": "Random Person",
-    "Discriminator": "1337",
-    "Balance": 14272.74,
-    "NetWorth": 14272.74,
-    "DailyStreak": 10,
-    "RaceWins": 7,
-    "SiegeWins": 8,
-    "LastDaily": "2019-02-21T22:39:17.221542Z",
-    "LastRaceWin": "2019-02-20T03:59:14.3331583Z",
-    "LastSiegeWin": "2019-02-21T22:39:01.1687054Z",
-    "Items": {
-      "0": 0,
-      "10": 1
+      "1": 2
     }
   },
   "370463333763121152": {
@@ -678,21 +418,247 @@
     "NetWorth": 200.0,
     "DailyStreak": 1,
     "RaceWins": 0,
-    "SiegeWins": 1,
+    "SiegeWins": 2,
     "LastDaily": "2019-01-05T18:26:34.691636Z",
     "LastRaceWin": "0001-01-01T00:00:00",
     "LastSiegeWin": "0001-01-01T00:00:00",
     "Items": null
   },
+  "294514347735121920": {
+    "Name": "Meo",
+    "Discriminator": "9382",
+    "Balance": 0.0,
+    "NetWorth": 0.0,
+    "DailyStreak": 0,
+    "RaceWins": 0,
+    "SiegeWins": 1,
+    "LastDaily": "2019-01-01T00:00:00",
+    "LastRaceWin": "2019-01-01T00:00:00",
+    "LastSiegeWin": "2019-01-01T00:00:00",
+    "Items": {}
+  },
+  "328773151297372163": {
+    "Name": "HexBlue",
+    "Discriminator": "2067",
+    "Balance": 4585.17,
+    "NetWorth": 4585.17,
+    "DailyStreak": 1,
+    "SiegePing": false,
+    "RaceWins": 5,
+    "SiegeWins": 0,
+    "LastDaily": "2019-02-23T21:28:26.546041Z",
+    "LastRaceWin": "2019-02-04T21:56:19.2031808Z",
+    "LastSiegeWin": "0001-01-01T00:00:00",
+    "Items": {
+      "0": 0
+    }
+  },
+  "335849071430336514": {
+    "Name": "ACN",
+    "Discriminator": "4614",
+    "Balance": 7457.44,
+    "NetWorth": 7997.66,
+    "DailyStreak": 1,
+    "SiegePing": false,
+    "RaceWins": 13,
+    "SiegeWins": 1,
+    "LastDaily": "2019-02-24T02:26:57.3521091Z",
+    "LastRaceWin": "2019-02-04T22:49:37.3276389Z",
+    "LastSiegeWin": "2019-02-04T23:58:40.4971712Z",
+    "Items": {
+      "0": 54022,
+      "10": 1
+    }
+  },
+  "482730950711836672": {
+    "Name": "chrisroberts777",
+    "Discriminator": "9395",
+    "Balance": 400.0,
+    "NetWorth": 400.0,
+    "DailyStreak": 1,
+    "SiegePing": false,
+    "RaceWins": 0,
+    "SiegeWins": 0,
+    "LastDaily": "2019-02-24T18:02:22.5638131Z",
+    "LastRaceWin": "2019-01-01T00:00:00",
+    "LastSiegeWin": "2019-01-01T00:00:00",
+    "Items": {
+      "10": 1
+    }
+  },
+  "327252741074321408": {
+    "Name": "Greeny",
+    "Discriminator": "6341",
+    "Balance": 1610.88,
+    "NetWorth": 1610.88,
+    "DailyStreak": 1,
+    "SiegePing": false,
+    "RaceWins": 2,
+    "SiegeWins": 1,
+    "LastDaily": "2019-02-25T00:40:11.5263796Z",
+    "LastRaceWin": "2019-02-04T21:50:06.9552761Z",
+    "LastSiegeWin": "0001-01-01T00:00:00",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "251914070309994496": {
+    "Name": "Smlie",
+    "Discriminator": "7566",
+    "Balance": 536.0,
+    "NetWorth": 536.0,
+    "DailyStreak": 0,
+    "SiegePing": false,
+    "RaceWins": 0,
+    "SiegeWins": 1,
+    "LastDaily": "2019-01-01T00:00:00",
+    "LastRaceWin": "2019-01-01T00:00:00",
+    "LastSiegeWin": "2019-02-25T10:28:16.5601368Z",
+    "Items": {}
+  },
+  "373086863369699328": {
+    "Name": "H√?¬£√?¬ß√?¬∑√?‚?¢√?‚?¢ 118",
+    "Discriminator": "0118",
+    "Balance": 6984.94,
+    "NetWorth": 6984.94,
+    "DailyStreak": 6,
+    "SiegePing": false,
+    "RaceWins": 3,
+    "SiegeWins": 4,
+    "LastDaily": "2019-02-25T11:37:57.5444299Z",
+    "LastRaceWin": "2019-02-02T14:02:21.5247695Z",
+    "LastSiegeWin": "2019-02-09T15:41:34.8127052Z",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "427395690134634506": {
+    "Name": "fanglenn02",
+    "Discriminator": "1725",
+    "Balance": 6442.36,
+    "NetWorth": 6442.36,
+    "DailyStreak": 1,
+    "SiegePing": false,
+    "RaceWins": 9,
+    "SiegeWins": 1,
+    "LastDaily": "2019-02-25T12:41:06.760968Z",
+    "LastRaceWin": "2019-02-17T12:50:22.6918696Z",
+    "LastSiegeWin": "2019-02-23T00:19:09.9059466Z",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "339514330930348032": {
+    "Name": "√£‚?¨≈ΩBananya√£‚?¨¬è",
+    "Discriminator": "1424",
+    "Balance": 300.0,
+    "NetWorth": 300.0,
+    "DailyStreak": 1,
+    "SiegePing": true,
+    "RaceWins": 1,
+    "SiegeWins": 0,
+    "LastDaily": "2019-02-25T22:42:31.5451153Z",
+    "LastRaceWin": "2019-02-25T22:42:01.680644Z",
+    "LastSiegeWin": "2019-01-01T00:00:00",
+    "Items": {}
+  },
+  "263360499629031424": {
+    "Name": "Prototype",
+    "Discriminator": "5258",
+    "Balance": 2963.0,
+    "NetWorth": 2963.24,
+    "DailyStreak": 3,
+    "SiegePing": false,
+    "RaceWins": 0,
+    "SiegeWins": 4,
+    "LastDaily": "2019-02-26T22:22:36.6033399Z",
+    "LastRaceWin": "2019-01-01T00:00:00",
+    "LastSiegeWin": "2019-02-26T22:26:13.9133957Z",
+    "Items": {
+      "10": 1,
+      "0": 24
+    }
+  },
+  "311360247740760064": {
+    "Name": "therealvinh",
+    "Discriminator": "1337",
+    "Balance": 2725.29,
+    "NetWorth": 2725.3,
+    "DailyStreak": 1,
+    "SiegePing": false,
+    "RaceWins": 2,
+    "SiegeWins": 4,
+    "LastDaily": "2019-02-09T11:52:24.1675449Z",
+    "LastRaceWin": "2019-02-26T12:14:56.8550296Z",
+    "LastSiegeWin": "2019-02-09T11:51:28.4581406Z",
+    "Items": {
+      "0": 1
+    }
+  },
+  "309826793286795275": {
+    "Name": "Psychadeletion",
+    "Discriminator": "5671",
+    "Balance": 4248.58,
+    "NetWorth": 4249.58,
+    "DailyStreak": 4,
+    "SiegePing": false,
+    "RaceWins": 3,
+    "SiegeWins": 5,
+    "LastDaily": "2019-02-27T01:38:27.3028814Z",
+    "LastRaceWin": "2019-02-15T15:49:09.0461206Z",
+    "LastSiegeWin": "2019-02-15T15:59:12.6847138Z",
+    "Items": {
+      "0": 100,
+      "10": 1
+    }
+  },
+  "448663705987842048": {
+    "Name": "Your bud Green",
+    "Discriminator": "5989",
+    "Balance": 13609.34,
+    "NetWorth": 13609.34,
+    "DailyStreak": 5,
+    "SiegePing": false,
+    "RaceWins": 8,
+    "SiegeWins": 8,
+    "LastDaily": "2019-02-27T05:00:41.3257091Z",
+    "LastRaceWin": "2019-02-18T21:49:19.7519899Z",
+    "LastSiegeWin": "2019-02-23T21:35:41.8523544Z",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "224734572481347584": {
+    "Name": "Random Person",
+    "Discriminator": "1337",
+    "Balance": 16466.58,
+    "NetWorth": 16466.58,
+    "DailyStreak": 15,
+    "SiegePing": false,
+    "RaceWins": 8,
+    "SiegeWins": 9,
+    "LastDaily": "2019-02-27T05:28:18.432982Z",
+    "LastRaceWin": "2019-02-27T05:02:51.9350091Z",
+    "LastSiegeWin": "2019-02-21T22:39:01.1687054Z",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
   "310960432909254667": {
     "Name": "BlueIce57",
     "Discriminator": "5769",
-    "Balance": 17983.93,
-    "NetWorth": 17983.99,
-    "DailyStreak": 2,
+    "Balance": 18406.29,
+    "NetWorth": 18406.35,
+    "DailyStreak": 1,
+    "SiegePing": false,
     "RaceWins": 17,
     "SiegeWins": 10,
-    "LastDaily": "2019-02-21T22:34:59.0354433Z",
+    "LastDaily": "2019-02-27T07:30:53.5653703Z",
     "LastRaceWin": "2019-02-17T01:34:56.5657831Z",
     "LastSiegeWin": "2019-02-21T23:23:58.3830628Z",
     "Items": {
@@ -700,50 +666,86 @@
       "10": 1
     }
   },
-  "193247613095641090": {
-    "Name": "FlameVapour",
-    "Discriminator": "2613",
-    "Balance": -726376.06,
-    "NetWorth": 2424.0,
-    "DailyStreak": 3,
-    "RaceWins": 4,
-    "SiegeWins": 3,
-    "LastDaily": "2019-02-21T23:25:06.2248437Z",
-    "LastRaceWin": "2019-02-21T17:58:31.8584258Z",
-    "LastSiegeWin": "2019-02-21T22:51:53.6775322Z",
-    "Items": {
-      "0": 6,
-      "10": 1,
-      "1": 2
-    }
-  },
-  "448663705987842048": {
-    "Name": "Your bud Green",
-    "Discriminator": "5989",
-    "Balance": 12178.43,
-    "NetWorth": 12178.43,
-    "DailyStreak": 1,
-    "RaceWins": 8,
-    "SiegeWins": 7,
-    "LastDaily": "2019-02-22T03:12:24.7220299Z",
-    "LastRaceWin": "2019-02-18T21:49:19.7519899Z",
-    "LastSiegeWin": "2019-02-17T18:02:32.4872988Z",
+  "402750363226341377": {
+    "Name": "Bluetiger0824",
+    "Discriminator": "7434",
+    "Balance": 8278.21,
+    "NetWorth": 8278.21,
+    "DailyStreak": 11,
+    "SiegePing": false,
+    "RaceWins": 1,
+    "SiegeWins": 4,
+    "LastDaily": "2019-02-27T10:32:46.8673034Z",
+    "LastRaceWin": "2019-02-14T01:05:58.9705381Z",
+    "LastSiegeWin": "2019-02-21T22:53:26.0005935Z",
     "Items": {
       "0": 0,
       "10": 1
     }
   },
-  "309826793286795275": {
-    "Name": "Psychadeletion",
-    "Discriminator": "5671",
-    "Balance": 3580.88,
-    "NetWorth": 3581.88,
+  "214154668044058624": {
+    "Name": "luka",
+    "Discriminator": "0001",
+    "Balance": 4580.69,
+    "NetWorth": 4580.79,
     "DailyStreak": 1,
+    "SiegePing": false,
     "RaceWins": 3,
-    "SiegeWins": 5,
-    "LastDaily": "2019-02-22T05:44:26.8311214Z",
-    "LastRaceWin": "2019-02-15T15:49:09.0461206Z",
-    "LastSiegeWin": "2019-02-15T15:59:12.6847138Z",
+    "SiegeWins": 2,
+    "LastDaily": "2019-02-27T12:30:48.0250236Z",
+    "LastRaceWin": "2019-02-25T14:14:43.0331805Z",
+    "LastSiegeWin": "2019-02-09T15:41:34.8157033Z",
+    "Items": {
+      "0": 10,
+      "10": 1
+    }
+  },
+  "290284201310158849": {
+    "Name": "TheMarbleousMarbler",
+    "Discriminator": "1852",
+    "Balance": 51962.94,
+    "NetWorth": 51962.94,
+    "DailyStreak": 48,
+    "SiegePing": false,
+    "RaceWins": 31,
+    "SiegeWins": 0,
+    "LastDaily": "2019-02-27T03:15:47.0504461Z",
+    "LastRaceWin": "2019-02-27T12:32:09.3266704Z",
+    "LastSiegeWin": "0001-01-01T00:00:00",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "480132225661140997": {
+    "Name": "Wenyunity",
+    "Discriminator": "2442",
+    "Balance": 0.0,
+    "NetWorth": 37812.86,
+    "DailyStreak": 37,
+    "SiegePing": false,
+    "RaceWins": 36,
+    "SiegeWins": 15,
+    "LastDaily": "2019-02-27T04:17:20.8123902Z",
+    "LastRaceWin": "2019-02-26T21:51:51.971864Z",
+    "LastSiegeWin": "2019-02-27T12:35:58.664631Z",
+    "Items": {
+      "0": 3781286,
+      "10": 1
+    }
+  },
+  "195529549855850496": {
+    "Name": "Kenlimepie",
+    "Discriminator": "3559",
+    "Balance": 54837.18,
+    "NetWorth": 54838.18,
+    "DailyStreak": 47,
+    "SiegePing": false,
+    "RaceWins": 43,
+    "SiegeWins": 10,
+    "LastDaily": "2019-02-27T12:50:56.8418945Z",
+    "LastRaceWin": "2019-02-26T02:14:25.4143428Z",
+    "LastSiegeWin": "2019-02-21T22:53:25.9965962Z",
     "Items": {
       "0": 100,
       "10": 1
@@ -752,81 +754,159 @@
   "448496216008032288": {
     "Name": "Woods Paul",
     "Discriminator": "1408",
-    "Balance": 274.85,
-    "NetWorth": 16229.96,
-    "DailyStreak": 7,
-    "RaceWins": 14,
-    "SiegeWins": 12,
-    "LastDaily": "2019-02-22T06:12:18.8459758Z",
-    "LastRaceWin": "2019-02-19T06:35:24.738006Z",
-    "LastSiegeWin": "2019-02-18T14:25:10.0220947Z",
-    "Items": {
-      "0": 1595511,
-      "10": 1
-    }
-  },
-  "480132225661140997": {
-    "Name": "Wenyunity",
-    "Discriminator": "2442",
-    "Balance": 500.0,
-    "NetWorth": 28792.69,
-    "DailyStreak": 33,
-    "RaceWins": 31,
-    "SiegeWins": 11,
-    "LastDaily": "2019-02-22T02:52:19.7413592Z",
-    "LastRaceWin": "2019-02-22T06:33:07.1953669Z",
-    "LastSiegeWin": "2019-02-20T16:14:03.3829892Z",
-    "Items": {
-      "0": 2829269,
-      "10": 1
-    }
-  },
-  "373086863369699328": {
-    "Name": "H√£√ßƒ∑ƒï≈ï 118",
-    "Discriminator": "0118",
-    "Balance": 6477.07,
-    "NetWorth": 6477.07,
-    "DailyStreak": 4,
-    "RaceWins": 3,
-    "SiegeWins": 4,
-    "LastDaily": "2019-02-22T07:59:03.5896317Z",
-    "LastRaceWin": "2019-02-02T14:02:21.5247695Z",
-    "LastSiegeWin": "2019-02-09T15:41:34.8127052Z",
+    "Balance": 19320.47,
+    "NetWorth": 19320.47,
+    "DailyStreak": 12,
+    "SiegePing": true,
+    "RaceWins": 17,
+    "SiegeWins": 13,
+    "LastDaily": "2019-02-27T14:10:51.3800063Z",
+    "LastRaceWin": "2019-02-27T12:42:09.3641131Z",
+    "LastSiegeWin": "2019-02-25T15:43:34.2746761Z",
     "Items": {
       "0": 0,
       "10": 1
     }
   },
+  "404622656403406848": {
+    "Name": "Enderjed",
+    "Discriminator": "2523",
+    "Balance": 610.88,
+    "NetWorth": 610.88,
+    "DailyStreak": 2,
+    "SiegePing": false,
+    "RaceWins": 0,
+    "SiegeWins": 0,
+    "LastDaily": "2019-02-27T18:38:43.2120778Z",
+    "LastRaceWin": "2019-01-01T00:00:00",
+    "LastSiegeWin": "2019-01-01T00:00:00",
+    "Items": {}
+  },
+  "225802674518360074": {
+    "Name": "Austin E",
+    "Discriminator": "2604",
+    "Balance": 0.0,
+    "NetWorth": 9196.93,
+    "DailyStreak": 12,
+    "SiegePing": true,
+    "RaceWins": 12,
+    "SiegeWins": 3,
+    "LastDaily": "2019-02-27T19:17:14.0489013Z",
+    "LastRaceWin": "2019-02-26T22:54:19.4249958Z",
+    "LastSiegeWin": "2019-02-19T23:02:40.776065Z",
+    "Items": {
+      "10": 1,
+      "0": 919693
+    }
+  },
+  "263996286909415427": {
+    "Name": "Fan Glenn",
+    "Discriminator": "6191",
+    "Balance": 31469.95,
+    "NetWorth": 31469.95,
+    "DailyStreak": 11,
+    "SiegePing": false,
+    "RaceWins": 55,
+    "SiegeWins": 15,
+    "LastDaily": "2019-02-26T22:47:05.2245035Z",
+    "LastRaceWin": "2019-02-27T20:14:28.9494339Z",
+    "LastSiegeWin": "2019-02-26T22:49:41.9978357Z",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "236329367075028993": {
+    "Name": "IloveRumania",
+    "Discriminator": "9415",
+    "Balance": 15667.25,
+    "NetWorth": 15667.25,
+    "DailyStreak": 11,
+    "SiegePing": true,
+    "RaceWins": 20,
+    "SiegeWins": 14,
+    "LastDaily": "2019-02-27T20:12:16.5840179Z",
+    "LastRaceWin": "2019-02-27T20:12:28.9555184Z",
+    "LastSiegeWin": "2019-02-27T20:19:50.118174Z",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "186599557482676224": {
+    "Name": "Joe Art Maker",
+    "Discriminator": "6225",
+    "Balance": 45989.27,
+    "NetWorth": 45989.27,
+    "DailyStreak": 46,
+    "SiegePing": true,
+    "RaceWins": 18,
+    "SiegeWins": 15,
+    "LastDaily": "2019-02-27T18:31:25.0851792Z",
+    "LastRaceWin": "2019-02-27T17:44:17.4250311Z",
+    "LastSiegeWin": "2019-02-27T20:19:50.5351194Z",
+    "Items": {
+      "0": 0,
+      "10": 1
+    }
+  },
+  "512357211830222861": {
+    "Name": "ISDTCB",
+    "Discriminator": "2869",
+    "Balance": 244.0,
+    "NetWorth": 244.0,
+    "DailyStreak": 0,
+    "SiegePing": false,
+    "RaceWins": 0,
+    "SiegeWins": 10,
+    "LastDaily": "2019-01-01T00:00:00",
+    "LastRaceWin": "2019-01-01T00:00:00",
+    "LastSiegeWin": "2019-02-23T18:47:25.7242371Z",
+    "Items": {}
+  },
   "235737776061022209": {
     "Name": "Tonkotsu",
     "Discriminator": "9903",
-    "Balance": 18917.9,
-    "NetWorth": 18933.0,
-    "DailyStreak": 12,
-    "RaceWins": 22,
-    "SiegeWins": 6,
-    "LastDaily": "2019-02-22T13:39:11.2956341Z",
-    "LastRaceWin": "2019-02-22T02:54:04.9820867Z",
+    "Balance": 21856.58,
+    "NetWorth": 21871.68,
+    "DailyStreak": 16,
+    "SiegePing": false,
+    "RaceWins": 26,
+    "SiegeWins": 8,
+    "LastDaily": "2019-02-26T21:49:34.4739003Z",
+    "LastRaceWin": "2019-02-26T21:56:46.109857Z",
     "LastSiegeWin": "2019-02-21T22:53:25.9926001Z",
     "Items": {
       "0": 1510,
       "10": 1
     }
   },
-  "263996286909415427": {
-    "Name": "Fan Glenn",
-    "Discriminator": "6191",
-    "Balance": 24767.32,
-    "NetWorth": 24767.32,
-    "DailyStreak": 7,
-    "RaceWins": 49,
+  "224267581370925056": {
+    "Name": "Doc671",
+    "Discriminator": "1965",
+    "Balance": 42812.25,
+    "NetWorth": 42812.25,
+    "DailyStreak": 44,
+    "SiegePing": true,
+    "RaceWins": 14,
+    "SiegeWins": 14,
+    "LastDaily": "2019-02-27T08:03:34.4682701Z",
+    "LastRaceWin": "2019-02-25T02:23:18.6983131Z",
+    "LastSiegeWin": "2019-02-27T20:19:50.9811697Z",
+    "Items": {}
+  },
+  "544962851236872223": {
+    "Name": "IloveLV",
+    "Discriminator": "9216",
+    "Balance": 339.0,
+    "NetWorth": 339.0,
+    "DailyStreak": 0,
+    "SiegePing": true,
+    "RaceWins": 0,
     "SiegeWins": 9,
-    "LastDaily": "2019-02-21T12:01:48.0048774Z",
-    "LastRaceWin": "2019-02-22T13:03:48.3342056Z",
-    "LastSiegeWin": "2019-02-22T13:52:27.9958574Z",
-    "Items": {
-      "0": 0,
-      "10": 1
-    }
+    "LastDaily": "2019-01-01T00:00:00",
+    "LastRaceWin": "2019-01-01T00:00:00",
+    "LastSiegeWin": "2019-02-22T23:57:21.5118713Z",
+    "Items": {}
   }
 }

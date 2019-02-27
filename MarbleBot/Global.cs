@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using MarbleBot.BaseClasses;
 using MarbleBot.Extensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MarbleBot
@@ -20,6 +22,7 @@ namespace MarbleBot
         internal static Random Rand = new Random();
         internal static DateTime StartTime = new DateTime();
         internal static string YTKey = "";
+        internal static string GDKey = "";
         internal static string UoM = "<:unitofmoney:372385317581488128>";
         internal static ulong BotId = 286228526234075136;
         internal static Dictionary<string, string> Autoresponses = new Dictionary<string, string>();
@@ -140,15 +143,23 @@ namespace MarbleBot
                 User = new MBUser() {
                     Name = Context.User.Username,
                     Discriminator = Context.User.Discriminator,
-                    Balance = 0,
-                    NetWorth = 0,
-                    DailyStreak = 0,
-                    RaceWins = 0,
-                    SiegeWins = 0,
-                    LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
-                    LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
-                    LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
-                    Items = new Dictionary<int, int>()
+                };
+            }
+            return User;
+        }
+
+        internal static MBUser GetUser(SocketCommandContext Context, ulong Id) {
+            var json = "";
+            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+            var obj = JObject.Parse(json);
+            MBUser User;
+            if (obj.ContainsKey(Id.ToString())) {
+                User = obj[Id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
+            } else {
+                User = new MBUser() {
+                    Name = Context.User.Username,
+                    Discriminator = Context.User.Discriminator,
                 };
             }
             return User;
@@ -163,15 +174,6 @@ namespace MarbleBot
                 User = new MBUser() {
                     Name = Context.User.Username,
                     Discriminator = Context.User.Discriminator,
-                    Balance = 0,
-                    NetWorth = 0,
-                    DailyStreak = 0,
-                    RaceWins = 0,
-                    SiegeWins = 0,
-                    LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
-                    LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
-                    LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
-                    Items = new Dictionary<int, int>()
                 };
             }
             return User;
@@ -187,29 +189,11 @@ namespace MarbleBot
                     User = new MBUser() {
                         Name = Context.User.Username,
                         Discriminator = Context.User.Discriminator,
-                        Balance = 0,
-                        NetWorth = 0,
-                        DailyStreak = 0,
-                        RaceWins = 0,
-                        SiegeWins = 0,
-                        LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
-                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
-                        LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
-                        Items = new Dictionary<int, int>()
                     };
                 } else {
                     User = new MBUser() {
                         Name = Context.Guild.GetUser(id).Username,
                         Discriminator = Context.Guild.GetUser(id).Discriminator,
-                        Balance = 0,
-                        NetWorth = 0,
-                        DailyStreak = 0,
-                        RaceWins = 0,
-                        SiegeWins = 0,
-                        LastDaily = DateTime.Parse("2019-01-01 00:00:00"),
-                        LastRaceWin = DateTime.Parse("2019-01-01 00:00:00"),
-                        LastSiegeWin = DateTime.Parse("2019-01-01 00:00:00"),
-                        Items = new Dictionary<int, int>()
                     };
                 }
             }
@@ -245,5 +229,29 @@ namespace MarbleBot
                 return item;
             }
         }
+
+        // Writes users to appropriate JSON file
+        internal static void WriteUsers(JObject obj) {
+            using (var users = new StreamWriter("Users.json", true, Encoding.Unicode)) {
+                using (var users2 = new JsonTextWriter(users)) {
+                    var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                    Serialiser.Serialize(users2, obj);
+                }
+            }
+        }
+
+        internal static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser, Func<SocketUser, MBUser, MBUser> func) {
+            mbUser = func(socketUser, mbUser);
+            mbUser.Name = socketUser.Username;
+            mbUser.Discriminator = socketUser.Discriminator;
+            obj.Remove(socketUser.ToString());
+            obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
+            using (var users = new StreamWriter("Users.json", true, Encoding.Unicode)) {
+                using (var users2 = new JsonTextWriter(users)) {
+                    var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                    Serialiser.Serialize(users2, obj);
+                }
+            }
+        } 
     }
 }

@@ -1,0 +1,2931 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Google.Apis.Docs.v1</name>
+    </assembly>
+    <members>
+        <member name="T:Google.Apis.Docs.v1.DocsService">
+            <summary>The Docs Service.</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.Version">
+            <summary>The API version.</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.DiscoveryVersionUsed">
+            <summary>The discovery version used to generate this service.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocsService.#ctor">
+            <summary>Constructs a new service.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocsService.#ctor(Google.Apis.Services.BaseClientService.Initializer)">
+            <summary>Constructs a new service.</summary>
+            <param name="initializer">The service initializer.</param>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsService.Features">
+            <summary>Gets the service supported features.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsService.Name">
+            <summary>Gets the service name.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsService.BaseUri">
+            <summary>Gets the service base URI.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsService.BasePath">
+            <summary>Gets the service base path.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocsService.Scope">
+            <summary>Available OAuth 2.0 scopes for use with the Google Docs API.</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.Scope.Documents">
+            <summary>View and manage your Google Docs documents</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.Scope.DocumentsReadonly">
+            <summary>View your Google Docs documents</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.Scope.Drive">
+            <summary>See, edit, create, and delete all of your Google Drive files</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.Scope.DriveFile">
+            <summary>View and manage Google Drive files and folders that you have opened or created with this
+            app</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.Scope.DriveReadonly">
+            <summary>See and download all your Google Drive files</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocsService.ScopeConstants">
+            <summary>Available OAuth 2.0 scope constants for use with the Google Docs API.</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.ScopeConstants.Documents">
+            <summary>View and manage your Google Docs documents</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.ScopeConstants.DocumentsReadonly">
+            <summary>View your Google Docs documents</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.ScopeConstants.Drive">
+            <summary>See, edit, create, and delete all of your Google Drive files</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.ScopeConstants.DriveFile">
+            <summary>View and manage Google Drive files and folders that you have opened or created with this
+            app</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsService.ScopeConstants.DriveReadonly">
+            <summary>See and download all your Google Drive files</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsService.Documents">
+            <summary>Gets the Documents resource.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocsBaseServiceRequest`1">
+            <summary>A base abstract class for Docs requests.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.#ctor(Google.Apis.Services.IClientService)">
+            <summary>Constructs a new DocsBaseServiceRequest instance.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.Xgafv">
+            <summary>V1 error format.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.XgafvEnum">
+            <summary>V1 error format.</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.XgafvEnum.Value1">
+            <summary>v1 error format</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.XgafvEnum.Value2">
+            <summary>v2 error format</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.AccessToken">
+            <summary>OAuth access token.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.Alt">
+            <summary>Data format for response.</summary>
+            [default: json]
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.AltEnum">
+            <summary>Data format for response.</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.AltEnum.Json">
+            <summary>Responses with Content-Type of application/json</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.AltEnum.Media">
+            <summary>Media download with context-dependent Content-Type</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.AltEnum.Proto">
+            <summary>Responses with Content-Type of application/x-protobuf</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.Callback">
+            <summary>JSONP</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.Fields">
+            <summary>Selector specifying which fields to include in a partial response.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.Key">
+            <summary>API key. Your API key identifies your project and provides you with API access, quota, and reports.
+            Required unless you provide an OAuth 2.0 token.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.OauthToken">
+            <summary>OAuth 2.0 token for the current user.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.PrettyPrint">
+            <summary>Returns response with indentations and line breaks.</summary>
+            [default: true]
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.QuotaUser">
+            <summary>Available to use for quota purposes for server-side applications. Can be any arbitrary string
+            assigned to a user, but should not exceed 40 characters.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.UploadType">
+            <summary>Legacy upload protocol for media (e.g. "media", "multipart").</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.UploadProtocol">
+            <summary>Upload protocol for media (e.g. "raw", "multipart").</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocsBaseServiceRequest`1.InitParameters">
+            <summary>Initializes Docs parameter list.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocumentsResource">
+            <summary>The "documents" collection of methods.</summary>
+        </member>
+        <member name="F:Google.Apis.Docs.v1.DocumentsResource.service">
+            <summary>The service which this resource belongs to.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.#ctor(Google.Apis.Services.IClientService)">
+            <summary>Constructs a new resource.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.BatchUpdate(Google.Apis.Docs.v1.Data.BatchUpdateDocumentRequest,System.String)">
+             <summary>Applies one or more updates to the document.
+            
+             Each request is validated before being applied. If any request is not valid, then the entire request will
+             fail and nothing will be applied.
+            
+             Some requests have replies to give you some information about how they are applied. Other requests do not
+             need to return information; these each return an empty reply. The order of replies matches that of the
+             requests.
+            
+             For example, suppose you call batchUpdate with four updates, and only the third one returns information. The
+             response would have two empty replies, the reply to the third request, and another empty reply, in that
+             order.
+            
+             Because other users may be editing the document, the document might not exactly reflect your changes: your
+             changes may be altered with respect to collaborator changes. If there are no collaborators, the document
+             should reflect your changes. In any case, the updates in your request are guaranteed to be applied together
+             atomically.</summary>
+             <param name="body">The body of the request.</param>
+             <param name="documentId">The ID of the document to update.</param>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest">
+             <summary>Applies one or more updates to the document.
+            
+             Each request is validated before being applied. If any request is not valid, then the entire request will
+             fail and nothing will be applied.
+            
+             Some requests have replies to give you some information about how they are applied. Other requests do not
+             need to return information; these each return an empty reply. The order of replies matches that of the
+             requests.
+            
+             For example, suppose you call batchUpdate with four updates, and only the third one returns information. The
+             response would have two empty replies, the reply to the third request, and another empty reply, in that
+             order.
+            
+             Because other users may be editing the document, the document might not exactly reflect your changes: your
+             changes may be altered with respect to collaborator changes. If there are no collaborators, the document
+             should reflect your changes. In any case, the updates in your request are guaranteed to be applied together
+             atomically.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.#ctor(Google.Apis.Services.IClientService,Google.Apis.Docs.v1.Data.BatchUpdateDocumentRequest,System.String)">
+            <summary>Constructs a new BatchUpdate request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.DocumentId">
+            <summary>The ID of the document to update.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.Body">
+            <summary>Gets or sets the body of this request.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.GetBody">
+            <summary>Returns the body of the request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.MethodName">
+            <summary>Gets the method name.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.HttpMethod">
+            <summary>Gets the HTTP method.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.RestPath">
+            <summary>Gets the REST path.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.BatchUpdateRequest.InitParameters">
+            <summary>Initializes BatchUpdate parameter list.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.Create(Google.Apis.Docs.v1.Data.Document)">
+             <summary>Creates a blank document using the title given in the request. Other fields in the request,
+             including any provided content, are ignored.
+            
+             Returns the created document.</summary>
+             <param name="body">The body of the request.</param>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocumentsResource.CreateRequest">
+             <summary>Creates a blank document using the title given in the request. Other fields in the request,
+             including any provided content, are ignored.
+            
+             Returns the created document.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.CreateRequest.#ctor(Google.Apis.Services.IClientService,Google.Apis.Docs.v1.Data.Document)">
+            <summary>Constructs a new Create request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.CreateRequest.Body">
+            <summary>Gets or sets the body of this request.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.CreateRequest.GetBody">
+            <summary>Returns the body of the request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.CreateRequest.MethodName">
+            <summary>Gets the method name.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.CreateRequest.HttpMethod">
+            <summary>Gets the HTTP method.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.CreateRequest.RestPath">
+            <summary>Gets the REST path.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.CreateRequest.InitParameters">
+            <summary>Initializes Create parameter list.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.Get(System.String)">
+            <summary>Gets the latest version of the specified document.</summary>
+            <param name="documentId">The ID of the document to retrieve.</param>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocumentsResource.GetRequest">
+            <summary>Gets the latest version of the specified document.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.GetRequest.#ctor(Google.Apis.Services.IClientService,System.String)">
+            <summary>Constructs a new Get request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.GetRequest.DocumentId">
+            <summary>The ID of the document to retrieve.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.GetRequest.SuggestionsViewMode">
+            <summary>The suggestions view mode to apply to the document. This allows viewing the document with all
+            suggestions inline, accepted or rejected. If one is not specified, DEFAULT_FOR_CURRENT_ACCESS is
+            used.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.DocumentsResource.GetRequest.SuggestionsViewModeEnum">
+            <summary>The suggestions view mode to apply to the document. This allows viewing the document with all
+            suggestions inline, accepted or rejected. If one is not specified, DEFAULT_FOR_CURRENT_ACCESS is
+            used.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.GetRequest.MethodName">
+            <summary>Gets the method name.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.GetRequest.HttpMethod">
+            <summary>Gets the HTTP method.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.DocumentsResource.GetRequest.RestPath">
+            <summary>Gets the REST path.</summary>
+        </member>
+        <member name="M:Google.Apis.Docs.v1.DocumentsResource.GetRequest.InitParameters">
+            <summary>Initializes Get parameter list.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.AutoText">
+            <summary>A ParagraphElement representing a spot in the text that is dynamically replaced with content that can
+            change over time, like a page number.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.AutoText.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.AutoText.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. An AutoText may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.AutoText.SuggestedTextStyleChanges">
+            <summary>The suggested text style changes to this AutoText, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.AutoText.TextStyle">
+            <summary>The text style of this AutoText.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.AutoText.Type">
+            <summary>The type of this auto text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.AutoText.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Background">
+            <summary>Represents the background of a document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Background.Color">
+            <summary>The background color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Background.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.BackgroundSuggestionState">
+            <summary>A mask that indicates which of the fields on the base Background have been changed in this suggestion.
+            For any field set to true, the Backgound has a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BackgroundSuggestionState.BackgroundColorSuggested">
+            <summary>Indicates whether the current background color has been modified in this suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BackgroundSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.BatchUpdateDocumentRequest">
+            <summary>Request message for BatchUpdateDocument.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BatchUpdateDocumentRequest.Requests">
+            <summary>A list of updates to apply to the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BatchUpdateDocumentRequest.WriteControl">
+            <summary>Provides control over how write requests are executed.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BatchUpdateDocumentRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.BatchUpdateDocumentResponse">
+            <summary>Response message from a BatchUpdateDocument request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BatchUpdateDocumentResponse.DocumentId">
+            <summary>The ID of the document to which the updates were applied to.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BatchUpdateDocumentResponse.Replies">
+            <summary>The reply of the updates. This maps 1:1 with the updates, although replies to some requests may be
+            empty.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BatchUpdateDocumentResponse.WriteControl">
+            <summary>The updated write control after applying the request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BatchUpdateDocumentResponse.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Body">
+             <summary>The document body.
+            
+             The body typically contains the full document contents except for headers, footers and footnotes.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Body.Content">
+             <summary>The contents of the body.
+            
+             The indexes for the body's content begin at zero.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Body.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Bullet">
+            <summary>Describes the bullet of a paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Bullet.ListId">
+            <summary>The ID of the list this paragraph belongs to.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Bullet.NestingLevel">
+            <summary>The nesting level of this paragraph in the list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Bullet.TextStyle">
+            <summary>The paragraph specific text style applied to this bullet.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Bullet.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.BulletSuggestionState">
+            <summary>A mask that indicates which of the fields on the base Bullet have been changed in this suggestion. For
+            any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BulletSuggestionState.ListIdSuggested">
+            <summary>Indicates if there was a suggested change to the list_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BulletSuggestionState.NestingLevelSuggested">
+            <summary>Indicates if there was a suggested change to the nesting_level.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BulletSuggestionState.TextStyleSuggestionState">
+            <summary>A mask that indicates which of the fields in text style have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.BulletSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Color">
+            <summary>A solid color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Color.RgbColor">
+            <summary>The RGB color value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Color.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ColumnBreak">
+            <summary>A ParagraphElement representing a column break. A column break makes the subsequent text start at the
+            top of the next column.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ColumnBreak.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ColumnBreak.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A ColumnBreak may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ColumnBreak.SuggestedTextStyleChanges">
+            <summary>The suggested text style changes to this ColumnBreak, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ColumnBreak.TextStyle">
+             <summary>The text style of this ColumnBreak.
+            
+             Similar to text content, like text runs and footnote references, the text style of a column break can affect
+             content layout as well as the styling of text inserted adjacent to it.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ColumnBreak.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.CreateNamedRangeRequest">
+            <summary>Creates a NamedRange referencing the given range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateNamedRangeRequest.Name">
+             <summary>The name of the NamedRange. Names do not need to be unique.
+            
+             Names must be at least 1 character and no more than 256 characters, measured in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateNamedRangeRequest.Range">
+            <summary>The range to apply the name to.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateNamedRangeRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.CreateNamedRangeResponse">
+            <summary>The result of creating a named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateNamedRangeResponse.NamedRangeId">
+            <summary>The ID of the created named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateNamedRangeResponse.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.CreateParagraphBulletsRequest">
+             <summary>Creates bullets for all of the paragraphs that overlap with the given range.
+            
+             The nesting level of each paragraph will be determined by counting leading tabs in front of each paragraph. To
+             avoid excess space between the bullet and the corresponding paragraph, these leading tabs are removed by this
+             request. This may change the indices of parts of the text.
+            
+             If the paragraph immediately before paragraphs being updated is in a list with a matching preset, the paragraphs
+             being updated are added to that preceding list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateParagraphBulletsRequest.BulletPreset">
+            <summary>The kinds of bullet glyphs to be used.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateParagraphBulletsRequest.Range">
+            <summary>The range to apply the bullet preset to.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CreateParagraphBulletsRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.CropProperties">
+             <summary>The crop properties of an image.
+            
+             The crop rectangle is represented using fractional offsets from the original content's four edges.
+            
+             - If the offset is in the interval (0, 1), the corresponding edge of crop rectangle is positioned inside of the
+             image's original bounding rectangle. - If the offset is negative or greater than 1, the corresponding edge of
+             crop rectangle is positioned outside of the image's original bounding rectangle. - If all offsets and rotation
+             angle are 0, the image is not cropped.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropProperties.Angle">
+            <summary>The clockwise rotation angle of the crop rectangle around its center, in radians. Rotation is
+            applied after the offsets.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropProperties.OffsetBottom">
+            <summary>The offset specifies how far inwards the bottom edge of the crop rectangle is from the bottom edge
+            of the original content as a fraction of the original content's height.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropProperties.OffsetLeft">
+            <summary>The offset specifies how far inwards the left edge of the crop rectangle is from the left edge of
+            the original content as a fraction of the original content's width.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropProperties.OffsetRight">
+            <summary>The offset specifies how far inwards the right edge of the crop rectangle is from the right edge of
+            the original content as a fraction of the original content's width.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropProperties.OffsetTop">
+            <summary>The offset specifies how far inwards the top edge of the crop rectangle is from the top edge of the
+            original content as a fraction of the original content's height.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.CropPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base CropProperties have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropPropertiesSuggestionState.AngleSuggested">
+            <summary>Indicates if there was a suggested change to angle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropPropertiesSuggestionState.OffsetBottomSuggested">
+            <summary>Indicates if there was a suggested change to offset_bottom.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropPropertiesSuggestionState.OffsetLeftSuggested">
+            <summary>Indicates if there was a suggested change to offset_left.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropPropertiesSuggestionState.OffsetRightSuggested">
+            <summary>Indicates if there was a suggested change to offset_right.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropPropertiesSuggestionState.OffsetTopSuggested">
+            <summary>Indicates if there was a suggested change to offset_top.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.CropPropertiesSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DeleteContentRangeRequest">
+            <summary>Deletes content from the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteContentRangeRequest.Range">
+             <summary>The range of content to delete.
+            
+             Deleting text that crosses a paragraph boundary may result in changes to paragraph styles, lists, positioned
+             objects and bookmarks as the two paragraphs are merged.
+            
+             Attempting to delete certain ranges can result in an invalid document structure in which case a 400 bad
+             request error is returned.
+            
+             Some examples of invalid delete requests include:
+            
+             * Deleting one code unit of a surrogate pair. * Deleting the last newline character of a Body, Header,
+             Footer, Footnote, TableCell or TableOfContents. * Deleting the start or end of a Table, TableOfContents or
+             Equation without deleting the entire element. * Deleting the newline character before a Table,
+             TableOfContents or SectionBreak without deleting the element. * Deleting individual rows or cells of a
+             table. Deleting the content within a table cell is allowed.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteContentRangeRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DeleteNamedRangeRequest">
+            <summary>Deletes a NamedRange.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteNamedRangeRequest.Name">
+            <summary>The name of the range(s) to delete. All named ranges with the given name will be deleted.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteNamedRangeRequest.NamedRangeId">
+            <summary>The ID of the named range to delete.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteNamedRangeRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DeleteParagraphBulletsRequest">
+             <summary>Deletes bullets from all of the paragraphs that overlap with the given range.
+            
+             The nesting level of each paragraph will be visually preserved by adding indent to the start of the
+             corresponding paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteParagraphBulletsRequest.Range">
+            <summary>The range to delete bullets from.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteParagraphBulletsRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DeletePositionedObjectRequest">
+            <summary>Deletes a PositionedObject from the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeletePositionedObjectRequest.ObjectId">
+            <summary>The ID of the positioned object to delete.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeletePositionedObjectRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DeleteTableColumnRequest">
+            <summary>Deletes a column from a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteTableColumnRequest.TableCellLocation">
+             <summary>The reference table cell location from which the column will be deleted.
+            
+             The column this cell spans will be deleted. If this is a merged cell that spans multiple columns, all
+             columns that the cell spans will be deleted. If no columns remain in the table after this deletion, the
+             whole table is deleted.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteTableColumnRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DeleteTableRowRequest">
+            <summary>Deletes a row from a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteTableRowRequest.TableCellLocation">
+             <summary>The reference table cell location from which the row will be deleted.
+            
+             The row this cell spans will be deleted. If this is a merged cell that spans multiple rows, all rows that
+             the cell spans will be deleted. If no rows remain in the table after this deletion, the whole table is
+             deleted.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DeleteTableRowRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Dimension">
+            <summary>A magnitude in a single direction in the specified units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Dimension.Magnitude">
+            <summary>The magnitude.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Dimension.Unit">
+            <summary>The units for magnitude.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Dimension.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Document">
+            <summary>A Google Docs document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.Body">
+            <summary>The main body of the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.DocumentId">
+            <summary>The ID of the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.DocumentStyle">
+            <summary>The style of the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.Footers">
+            <summary>The footers in the document, keyed by footer ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.Footnotes">
+            <summary>The footnotes in the document, keyed by footnote ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.Headers">
+            <summary>The headers in the document, keyed by header ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.InlineObjects">
+            <summary>The inline objects in the document, keyed by object ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.Lists">
+            <summary>The lists in the document, keyed by list ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.NamedRanges">
+            <summary>The named ranges in the document, keyed by name.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.NamedStyles">
+            <summary>The named styles of the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.PositionedObjects">
+            <summary>The positioned objects in the document, keyed by object ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.RevisionId">
+             <summary>The revision ID of the document. Can be used in update requests to specify which revision of a
+             document to apply updates to and how the request should behave if the document has been edited since that
+             revision. Only populated if the user has edit access to the document.
+            
+             The format of the revision ID may change over time, so it should be treated opaquely. A returned revision ID
+             is only guaranteed to be valid for 24 hours after it has been returned and cannot be shared across users. If
+             the revision ID is unchanged between calls, then the document has not changed. Conversely, a changed ID (for
+             the same document and user) usually means the document has been updated; however, a changed ID can also be
+             due to internal factors such as ID format changes.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.SuggestedDocumentStyleChanges">
+            <summary>The suggested changes to the style of the document, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.SuggestedNamedStylesChanges">
+            <summary>The suggested changes to the named styles of the document, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.SuggestionsViewMode">
+             <summary>The suggestions view mode applied to the document.
+            
+             Note: When editing a document, changes must be based on a document with SUGGESTIONS_INLINE.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.Title">
+            <summary>The title of the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Document.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DocumentStyle">
+            <summary>The style of the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.Background">
+            <summary>The background of the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.DefaultFooterId">
+            <summary>The ID of the default footer. If not set, there is no default footer.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.DefaultHeaderId">
+            <summary>The ID of the default header. If not set, there is no default header.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.EvenPageFooterId">
+            <summary>The ID of the footer used only for even pages. The value of use_even_page_header_footer determines
+            whether to use the default_footer_id or this value for the footer on even pages. If not set, there is no
+            even page footer.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.EvenPageHeaderId">
+            <summary>The ID of the header used only for even pages. The value of use_even_page_header_footer determines
+            whether to use the default_header_id or this value for the header on even pages. If not set, there is no
+            even page header.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.FirstPageFooterId">
+            <summary>The ID of the footer used only for the first page. If not set then a unique footer for the first
+            page does not exist. The value of use_first_page_header_footer determines whether to use the
+            default_footer_id or this value for the footer on the first page. If not set, there is no first page
+            footer.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.FirstPageHeaderId">
+            <summary>The ID of the header used only for the first page. If not set then a unique header for the first
+            page does not exist. The value of use_first_page_header_footer determines whether to use the
+            default_header_id or this value for the header on the first page. If not set, there is no first page
+            header.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.MarginBottom">
+            <summary>The bottom page margin.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.MarginLeft">
+            <summary>The left page margin.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.MarginRight">
+            <summary>The right page margin.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.MarginTop">
+            <summary>The top page margin.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.PageNumberStart">
+            <summary>The page number from which to start counting the number of pages.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.PageSize">
+            <summary>The size of a page in the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.UseEvenPageHeaderFooter">
+            <summary>Indicates whether to use the even page header / footer IDs for the even pages.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.UseFirstPageHeaderFooter">
+            <summary>Indicates whether to use the first page header / footer IDs for the first page.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base DocumentStyle have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.BackgroundSuggestionState">
+            <summary>A mask that indicates which of the fields in background have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.DefaultFooterIdSuggested">
+            <summary>Indicates if there was a suggested change to default_footer_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.DefaultHeaderIdSuggested">
+            <summary>Indicates if there was a suggested change to default_header_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.EvenPageFooterIdSuggested">
+            <summary>Indicates if there was a suggested change to even_page_footer_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.EvenPageHeaderIdSuggested">
+            <summary>Indicates if there was a suggested change to even_page_header_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.FirstPageFooterIdSuggested">
+            <summary>Indicates if there was a suggested change to first_page_footer_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.FirstPageHeaderIdSuggested">
+            <summary>Indicates if there was a suggested change to first_page_header_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.MarginBottomSuggested">
+            <summary>Indicates if there was a suggested change to margin_bottom.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.MarginLeftSuggested">
+            <summary>Indicates if there was a suggested change to margin_left.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.MarginRightSuggested">
+            <summary>Indicates if there was a suggested change to margin_right.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.MarginTopSuggested">
+            <summary>Indicates if there was a suggested change to margin_top.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.PageNumberStartSuggested">
+            <summary>Indicates if there was a suggested change to page_number_start.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.PageSizeSuggestionState">
+            <summary>A mask that indicates which of the fields in size have been changed in this suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.UseEvenPageHeaderFooterSuggested">
+            <summary>Indicates if there was a suggested change to use_even_page_header_footer.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.UseFirstPageHeaderFooterSuggested">
+            <summary>Indicates if there was a suggested change to use_first_page_header_footer.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.DocumentStyleSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.EmbeddedDrawingProperties">
+            <summary>The properties of an embedded drawing.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedDrawingProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.EmbeddedDrawingPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base EmbeddedDrawingProperties have been changed in
+            this suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedDrawingPropertiesSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.EmbeddedObject">
+            <summary>An embedded object in the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.Description">
+            <summary>The description of the embedded object. The `title` and `description` are both combined to display
+            alt text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.EmbeddedDrawingProperties">
+            <summary>The properties of an embedded drawing.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.EmbeddedObjectBorder">
+            <summary>The border of the embedded object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.ImageProperties">
+            <summary>The properties of an image.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.LinkedContentReference">
+             <summary>A reference to the external linked source content. For example, it contains a reference to the
+             source Sheets chart when the embedded object is a linked chart.
+            
+             If unset, then the embedded object is not linked.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.MarginBottom">
+            <summary>The bottom margin of the embedded object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.MarginLeft">
+            <summary>The left margin of the embedded object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.MarginRight">
+            <summary>The right margin of the embedded object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.MarginTop">
+            <summary>The top margin of the embedded object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.Size">
+            <summary>The size of the embedded object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.Title">
+            <summary>The title of the embedded object. The `title` and `description` are both combined to display alt
+            text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObject.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.EmbeddedObjectBorder">
+            <summary>A border around an EmbeddedObject.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorder.Color">
+            <summary>The color of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorder.DashStyle">
+            <summary>The dash style of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorder.PropertyState">
+            <summary>The property state of the border property.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorder.Width">
+            <summary>The width of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorder.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.EmbeddedObjectBorderSuggestionState">
+            <summary>A mask that indicates which of the fields on the base EmbeddedObjectBorder have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorderSuggestionState.ColorSuggested">
+            <summary>Indicates if there was a suggested change to color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorderSuggestionState.DashStyleSuggested">
+            <summary>Indicates if there was a suggested change to dash_style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorderSuggestionState.PropertyStateSuggested">
+            <summary>Indicates if there was a suggested change to property_state.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorderSuggestionState.WidthSuggested">
+            <summary>Indicates if there was a suggested change to width.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectBorderSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState">
+            <summary>A mask that indicates which of the fields on the base EmbeddedObject have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.DescriptionSuggested">
+            <summary>Indicates if there was a suggested change to description.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.EmbeddedDrawingPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields in embedded_drawing_properties have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.EmbeddedObjectBorderSuggestionState">
+            <summary>A mask that indicates which of the fields in embedded_object_border have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.ImagePropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields in image_properties have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.LinkedContentReferenceSuggestionState">
+            <summary>A mask that indicates which of the fields in linked_content_reference have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.MarginBottomSuggested">
+            <summary>Indicates if there was a suggested change to margin_bottom.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.MarginLeftSuggested">
+            <summary>Indicates if there was a suggested change to margin_left.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.MarginRightSuggested">
+            <summary>Indicates if there was a suggested change to margin_right.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.MarginTopSuggested">
+            <summary>Indicates if there was a suggested change to margin_top.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.SizeSuggestionState">
+            <summary>A mask that indicates which of the fields in size have been changed in this suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.TitleSuggested">
+            <summary>Indicates if there was a suggested change to title.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EmbeddedObjectSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.EndOfSegmentLocation">
+            <summary>Location at the end of a body, header, footer or footnote. The location is immediately before the last
+            newline in the document segment.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EndOfSegmentLocation.SegmentId">
+            <summary>The ID of the header, footer or footnote the location is in. An empty segment ID signifies the
+            document's body.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.EndOfSegmentLocation.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Equation">
+            <summary>A ParagraphElement representing an equation.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Equation.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Equation.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A Equation may have multiple insertion IDs if it is a nested suggested
+            change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Equation.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Footer">
+            <summary>A document footer.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Footer.Content">
+             <summary>The contents of the footer.
+            
+             The indexes for a footer's content begin at zero.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Footer.FooterId">
+            <summary>The ID of the footer.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Footer.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Footnote">
+            <summary>A document footnote.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Footnote.Content">
+             <summary>The contents of the footnote.
+            
+             The indexes for a footnote's content begin at zero.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Footnote.FootnoteId">
+            <summary>The ID of the footnote.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Footnote.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.FootnoteReference">
+            <summary>A ParagraphElement representing a footnote reference. A footnote reference is the inline content
+            rendered with a number and is used to identify the footnote.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.FootnoteReference.FootnoteId">
+            <summary>The ID of the footnote that contains the content of this footnote reference.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.FootnoteReference.FootnoteNumber">
+            <summary>The rendered number of this footnote.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.FootnoteReference.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.FootnoteReference.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A FootnoteReference may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.FootnoteReference.SuggestedTextStyleChanges">
+            <summary>The suggested text style changes to this FootnoteReference, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.FootnoteReference.TextStyle">
+            <summary>The text style of this FootnoteReference.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.FootnoteReference.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Header">
+            <summary>A document header.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Header.Content">
+             <summary>The contents of the header.
+            
+             The indexes for a header's content begin at zero.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Header.HeaderId">
+            <summary>The ID of the header.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Header.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.HorizontalRule">
+            <summary>A ParagraphElement representing a horizontal line.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.HorizontalRule.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.HorizontalRule.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A HorizontalRule may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.HorizontalRule.SuggestedTextStyleChanges">
+            <summary>The suggested text style changes to this HorizontalRule, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.HorizontalRule.TextStyle">
+             <summary>The text style of this HorizontalRule.
+            
+             Similar to text content, like text runs and footnote references, the text style of a horizontal rule can
+             affect content layout as well as the styling of text inserted adjacent to it.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.HorizontalRule.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ImageProperties">
+            <summary>The properties of an image.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.Angle">
+            <summary>The clockwise rotation angle of the image, in radians.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.Brightness">
+            <summary>The brightness effect of the image. The value should be in the interval [-1.0, 1.0], where 0 means
+            no effect.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.ContentUri">
+            <summary>A URI to the image with a default lifetime of 30 minutes. This URI is tagged with the account of
+            the requester. Anyone with the URI effectively accesses the image as the original requester. Access to the
+            image may be lost if the document's sharing settings change.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.Contrast">
+            <summary>The contrast effect of the image. The value should be in the interval [-1.0, 1.0], where 0 means no
+            effect.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.CropProperties">
+             <summary>The crop properties of the image.
+            
+             After cropping, the image will be stretched to fit in its container.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.SourceUri">
+            <summary>The source URI is the URI used to insert the image. The source URI can be empty.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.Transparency">
+            <summary>The transparency effect of the image. The value should be in the interval [0.0, 1.0], where 0 means
+            no effect and 1 means completely transparent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImageProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base ImageProperties have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.AngleSuggested">
+            <summary>Indicates if there was a suggested change to angle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.BrightnessSuggested">
+            <summary>Indicates if there was a suggested change to brightness.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.ContentUriSuggested">
+            <summary>Indicates if there was a suggested change to content_uri.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.ContrastSuggested">
+            <summary>Indicates if there was a suggested change to contrast.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.CropPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields in crop_properties have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.SourceUriSuggested">
+            <summary>Indicates if there was a suggested change to source_uri.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.TransparencySuggested">
+            <summary>Indicates if there was a suggested change to transparency.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ImagePropertiesSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InlineObject">
+            <summary>An object that appears inline with text. An InlineObject contains an EmbeddedObject such as an
+            image.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObject.InlineObjectProperties">
+            <summary>The properties of this inline object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObject.ObjectId">
+            <summary>The ID of this inline object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObject.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObject.SuggestedInlineObjectPropertiesChanges">
+            <summary>The suggested changes to the inline object properties, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObject.SuggestedInsertionId">
+            <summary>The suggested insertion ID. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObject.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InlineObjectElement">
+            <summary>A ParagraphElement that contains an InlineObject.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectElement.InlineObjectId">
+            <summary>The ID of the InlineObject this element contains.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectElement.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectElement.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. An InlineObjectElement may have multiple insertion IDs if it is a
+            nested suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectElement.SuggestedTextStyleChanges">
+            <summary>The suggested text style changes to this InlineObject, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectElement.TextStyle">
+             <summary>The text style of this InlineObjectElement.
+            
+             Similar to text content, like text runs and footnote references, the text style of an inline object element
+             can affect content layout as well as the styling of text inserted adjacent to it.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectElement.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InlineObjectProperties">
+            <summary>Properties of an InlineObject.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectProperties.EmbeddedObject">
+            <summary>The embedded object of this inline object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InlineObjectPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base InlineObjectProperties have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectPropertiesSuggestionState.EmbeddedObjectSuggestionState">
+            <summary>A mask that indicates which of the fields in embedded_object have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InlineObjectPropertiesSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InsertInlineImageRequest">
+            <summary>Inserts an InlineObject containing an image at the given location.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineImageRequest.EndOfSegmentLocation">
+             <summary>Inserts the text at the end of a header, footer or the document body.
+            
+             Inline images cannot be inserted inside a footnote.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineImageRequest.Location">
+             <summary>Inserts the image at a specific index in the document.
+            
+             The image must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted
+             at a table's start index (i.e. between the table and its preceding paragraph).
+            
+             Inline images cannot be inserted inside a footnote or equation.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineImageRequest.ObjectSize">
+            <summary>The size that the image should appear as in the document. This property is optional and the final
+            size of the image in the document is determined by the following rules: * If neither width nor height is
+            specified, then a default size of the image is calculated based on its resolution. * If one dimension is
+            specified then the other dimension is calculated to preserve the aspect ratio of the image. * If both width
+            and height are specified, the image is scaled to fit within the provided dimensions while maintaining its
+            aspect ratio.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineImageRequest.Uri">
+             <summary>The image URI.
+            
+             The image is fetched once at insertion time and a copy is stored for display inside the document. Images
+             must be less than 50MB in size, cannot exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format.
+            
+             The provided URI can be at most 2 kB in length. The URI itself is saved with the image, and exposed via the
+             ImageProperties.content_uri field.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineImageRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InsertInlineImageResponse">
+            <summary>The result of inserting an inline image.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineImageResponse.ObjectId">
+            <summary>The ID of the created InlineObject.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineImageResponse.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InsertInlineSheetsChartResponse">
+            <summary>The result of inserting an embedded Google Sheets chart.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineSheetsChartResponse.ObjectId">
+            <summary>The object ID of the inserted chart.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertInlineSheetsChartResponse.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InsertTableRowRequest">
+            <summary>Inserts an empty row into a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertTableRowRequest.InsertBelow">
+             <summary>Whether to insert new row below the reference cell location.
+            
+             - `True`: insert below the cell. - `False`: insert above the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertTableRowRequest.TableCellLocation">
+             <summary>The reference table cell location from which rows will be inserted.
+            
+             A new row will be inserted above (or below) the row where the reference cell is. If the reference cell is a
+             merged cell, a new row will be inserted above (or below) the merged cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertTableRowRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.InsertTextRequest">
+            <summary>Inserts text at the specified location.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertTextRequest.EndOfSegmentLocation">
+            <summary>Inserts the text at the end of a header, footer, footnote or the document body.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertTextRequest.Location">
+             <summary>Inserts the text at a specific index in the document.
+            
+             Text must be inserted inside the bounds of an existing Paragraph. For instance, text cannot be inserted at a
+             table's start index (i.e. between the table and its preceding paragraph). The text must be inserted in the
+             preceding paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertTextRequest.Text">
+             <summary>The text to be inserted.
+            
+             Inserting a newline character will implicitly create a new Paragraph at that index. The paragraph style of
+             the new paragraph will be copied from the paragraph at the current insertion index, including lists and
+             bullets.
+            
+             Text styles for inserted text will be determined automatically, generally preserving the styling of
+             neighboring text. In most cases, the text style for the inserted text will match the text immediately before
+             the insertion index.
+            
+             Some control characters (U+0000-U+0008, U+000C-U+001F) and characters from the Unicode Basic Multilingual
+             Plane Private Use Area (U+E000-U+F8FF) will be stripped out of the inserted text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.InsertTextRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Link">
+            <summary>A reference to another portion of a document or an external URL resource.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Link.BookmarkId">
+            <summary>The ID of a bookmark in this document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Link.HeadingId">
+            <summary>The ID of a heading in this document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Link.Url">
+            <summary>An external URL.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Link.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.LinkedContentReference">
+            <summary>A reference to the external linked source content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.LinkedContentReference.SheetsChartReference">
+            <summary>A reference to the linked chart.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.LinkedContentReference.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.LinkedContentReferenceSuggestionState">
+            <summary>A mask that indicates which of the fields on the base LinkedContentReference have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.LinkedContentReferenceSuggestionState.SheetsChartReferenceSuggestionState">
+            <summary>A mask that indicates which of the fields in sheets_chart_reference have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.LinkedContentReferenceSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.List">
+            <summary>A List represents the list attributes for a group of paragraphs that all belong to the same list. A
+            paragraph that is part of a list has a reference to the list's ID in its bullet.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.List.ListProperties">
+            <summary>The properties of the list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.List.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.List.SuggestedInsertionId">
+            <summary>The suggested insertion ID. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.List.SuggestedListPropertiesChanges">
+            <summary>The suggested changes to the list properties, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.List.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ListProperties">
+            <summary>The properties of a list which describe the look and feel of bullets belonging to paragraphs associated
+            with a list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ListProperties.NestingLevels">
+             <summary>Describes the properties of the bullets at the associated level.
+            
+             A list has at most nine levels of nesting with nesting level 0 corresponding to the top-most level and
+             nesting level 8 corresponding to the most nested level. The nesting levels are returned in ascending order
+             with the least nested returned first.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ListProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ListPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base ListProperties have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ListPropertiesSuggestionState.NestingLevelsSuggestionStates">
+             <summary>A mask that indicates which of the fields on the corresponding NestingLevel in nesting_levels have
+             been changed in this suggestion.
+            
+             The nesting level suggestion states are returned in ascending order of the nesting level with the least
+             nested returned first.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ListPropertiesSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Location">
+            <summary>A particular location in the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Location.Index">
+             <summary>The zero-based index, in UTF-16 code units.
+            
+             The index is relative to the beginning of the segment specified by segment_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Location.SegmentId">
+            <summary>The ID of the header, footer or footnote the location is in. An empty segment ID signifies the
+            document's body.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Location.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NamedRange">
+             <summary>A collection of Ranges with the same named range ID.
+            
+             Named ranges allow developers to associate parts of a document with an arbitrary user-defined label so their
+             contents can be programmatically read or edited at a later time. A document can contain multiple named ranges
+             with the same name, but every named range has a unique ID.
+            
+             A named range is created with a single Range, and content inserted inside a named range generally expands that
+             range. However, certain document changes can cause the range to be split into multiple ranges.
+            
+             Named ranges are not private. All applications and collaborators that have access to the document can see its
+             named ranges.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedRange.Name">
+            <summary>The name of the named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedRange.NamedRangeId">
+            <summary>The ID of the named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedRange.Ranges">
+            <summary>The ranges that belong to this named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedRange.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NamedRanges">
+            <summary>A collection of all the NamedRanges in the document that share a given name.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedRanges.Name">
+            <summary>The name that all the named ranges share.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedRanges.NamedRangesValue">
+            <summary>The NamedRanges that share the same name.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedRanges.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NamedStyle">
+            <summary>A named style. Paragraphs in the document can inherit their TextStyle and ParagraphStyle from this
+            named style when they have the same named style type.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyle.NamedStyleType">
+            <summary>The type of this named style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyle.ParagraphStyle">
+            <summary>The paragraph style of this named style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyle.TextStyle">
+            <summary>The text style of this named style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NamedStyleSuggestionState">
+            <summary>A suggestion state of a NamedStyle message.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyleSuggestionState.NamedStyleType">
+             <summary>The named style type that this suggestion state corresponds to.
+            
+             This field is provided as a convenience for matching the NamedStyleSuggestionState with its corresponding
+             NamedStyle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyleSuggestionState.ParagraphStyleSuggestionState">
+            <summary>A mask that indicates which of the fields in paragraph style have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyleSuggestionState.TextStyleSuggestionState">
+            <summary>A mask that indicates which of the fields in text style have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyleSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NamedStyles">
+            <summary>The named styles. Paragraphs in the document can inherit their TextStyle and ParagraphStyle from these
+            named styles.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyles.Styles">
+             <summary>The named styles.
+            
+             There is an entry for each of the possible named style types.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStyles.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NamedStylesSuggestionState">
+            <summary>The suggestion state of a NamedStyles message.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStylesSuggestionState.StylesSuggestionStates">
+             <summary>A mask that indicates which of the fields on the corresponding NamedStyle in styles have been
+             changed in this suggestion.
+            
+             The order of these named style suggestion states match the order of the corresponding named style within the
+             named styles suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NamedStylesSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NestingLevel">
+            <summary>Contains properties describing the look and feel of a list bullet at a given level of
+            nesting.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.BulletAlignment">
+            <summary>The alignment of the bullet within the space allotted for rendering the bullet.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.GlyphFormat">
+             <summary>The format string used by bullets at this level of nesting.
+            
+             The glyph format contains one or more placeholders, and these placeholder are replaced with the appropriate
+             values depending on the glyph_type or glyph_symbol. The placeholders follow the pattern `%[nesting_level]`.
+             Furthermore, placeholders can have prefixes and suffixes. Thus, the glyph format follows the pattern
+             `%[nesting_level]`. Note that the prefix and suffix are optional and can be arbitrary strings.
+            
+             For example, the glyph format `%0.` indicates that the rendered glyph will replace the placeholder with the
+             corresponding glyph for nesting level 0 followed by a period as the suffix. So a list with a glyph type of
+             UPPER_ALPHA and glyph format `%0.` at nesting level 0 will result in a list with rendered glyphs `A.` `B.`
+             `C.`
+            
+             The glyph format can contain placeholders for the current nesting level as well as placeholders for parent
+             nesting levels. For example, a list can have a glyph format of `%0.` at nesting level 0 and a glyph format
+             of `%0.%1.` at nesting level 1. Assuming both nesting levels have DECIMAL glyph types, this would result in
+             a list with rendered glyphs `1.` `2.` `  2.1.` `  2.2.` `3.`
+            
+             For nesting levels that are ordered, the string that replaces a placeholder in the glyph format for a
+             particular paragraph depends on the paragraph's order within the list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.GlyphSymbol">
+             <summary>A custom glyph symbol used by bullets when paragraphs at this level of nesting are unordered.
+            
+             The glyph symbol replaces placeholders within the glyph_format. For example, if the glyph_symbol is the
+             solid circle corresponding to Unicode U+25cf code point and the glyph_format is `%0`, the rendered glyph
+             would be the solid circle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.GlyphType">
+             <summary>The type of glyph used by bullets when paragraphs at this level of nesting are ordered.
+            
+             The glyph type determines the type of glyph used to replace placeholders within the glyph_format when
+             paragraphs at this level of nesting are ordered. For example, if the nesting level is 0, the glyph_format is
+             `%0.` and the glyph type is DECIMAL, then the rendered glyph would replace the placeholder `%0` in the glyph
+             format with a number corresponding to list item's order within the list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.IndentFirstLine">
+            <summary>The amount of indentation for the first line of paragraphs at this level of nesting.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.IndentStart">
+            <summary>The amount of indentation for paragraphs at this level of nesting. Applied to the side that
+            corresponds to the start of the text, based on the paragraph's content direction.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.StartNumber">
+             <summary>The number of the first list item at this nesting level.
+            
+             A value of 0 is treated as a value of 1 for lettered lists and roman numeraled lists, i.e. for values of
+             both 0 and 1, lettered and roman numeraled lists will begin at `a` and `i` respectively.
+            
+             This value is ignored for nesting levels with unordered glyphs.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.TextStyle">
+            <summary>The text style of bullets at this level of nesting.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevel.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState">
+            <summary>A mask that indicates which of the fields on the base NestingLevel have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.BulletAlignmentSuggested">
+            <summary>Indicates if there was a suggested change to bullet_alignment.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.GlyphFormatSuggested">
+            <summary>Indicates if there was a suggested change to glyph_format.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.GlyphSymbolSuggested">
+            <summary>Indicates if there was a suggested change to glyph_symbol.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.GlyphTypeSuggested">
+            <summary>Indicates if there was a suggested change to glyph_type.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.IndentFirstLineSuggested">
+            <summary>Indicates if there was a suggested change to indent_first_line.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.IndentStartSuggested">
+            <summary>Indicates if there was a suggested change to indent_start.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.StartNumberSuggested">
+            <summary>Indicates if there was a suggested change to start_number.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.TextStyleSuggestionState">
+            <summary>A mask that indicates which of the fields in text style have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.NestingLevelSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ObjectReferences">
+            <summary>A collection of object IDs.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ObjectReferences.ObjectIds">
+            <summary>The object IDs.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ObjectReferences.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.OptionalColor">
+            <summary>A color that can either be fully opaque or fully transparent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.OptionalColor.Color">
+            <summary>If set, this will be used as an opaque color. If unset, this represents a transparent
+            color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.OptionalColor.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.PageBreak">
+            <summary>A ParagraphElement representing a page break. A page break makes the subsequent text start at the top
+            of the next page.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PageBreak.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PageBreak.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A PageBreak may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PageBreak.SuggestedTextStyleChanges">
+            <summary>The suggested text style changes to this PageBreak, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PageBreak.TextStyle">
+             <summary>The text style of this PageBreak.
+            
+             Similar to text content, like text runs and footnote references, the text style of a page break can affect
+             content layout as well as the styling of text inserted adjacent to it.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PageBreak.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Paragraph">
+            <summary>A StructuralElement representing a paragraph. A paragraph is a range of content that is terminated with
+            a newline character.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.Bullet">
+            <summary>The bullet for this paragraph. If not present, the paragraph does not belong to a list.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.Elements">
+            <summary>The content of the paragraph broken down into its component parts.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.ParagraphStyle">
+            <summary>The style of this paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.PositionedObjectIds">
+            <summary>The IDs of the positioned objects tethered to this paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.SuggestedBulletChanges">
+            <summary>The suggested changes to this paragraph's bullet.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.SuggestedParagraphStyleChanges">
+            <summary>The suggested paragraph style changes to this paragraph, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.SuggestedPositionedObjectIds">
+            <summary>The IDs of the positioned objects that are suggested to be attached to this paragraph, keyed by
+            suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Paragraph.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ParagraphBorder">
+            <summary>A border around a paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphBorder.Color">
+            <summary>The color of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphBorder.DashStyle">
+            <summary>The dash style of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphBorder.Padding">
+            <summary>The padding of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphBorder.Width">
+            <summary>The width of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphBorder.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ParagraphElement">
+            <summary>A ParagraphElement describes content within a Paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.AutoText">
+            <summary>An auto text paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.ColumnBreak">
+            <summary>A column break paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.EndIndex">
+            <summary>The zero-base end index of this paragraph element, exclusive, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.Equation">
+            <summary>An equation paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.FootnoteReference">
+            <summary>A footnote reference paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.HorizontalRule">
+            <summary>A horizontal rule paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.InlineObjectElement">
+            <summary>An inline object paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.PageBreak">
+            <summary>A page break paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.StartIndex">
+            <summary>The zero-based start index of this paragraph element, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.TextRun">
+            <summary>A text run paragraph element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphElement.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ParagraphStyle">
+             <summary>Styles that apply to a whole paragraph.
+            
+             Inherited paragraph styles are represented as unset fields in this message. A paragraph style's parent depends
+             on where the paragraph style is defined:
+            
+             * The ParagraphStyle on a Paragraph inherits from the paragraph's corresponding named style type. * The
+             ParagraphStyle on a named style inherits from the normal text named style. * The ParagraphStyle of the normal
+             text named style inherits from the default paragraph style in the Docs editor. * The ParagraphStyle on a
+             Paragraph element that is contained in a table may inherit its paragraph style from the table style.
+            
+             If the paragraph style does not inherit from a parent, unsetting fields will revert the style to a value
+             matching the defaults in the Docs editor.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.Alignment">
+            <summary>The text alignment for this paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.AvoidWidowAndOrphan">
+            <summary>Whether to avoid widows and orphans for the paragraph. If unset, the value is inherited from the
+            parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.BorderBetween">
+             <summary>The border between this paragraph and the next and previous paragraphs. If unset, the value is
+             inherited from the parent.
+            
+             The between border is rendered when the adjacent paragraph has the same border and indent properties.
+            
+             Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must
+             be specified in its entirety.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.BorderBottom">
+             <summary>The border at the bottom of this paragraph. If unset, the value is inherited from the parent.
+            
+             The bottom border is rendered when the paragraph below has different border and indent properties.
+            
+             Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must
+             be specified in its entirety.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.BorderLeft">
+             <summary>The border to the left of this paragraph. If unset, the value is inherited from the parent.
+            
+             Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must
+             be specified in its entirety.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.BorderRight">
+             <summary>The border to the right of this paragraph. If unset, the value is inherited from the parent.
+            
+             Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must
+             be specified in its entirety.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.BorderTop">
+             <summary>The border at the top of this paragraph. If unset, the value is inherited from the parent.
+            
+             The top border is rendered when the paragraph above has different border and indent properties.
+            
+             Paragraph borders cannot be partially updated. When making changes to a paragraph border the new border must
+             be specified in its entirety.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.Direction">
+            <summary>The text direction of this paragraph. If unset, the value defaults to LEFT_TO_RIGHT since paragraph
+            direction is not inherited.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.HeadingId">
+            <summary>The heading ID of the paragraph. If empty, then this paragraph is not a heading. This property is
+            read-only.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.IndentEnd">
+            <summary>The amount of indentation for the paragraph on the side that corresponds to the end of the text,
+            based on the current paragraph direction. If unset, the value is inherited from the parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.IndentFirstLine">
+            <summary>The amount of indentation for the first line of the paragraph. If unset, the value is inherited
+            from the parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.IndentStart">
+            <summary>The amount of indentation for the paragraph on the side that corresponds to the start of the text,
+            based on the current paragraph direction. If unset, the value is inherited from the parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.KeepLinesTogether">
+            <summary>Whether all lines of the paragraph should be laid out on the same page or column if possible. If
+            unset, the value is inherited from the parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.KeepWithNext">
+            <summary>Whether at least a part of this paragraph should be laid out on the same page or column as the next
+            paragraph if possible. If unset, the value is inherited from the parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.LineSpacing">
+            <summary>The amount of space between lines, as a percentage of normal, where normal is represented as 100.0.
+            If unset, the value is inherited from the parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.NamedStyleType">
+             <summary>The named style type of the paragraph.
+            
+             Since updating the named style type affects other properties within ParagraphStyle, the named style type is
+             applied before the other properties are updated.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.Shading">
+            <summary>The shading of the paragraph. If unset, the value is inherited from the parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.SpaceAbove">
+            <summary>The amount of extra space above the paragraph. If unset, the value is inherited from the
+            parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.SpaceBelow">
+            <summary>The amount of extra space below the paragraph. If unset, the value is inherited from the
+            parent.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.SpacingMode">
+            <summary>The spacing mode for the paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.TabStops">
+            <summary>A list of the tab stops for this paragraph. The list of tab stops is not inherited. This property
+            is read-only.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base ParagraphStyle have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.AlignmentSuggested">
+            <summary>Indicates if there was a suggested change to alignment.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.AvoidWidowAndOrphanSuggested">
+            <summary>Indicates if there was a suggested change to avoid_widow_and_orphan.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.BorderBetweenSuggested">
+            <summary>Indicates if there was a suggested change to border_between.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.BorderBottomSuggested">
+            <summary>Indicates if there was a suggested change to border_bottom.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.BorderLeftSuggested">
+            <summary>Indicates if there was a suggested change to border_left.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.BorderRightSuggested">
+            <summary>Indicates if there was a suggested change to border_right.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.BorderTopSuggested">
+            <summary>Indicates if there was a suggested change to border_top.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.DirectionSuggested">
+            <summary>Indicates if there was a suggested change to direction.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.HeadingIdSuggested">
+            <summary>Indicates if there was a suggested change to heading_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.IndentEndSuggested">
+            <summary>Indicates if there was a suggested change to indent_end.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.IndentFirstLineSuggested">
+            <summary>Indicates if there was a suggested change to indent_first_line.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.IndentStartSuggested">
+            <summary>Indicates if there was a suggested change to indent_start.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.KeepLinesTogetherSuggested">
+            <summary>Indicates if there was a suggested change to keep_lines_together.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.KeepWithNextSuggested">
+            <summary>Indicates if there was a suggested change to keep_with_next.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.LineSpacingSuggested">
+            <summary>Indicates if there was a suggested change to line_spacing.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.NamedStyleTypeSuggested">
+            <summary>Indicates if there was a suggested change to named_style_type.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.ShadingSuggestionState">
+            <summary>A mask that indicates which of the fields in shading have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.SpaceAboveSuggested">
+            <summary>Indicates if there was a suggested change to space_above.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.SpaceBelowSuggested">
+            <summary>Indicates if there was a suggested change to space_below.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.SpacingModeSuggested">
+            <summary>Indicates if there was a suggested change to spacing_mode.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ParagraphStyleSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.PositionedObject">
+            <summary>An object that is tethered to a Paragraph and positioned relative to the beginning of the paragraph. A
+            PositionedObject contains an EmbeddedObject such as an image.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObject.ObjectId">
+            <summary>The ID of this positioned object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObject.PositionedObjectProperties">
+            <summary>The properties of this positioned object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObject.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObject.SuggestedInsertionId">
+            <summary>The suggested insertion ID. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObject.SuggestedPositionedObjectPropertiesChanges">
+            <summary>The suggested changes to the positioned object properties, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObject.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.PositionedObjectPositioning">
+            <summary>The positioning of a PositionedObject. The positioned object is positioned relative to the beginning of
+            the Paragraph it is tethered to.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioning.Layout">
+            <summary>The layout of this positioned object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioning.LeftOffset">
+            <summary>The offset of the left edge of the positioned object relative to the beginning of the Paragraph it
+            is tethered to. The exact positioning of the object can depend on other content in the document and the
+            document's styling.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioning.TopOffset">
+            <summary>The offset of the top edge of the positioned object relative to the beginning of the Paragraph it
+            is tethered to. The exact positioning of the object can depend on other content in the document and the
+            document's styling.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioning.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.PositionedObjectPositioningSuggestionState">
+            <summary>A mask that indicates which of the fields on the base PositionedObjectPositioning have been changed in
+            this suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioningSuggestionState.LayoutSuggested">
+            <summary>Indicates if there was a suggested change to layout.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioningSuggestionState.LeftOffsetSuggested">
+            <summary>Indicates if there was a suggested change to left_offset.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioningSuggestionState.TopOffsetSuggested">
+            <summary>Indicates if there was a suggested change to top_offset.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPositioningSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.PositionedObjectProperties">
+            <summary>Properties of a PositionedObject.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectProperties.EmbeddedObject">
+            <summary>The embedded object of this positioned object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectProperties.Positioning">
+            <summary>The positioning of this positioned object relative to the newline of the Paragraph that references
+            this positioned object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.PositionedObjectPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base PositionedObjectProperties have been changed in
+            this suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPropertiesSuggestionState.EmbeddedObjectSuggestionState">
+            <summary>A mask that indicates which of the fields in embedded_object have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPropertiesSuggestionState.PositioningSuggestionState">
+            <summary>A mask that indicates which of the fields in positioning have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.PositionedObjectPropertiesSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Range">
+            <summary>Specifies a contiguous range of text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Range.EndIndex">
+             <summary>The zero-based end index of this range, exclusive, in UTF-16 code units.
+            
+             In all current uses, an end index must be provided. This field is an Int32Value in order to accommodate
+             future use cases with open-ended ranges.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Range.SegmentId">
+            <summary>The ID of the header, footer or footnote that this range is contained in. An empty segment ID
+            signifies the document's body.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Range.StartIndex">
+             <summary>The zero-based start index of this range, in UTF-16 code units.
+            
+             In all current uses, a start index must be provided. This field is an Int32Value in order to accommodate
+             future use cases with open-ended ranges.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Range.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ReplaceAllTextRequest">
+            <summary>Replaces all instances of text matching a criteria with replace text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ReplaceAllTextRequest.ContainsText">
+            <summary>Finds text in the document matching this substring.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ReplaceAllTextRequest.ReplaceText">
+            <summary>The text that will replace the matched text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ReplaceAllTextRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ReplaceAllTextResponse">
+            <summary>The result of replacing text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ReplaceAllTextResponse.OccurrencesChanged">
+            <summary>The number of occurrences changed by replacing all text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ReplaceAllTextResponse.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Request">
+            <summary>A single update to apply to a document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.CreateNamedRange">
+            <summary>Creates a named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.CreateParagraphBullets">
+            <summary>Creates bullets for paragraphs.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.DeleteContentRange">
+            <summary>Deletes content from the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.DeleteNamedRange">
+            <summary>Deletes a named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.DeleteParagraphBullets">
+            <summary>Deletes bullets from paragraphs.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.DeletePositionedObject">
+            <summary>Deletes a positioned object from the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.DeleteTableColumn">
+            <summary>Deletes a column from a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.DeleteTableRow">
+            <summary>Deletes a row from a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.InsertInlineImage">
+            <summary>Inserts an inline image at the specified location.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.InsertTableRow">
+            <summary>Inserts an empty row into a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.InsertText">
+            <summary>Inserts text at the specified location.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.ReplaceAllText">
+            <summary>Replaces all instances of the specified text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.UpdateParagraphStyle">
+            <summary>Updates the paragraph style at the specified range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.UpdateTextStyle">
+            <summary>Updates the text style at the specified range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Request.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Response">
+            <summary>A single response from an update.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Response.CreateNamedRange">
+            <summary>The result of creating a named range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Response.InsertInlineImage">
+            <summary>The result of inserting an inline image.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Response.InsertInlineSheetsChart">
+            <summary>The result of inserting an inline Google Sheets chart.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Response.ReplaceAllText">
+            <summary>The result of replacing text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Response.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.RgbColor">
+            <summary>An RGB color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.RgbColor.Blue">
+            <summary>The blue component of the color, from 0.0 to 1.0.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.RgbColor.Green">
+            <summary>The green component of the color, from 0.0 to 1.0.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.RgbColor.Red">
+            <summary>The red component of the color, from 0.0 to 1.0.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.RgbColor.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SectionBreak">
+             <summary>A StructuralElement representing a section break. A section is a range of content which has the same
+             SectionStyle. A section break represents the start of a new section, and the section style applies to the
+             section after the section break.
+            
+             The document body always begins with a section break.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionBreak.SectionStyle">
+            <summary>The style of the section after this section break.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionBreak.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionBreak.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A SectionBreak may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionBreak.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SectionColumnProperties">
+            <summary>Properties that apply to a section's column.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionColumnProperties.PaddingEnd">
+            <summary>The padding at the end of the column.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionColumnProperties.Width">
+            <summary>The width of the column.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionColumnProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SectionStyle">
+            <summary>The styling that applies to a section.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionStyle.ColumnProperties">
+             <summary>The section's columns properties.
+            
+             If empty, the section contains one column with the default properties in the Docs editor.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionStyle.ColumnSeparatorStyle">
+             <summary>The style of column separators.
+            
+             This style can be set even when there is one column in the section.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionStyle.ContentDirection">
+            <summary>The content direction of this section. If unset, the value defaults to LEFT_TO_RIGHT.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SectionStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Shading">
+            <summary>The shading of a paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Shading.BackgroundColor">
+            <summary>The background color of this paragraph shading.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Shading.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.ShadingSuggestionState">
+            <summary>A mask that indicates which of the fields on the base Shading have been changed in this suggested
+            change. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ShadingSuggestionState.BackgroundColorSuggested">
+            <summary>Indicates if there was a suggested change to the Shading.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.ShadingSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SheetsChartReference">
+            <summary>A reference to a linked chart embedded from Google Sheets.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SheetsChartReference.ChartId">
+            <summary>The ID of the specific chart in the Google Sheets spreadsheet that is embedded.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SheetsChartReference.SpreadsheetId">
+            <summary>The ID of the Google Sheets spreadsheet that contains the source chart.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SheetsChartReference.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SheetsChartReferenceSuggestionState">
+            <summary>A mask that indicates which of the fields on the base SheetsChartReference have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SheetsChartReferenceSuggestionState.ChartIdSuggested">
+            <summary>Indicates if there was a suggested change to chart_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SheetsChartReferenceSuggestionState.SpreadsheetIdSuggested">
+            <summary>Indicates if there was a suggested change to spreadsheet_id.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SheetsChartReferenceSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Size">
+            <summary>A width and height.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Size.Height">
+            <summary>The height of the object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Size.Width">
+            <summary>The width of the object.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Size.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SizeSuggestionState">
+            <summary>A mask that indicates which of the fields on the base Size have been changed in this suggestion. For
+            any field set to true, the Size has a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SizeSuggestionState.HeightSuggested">
+            <summary>Indicates if there was a suggested change to height.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SizeSuggestionState.WidthSuggested">
+            <summary>Indicates if there was a suggested change to width.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SizeSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.StructuralElement">
+            <summary>A StructuralElement describes content that provides structure to the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.StructuralElement.EndIndex">
+            <summary>The zero-based end index of this structural element, exclusive, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.StructuralElement.Paragraph">
+            <summary>A paragraph type of structural element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.StructuralElement.SectionBreak">
+            <summary>A section break type of structural element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.StructuralElement.StartIndex">
+            <summary>The zero-based start index of this structural element, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.StructuralElement.Table">
+            <summary>A table type of structural element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.StructuralElement.TableOfContents">
+            <summary>A table of contents type of structural element.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.StructuralElement.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SubstringMatchCriteria">
+            <summary>A criteria that matches a specific string of text in the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SubstringMatchCriteria.MatchCase">
+             <summary>Indicates whether the search should respect case:
+            
+             - `True`: the search is case sensitive. - `False`: the search is case insensitive.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SubstringMatchCriteria.Text">
+            <summary>The text to search for in the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SubstringMatchCriteria.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedBullet">
+            <summary>A suggested change to a Bullet.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedBullet.Bullet">
+            <summary>A Bullet that only includes the changes made in this suggestion. This can be used along with the
+            bullet_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedBullet.BulletSuggestionState">
+            <summary>A mask that indicates which of the fields on the base Bullet have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedBullet.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedDocumentStyle">
+            <summary>A suggested change to the DocumentStyle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedDocumentStyle.DocumentStyle">
+            <summary>A DocumentStyle that only includes the changes made in this suggestion. This can be used along with
+            the document_style_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedDocumentStyle.DocumentStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base DocumentStyle have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedDocumentStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedInlineObjectProperties">
+            <summary>A suggested change to InlineObjectProperties.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedInlineObjectProperties.InlineObjectProperties">
+            <summary>An InlineObjectProperties that only includes the changes made in this suggestion. This can be used
+            along with the inline_object_properties_suggestion_state to see which fields have changed and their new
+            values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedInlineObjectProperties.InlineObjectPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base InlineObjectProperties have been changed in
+            this suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedInlineObjectProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedListProperties">
+            <summary>A suggested change to ListProperties.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedListProperties.ListProperties">
+            <summary>A ListProperties that only includes the changes made in this suggestion. This can be used along
+            with the list_properties_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedListProperties.ListPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base ListProperties have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedListProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedNamedStyles">
+            <summary>A suggested change to the NamedStyles.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedNamedStyles.NamedStyles">
+            <summary>A NamedStyles that only includes the changes made in this suggestion. This can be used along with
+            the named_styles_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedNamedStyles.NamedStylesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base NamedStyles have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedNamedStyles.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedParagraphStyle">
+            <summary>A suggested change to a ParagraphStyle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedParagraphStyle.ParagraphStyle">
+            <summary>A ParagraphStyle that only includes the changes made in this suggestion. This can be used along
+            with the paragraph_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedParagraphStyle.ParagraphStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base ParagraphStyle have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedParagraphStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedPositionedObjectProperties">
+            <summary>A suggested change to PositionedObjectProperties.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedPositionedObjectProperties.PositionedObjectProperties">
+            <summary>A PositionedObjectProperties that only includes the changes made in this suggestion. This can be
+            used along with the positioned_object_properties_suggestion_state to see which fields have changed and their
+            new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedPositionedObjectProperties.PositionedObjectPropertiesSuggestionState">
+            <summary>A mask that indicates which of the fields on the base PositionedObjectProperties have been changed
+            in this suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedPositionedObjectProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedTableCellStyle">
+            <summary>A suggested change to a TableCellStyle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTableCellStyle.TableCellStyle">
+            <summary>A TableCellStyle that only includes the changes made in this suggestion. This can be used along
+            with the table_cell_style_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTableCellStyle.TableCellStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base TableCellStyle have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTableCellStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedTableRowStyle">
+            <summary>A suggested change to a TableRowStyle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTableRowStyle.TableRowStyle">
+            <summary>A TableRowStyle that only includes the changes made in this suggestion. This can be used along with
+            the table_row_style_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTableRowStyle.TableRowStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base TableRowStyle have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTableRowStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.SuggestedTextStyle">
+            <summary>A suggested change to a TextStyle.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTextStyle.TextStyle">
+            <summary>A TextStyle that only includes the changes made in this suggestion. This can be used along with the
+            text_style_suggestion_state to see which fields have changed and their new values.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTextStyle.TextStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base TextStyle have been changed in this
+            suggestion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.SuggestedTextStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TabStop">
+            <summary>A tab stop within a paragraph.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TabStop.Alignment">
+            <summary>The alignment of this tab stop. If unset, the value defaults to START.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TabStop.Offset">
+            <summary>The offset between this tab stop and the start margin.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TabStop.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.Table">
+            <summary>A StructuralElement representing a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Table.Columns">
+             <summary>Number of columns in the table.
+            
+             It is possible for a table to be non-rectangular, so some rows may have a different number of
+             cells.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Table.Rows">
+            <summary>Number of rows in the table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Table.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Table.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A Table may have multiple insertion IDs if it is a nested suggested
+            change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Table.TableRows">
+            <summary>The contents and style of each row.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Table.TableStyle">
+            <summary>The style of the table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.Table.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableCell">
+            <summary>The contents and style of a cell in a Table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.Content">
+            <summary>The content of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.EndIndex">
+            <summary>The zero-based end index of this cell, exclusive, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.StartIndex">
+            <summary>The zero-based start index of this cell, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A TableCell may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.SuggestedTableCellStyleChanges">
+            <summary>The suggested changes to the table cell style, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.TableCellStyle">
+            <summary>The style of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCell.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableCellBorder">
+            <summary>A border around a table cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellBorder.Color">
+            <summary>The color of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellBorder.DashStyle">
+            <summary>The dash style of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellBorder.Width">
+            <summary>The width of the border.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellBorder.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableCellLocation">
+            <summary>Location of a single cell within a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellLocation.ColumnIndex">
+            <summary>The zero-based column index. For example, the second column in the table has a column index of
+            1.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellLocation.RowIndex">
+            <summary>The zero-based row index. For example, the second row in the table has a row index of 1.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellLocation.TableStartLocation">
+            <summary>The location where the table starts in the document.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellLocation.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableCellStyle">
+             <summary>The style of a TableCell.
+            
+             Inherited table cell styles are represented as unset fields in this message. A table cell style can inherit from
+             the table's style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.BackgroundColor">
+            <summary>The background color of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.BorderBottom">
+            <summary>The bottom border of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.BorderLeft">
+            <summary>The left border of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.BorderRight">
+            <summary>The right border of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.BorderTop">
+            <summary>The top border of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.ColumnSpan">
+            <summary>The column span of the cell. This property is read-only.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.ContentAlignment">
+            <summary>The alignment of the content in the table cell. The default alignment matches the alignment for
+            newly created table cells in the Docs editor.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.PaddingBottom">
+            <summary>The bottom padding of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.PaddingLeft">
+            <summary>The left padding of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.PaddingRight">
+            <summary>The right padding of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.PaddingTop">
+            <summary>The top padding of the cell.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.RowSpan">
+            <summary>The row span of the cell. This property is read-only.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base TableCellStyle have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.BackgroundColorSuggested">
+            <summary>Indicates if there was a suggested change to background_color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.BorderBottomSuggested">
+            <summary>Indicates if there was a suggested change to border_bottom.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.BorderLeftSuggested">
+            <summary>Indicates if there was a suggested change to border_left.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.BorderRightSuggested">
+            <summary>Indicates if there was a suggested change to border_right.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.BorderTopSuggested">
+            <summary>Indicates if there was a suggested change to border_top.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.ColumnSpanSuggested">
+            <summary>Indicates if there was a suggested change to column_span.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.ContentAlignmentSuggested">
+            <summary>Indicates if there was a suggested change to content_alignment.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.PaddingBottomSuggested">
+            <summary>Indicates if there was a suggested change to padding_bottom.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.PaddingLeftSuggested">
+            <summary>Indicates if there was a suggested change to padding_left.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.PaddingRightSuggested">
+            <summary>Indicates if there was a suggested change to padding_right.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.PaddingTopSuggested">
+            <summary>Indicates if there was a suggested change to padding_top.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.RowSpanSuggested">
+            <summary>Indicates if there was a suggested change to row_span.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableCellStyleSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableColumnProperties">
+            <summary>The properties of a column in a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableColumnProperties.Width">
+            <summary>The width of the column. Set when the column's `width_type` is FIXED_WIDTH.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableColumnProperties.WidthType">
+            <summary>The width type of the column.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableColumnProperties.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableOfContents">
+            <summary>A StructuralElement representing a table of contents.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableOfContents.Content">
+            <summary>The content of the table of contents.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableOfContents.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableOfContents.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A TableOfContents may have multiple insertion IDs if it is a nested
+            suggested change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableOfContents.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableRow">
+            <summary>The contents and style of a row in a Table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.EndIndex">
+            <summary>The zero-based end index of this row, exclusive, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.StartIndex">
+            <summary>The zero-based start index of this row, in UTF-16 code units.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A TableRow may have multiple insertion IDs if it is a nested suggested
+            change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.SuggestedTableRowStyleChanges">
+            <summary>The suggested style changes to this row, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.TableCells">
+             <summary>The contents and style of each cell in this row.
+            
+             It is possible for a table to be non-rectangular, so some rows may have a different number of cells than
+             other rows in the same table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.TableRowStyle">
+            <summary>The style of the table row.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRow.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableRowStyle">
+            <summary>Styles that apply to a table row.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRowStyle.MinRowHeight">
+            <summary>The minimum height of the row. The row will be rendered in the Docs editor at a height equal to or
+            greater than this value in order to show all the content in the row's cells.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRowStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableRowStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base TableRowStyle have been changed in this
+            suggestion. For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRowStyleSuggestionState.MinRowHeightSuggested">
+            <summary>Indicates if there was a suggested change to min_row_height.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableRowStyleSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TableStyle">
+            <summary>Styles that apply to a table.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableStyle.TableColumnProperties">
+             <summary>The properties of each column.
+            
+             Note that in Docs, tables contain rows and rows contain cells, similar to HTML. So the properties for a row
+             can be found on the row's table_row_style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TableStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TextRun">
+            <summary>A ParagraphElement that represents a run of text that all has the same styling.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextRun.Content">
+             <summary>The text of this run.
+            
+             Any non-text elements in the run are replaced with the Unicode character U+E907.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextRun.SuggestedDeletionIds">
+            <summary>The suggested deletion IDs. If empty, then there are no suggested deletions of this
+            content.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextRun.SuggestedInsertionIds">
+            <summary>The suggested insertion IDs. A TextRun may have multiple insertion IDs if it is a nested suggested
+            change. If empty, then this is not a suggested insertion.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextRun.SuggestedTextStyleChanges">
+            <summary>The suggested text style changes to this run, keyed by suggestion ID.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextRun.TextStyle">
+            <summary>The text style of this run.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextRun.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TextStyle">
+             <summary>Represents the styling that can be applied to text.
+            
+             Inherited text styles are represented as unset fields in this message. A text style's parent depends on where
+             the text style is defined:
+            
+             * The TextStyle of text in a Paragraph inherits from the paragraph's corresponding named style type. * The
+             TextStyle on a named style inherits from the normal text named style. * The TextStyle of the normal text named
+             style inherits from the default text style in the Docs editor. * The TextStyle on a Paragraph element that is
+             contained in a table may inherit its text style from the table style.
+            
+             If the text style does not inherit from a parent, unsetting fields will revert the style to a value matching the
+             defaults in the Docs editor.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.BackgroundColor">
+            <summary>The background color of the text. If set, the color is either an RGB color or transparent,
+            depending on the `color` field.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.BaselineOffset">
+             <summary>The text's vertical offset from its normal position.
+            
+             Text with `SUPERSCRIPT` or `SUBSCRIPT` baseline offsets is automatically rendered in a smaller font size,
+             computed based on the `font_size` field. The `font_size` itself is not affected by changes in this
+             field.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.Bold">
+            <summary>Whether or not the text is rendered as bold.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.FontSize">
+            <summary>The size of the text's font.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.ForegroundColor">
+            <summary>The foreground color of the text. If set, the color is either an RGB color or transparent,
+            depending on the `color` field.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.Italic">
+            <summary>Whether or not the text is italicized.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.Link">
+             <summary>The hyperlink destination of the text. If unset, there is no link. Links are not inherited from
+             parent text.
+            
+             Changing the link in an update request causes some other changes to the text style of the range:
+            
+             * When setting a link, the text foreground color will be updated to the default link color and the text will
+             be underlined. If these fields are modified in the same request, those values will be used instead of the
+             link defaults. * Setting a link on a text range that overlaps with an existing link will also update the
+             existing link to point to the new URL. * Links are not settable on newline characters. As a result, setting
+             a link on a text range that crosses a paragraph boundary, such as `"ABC\n123"`, will separate the newline
+             character(s) into their own text runs. The link will be applied separately to the runs before and after the
+             newline. * Removing a link will update the text style of the range to match the style of the preceding text
+             (or the default text styles if the preceding text is another link) unless different styles are being set in
+             the same request.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.SmallCaps">
+            <summary>Whether or not the text is in small capital letters.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.Strikethrough">
+            <summary>Whether or not the text is struck through.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.Underline">
+            <summary>Whether or not the text is underlined.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.WeightedFontFamily">
+             <summary>The font family and rendered weight of the text.
+            
+             If an update request specifies values for both `weighted_font_family` and `bold`, the `weighted_font_family`
+             is applied first, then `bold`.
+            
+             If `weighted_font_family#weight` is not set, it defaults to `400`.
+            
+             If `weighted_font_family` is set, then `weighted_font_family#font_family` must also be set with a non-empty
+             value. Otherwise, a 400 bad request error is returned.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyle.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.TextStyleSuggestionState">
+            <summary>A mask that indicates which of the fields on the base TextStyle have been changed in this suggestion.
+            For any field set to true, there is a new suggested value.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.BackgroundColorSuggested">
+            <summary>Indicates if there was a suggested change to background_color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.BaselineOffsetSuggested">
+            <summary>Indicates if there was a suggested change to baseline_offset.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.BoldSuggested">
+            <summary>Indicates if there was a suggested change to bold.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.FontSizeSuggested">
+            <summary>Indicates if there was a suggested change to font_size.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.ForegroundColorSuggested">
+            <summary>Indicates if there was a suggested change to foreground_color.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.ItalicSuggested">
+            <summary>Indicates if there was a suggested change to italic.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.LinkSuggested">
+            <summary>Indicates if there was a suggested change to link.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.SmallCapsSuggested">
+            <summary>Indicates if there was a suggested change to small_caps.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.StrikethroughSuggested">
+            <summary>Indicates if there was a suggested change to strikethrough.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.UnderlineSuggested">
+            <summary>Indicates if there was a suggested change to underline.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.WeightedFontFamilySuggested">
+            <summary>Indicates if there was a suggested change to weighted_font_family.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.TextStyleSuggestionState.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.UpdateParagraphStyleRequest">
+            <summary>Update the styling of all paragraphs that overlap with the given range.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateParagraphStyleRequest.Fields">
+             <summary>The fields that should be updated.
+            
+             At least one field must be specified. The root `paragraph_style` is implied and should not be specified.
+            
+             For example, to update the paragraph style's alignment property, set `fields` to `"alignment"`.
+            
+             To reset a property to its default value, include its field name in the field mask but leave the field
+             itself unset.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateParagraphStyleRequest.ParagraphStyle">
+             <summary>The styles to set on the paragraphs.
+            
+             Certain paragraph style changes may cause other changes in order to mirror the behavior of the Docs editor.
+             See the documentation of ParagraphStyle for more information.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateParagraphStyleRequest.Range">
+            <summary>The range overlapping the paragraphs to style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateParagraphStyleRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.UpdateTextStyleRequest">
+            <summary>Update the styling of text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateTextStyleRequest.Fields">
+             <summary>The fields that should be updated.
+            
+             At least one field must be specified. The root `text_style` is implied and should not be specified. A single
+             `"*"` can be used as short-hand for listing every field.
+            
+             For example, to update the text style to bold, set `fields` to `"bold"`.
+            
+             To reset a property to its default value, include its field name in the field mask but leave the field
+             itself unset.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateTextStyleRequest.Range">
+             <summary>The range of text to style.
+            
+             The range may be extended to include adjacent newlines.
+            
+             If the range fully contains a paragraph belonging to a list, the paragraph's bullet is also updated with the
+             matching text style.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateTextStyleRequest.TextStyle">
+             <summary>The styles to set on the text.
+            
+             If the value for a particular style matches that of the parent, that style will be set to inherit.
+            
+             Certain text style changes may cause other changes in order to to mirror the behavior of the Docs editor.
+             See the documentation of TextStyle for more information.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.UpdateTextStyleRequest.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.WeightedFontFamily">
+            <summary>Represents a font family and weight of text.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.WeightedFontFamily.FontFamily">
+             <summary>The font family of the text.
+            
+             The font family can be any font from the Font menu in Docs or from [Google Fonts]
+             (https://fonts.google.com/). If the font name is unrecognized, the text is rendered in `Arial`.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.WeightedFontFamily.Weight">
+             <summary>The weight of the font. This field can have any value that is a multiple of `100` between `100` and
+             `900`, inclusive. This range corresponds to the numerical values described in the CSS 2.1 Specification,
+             [section 15.6](https://www.w3.org/TR/CSS21/fonts.html#font-boldness), with non-numerical values disallowed.
+            
+             The default value is `400` ("normal").
+            
+             The font weight makes up just one component of the rendered font weight. The rendered weight is determined
+             by a combination of the `weight` and the text style's resolved `bold` value, after accounting for
+             inheritance:
+            
+             * If the text is bold and the weight is less than `400`, the rendered weight is 400. * If the text is bold
+             and the weight is greater than or equal to `400` but is less than `700`, the rendered weight is `700`. * If
+             the weight is greater than or equal to `700`, the rendered weight is equal to the weight. * If the text is
+             not bold, the rendered weight is equal to the weight.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.WeightedFontFamily.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+        <member name="T:Google.Apis.Docs.v1.Data.WriteControl">
+            <summary>Provides control over how write requests are executed.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.WriteControl.RequiredRevisionId">
+             <summary>The ID of the revision of the document that the write request will be applied to. If this is not
+             the latest revision of the document, the request will not be processed and will return a 400 bad request
+             error.
+            
+             When a required revision ID is returned in a response, it indicates the revision ID of the document after
+             the request was applied.</summary>
+        </member>
+        <member name="P:Google.Apis.Docs.v1.Data.WriteControl.ETag">
+            <summary>The ETag of the item.</summary>
+        </member>
+    </members>
+</doc>
