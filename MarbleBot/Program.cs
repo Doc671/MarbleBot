@@ -23,7 +23,6 @@ namespace MarbleBot
 
         public async Task StartAsync()
         {
-            Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.Title = "MarbleBot";
 
             var logPath = "MBLog-" + DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss") + ".txt";

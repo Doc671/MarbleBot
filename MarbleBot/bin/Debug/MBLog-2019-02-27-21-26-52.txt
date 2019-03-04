@@ -20,3 +20,7 @@ Started running: 2019-02-27 21:26:52
 [2019-02-27 21:33:23] Exception: Additional text encountered after finished reading JSON content: {. Path '', line 912, position 1.
 [2019-02-27 21:36:44] Doc671#1965: mb/richlist
 [2019-02-27 21:36:44] MarbleBot#7194: 
+[2019-02-27 21:49:52] Exception: Additional text encountered after finished reading JSON content: {. Path '', line 912, position 1.
+[2019-02-27 21:50:14] Exception: Additional text encountered after finished reading JSON content: {. Path '', line 912, position 1.
+[2019-02-27 21:52:23] Exception: Additional text encountered after finished reading JSON content: {. Path '', line 912, position 1.
+[2019-02-27 21:52:48] Exception: Additional text encountered after finished reading JSON content: {. Path '', line 912, position 1.

@@ -110,13 +110,15 @@ namespace MarbleBot.Modules
                     case "siege": bCommand.Desc = "Participate in a Marble Siege boss battle!"; bCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
                 }
 
-                var message = new StringBuilder();
+                if (!bCommand.Desc.IsEmpty()) {
+                    var message = new StringBuilder();
 
-                message.Append("**__MarbleBot Help: `" + bCommand.Name + "` command__**\n*" + bCommand.Desc + "*\n\nUsage: `" + bCommand.Usage + "`");
-                if (!(bCommand.Example == null)) message.Append("\nExample: `" + bCommand.Example + "`");
-                if (!(bCommand.Warning == null)) message.Append("\n\n:warning: " + bCommand.Warning);
+                    message.Append("**__MarbleBot Help: `" + bCommand.Name + "` command__**\n*" + bCommand.Desc + "*\n\nUsage: `" + bCommand.Usage + "`");
+                    if (!(bCommand.Example == null)) message.Append("\nExample: `" + bCommand.Example + "`");
+                    if (!(bCommand.Warning == null)) message.Append("\n\n:warning: " + bCommand.Warning);
 
-                await ReplyAsync(message.ToString());
+                    await ReplyAsync(message.ToString());
+                } else await ReplyAsync("Could not find requested command!");
             }
         }
 
@@ -869,9 +871,17 @@ namespace MarbleBot.Modules
             switch(melmon) {
                 case "desk": await chnl.SendMessageAsync(msg); break;
                 case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
-                case "ken": srvr = Program._client.GetGuild(Global.CM); chnl = srvr.GetTextChannel(Global.CM); await chnl.SendMessageAsync(msg); break;
+                case "ken": srvr = Context.Client.GetGuild(Global.CM); chnl = srvr.GetTextChannel(Global.CM); await chnl.SendMessageAsync(msg); break;
                 case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
                 case "brady": chnl = srvr.GetTextChannel(237158048282443776); await chnl.SendMessageAsync(msg); break;
+                default:
+                    var split = melmon.Split(',');
+                    ulong.TryParse(split[0], out ulong chnlId);
+                    ulong.TryParse(split[1], out ulong srvrId);
+                    srvr = Context.Client.GetGuild(srvrId);
+                    chnl = srvr.GetTextChannel(chnlId);
+                    await chnl.SendMessageAsync(msg);
+                    break;
             }
         }
 
@@ -908,9 +918,13 @@ namespace MarbleBot.Modules
             if (major) await msg.PinAsync();
         }
 
+        [Command("setgame")]
+        [RequireOwner]
+        public async Task _setGame([Remainder] string game) { await Context.Client.SetGameAsync(game); }
+
         [Command("setstatus")]
         [RequireOwner]
-        public async Task _setstatus(string status)
+        public async Task _setStatus(string status)
         {
             switch (status) {
                 case "online": await Context.Client.SetStatusAsync(UserStatus.Online); break;

@@ -149,20 +149,20 @@ namespace MarbleBot.Modules
                         var json = "";
                         using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                         var obj = JObject.Parse(json);
-                        var User = Global.GetUser(Context, obj, winnerID);
-                        if (DateTime.UtcNow.Subtract(User.LastRaceWin).TotalHours > 6) {
+                        var user = Global.GetUser(Context, obj, winnerID);
+                        if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6) {
                             var noOfSameUser = 0;
                             foreach (var marble in marbles) if (marble.Item2 == winnerID) noOfSameUser++;
                             var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(id) / noOfSameUser) - 1) * 100, 2));
                             if (gift > 0) {
-                                User.Balance += gift;
-                                User.NetWorth += gift;
-                                User.LastRaceWin = DateTime.UtcNow;
-                                User.RaceWins++;
+                                user.Balance += gift;
+                                user.NetWorth += gift;
+                                user.LastRaceWin = DateTime.UtcNow;
+                                user.RaceWins++;
                                 obj.Remove(winnerID.ToString());
-                                obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(User)));
+                                obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(user)));
                                 Global.WriteUsers(obj);
-                                await ReplyAsync($"**{User.Name}** won <:unitofmoney:372385317581488128>**{gift:n}** for winning the race!");
+                                await ReplyAsync($"**{user.Name}** won <:unitofmoney:372385317581488128>**{gift:n}** for winning the race!");
                             }
                         }
                         using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
@@ -294,7 +294,7 @@ namespace MarbleBot.Modules
                     var User = Global.GetUser(Context);
                     var nextDaily = DateTime.UtcNow.Subtract(User.LastRaceWin);
                     var output = "";
-                    if (nextDaily.TotalHours < 6) output = string.Format("You can earn money from racing in **{0}**!", Global.GetDateString(User.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6))));
+                    if (nextDaily.TotalHours < 6) output = $"You can earn money from racing in **{Global.GetDateString(User.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!";
                     else output = "You can earn money from racing now!";
                     builder.WithAuthor(Context.User)
                         .WithDescription(output);
@@ -302,29 +302,34 @@ namespace MarbleBot.Modules
                     break;
                 }
                 case "remove": {
-                    var found = false;
+                    byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0; // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
                     var wholeFile = new StringBuilder();
                     var id = 0ul;
                     using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
                         while (!marbleList.EndOfStream) {
                             var line = await marbleList.ReadLineAsync();
                             if (line.Split(',')[0] == option) {
-                                found = true;
-                                id = ulong.Parse(line.Split(',')[1]);
+                                if (ulong.Parse(line.Split(',')[1]) == Context.User.Id) {
+                                    id = ulong.Parse(line.Split(',')[1]);
+                                    state = 2;
+                                } else {
+                                    wholeFile.AppendLine(line);
+                                    if (!(state == 2)) state = 1;
+                                }
                             } else wholeFile.AppendLine(line);
                         }
                     }
-                    if (found) {
-                        if (id != Context.User.Id) await ReplyAsync("This is not your marble!");
-                        else {
-                            using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
+                    switch (state) {
+                        case 0: await ReplyAsync("Could not find the requested racer!"); break;
+                        case 1: await ReplyAsync("This is not your marble!"); break;
+                        case 2: using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
                                 Global.RaceAlive[fileID]--;
                                 await marbleList.WriteAsync(wholeFile.ToString());
                                 await ReplyAsync("Removed contestant **" + option + "**!");
                             }
-                        }
+                            break;
+                        case 3: goto case 2;
                     }
-                    else await ReplyAsync("Could not find the requested racer!");
                     break;
                 }
                 default: {
@@ -426,15 +431,32 @@ namespace MarbleBot.Modules
                         await ReplyAsync("It doesn't look like anyone has signed up!");
                     } else {
                         Global.SiegeInfo[fileID].Active = true;
-                        var bossWeight = (int)Math.Round(Global.SiegeInfo[fileID].Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
-                        if (IsBetween(bossWeight, 0, 8)) Global.SiegeInfo[fileID].Boss = Global.PreeTheTree;
-                        else if (IsBetween(bossWeight, 9, 16)) Global.SiegeInfo[fileID].Boss = Global.HelpMeTheTree;
-                        else if (IsBetween(bossWeight, 17, 24)) Global.SiegeInfo[fileID].Boss = Global.HATTMANN;
-                        else if (IsBetween(bossWeight, 25, 32)) Global.SiegeInfo[fileID].Boss = Global.Orange;
-                        else if (IsBetween(bossWeight, 33, 40)) Global.SiegeInfo[fileID].Boss = Global.Erango;
-                        else if (IsBetween(bossWeight, 41, 48)) Global.SiegeInfo[fileID].Boss = Global.Octopheesh;
-                        else if (IsBetween(bossWeight, 49, 56)) Global.SiegeInfo[fileID].Boss = Global.Green;
-                        else Global.SiegeInfo[fileID].Boss = Global.Destroyer;
+                        if (option.Contains("override") && (Context.User.Id == 224267581370925056 || Context.IsPrivate)) {
+                            switch (option.Split(' ')[1].ToLower()) {
+                                case "pree": Global.SiegeInfo[fileID].Boss = Global.PreeTheTree; break;
+                                case "preethetree": goto case "pree";
+                                case "helpme": Global.SiegeInfo[fileID].Boss = Global.HelpMeTheTree; break;
+                                case "help": goto case "help";
+                                case "helpmethetree": goto case "helpme";
+                                case "hattmann": Global.SiegeInfo[fileID].Boss = Global.HATTMANN; break;
+                                case "hatt": Global.SiegeInfo[fileID].Boss = Global.HATTMANN; break;
+                                case "orange": Global.SiegeInfo[fileID].Boss = Global.Orange; break;
+                                case "erango": Global.SiegeInfo[fileID].Boss = Global.Erango; break;
+                                case "octopheesh": Global.SiegeInfo[fileID].Boss = Global.Octopheesh; break;
+                                case "green": Global.SiegeInfo[fileID].Boss = Global.Green; break;
+                                case "destroyer": Global.SiegeInfo[fileID].Boss = Global.Destroyer; break;
+                            }
+                        } else {
+                            var bossWeight = (int)Math.Round(Global.SiegeInfo[fileID].Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
+                            if (IsBetween(bossWeight, 0, 8)) Global.SiegeInfo[fileID].Boss = Global.PreeTheTree;
+                            else if (IsBetween(bossWeight, 9, 16)) Global.SiegeInfo[fileID].Boss = Global.HelpMeTheTree;
+                            else if (IsBetween(bossWeight, 17, 24)) Global.SiegeInfo[fileID].Boss = Global.HATTMANN;
+                            else if (IsBetween(bossWeight, 25, 32)) Global.SiegeInfo[fileID].Boss = Global.Orange;
+                            else if (IsBetween(bossWeight, 33, 40)) Global.SiegeInfo[fileID].Boss = Global.Erango;
+                            else if (IsBetween(bossWeight, 41, 48)) Global.SiegeInfo[fileID].Boss = Global.Octopheesh;
+                            else if (IsBetween(bossWeight, 49, 56)) Global.SiegeInfo[fileID].Boss = Global.Green;
+                            else Global.SiegeInfo[fileID].Boss = Global.Destroyer;
+                        }
                         int hp;
                         switch (Global.SiegeInfo[fileID].Boss.Difficulty) {
                             case Difficulty.Trivial: hp = 15; break;
@@ -643,29 +665,33 @@ namespace MarbleBot.Modules
                 case "marbles": goto case "contestants";
                 case "participants": goto case "contestants";
                 case "remove": {
-                    var found = false;
+                    byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0; // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
                     var wholeFile = new StringBuilder();
                     var id = 0ul;
                     using (var marbleList = new StreamReader(fileID.ToString() + "siege.csv")) {
                         while (!marbleList.EndOfStream) {
                             var line = await marbleList.ReadLineAsync();
                             if (line.Split(',')[0] == option) {
-                                found = true;
-                                id = ulong.Parse(line.Split(',')[1]);
+                                if (ulong.Parse(line.Split(',')[1]) == Context.User.Id) {
+                                    id = ulong.Parse(line.Split(',')[1]);
+                                    state = 2;
+                                } else {
+                                    wholeFile.AppendLine(line);
+                                    if (!(state == 2)) state = 1;
+                                }
                             } else wholeFile.AppendLine(line);
                         }
                     }
-                    if (found) {
-                        if (id != Context.User.Id || Context.User.Id == 224267581370925056) await ReplyAsync("This is not your marble!");
-                        else {
-                            using (var marbleList = new StreamWriter(fileID.ToString() + "siege.csv", false)) {
+                    switch (state) {
+                        case 0: await ReplyAsync("Could not find the requested marble!"); break;
+                        case 1: await ReplyAsync("This is not your marble!"); break;
+                        case 2: using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
                                 await marbleList.WriteAsync(wholeFile.ToString());
-                                Global.RaceAlive[fileID]--;
                                 await ReplyAsync("Removed contestant **" + option + "**!");
                             }
-                        }
+                            break;
+                        case 3: goto case 2;
                     }
-                    else await ReplyAsync("Could not find the requested racer!");
                     break;
                 }
                 case "info": {
@@ -746,8 +772,23 @@ namespace MarbleBot.Modules
                         case "erango": boss = Global.Erango; break;
                         case "octopheesh": boss = Global.Octopheesh; break;
                         case "frigidium": await ReplyAsync("No."); state = 3; break;
+                        case "highwaystickman": goto case "frigidium";
+                        case "outcast": goto case "frigidium";
+                        case "doon": goto case "frigidium";
+                        case "shardberg": goto case "frigidium";
+                        case "iceelemental": goto case "frigidium";
+                        case "snowjoke": goto case "frigidium";
+                        case "pheesh": goto case "frigidium";
+                        case "shark": goto case "frigidium";
+                        case "pufferfish": goto case "frigidium";
                         case "neptune": goto case "frigidium";
+                        case "lavachunk": goto case "frigidium";
+                        case "pyromaniac": goto case "frigidium";
+                        case "volcano": goto case "frigidium";
                         case "red": goto case "frigidium";
+                        case "spaceman": goto case "frigidium";
+                        case "rgvzdhjvewvy": goto case "frigidium";
+                        case "corruptsoldier": goto case "frigidium";
                         case "corruptpurple": goto case "frigidium";
                         case "chest": goto case "frigidium";
                         case "scaryface": goto case "frigidium";
@@ -895,7 +936,7 @@ namespace MarbleBot.Modules
                                             break;
                                         case MSE.Stun:
                                             marble.StatusEffect = MSE.Stun;
-                                            builder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Poison**");
+                                            builder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!", $"HP: {marble.HP}/{marble.MaxHP}\nStatus Effect: **Stun**");
                                             marble.LastStun = DateTime.UtcNow;
                                             break;
                                         default: builder.AddField($"**{marble.Name}** has been damaged!", $"HP: {marble.HP}/{marble.MaxHP}"); break;
@@ -907,7 +948,7 @@ namespace MarbleBot.Modules
                                     if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45) {
                                         marble.HP = 0;
                                         Global.SiegeInfo[Id].DMGMultiplier += 0.2;
-                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: 0/{marble.MaxHP}\nDamage Multiplier: {Global.SiegeInfo[Id].DMGMultiplier}");
+                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{Global.SiegeInfo[Id].DMGMultiplier}**");
                                     }
                                     break;
                                 case MSE.Poison:
@@ -919,7 +960,7 @@ namespace MarbleBot.Modules
                                             marble.HP = 1;
                                             marble.StatusEffect = MSE.None;
                                         }
-                                        builder.AddField($"**{marble.Name}** has taken Poison damage!", $"HP: {marble.HP}/{marble.MaxHP}");
+                                        builder.AddField($"**{marble.Name}** has taken Poison damage!", $"HP: **{marble.HP}**/{marble.MaxHP}");
                                     }
                                     marble.LastPoisonTick = DateTime.UtcNow;
                                     break;

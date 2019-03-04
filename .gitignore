@@ -1,0 +1,13 @@
+# ignore Visual Studio solution settings
+.vs
+
+# ignore Visual Studio files
+*.suo
+*.pdb
+
+# ignore NuGet packages
+packages
+
+# ignore build & object folders
+MarbleBot/bin
+MarbleBot/obj

@@ -59,19 +59,17 @@ namespace MarbleBot.Modules {
                     var obj = JObject.Parse(json);
                     var user = Global.GetUser(Context, obj);
                     if (user.Balance >= item.Price * noOfItems) {
-                        Global.WriteUsers(obj, Context.User, user, (sU, mU)=>{
-                            if (mU.Items != null) {
-                                if (mU.Items.ContainsKey(item.Id)) mU.Items[item.Id] += noOfItems;
-                                else mU.Items.Add(item.Id, noOfItems);
-                            } else {
-                                mU.Items = new Dictionary<int, int> {
-                                    { item.Id, noOfItems }
-                                };
-                            }
-                            mU.Balance -= item.Price * noOfItems;
-                            mU.Items[item.Id] -= noOfItems;
-                            return mU;
-                        });
+                        if (user.Items != null) {
+                            if (user.Items.ContainsKey(item.Id)) user.Items[item.Id] += noOfItems;
+                            else user.Items.Add(item.Id, noOfItems);
+                        } else {
+                            user.Items = new Dictionary<int, int> {
+                                { item.Id, noOfItems }
+                            };
+                        }
+                        user.Balance -= item.Price * noOfItems;
+                        user.Items[item.Id] -= noOfItems;
+                        Global.WriteUsers(obj, Context.User, user);
                         await ReplyAsync($"**{user.Name}** has successfully purchased **{item.Name}** x**{noOfItems}** for <:unitofmoney:372385317581488128>**{item.Price:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{item.Price * noOfItems:n}**\nNew balance: <:unitofmoney:372385317581488128>**{user.Balance:n}**.");
                     }
                     else await ReplyAsync(":warning: | You can't afford this!");
@@ -97,13 +95,11 @@ namespace MarbleBot.Modules {
                     orange = true;
                     User.Items.Add(10, 1);
                 }
-                Global.WriteUsers(obj, Context.User, User, (sU, mU)=>{
-                    mU.Balance += gift;
-                    mU.NetWorth += gift;
-                    mU.DailyStreak++;
-                    mU.LastDaily = DateTime.UtcNow;
-                    return mU;
-                });
+                User.Balance += gift;
+                User.NetWorth += gift;
+                User.DailyStreak++;
+                User.LastDaily = DateTime.UtcNow;
+                Global.WriteUsers(obj, Context.User, User);
                 await ReplyAsync(string.Format("**{0}**, you have received <:unitofmoney:372385317581488128>**{1:n}**!\n(Streak: **{2}**)", Context.User.Username, gift, User.DailyStreak));
                 if (orange) await ReplyAsync("You have been given a **Qefpedun Charm**!");
             } else {
@@ -284,11 +280,9 @@ namespace MarbleBot.Modules {
                     var obj = JObject.Parse(json);
                     var user = Global.GetUser(Context, obj);
                     if (user.Items.ContainsKey(item.Id) && user.Items[item.Id] >= noOfItems) {
-                        Global.WriteUsers(obj, Context.User, user, (sU, mU)=>{
-                            mU.Balance += item.Price * noOfItems;
-                            mU.Items[item.Id] -= noOfItems;
-                            return mU;
-                        });
+                        user.Balance += item.Price * noOfItems;
+                        user.Items[item.Id] -= noOfItems;
+                        Global.WriteUsers(obj, Context.User, user);
                         await ReplyAsync($"**{user.Name}** has successfully sold **{item.Name}** x**{noOfItems}** for <:unitofmoney:372385317581488128>**{item.Price:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{item.Price * noOfItems:n}**\nNew balance: <:unitofmoney:372385317581488128>**{user.Balance:n}**.");
                     } else await ReplyAsync(":warning: | You don't have enough of this item!");
                 }

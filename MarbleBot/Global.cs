@@ -60,18 +60,18 @@ namespace MarbleBot
             new Attack("How To Be An Idiot Vol. 3", 3, 45, MSE.None)
         });
         internal static Boss Green = new Boss("Green", 1500, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png", new Attack[] {
-            new Attack("Wobbly Toxicut", 8, 45, MSE.None),
-            new Attack("Falling Hellslash", 9, 45, MSE.None),
-            new Attack("Attractive Domesday", 15, 20, MSE.None),
-            new Attack("Spinning Pyroclash", 6, 65, MSE.None),
-            new Attack("Accurate Flarer", 4, 90, MSE.None)
+            new Attack("Wobbly Toxicut", 9, 45, MSE.Poison),
+            new Attack("Falling Hellslash", 11, 45, MSE.None),
+            new Attack("Attractive Domesday", 17, 20, MSE.None),
+            new Attack("Spinning Pyroclash", 8, 65, MSE.None),
+            new Attack("Accurate Flarer", 6, 90, MSE.None)
         });
         internal static Boss Destroyer = new Boss("Destroyer", 3720, Difficulty.Extreme, "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png", new Attack[] {
-            new Attack("Antimatter Missile", 11, 45, MSE.None),
-            new Attack("Annihilator-A", 9, 40, MSE.None),
-            new Attack("Flamethrower", 8, 50, MSE.None),
-            new Attack("Black Hole", 12, 50, MSE.None),
-            new Attack("Repulsor Blast", 6, 65, MSE.None)
+            new Attack("Antimatter Missile", 13, 50, MSE.None),
+            new Attack("Annihilator-A", 11, 45, MSE.None),
+            new Attack("Flamethrower", 10, 55, MSE.None),
+            new Attack("Black Hole", 14, 55, MSE.None),
+            new Attack("Repulsor Blast", 8, 70, MSE.None)
         });
         internal static Boss HelpMeTheTree = new Boss("Help Me the Tree", 500, Difficulty.Easy, "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png", new Attack[] {
             new Attack("Donation Box", 5, 45, MSE.None),
@@ -80,10 +80,10 @@ namespace MarbleBot
             new Attack("Decay", 2, 50, MSE.Poison)
         });
         internal static Boss Erango = new Boss("erangO", 1200, Difficulty.Moderate, "https://cdn.discordapp.com/attachments/296376584238137355/548221808294232071/unknown.png", new Attack[] {
-            new Attack("erangO Pellets", 5, 90, MSE.None),
-            new Attack("Doom Beam", 10, 35, MSE.Doom),
-            new Attack("Fake Poup Soop", 8, 45, MSE.None),
-            new Attack("Unapproved by Orange", 0, 45, MSE.Stun)
+            new Attack("erangO Pellets", 6, 90, MSE.None),
+            new Attack("Doom Beam", 10, 45, MSE.Doom),
+            new Attack("Fake Poup Soop", 8, 55, MSE.None),
+            new Attack("Unapproved by Orange", 3, 55, MSE.Stun)
         });
         internal static Boss Octopheesh = new Boss("Octopheesh", 800, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/548220914488049665/BossOctopheesh.png", new Attack[] {
             new Attack("Two Bipheesh", 8, 75, MSE.None),
@@ -232,24 +232,23 @@ namespace MarbleBot
 
         // Writes users to appropriate JSON file
         internal static void WriteUsers(JObject obj) {
-            using (var users = new StreamWriter("Users.json", true, Encoding.Unicode)) {
+            using (var users = new StreamWriter("Users.json")) {
                 using (var users2 = new JsonTextWriter(users)) {
-                    var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                    Serialiser.Serialize(users2, obj);
+                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                    serialiser.Serialize(users2, obj);
                 }
             }
         }
 
-        internal static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser, Func<SocketUser, MBUser, MBUser> func) {
-            mbUser = func(socketUser, mbUser);
+        internal static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser) {
             mbUser.Name = socketUser.Username;
             mbUser.Discriminator = socketUser.Discriminator;
-            obj.Remove(socketUser.ToString());
+            obj.Remove(socketUser.Id.ToString());
             obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
-            using (var users = new StreamWriter("Users.json", true, Encoding.Unicode)) {
+            using (var users = new StreamWriter("Users.json")) {
                 using (var users2 = new JsonTextWriter(users)) {
-                    var Serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                    Serialiser.Serialize(users2, obj);
+                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                    serialiser.Serialize(users2, obj);
                 }
             }
         } 
