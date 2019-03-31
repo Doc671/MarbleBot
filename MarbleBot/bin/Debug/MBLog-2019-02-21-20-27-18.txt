@@ -1,5 +1,0 @@
-MarbleBot by Doc671
-Started running: 2019-02-21 20:27:18
-
-[2019-02-21 20:56:19] BadArgCount: The input text has too few parameters.
-[2019-02-21 21:03:09] Exception: Input string was not in a correct format.

@@ -1,5 +1,0 @@
-MarbleBot by Doc671
-Started running: 2019-02-22 10:36:23
-
-[2019-02-22 10:38:27] Doc671#1965: mb/daily
-[2019-02-22 10:38:27] MarbleBot#7194: You need to wait for **1 hour, 10 minutes and 54 seconds** until you can get your daily gift again!

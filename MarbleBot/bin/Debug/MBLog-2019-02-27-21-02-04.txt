@@ -1,8 +1,0 @@
-MarbleBot by Doc671
-Started running: 2019-02-27 21:02:04
-
-[2019-02-27 21:02:11] Doc671#1965: mb/race signup A
-[2019-02-27 21:02:12] MarbleBot#7194: 
-[2019-02-27 21:02:15] Exception: Input string was not in a correct format.
-[2019-02-27 21:02:15] Doc671#1965: mb/race start
-[2019-02-27 21:02:15] MarbleBot#7194: Changed the contestant count to 6.

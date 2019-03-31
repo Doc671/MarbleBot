@@ -1,7 +1,0 @@
-MarbleBot by Doc671
-Started running: 2019-02-21 20:24:53
-
-[2019-02-21 20:25:52] BadArgCount: The input text has too many parameters.
-[2019-02-21 20:25:52] Doc671#1965: mb/boss help me
-[2019-02-21 20:25:58] Doc671#1965: mb/siege boss help me
-[2019-02-21 20:25:58] MarbleBot#7194: 
