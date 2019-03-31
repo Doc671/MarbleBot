@@ -12,16 +12,12 @@ using Google.Apis.YouTube.v3.Data;
 
 namespace MarbleBot.Modules
 {
-
-    public class YT : ModuleBase<SocketCommandContext>
+    /// <summary> YouTube API-related commands. </summary>
+    public class YouTube : ModuleBase<SocketCommandContext>
     {
-        /// <summary>
-        /// YouTube API-related commands
-        /// </summary>
-
         [Command("channelinfo")]
-        [Summary("returns information about a channel")]
-        public async Task _channelinfo([Remainder] string searchTerm)
+        [Summary("[BROKEN] Returns information about a channel.")]
+        public async Task ChannelInfoCommandAsync([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
             Channel display;
@@ -57,12 +53,13 @@ namespace MarbleBot.Modules
                 .AddField("Country", display.Snippet.Country, true)
                 .AddField("Description", display.Snippet.Description, true);
 
-            await ReplyAsync("", false, builder.Build());
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("cv")]
-        [Summary("Allows verified users to send a video in CM #community-videos")]
-        public async Task _cv(string url, [Remainder] string desc = "")
+        [Summary("Allows verified users to send a video in Community Marble channel #community-videos.")]
+        [Remarks("CM Only")]
+        public async Task CommunityVideosCommandAsync(string url, [Remainder] string desc = "")
         {
             if (Context.IsPrivate)
             {
@@ -131,8 +128,8 @@ namespace MarbleBot.Modules
         }
 
         [Command("searchchannel")]
-        [Summary("searches channels")]
-        public async Task _searchchannel([Remainder] string searchTerm)
+        [Summary("Displays a list of channels that match the search criteria.")]
+        public async Task SearchChannelCommandAsync([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
@@ -162,7 +159,7 @@ namespace MarbleBot.Modules
             {
                 if (searchResult.Id.Kind == "youtube#channel" && !Moderation.CheckSwear(searchResult.Snippet.Title))
                 {
-                    channels.Add(String.Format("{0} (<https://www.youtube.com/channel/{1}>)", searchResult.Snippet.Title, searchResult.Id.ChannelId));
+                    channels.Add(string.Format("{0} (<https://www.youtube.com/channel/{1}>)", searchResult.Snippet.Title, searchResult.Id.ChannelId));
                     found = true;
                 }
                 else
@@ -174,9 +171,9 @@ namespace MarbleBot.Modules
 
             if (found) {
                 if (profaneCount > 0) {
-                    await ReplyAsync(String.Format("**__Channels:__**\n{0}\n", string.Join("\n", channels)) + "\n" + profaneCount + " results omitted (profanity detected)");
+                    await ReplyAsync(string.Format("**__Channels:__**\n{0}\n", string.Join("\n", channels)) + "\n" + profaneCount + " results omitted (profanity detected)");
                 } else {
-                    await ReplyAsync(String.Format("**__Channels:__**\n{0}\n", string.Join("\n", channels)));
+                    await ReplyAsync(string.Format("**__Channels:__**\n{0}\n", string.Join("\n", channels)));
                 }
             } else {
                 await ReplyAsync("Couldn't seem to find anything...");
@@ -185,8 +182,8 @@ namespace MarbleBot.Modules
 
 
         [Command("searchvideo")]
-        [Summary("searches videos")]
-        public async Task _searchvideo([Remainder] string searchTerm)
+        [Summary("Displays a list of videos that match the search critera.")]
+        public async Task SearchVideoCommandAsync([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
@@ -215,16 +212,16 @@ namespace MarbleBot.Modules
                     //videos.Add("(profanity detected, item not displayed)");
                     profaneCount++;
                 } else if (searchResult.Id.Kind == "youtube#video") {
-                    videos.Add(String.Format("{0} (<https://youtu.be/{1}>)", searchResult.Snippet.Title, searchResult.Id.VideoId));
+                    videos.Add(string.Format("{0} (<https://youtu.be/{1}>)", searchResult.Snippet.Title, searchResult.Id.VideoId));
                     found = true;
                 }
             }
 
             if (found) {
                 if (profaneCount > 0) {
-                    await ReplyAsync(String.Format("**__Videos__**:\n{0}\n", string.Join("\n", videos)) + "\n" + profaneCount + " results omitted (profanity detected)");
+                    await ReplyAsync(string.Format("**__Videos__**:\n{0}\n", string.Join("\n", videos)) + "\n" + profaneCount + " results omitted (profanity detected)");
                 } else {
-                    await ReplyAsync(String.Format("**__Videos__**:\n{0}\n", string.Join("\n", videos)));
+                    await ReplyAsync(string.Format("**__Videos__**:\n{0}\n", string.Join("\n", videos)));
                 }
             } else {
                 await ReplyAsync("Couldn't seem to find anything...");

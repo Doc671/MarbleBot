@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Discord;
+using Discord.WebSocket;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 /*using Google.Apis.Auth.OAuth2;
 using Google.Apis.Docs.v1;
 using Google.Apis.Docs.v1.Data;

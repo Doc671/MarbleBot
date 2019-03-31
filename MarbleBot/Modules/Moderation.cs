@@ -5,18 +5,15 @@ using System.IO;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
-{
+{   
+    /// <summary> Moderation commands. </summary>
     public class Moderation : ModuleBase<SocketCommandContext>
     {
-        /// <summary>
-        /// Moderation commands
-        /// </summary>
-
         [Command("clear")]
         [Summary("Deletes the specified amount of messages.")]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
-        public async Task _clear(uint amount)
+        public async Task ClearCommandAsync(uint amount)
         {
             await Context.Channel.TriggerTypingAsync();
             var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).FlattenAsync();
@@ -29,8 +26,9 @@ namespace MarbleBot.Modules
 
         [Command("clear-recent-spam")]
         [Summary("Clears recent empty messages")]
-        [RequireOwner]
-        public async Task _clearRecentSpam(string rserver, string rchannel) {
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [RequireBotPermission(ChannelPermission.ManageMessages)]
+        public async Task ClearRecentSpamCommandAsync(string rserver, string rchannel) {
             Trace.WriteLine("hi");
             var server = ulong.Parse(rserver);
             var channel = ulong.Parse(rchannel);
@@ -71,7 +69,7 @@ namespace MarbleBot.Modules
 
 
         // Checks if a string contains a swear; returns true if profanity is present
-        public static bool CheckSwear(string word)
+        public static bool CheckSwear(string msg)
         {
             StreamReader FS;
             if (File.Exists("C:/Folder/NarrationPt8_data/e00/d00/ListOfBand.txt")) FS = new StreamReader("C:/Folder/NarrationPt8_data/e00/d00/ListOfBand.txt");
@@ -79,29 +77,14 @@ namespace MarbleBot.Modules
             string swears = FS.ReadLine(); // Imports list of... obscene language
             FS.Close();
             string[] swearList = swears.Split(',');
-            bool swearPresent = false;
-            for (int h = 0; h < swearList.Length - 1; h++) // Checks each word in the list
-            {
-                for (int i = 0; i < swearList[h].Length - 1; i++) // Checks each character in each word in the list
-                {
-                    int chars = 0;
-                    bool[] pos = new bool[swearList[h].Length];
-                    char[] swear = swearList[h].ToCharArray();
-                    for (int j = 0; j < word.Length - 1; j++) // Checks each character in the input word
-                    {
-                        if (word[j] == swear[i])
-                        {
-                            chars++;
-                            pos[i] = true;
-                        }
-                    }
-                    if (chars >= swear.Length && pos[0] == true && pos[1] == true && pos[2] == true)
-                    {
-                        Trace.WriteLine("Profanity detected, violation: " + word);
-                        swearPresent = true;
-                    }
+            var swearPresent = false;
+            foreach (var swear in swearList) {
+                if (msg.Contains(swear)) {
+                    swearPresent = true;
+                    break;
                 }
             }
+            if (swearPresent) Trace.WriteLine($"Profanity detected, violation: {msg}");
             return swearPresent;
         }
     }

@@ -1,32 +1,29 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using MarbleBot.BaseClasses;
 using MarbleBot.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MarbleBot.Modules {
+    /// <summary> Commands related to currency. </summary>
     public class Economy : ModuleBase<SocketCommandContext> {
-        /// <summary>
-        /// Commands related to currency
-        /// </summary>
-
         [Command("balance")]
-        [Alias("credits", "money")]
-        [Summary("Check your balance or the balance of someone else")]
-        public async Task _balance([Remainder] string searchTerm = "") {
+        [Alias("credits", "money", "bal")]
+        [Summary("Returns how much money you or someone else has.")]
+        public async Task BalanceCommandAsync([Remainder] string searchTerm = "") {
             await Context.Channel.TriggerTypingAsync();
             var User = new MBUser();
             var id = Context.User.Id;
             if (searchTerm.IsEmpty()) User = Global.GetUser(Context);
             else {
-                var json = "";
+                string json;
                 using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
                 var search = from user in rawUsers where searchTerm.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchTerm.ToLower()) || searchTerm.ToLower().Contains(user.Value.Discriminator) select user;
@@ -41,12 +38,13 @@ namespace MarbleBot.Modules {
                 .WithColor(Global.GetColor(Context))
                 .AddField("Balance", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.Balance), true)
                 .AddField("Net Worth", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.NetWorth), true);
-            await ReplyAsync("", false, builder.Build());
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("buy")]
-        [Summary("Buy items")]
-        public async Task _buy(string rawID, string rawNo) {
+        [Alias("buyitem")]
+        [Summary("Buys items.")]
+        public async Task BuyCommandAsync(string rawID, string rawNo) {
             await Context.Channel.TriggerTypingAsync();
             if (int.TryParse(rawNo, out int noOfItems) && noOfItems > 0) {
                 var item = Global.GetItem(rawID);
@@ -54,7 +52,7 @@ namespace MarbleBot.Modules {
                 else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
                 else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else if (item.OnSale) {
-                    var json = "";
+                    string json;
                     using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                     var obj = JObject.Parse(json);
                     var user = Global.GetUser(Context, obj);
@@ -68,43 +66,48 @@ namespace MarbleBot.Modules {
                             };
                         }
                         user.Balance -= item.Price * noOfItems;
-                        user.Items[item.Id] -= noOfItems;
                         Global.WriteUsers(obj, Context.User, user);
                         await ReplyAsync($"**{user.Name}** has successfully purchased **{item.Name}** x**{noOfItems}** for <:unitofmoney:372385317581488128>**{item.Price:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{item.Price * noOfItems:n}**\nNew balance: <:unitofmoney:372385317581488128>**{user.Balance:n}**.");
-                    }
-                    else await ReplyAsync(":warning: | You can't afford this!");
-                }
-                else await ReplyAsync(":warning: | This item is not on sale!");
+                    } else await ReplyAsync(":warning: | You can't afford this!");
+                } else await ReplyAsync(":warning: | This item is not on sale!");
             } else await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
         }
 
+        [Command("craft")]
+        [Summary("Not implemented yet.")]
+        public async Task CraftCommandAsync()
+        {
+            await ReplyAsync("...");
+        }
+
         [Command("daily")]
-        [Summary("Get daily money")]
-        public async Task _daily() {
+        [Summary("Gives daily Units of Money (200 to the power of your streak minus one).")]
+        public async Task DailyCommandAsync() {
             await Context.Channel.TriggerTypingAsync();
-            var json = "";
+            string json;
             using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
             var obj = JObject.Parse(json);
-            var User = Global.GetUser(Context, obj);
-            if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 24) {
-                if (DateTime.UtcNow.Subtract(User.LastDaily).TotalHours > 48) User.DailyStreak = 0;
+            var user = Global.GetUser(Context, obj);
+            if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 24) {
+                if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 48) user.DailyStreak = 0;
                 decimal gift;
-                gift = Convert.ToDecimal(Math.Round(Math.Pow(200, 1 + (Convert.ToDouble(User.DailyStreak) / 100)), 2));
+                var power = user.DailyStreak > 100 ? 100 : user.DailyStreak;
+                gift = Convert.ToDecimal(Math.Round(Math.Pow(200, 1 + (Convert.ToDouble(power) / 100)), 2));
                 var orange = false;
-                if (!User.Items.ContainsKey(10) && DateTime.UtcNow.DayOfYear < 51 && DateTime.UtcNow.DayOfYear > 42) {
+                if (!user.Items.ContainsKey(10) && DateTime.UtcNow.DayOfYear < 51 && DateTime.UtcNow.DayOfYear > 42) {
                     orange = true;
-                    User.Items.Add(10, 1);
+                    user.Items.Add(10, 1);
                 }
-                User.Balance += gift;
-                User.NetWorth += gift;
-                User.DailyStreak++;
-                User.LastDaily = DateTime.UtcNow;
-                Global.WriteUsers(obj, Context.User, User);
-                await ReplyAsync(string.Format("**{0}**, you have received <:unitofmoney:372385317581488128>**{1:n}**!\n(Streak: **{2}**)", Context.User.Username, gift, User.DailyStreak));
+                user.Balance += gift;
+                user.NetWorth += gift;
+                user.DailyStreak++;
+                user.LastDaily = DateTime.UtcNow;
+                Global.WriteUsers(obj, Context.User, user);
+                await ReplyAsync(string.Format("**{0}**, you have received <:unitofmoney:372385317581488128>**{1:n}**!\n(Streak: **{2}**)", Context.User.Username, gift, user.DailyStreak));
                 if (orange) await ReplyAsync("You have been given a **Qefpedun Charm**!");
             } else {
                 var ADayAgo = DateTime.UtcNow.AddDays(-1);
-                await ReplyAsync(string.Format("You need to wait for **{0}** until you can get your daily gift again!", Global.GetDateString(User.LastDaily.Subtract(ADayAgo))));
+                await ReplyAsync(string.Format("You need to wait for **{0}** until you can get your daily gift again!", Global.GetDateString(user.LastDaily.Subtract(ADayAgo))));
             }
         }
 
@@ -115,7 +118,7 @@ namespace MarbleBot.Modules {
 
             } else {
                 var gift = ulong.Parse(money.Trim());
-                var json = "";
+                string json;
                 using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MoneyUser>>(json);
                 var search = from user in rawUsers where searchUser.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchUser.ToLower()) || searchUser.ToLower().Contains(user.Value.Discriminator) select user;
@@ -125,8 +128,9 @@ namespace MarbleBot.Modules {
         }*/
 
         [Command("item")]
-        [Summary("View info about an item")]
-        public async Task _item([Remainder] string searchTerm) {
+        [Alias("iteminfo")]
+        [Summary("Returns information about an item.")]
+        public async Task ItemCommandAsync([Remainder] string searchTerm) {
             await Context.Channel.TriggerTypingAsync();
             var item = Global.GetItem(searchTerm);
             if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
@@ -141,13 +145,14 @@ namespace MarbleBot.Modules {
                     .AddField("ID", string.Format("{0:000}", item.Id), true)
                     .AddField("Price", price, true)
                     .AddField("For Sale", item.OnSale ? "Yes" : "No", true);
-                await ReplyAsync("", false, builder.Build());
+                await ReplyAsync(embed: builder.Build());
             }
         }
 
         [Command("poupsoop")]
-        [Summary("Calculates total value of Poup Soop")]
-        public async Task _poupsoop([Remainder] string msg) {
+        [Alias("poupsoopcalc, poupcalc")]
+        [Summary("Calculates the total price of Poup Soop.")]
+        public async Task PoupSoopCalcCommandAsync([Remainder] string msg) {
             await Context.Channel.TriggerTypingAsync();
             var splitMsg = msg.Split('|');
             var totalCost = 0m;
@@ -175,19 +180,19 @@ namespace MarbleBot.Modules {
                 builder.AddField(type + " x" + no, string.Format("Cost: <:unitofmoney:372385317581488128>{0:n}", subtot));
             }
             builder.AddField("Total Cost", string.Format("<:unitofmoney:372385317581488128>{0:n}", totalCost));
-            await ReplyAsync("", false, builder.Build());
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("profile")]
         [Alias("stats")]
-        [Summary("Check your profile or the profile of someone else")]
-        public async Task _profile([Remainder] string searchTerm = "") {
+        [Summary("Returns the profile of you or someone else.")]
+        public async Task ProfileCommandAsync([Remainder] string searchTerm = "") {
             await Context.Channel.TriggerTypingAsync();
             var User = new MBUser();
             var id = Context.User.Id;
             if (searchTerm.IsEmpty()) User = Global.GetUser(Context);
             else {
-                var json = "";
+                string json;
                 using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
                 var search = from user in rawUsers where searchTerm.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchTerm.ToLower()) || searchTerm.ToLower().Contains(user.Value.Discriminator) select user;
@@ -195,10 +200,12 @@ namespace MarbleBot.Modules {
                 id = ulong.Parse(foundUser.Key);
                 User = foundUser.Value;
             }
-            var lastDaily = User.LastDaily.ToString();
-            if (User.LastDaily.ToString("dd/MM/yyyy") == "01/01/2019") lastDaily = "N/A";
-            var lastRaceWin = User.LastRaceWin.ToString();
-            if (User.LastRaceWin.ToString("dd/MM/yyyy") == "01/01/2019") lastRaceWin = "N/A";
+            var lastDaily = User.LastDaily.ToString("yyyy-MM-dd hh:mm:ss");
+            if (User.LastDaily.ToString("yyyy-MM-dd") == "2019-01-01") lastDaily = "N/A";
+            var lastRaceWin = User.LastRaceWin.ToString("yyyy-MM-dd hh:mm:ss");
+            if (User.LastRaceWin.ToString("yyyy-MM-dd") == "2019-01-01") lastRaceWin = "N/A";
+            var lastSiegeWin = User.LastSiegeWin.ToString("yyyy-MM-dd hh:mm:ss");
+            if (User.LastSiegeWin.ToString("yyyy-MM-dd") == "2019-01-01") lastSiegeWin = "N/A";
             var author = Context.Client.GetUser(id);
             var itemOutput = new StringBuilder();
             if (User.Items.Count > 0) {
@@ -210,7 +217,7 @@ namespace MarbleBot.Modules {
                 .WithAuthor(author)
                 .WithCurrentTimestamp()
                 .WithColor(Global.GetColor(Context))
-                .WithFooter("All times in UTC, all dates DD/MM/YYYY.")
+                .WithFooter("All times in UTC, all dates YYYY-MM-DD.")
                 .AddField("Balance", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.Balance), true)
                 .AddField("Net Worth", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.NetWorth), true)
                 .AddField("Daily Streak", User.DailyStreak, true)
@@ -219,19 +226,19 @@ namespace MarbleBot.Modules {
                 .AddField("Siege Wins", User.SiegeWins, true)
                 .AddField("Last Daily", lastDaily, true)
                 .AddField("Last Race Win", lastRaceWin, true)
-                .AddField("Last Siege Win", User.LastSiegeWin, true)
+                .AddField("Last Siege Win", lastSiegeWin, true)
                 .AddField("Items", itemOutput.ToString());
-            await ReplyAsync("", false, builder.Build());
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("richlist")]
         [Alias("richest", "top10", "leaderboard", "networthleaderboard")]
-        [Summary("Shows the top 10 richest people")]
-        public async Task _richlist(string rawNo = "1") {
+        [Summary("Shows the ten richest people globally by Net Worth.")]
+        public async Task RichListCommandAsync(string rawNo = "1") {
             await Context.Channel.TriggerTypingAsync();
             if (!int.TryParse(rawNo, out int no)) await ReplyAsync("This is not a valid integer!");
             else {
-                var json = "";
+                string json;
                 using (var userFile = new StreamReader("Users.json")) json = userFile.ReadToEnd();
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
                 var users = new List<Tuple<string, MBUser>>();
@@ -261,13 +268,14 @@ namespace MarbleBot.Modules {
                     .WithDescription(output.ToString());
                 if (yourPos != 0) builder.WithFooter(string.Format("Requested by {2}#{3} ({0}{1})", yourPos, yourPos.Ordinal(), Context.User.Username, Context.User.Discriminator), Context.User.GetAvatarUrl());
                 else builder.WithFooter(string.Format("Requested by {0}#{1}", Context.User.Username, Context.User.Discriminator));
-                await ReplyAsync("", false, builder.Build());
+                await ReplyAsync(embed: builder.Build());
             }
         }
 
         [Command("sell")]
-        [Summary("Sell items")]
-        public async Task _sell(string rawID, string rawNo) {
+        [Alias("sellitem")]
+        [Summary("Sells items.")]
+        public async Task SellCommandAsync(string rawID, string rawNo) {
             await Context.Channel.TriggerTypingAsync();
             if (int.TryParse(rawNo, out int noOfItems) && noOfItems > 0) {
                 var item = Global.GetItem(rawID);
@@ -275,7 +283,7 @@ namespace MarbleBot.Modules {
                 else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
                 else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else {
-                    var json = "";
+                    string json;
                     using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                     var obj = JObject.Parse(json);
                     var user = Global.GetUser(Context, obj);
@@ -290,9 +298,9 @@ namespace MarbleBot.Modules {
         }
 
         [Command("shop")]
-        [Alias("items")]
-        [Summary("Shows all available items")]
-        public async Task _shop() {
+        [Alias("items", "store")]
+        [Summary("Shows all items available for sale, their IDs and their prices.")]
+        public async Task ShopCommandAsync() {
             await Context.Channel.TriggerTypingAsync();
             var output = new StringBuilder();
             using (var itemFile = new StreamReader("ShopItems.csv")){
@@ -306,7 +314,7 @@ namespace MarbleBot.Modules {
                 .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
                 .WithTitle("All items for sale");
-            await ReplyAsync("", false, builder.Build());
+            await ReplyAsync(embed: builder.Build());
         }
     }
 }

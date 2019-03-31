@@ -5,17 +5,14 @@ using System;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
-{
+{        
+    /// <summary> Role-handling commands. </summary>
     public class Roles : ModuleBase<SocketCommandContext>
     {
-        /// <summary>
-        /// Role-handling commands
-        /// </summary>
-
         [Command("give")]
         [Alias("giverole")]
-        [Summary("Gives a role")]
-        public async Task _roleGive(string roleName)
+        [Summary("Gives a role if it is on the role list.")]
+        public async Task GiveRoleCommandAsync(string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
             if (Context.IsPrivate) await ReplyAsync("There are no roles in a DM!");
@@ -47,8 +44,8 @@ namespace MarbleBot.Modules
 
         [Command("take")]
         [Alias("removerole, takerole")]
-        [Summary("Takes a role from someone.")]
-        public async Task _roleTake(string roleName)
+        [Summary("Takes a role if it is on the role list.")]
+        public async Task TakeRoleCommandAsync(string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
             if (Context.IsPrivate) await ReplyAsync("There are no roles in a DM!");
@@ -79,8 +76,9 @@ namespace MarbleBot.Modules
         }
 
         [Command("role")]
-        [Summary("Toggles roles")]
-        public async Task _role(string roleName)
+        [Alias("roletoggle")]
+        [Summary("Toggles role list roles.")]
+        public async Task RoleToggleCommandAsync(string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
             if (Context.IsPrivate) await ReplyAsync("There are no roles in a DM!");
@@ -89,8 +87,7 @@ namespace MarbleBot.Modules
                 IRole role = Context.Guild.GetRole(237127439409610752);
                 bool roleExists = true;
                 SocketGuildUser user = Context.Guild.GetUser(Context.User.Id);
-                switch (roleName.ToLower())
-                {
+                switch (roleName.ToLower()) {
                     case "roleplayer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242052397784891392); break;
                     case "spammer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(315212474909720577); break;
                     case "dead": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242048058580402177); break;
@@ -102,20 +99,15 @@ namespace MarbleBot.Modules
                     case "spoilers": if (Context.Guild.Id == Global.CM) role = Context.Guild.GetRole(422479447686643712); break;
                     default: roleExists = false; break;
                 };
-                if (roleExists)
-                {
+                if (roleExists) {
                     bool hasRole = false;
-                    foreach (SocketRole rol in user.Roles)
-                    {
+                    foreach (SocketRole rol in user.Roles) {
                         if (rol.Name.ToLower() == roleName.ToLower()) hasRole = true;
                     }
-                    if (hasRole)
-                    {
+                    if (hasRole) {
                         await (Context.User as IGuildUser).RemoveRoleAsync(role);
                         await Context.Channel.SendMessageAsync("Success. The **" + role.Name + "** role has been taken from you.");
-                    }
-                    else
-                    {
+                    } else {
                         await (Context.User as IGuildUser).AddRoleAsync(role);
                         await Context.Channel.SendMessageAsync("Success. The **" + role.Name + "** role has been given to you.");
                     }
@@ -126,20 +118,17 @@ namespace MarbleBot.Modules
 
         [Command("rolelist")]
         [Alias("roles")]
-        [Summary("Shows a list of all roles")]
-        public async Task _roleList()
+        [Summary("Shows a list of roles that can be given/taken by `mb/give` and `mb/take`.")]
+        public async Task RoleListCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (Context.IsPrivate)
-            {
+            if (Context.IsPrivate) {
                 await ReplyAsync("There are no roles in a DM!");
             }
-            else
-            {
+            else {
                 EmbedBuilder builder = new EmbedBuilder();
                 builder.WithColor(Global.GetColor(Context));
-                switch (Context.Guild.Id)
-                {
+                switch (Context.Guild.Id) {
                     case Global.CM:
                         builder.AddField("MarbleBot Role List", "Spoilers")
                             .WithTimestamp(DateTime.UtcNow);

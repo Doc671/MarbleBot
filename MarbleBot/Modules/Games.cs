@@ -1,34 +1,29 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using MarbleBot.BaseClasses;
+using MarbleBot.Extensions;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using MarbleBot.BaseClasses;
-using MarbleBot.Extensions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace MarbleBot.Modules
 {
+    /// <summary> Game commands. </summary>
     public class Games : ModuleBase<SocketCommandContext>
     {
-        /// <summary>
-        /// Game commands
-        /// </summary>
-
         [Command("race")]
-        [Summary("Players compete in a marble race!")]
-        public async Task _race(string command = "", [Remainder] string option = "") {
+        [Summary("Participate in a marble race!")]
+        public async Task RaceCommandAsync(string command = "", [Remainder] string option = "") {
             await Context.Channel.TriggerTypingAsync();
             ulong fileID = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-            Global.RaceAlive.Add(0, 0);
-            Global.RaceAlive.Remove(0);
             EmbedBuilder builder = new EmbedBuilder()
                 .WithColor(Global.GetColor(Context))
                 .WithCurrentTimestamp();
+
             switch (command.ToLower()) {
                 case "signup": { 
                     var name = "";
@@ -44,39 +39,26 @@ namespace MarbleBot.Modules
                     using (var racers = new StreamWriter("RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
                     if (!File.Exists(fileID.ToString() + "race.csv")) File.Create(fileID.ToString() + "race.csv").Close();
                     byte alive = 0;
-                    if (Context.IsPrivate) {
-                        if (!Global.RaceAlive.ContainsKey(Context.User.Id)) Global.RaceAlive.Add(Context.User.Id, 1);
-                        else Global.RaceAlive[Context.User.Id]++;
-                        alive = Global.RaceAlive[Context.User.Id];
-                    } else {
-                        if (!Global.RaceAlive.ContainsKey(Context.Guild.Id)) Global.RaceAlive.Add(Context.Guild.Id, 1);
-                        else Global.RaceAlive[Context.Guild.Id]++;
-                        alive = Global.RaceAlive[Context.Guild.Id];
-                    }
-                    if (name.Contains(',')) {
-                        var newName = new char[name.Length];
-                        for (int i = 0; i < name.Length - 1; i++) {
-                            if (name[i] == ',') newName[i] = ';';
-                            else newName[i] = name[i];
+                    using (var marbleList = new StreamReader(fileID.ToString() + "race.csv", true)) {
+                        while (!marbleList.EndOfStream) {
+                            var line = await marbleList.ReadLineAsync();
+                            if (!(line.IsEmpty())) alive++;
                         }
-                        name = new string(newName);
+                        marbleList.Close();
                     }
                     using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", true)) {
                         await marbleList.WriteLineAsync(name + "," + Context.User.Id);
                         marbleList.Close();
                     }
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     if (alive > 9) {
                         await ReplyAsync("The limit of 10 contestants has been reached!");
-                        await _race("start");
+                        await RaceCommandAsync("start");
                     }
                     break;
                 }
                 case "join": goto case "signup";
                 case "start": {
-                    var canStart = false;
-                    if (Context.IsPrivate) canStart = Global.RaceAlive.ContainsKey(Context.User.Id);
-                    else canStart = Global.RaceAlive.ContainsKey(Context.Guild.Id);
                     byte marbleCount = 0;
                     using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
                         while (!marbleList.EndOfStream) {
@@ -84,18 +66,10 @@ namespace MarbleBot.Modules
                             if (!line.IsEmpty()) marbleCount++;
                         }
                     }
-                    if (marbleCount != 0) {
-                        byte oldCount = 255;
-                        if (Global.RaceAlive.ContainsKey(fileID)) {
-                            oldCount = Global.RaceAlive[fileID];
-                            Global.RaceAlive[fileID] = marbleCount;
-                        } else Global.RaceAlive.Add(fileID, marbleCount);
-                        if (marbleCount != oldCount) await ReplyAsync("Changed the contestant count to " + marbleCount + ".");
-                        canStart = true;
-                    }
-                    if (!canStart) {
+                    if (marbleCount == 0) {
                         await ReplyAsync("It doesn't look like anyone has signed up!");
                     } else {
+                        // Get marbles
                         var marbles = new List<Tuple<string, ulong>>();
                         using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
                             while (!marbleList.EndOfStream) {
@@ -104,8 +78,11 @@ namespace MarbleBot.Modules
                             }
                             marbleList.Close();
                         }
+                        Global.RaceAlive.Add(fileID, marbleCount);
+
+                        // Race start
                         builder.WithTitle("The race has started!");
-                        var msg = await ReplyAsync("", false, builder.Build());
+                        var msg = await ReplyAsync(embed: builder.Build());
                         await Task.Delay(1500);
                         byte alive = 255;
                         if (Context.IsPrivate) alive = Global.RaceAlive[Context.User.Id];
@@ -127,12 +104,17 @@ namespace MarbleBot.Modules
                             }
                             int choice = Global.Rand.Next(0, msgCount - 1);
                             deathmsg = msgs[choice];
+                            var mName = marbles[eliminated].Item1.ToLower();
+                            if (deathmsg.Contains("was") && (mName.Contains("you ") || mName.Contains("we ") || mName.Contains("they ")))
+                                deathmsg = "were " + string.Concat(deathmsg.Skip(4));
                             builder.AddField("**" + marbles[eliminated].Item1 + "** is eliminated!", marbles[eliminated].Item1 + " " + deathmsg + " and is now out of the competition!");
                             marbles[eliminated] = Tuple.Create("///out", marbles[eliminated].Item2);
                             alive--;
                             await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                             await Task.Delay(1500);
                         }
+
+                        // Race finish
                         if (Context.IsPrivate) Global.RaceAlive.Remove(Context.User.Id);
                         else Global.RaceAlive.Remove(Context.Guild.Id);
                         var winnerID = 0ul;
@@ -140,13 +122,17 @@ namespace MarbleBot.Modules
                             if (marble.Item1 != "///out") {
                                 winnerID = marble.Item2;
                                 builder.AddField("**" + marble.Item1 + "** wins!", marble.Item1 + " is the winner!");
-                                using (var racers = new StreamWriter("RaceWinners.txt", true)) await racers.WriteLineAsync(marble.Item1);
+                                if (id > 1) {
+                                    using (var racers = new StreamWriter("RaceWinners.txt", true)) await racers.WriteLineAsync(marble.Item1);
+                                }
                                 await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                                 await ReplyAsync("**" + marble.Item1 + "** won the race!");
                                 break;
                             }
                         }
-                        var json = "";
+
+                        // Reward winner
+                        string json;
                         using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                         var obj = JObject.Parse(json);
                         var user = Global.GetUser(Context, obj, winnerID);
@@ -182,26 +168,6 @@ namespace MarbleBot.Modules
                     }
                     break;
                 }
-                case "setcount": {
-                    if (option == "auto") {
-                        byte marbleCount = 0;
-                        using (var marbleList = new StreamReader(fileID.ToString() + "race.csv")) {
-                            while (!marbleList.EndOfStream) {
-                                var line = await marbleList.ReadLineAsync();
-                                if (!line.IsEmpty()) marbleCount++;
-                            }
-                        }
-                        if (Global.RaceAlive.ContainsKey(fileID)) Global.RaceAlive[fileID] = marbleCount;
-                        else Global.RaceAlive.Add(fileID, marbleCount);
-                        await ReplyAsync("Changed the contestant count to " + marbleCount + ".");
-                    } else if (Context.User.Id == 224267581370925056 || Context.IsPrivate) {
-                        var newcount = byte.Parse(option);
-                        if (Global.RaceAlive.ContainsKey(fileID)) Global.RaceAlive[fileID] = newcount;
-                        else Global.RaceAlive.Add(fileID, newcount);
-                        await ReplyAsync("Changed the contestant count to " + newcount + ".");
-                    }
-                    break;
-                }
                 case "contestants": {
                     var marbles = new StringBuilder();
                     byte count = 0;
@@ -222,7 +188,7 @@ namespace MarbleBot.Modules
                         builder.AddField("Contestants", marbles.ToString());
                         builder.WithFooter("Contestant count: " + count)
                             .WithTitle("Marble Race: Contestants");
-                        await ReplyAsync("", false, builder.Build());
+                        await ReplyAsync(embed: builder.Build());
                     }
                     break;
                 }
@@ -255,7 +221,7 @@ namespace MarbleBot.Modules
                             }
                             builder.WithTitle("Race Leaderboard: Winners")
                                 .WithDescription(desc.ToString());
-                            await ReplyAsync("", false, builder.Build());
+                            await ReplyAsync(embed: builder.Build());
                             break;
                         }
                         case "mostused": {
@@ -284,7 +250,7 @@ namespace MarbleBot.Modules
                             }
                             builder.WithTitle("Race Leaderboard: Most Used")
                                 .WithDescription(desc.ToString());
-                            await ReplyAsync("", false, builder.Build());
+                            await ReplyAsync(embed: builder.Build());
                             break;
                         }
                     }
@@ -298,7 +264,7 @@ namespace MarbleBot.Modules
                     else output = "You can earn money from racing now!";
                     builder.WithAuthor(Context.User)
                         .WithDescription(output);
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     break;
                 }
                 case "remove": {
@@ -323,7 +289,6 @@ namespace MarbleBot.Modules
                         case 0: await ReplyAsync("Could not find the requested racer!"); break;
                         case 1: await ReplyAsync("This is not your marble!"); break;
                         case 2: using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
-                                Global.RaceAlive[fileID]--;
                                 await marbleList.WriteAsync(wholeFile.ToString());
                                 await ReplyAsync("Removed contestant **" + option + "**!");
                             }
@@ -335,21 +300,22 @@ namespace MarbleBot.Modules
                 default: {
                     builder.AddField("How to play", "Use `mb/race signup <marble name>` to sign up as a marble!\nWhen everyone's done, use `mb/race start`! This happens automatically if 10 people have signed up.\n\nCheck who's participating with `mb/race contestants`!\n\nYou can earn Units of Money if you win! (6 hour cooldown)")
                         .WithTitle("Marble Race!");
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     break;
                 }
             }
         }
 
         [Command("siege")]
-        [Summary("Participate in a Marble Siege battle")]
-        public async Task _siege(string command = "", [Remainder] string option = "") {
+        [Summary("Participate in a Marble Siege boss battle!")]
+        public async Task SiegeCommandAsync(string command = "", [Remainder] string option = "") {
             await Context.Channel.TriggerTypingAsync();
             ulong fileID = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
             bool IsBetween(int no, int lower, int upper) { return lower <= no && no <= upper; }
             EmbedBuilder builder = new EmbedBuilder()
                 .WithColor(Global.GetColor(Context))
                 .WithCurrentTimestamp();
+
             switch (command.ToLower()) {
                 case "signup": { 
                     var name = "";
@@ -367,8 +333,8 @@ namespace MarbleBot.Modules
                     var found = false;
                     using (var marbleList = new StreamReader(fileID.ToString() + "siege.csv")) {
                         while (!marbleList.EndOfStream) {
-                            var line = (await marbleList.ReadLineAsync()).Split(',');
-                            found = line[1].Contains(Context.User.Id.ToString()) || line[1] == Context.User.Id.ToString();
+                            var line = await marbleList.ReadLineAsync();
+                            found = line.Contains(Context.User.Id.ToString());
                         }
                     }
                     if (found) {
@@ -397,10 +363,10 @@ namespace MarbleBot.Modules
                         alive = (byte)allLines.Length;
                         marbleList.Close();
                     }
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     if (alive > 19) {
                         await ReplyAsync("The limit of 20 contestants has been reached!");
-                        await _siege("start");
+                        await SiegeCommandAsync("start");
                     }
                     break;
                 }
@@ -412,6 +378,8 @@ namespace MarbleBot.Modules
                             break;
                         }
                     }
+
+                    // Get marbles
                     byte marbleCount = 0;
                     using (var marbleList = new StreamReader(fileID.ToString() + "siege.csv")) {
                         while (!marbleList.EndOfStream) {
@@ -431,6 +399,7 @@ namespace MarbleBot.Modules
                         await ReplyAsync("It doesn't look like anyone has signed up!");
                     } else {
                         Global.SiegeInfo[fileID].Active = true;
+                        // Pick boss & set battle stats based on boss
                         if (option.Contains("override") && (Context.User.Id == 224267581370925056 || Context.IsPrivate)) {
                             switch (option.Split(' ')[1].ToLower()) {
                                 case "pree": Global.SiegeInfo[fileID].Boss = Global.PreeTheTree; break;
@@ -475,6 +444,8 @@ namespace MarbleBot.Modules
                             marble.HP = hp;
                             marble.MaxHP = hp;
                         }
+                        
+                        // Siege Start
                         var cdown = await ReplyAsync("**3**");
                         await Task.Delay(1000);
                         await cdown.ModifyAsync(m => m.Content = "**2**");
@@ -482,7 +453,7 @@ namespace MarbleBot.Modules
                         await cdown.ModifyAsync(m => m.Content = "**1**");
                         await Task.Delay(1000);
                         await cdown.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
-                        Global.Sieges.Add(Task.Run(async () => { await SiegeBossActions(fileID); }));
+                        Global.Sieges.Add(Task.Run(async () => { await SiegeBossActionsAsync(fileID); }));
                         var marbles = new StringBuilder();
                         var pings = new StringBuilder();
                         foreach (var marble in Global.SiegeInfo[fileID].Marbles) {
@@ -494,7 +465,7 @@ namespace MarbleBot.Modules
                             .WithThumbnailUrl(Global.SiegeInfo[fileID].Boss.ImageUrl)
                             .AddField($"Marbles: **{Global.SiegeInfo[fileID].Marbles.Count}**", marbles.ToString())
                             .AddField($"Boss: **{Global.SiegeInfo[fileID].Boss.Name}**", string.Format("HP: **{0}**\nAttacks: **{1}**\nDifficulty: **{2}**", Global.SiegeInfo[fileID].Boss.HP, Global.SiegeInfo[fileID].Boss.Attacks.Length, Enum.GetName(typeof(Difficulty), Global.SiegeInfo[fileID].Boss.Difficulty)));
-                        await ReplyAsync("", false, builder.Build());
+                        await ReplyAsync(embed: builder.Build());
                         if (pings.Length != 0) await ReplyAsync(pings.ToString());
                     }
                     break;
@@ -510,8 +481,7 @@ namespace MarbleBot.Modules
                                 if (marble.StatusEffect != MSE.Stun) {
                                     if (DateTime.UtcNow.Subtract(Global.SiegeInfo[fileID].LastMorale).TotalSeconds > 20 && Global.SiegeInfo[fileID].Morales > 0) {
                                         Global.SiegeInfo[fileID].Morales--;
-                                        Global.SiegeInfo[fileID].DMGMultiplier /= 2;
-                                        await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[fileID].DMGMultiplier}**!");
+                                        await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[fileID].DamageMultiplier}**!");
                                     }
                                     var dmg = Global.Rand.Next(1, 25);
                                     if (dmg > 20) dmg = Global.Rand.Next(21, 35);
@@ -530,7 +500,7 @@ namespace MarbleBot.Modules
                                         title = "CRITICAL attack!";
                                         url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
                                     } else title = "Glitch attack!";
-                                    dmg = marble.StatusEffect == MSE.Chill ? (int)Math.Round(dmg * Global.SiegeInfo[fileID].DMGMultiplier * 0.5) : (int)Math.Round(dmg * Global.SiegeInfo[fileID].DMGMultiplier);
+                                    dmg = marble.StatusEffect == MSE.Chill ? (int)Math.Round(dmg * Global.SiegeInfo[fileID].DamageMultiplier * 0.5) : (int)Math.Round(dmg * Global.SiegeInfo[fileID].DamageMultiplier);
                                     var clone = false;
                                     if (marble.Cloned) {
                                         clone = true;
@@ -547,11 +517,11 @@ namespace MarbleBot.Modules
                                         .WithThumbnailUrl(url)
                                         .WithDescription(string.Format("**{0}** dealt **{1}** damage to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, dmg, Global.SiegeInfo[fileID].Boss.Name))
                                         .AddField("Boss HP", "**" + Global.SiegeInfo[fileID].Boss.HP + "**/" + Global.SiegeInfo[fileID].Boss.MaxHP);
-                                    await ReplyAsync("", false, builder.Build());
+                                    await ReplyAsync(embed: builder.Build());
                                     if (clone && marble.Name[marble.Name.Length - 1] != 's') await ReplyAsync($"{marble.Name}'s clones disappeared!");
                                     else if (clone) await ReplyAsync($"{marble.Name}' clones disappeared!");
                                     if (Global.SiegeInfo[fileID].Boss.HP < 1) {
-                                        await SiegeVictory(fileID);
+                                        await SiegeVictoryAsync(fileID);
                                     }
                                 } else await ReplyAsync($"**{Context.User.Username}**, you are stunned and cannot attack!");
                             } else await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
@@ -563,24 +533,24 @@ namespace MarbleBot.Modules
                 case "grab": {
                     if (Global.SiegeInfo[fileID].Marbles.Any(m => m.Id == Context.User.Id)) {
                         if (Global.SiegeInfo[fileID].PowerUp.IsEmpty()) await ReplyAsync("There is no power-up to grab!");
+                        else if (Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).HP < 1) await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer grab power-ups!");
                         else {
                             if (Global.Rand.Next(0, 3) == 0) {
                                 Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).PUHits++;
                                 switch (Global.SiegeInfo[fileID].PowerUp) {
                                     case "Morale Boost":
-                                        Global.SiegeInfo[fileID].DMGMultiplier *= 2;
-                                        builder.WithTitle("POWER-UP ACTIVATED!")
-                                            .WithDescription(string.Format("**{0}** activated **Morale Boost**! Damage multiplier increased to **{1}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, Global.SiegeInfo[fileID].DMGMultiplier));
-                                        await ReplyAsync("", false, builder.Build());
-                                        Global.SiegeInfo[fileID].SetPowerUp("");
                                         Global.SiegeInfo[fileID].Morales++;
+                                        builder.WithTitle("POWER-UP ACTIVATED!")
+                                            .WithDescription(string.Format("**{0}** activated **Morale Boost**! Damage multiplier increased to **{1}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, Global.SiegeInfo[fileID].DamageMultiplier));
+                                        await ReplyAsync(embed: builder.Build());
+                                        Global.SiegeInfo[fileID].SetPowerUp("");
                                         Global.SiegeInfo[fileID].LastMorale = DateTime.UtcNow;
                                         break;
                                     case "Clone":
                                         Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Cloned = true;
                                         builder.WithTitle("POWER-UP ACTIVATED!")
                                             .WithDescription(string.Format("**{0}** activated **Clone**! Five clones of {0} appeared!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name));
-                                        await ReplyAsync("", false, builder.Build());
+                                        await ReplyAsync(embed: builder.Build());
                                         Global.SiegeInfo[fileID].SetPowerUp("");
                                         break;
                                     case "Summon":
@@ -593,13 +563,13 @@ namespace MarbleBot.Modules
                                             default: ally = "MarbleBot"; url = ""; break;
                                         }
                                         var dmg = Global.Rand.Next(60, 85);
-                                        Global.SiegeInfo[fileID].Boss.HP -= (int)Math.Round(dmg * Global.SiegeInfo[fileID].DMGMultiplier);
+                                        Global.SiegeInfo[fileID].Boss.HP -= (int)Math.Round(dmg * Global.SiegeInfo[fileID].DamageMultiplier);
                                         if (Global.SiegeInfo[fileID].Boss.HP < 0) Global.SiegeInfo[fileID].Boss.HP = 0;
                                         builder.WithTitle("POWER-UP ACTIVATED!")
                                             .WithThumbnailUrl(url)
                                             .AddField("Boss HP", $"**{Global.SiegeInfo[fileID].Boss.HP}**/{Global.SiegeInfo[fileID].Boss.MaxHP}")
                                             .WithDescription($"**{Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name}** activated **Summon**! **{ally}** came into the arena and dealt **{dmg}** damage to the boss!");
-                                        await ReplyAsync("", false, builder.Build());
+                                        await ReplyAsync(embed: builder.Build());
                                         Global.SiegeInfo[fileID].SetPowerUp("");
                                         break;
                                     case "Cure":
@@ -608,7 +578,7 @@ namespace MarbleBot.Modules
                                         Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).StatusEffect = MSE.None;
                                         builder.WithTitle("Cured!")
                                             .WithDescription($"**{marble.Name}** has been cured of **{mse}**!");
-                                        await ReplyAsync("", false, builder.Build());
+                                        await ReplyAsync(embed: builder.Build());
                                         Global.SiegeInfo[fileID].SetPowerUp("");
                                         break;
                                 }
@@ -635,7 +605,7 @@ namespace MarbleBot.Modules
                     else output = "You can earn money from Sieges now!";
                     builder.WithAuthor(Context.User)
                         .WithDescription(output);
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     break;
                 }
                 case "contestants": {
@@ -658,7 +628,7 @@ namespace MarbleBot.Modules
                         builder.AddField("Contestants", marbles.ToString());
                         builder.WithFooter("Contestant count: " + cCount)
                             .WithTitle("Marble Siege: Contestants");
-                        await ReplyAsync("", false, builder.Build());
+                        await ReplyAsync(embed: builder.Build());
                     }
                     break;
                 }
@@ -685,7 +655,7 @@ namespace MarbleBot.Modules
                     switch (state) {
                         case 0: await ReplyAsync("Could not find the requested marble!"); break;
                         case 1: await ReplyAsync("This is not your marble!"); break;
-                        case 2: using (var marbleList = new StreamWriter(fileID.ToString() + "race.csv", false)) {
+                        case 2: using (var marbleList = new StreamWriter(fileID.ToString() + "siege.csv", false)) {
                                 await marbleList.WriteAsync(wholeFile.ToString());
                                 await ReplyAsync("Removed contestant **" + option + "**!");
                             }
@@ -705,7 +675,7 @@ namespace MarbleBot.Modules
                         var PU = siege.PowerUp.IsEmpty() ? "None" : siege.PowerUp;
                         builder.AddField($"Boss: **{siege.Boss.Name}**", string.Format("\nHP: **{0}**/{3}\nAttacks: **{1}**\nDifficulty: **{2}**", siege.Boss.HP, siege.Boss.Attacks.Length, Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty), siege.Boss.MaxHP))
                             .AddField($"Marbles: **{siege.Marbles.Count}**", marbles.ToString())
-                            .WithDescription($"Damage Multiplier: **{siege.DMGMultiplier}**\nActive Power-up: **{PU}**")
+                            .WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{PU}**")
                             .WithThumbnailUrl(siege.Boss.ImageUrl);
                     } else {
                         using (var marbleList = new StreamReader(fileID.ToString() + "siege.csv")) {
@@ -723,7 +693,7 @@ namespace MarbleBot.Modules
                         builder.AddField("Marbles", marbles.ToString());
                         builder.WithDescription("Siege not started yet.");
                     }
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     break;
                 }
                 case "leaderboard": {
@@ -752,7 +722,7 @@ namespace MarbleBot.Modules
                     }
                     builder.WithTitle("Siege Leaderboard: Most Used")
                         .WithDescription(desc.ToString());
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     break;
                 }
                 case "leaderboard mostused": goto case "leaderboard";
@@ -816,11 +786,20 @@ namespace MarbleBot.Modules
                             .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)}** {(int)boss.Difficulty}/10")
                             .WithThumbnailUrl(boss.ImageUrl)
                             .WithTitle(boss.Name);
-                        await ReplyAsync("", false, builder.Build());
+                        await ReplyAsync(embed: builder.Build());
                     } else if (state == 0) await ReplyAsync("Could not find the requested boss!");
                     break;
                 }
                 case "bossinfo": goto case "boss";
+                case "bosslist":
+                    Boss[] playableBosses = { Global.PreeTheTree, Global.HelpMeTheTree, Global.HATTMANN, Global.Orange, Global.Erango, Global.Octopheesh, Global.Green, Global.Destroyer };
+                    foreach (var boss in playableBosses) {
+                        builder.AddField($"{boss.Name}", $"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)}**, HP: **{boss.MaxHP}**, Attacks: **{boss.Attacks.Count()}**");
+                    }
+                    builder.WithDescription("Use `mb/siege boss <boss name>` for more info!")
+                        .WithTitle("Playable MS Bosses");
+                    await ReplyAsync(embed: builder.Build());
+                    break;
                 case "powerup": {
                     var powerup = "";
                     var desc = "";
@@ -848,7 +827,7 @@ namespace MarbleBot.Modules
                         builder.WithDescription(desc)
                             .WithThumbnailUrl(url)
                             .WithTitle(powerup);
-                        await ReplyAsync("", false, builder.Build());
+                        await ReplyAsync(embed: builder.Build());
                     }
                     break;
                 }
@@ -857,7 +836,7 @@ namespace MarbleBot.Modules
                 case "powerupinfo": goto case "powerup";
                 case "puinfo": goto case "powerup";
                 case "ping": {
-                    var json = "";
+                    string json;
                     using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                     var obj = JObject.Parse(json);
                     var user = Global.GetUser(Context, obj);
@@ -882,24 +861,25 @@ namespace MarbleBot.Modules
                     sb.AppendLine("Check who's participating with `mb/siege contestants` and view Siege information with `mb/siege info`!");
                     builder.AddField("How to play", sb.ToString())
                         .WithTitle("Marble Siege!");
-                    await ReplyAsync("", false, builder.Build());
+                    await ReplyAsync(embed: builder.Build());
                     break;
             }
         }
 
         // Separate task dealing with time-based boss responses
-        public async Task SiegeBossActions(ulong Id) {
+        public async Task SiegeBossActionsAsync(ulong Id) {
             var StartTime = DateTime.UtcNow;
             var timeout = false;
             do {
                 await Task.Delay(15000);
                 if (Global.SiegeInfo[Id].Boss.HP < 1) {
-                    await SiegeVictory(Id);
+                    await SiegeVictoryAsync(Id);
                     break;
                 } else if (DateTime.UtcNow.Subtract(StartTime).TotalMinutes >= 10) {
                     timeout = true;
                     break;
                 } else {
+                    // Attack marbles
                     var rand = Global.Rand.Next(0, Global.SiegeInfo[Id].Boss.Attacks.Length);
                     var atk = Global.SiegeInfo[Id].Boss.Attacks[rand];
                     var builder = new EmbedBuilder()
@@ -917,8 +897,7 @@ namespace MarbleBot.Modules
                                 hits++;
                                 if (marble.HP < 1) {
                                     marble.HP = 0;
-                                    Global.SiegeInfo[Id].DMGMultiplier += 0.2;
-                                    builder.AddField($"**{marble.Name}** has been killed!", $"HP: 0/{marble.MaxHP}\nDamage Multiplier: {Global.SiegeInfo[Id].DMGMultiplier}");
+                                    builder.AddField($"**{marble.Name}** has been killed!", $"HP: 0/{marble.MaxHP}\nDamage Multiplier: {Global.SiegeInfo[Id].DamageMultiplier}");
                                 } else {
                                     switch (atk.StatusEffect) {
                                         case MSE.Chill:
@@ -943,12 +922,13 @@ namespace MarbleBot.Modules
                                     }
                                 }
                             }
+
+                            // Perform status effects
                             switch (marble.StatusEffect) {
                                 case MSE.Doom:
                                     if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45) {
                                         marble.HP = 0;
-                                        Global.SiegeInfo[Id].DMGMultiplier += 0.2;
-                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{Global.SiegeInfo[Id].DMGMultiplier}**");
+                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{Global.SiegeInfo[Id].DamageMultiplier}**");
                                     }
                                     break;
                                 case MSE.Poison:
@@ -969,11 +949,14 @@ namespace MarbleBot.Modules
                     }
                     if (hits < 1) builder.AddField("Missed!", "No-one got hurt!");
                     await Context.Channel.SendMessageAsync("", false, builder.Build());
+
+                    // Wear off Morale Boost
                     if (DateTime.UtcNow.Subtract(Global.SiegeInfo[Id].LastMorale).TotalSeconds > 20 && Global.SiegeInfo[Id].Morales > 0) {
                         Global.SiegeInfo[Id].Morales--;
-                        Global.SiegeInfo[Id].DMGMultiplier /= 2;
-                        await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[Id].DMGMultiplier}**!");
+                        await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{Global.SiegeInfo[Id].DamageMultiplier}**!");
                     }
+
+                    // Siege failure
                     if (Global.SiegeInfo[Id].Marbles.Aggregate(0, (agg, m) => { agg += m.HP; return agg; }) < 1) {
                         var marbles = new StringBuilder();
                         foreach (var marble in Global.SiegeInfo[Id].Marbles) {
@@ -982,13 +965,15 @@ namespace MarbleBot.Modules
                         builder = new EmbedBuilder()
                             .WithColor(Global.GetColor(Context))
                             .WithCurrentTimestamp()
-                            .WithDescription($"All the marbles died!\n**{Global.SiegeInfo[Id].Boss.Name}** won!")
+                            .WithDescription($"All the marbles died!\n**{Global.SiegeInfo[Id].Boss.Name}** won!\nFinal HP: **{Global.SiegeInfo[Id].Boss.HP}**/{Global.SiegeInfo[Id].Boss.MaxHP}")
                             .AddField($"Fallen Marbles: **{Global.SiegeInfo[Id].Marbles.Count}**", marbles.ToString())
                             .WithThumbnailUrl(Global.SiegeInfo[Id].Boss.ImageUrl)
                             .WithTitle("Siege Failure!");
                         await Context.Channel.SendMessageAsync("", false, builder.Build());
                         break;
                     }
+                    
+                    // Cause new power-up to appear
                     if (Global.SiegeInfo[Id].PowerUp == "") {
                         rand = Global.Rand.Next(0, 8);
                         switch (rand) {
@@ -1054,7 +1039,7 @@ namespace MarbleBot.Modules
             if (timeout) await Context.Channel.SendMessageAsync("10 minute timeout reached! Siege aborted!");
         }
 
-        public async Task SiegeVictory(ulong Id) {
+        public async Task SiegeVictoryAsync(ulong Id) {
             var siege = Global.SiegeInfo[Id];
             var builder = new EmbedBuilder()
                 .WithColor(Global.GetColor(Context))
@@ -1063,37 +1048,40 @@ namespace MarbleBot.Modules
                 .WithDescription($"**{siege.Boss.Name}** has been defeated!");
             for (int i = 0; i < siege.Marbles.Count; i++) {
                 var marble = siege.Marbles[i];
-                var json = "";
+                string json;
                 using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                 var obj = JObject.Parse(json);
-                var User = Global.GetUser(Context, obj, marble.Id);
+                var user = Global.GetUser(Context, obj, marble.Id);
                 int earnings = marble.BossHits + (marble.PUHits * 50);
-                if (DateTime.UtcNow.Subtract(User.LastSiegeWin).TotalHours > 6) {
+                if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6) {
                     var output = new StringBuilder();
-                    if (marble.BossHits > 0) output.AppendLine($"Damage dealt: {Global.UoM}**{marble.BossHits:n}**");
-                    if (marble.PUHits > 0) output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PUHits * 50:n}**");
+                    var didNothing = true;
+                    if (marble.BossHits > 0) {
+                        output.AppendLine($"Damage dealt: {Global.UoM}**{marble.BossHits:n}**");
+                        didNothing = false;
+                    }
+                    if (marble.PUHits > 0) {
+                        output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PUHits * 50:n}**");
+                        didNothing = false;
+                    }
                     if (marble.HP > 0) {
                         earnings += 200;
                         output.AppendLine($"Alive bonus: {Global.UoM}**{200:n}**");
-                        User.SiegeWins++;
-                        if (earnings == 200) {
-                            earnings = 0;
-                            output.AppendLine($"Did nothing: {Global.UoM}**-{200:n}**");
-                        }
+                        user.SiegeWins++;
                     }
-                    if (output.Length > 0) {
+                    if (output.Length > 0 && !didNothing) {
+                        if (marble.HP > 0) user.LastSiegeWin = DateTime.UtcNow;
                         output.AppendLine($"__**Total: {Global.UoM}{earnings:n}**__");
-                        User.Balance += earnings;
-                        User.NetWorth += earnings;
+                        user.Balance += earnings;
+                        user.NetWorth += earnings;
                         builder.AddField($"**{Context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
                     }
                 }
-                if (marble.HP > 0 && earnings > 0) User.LastSiegeWin = DateTime.UtcNow;
                 obj.Remove(marble.Id.ToString());
-                obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(User)));
+                obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
                 Global.WriteUsers(obj);
             }
-            await ReplyAsync("", false, builder.Build());
+            await ReplyAsync(embed: builder.Build());
             Global.SiegeInfo[Id].Boss.ResetHP();
             Global.SiegeInfo.Remove(Id);
             using (var marbleList = new StreamWriter(Id.ToString() + "siege.csv", false)) {
@@ -1103,9 +1091,22 @@ namespace MarbleBot.Modules
         }
 
         [Command("boss")]
-        public async Task _boss([Remainder] string searchTerm) { await _siege("boss", searchTerm); }
+        [Summary("Alias for `mb/siege boss`.")]
+        public async Task BossCommandAsync([Remainder] string searchTerm) => await SiegeCommandAsync("boss", searchTerm);
+
+        [Command("bosslist")]
+        [Summary("Alias for `mb/siege bosslist`.")]
+        public async Task BossListCommandAsync() => await SiegeCommandAsync("bosslist");
 
         [Command("powerup")]
-        public async Task _powerup([Remainder] string searchTerm) { await _siege("powerup", searchTerm); }
+        [Summary("Alias for `mb/siege powerup`.")]
+        public async Task PowerUpCommandAsync([Remainder] string searchTerm) => await SiegeCommandAsync("powerup", searchTerm);
+
+        [Command("dive")]
+        [Summary("Not implemented yet.")]
+        public async Task DiveCommandAsync()
+        {
+            await ReplyAsync("...");
+        }
     }
 }

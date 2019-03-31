@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.BaseClasses;
 using MarbleBot.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MarbleBot
 {
+    /// <summary> Contains global variables. </summary>
     static class Global
     {
-        /// <summary>
-        /// Contains global variables
-        /// </summary>
+        internal static CommandService CommandService { get; set; }
 
         internal static Random Rand = new Random();
         internal static DateTime StartTime = new DateTime();
@@ -86,10 +85,10 @@ namespace MarbleBot
             new Attack("Unapproved by Orange", 3, 55, MSE.Stun)
         });
         internal static Boss Octopheesh = new Boss("Octopheesh", 800, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/548220914488049665/BossOctopheesh.png", new Attack[] {
-            new Attack("Two Bipheesh", 8, 75, MSE.None),
-            new Attack("EMP Burst", 6, 45, MSE.Stun),
-            new Attack("Vile Beam", 13, 40, MSE.None),
-            new Attack("Pheesh Swarm", 6, 95, MSE.None)
+            new Attack("Two Bipheesh", 13, 75, MSE.None),
+            new Attack("EMP Burst", 11, 45, MSE.Stun),
+            new Attack("Vile Beam", 18, 40, MSE.None),
+            new Attack("Pheesh Swarm", 11, 95, MSE.None)
         });
 
         // Gets colour for embed depending on server
@@ -132,7 +131,7 @@ namespace MarbleBot
 
         // Returns a MoneyUser with the ID of the user
         internal static MBUser GetUser(SocketCommandContext Context) {
-            var json = "";
+            string json;
             using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
             var obj = JObject.Parse(json);
             MBUser User;
@@ -149,7 +148,7 @@ namespace MarbleBot
         }
 
         internal static MBUser GetUser(SocketCommandContext Context, ulong Id) {
-            var json = "";
+            string json;
             using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
             var obj = JObject.Parse(json);
             MBUser User;

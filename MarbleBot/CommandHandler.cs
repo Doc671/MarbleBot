@@ -12,17 +12,14 @@ namespace MarbleBot
     public class CommandHandler
     {
         private readonly DiscordSocketClient _client;
-
         private readonly CommandService _service;
 
         public CommandHandler(DiscordSocketClient client)
         {
             _client = client;
-
             _service = new CommandService();
-
             _service.AddModulesAsync(Assembly.GetEntryAssembly(), null);
-
+            Global.CommandService = _service;
             _client.MessageReceived += HandleCommandAsync;
         }
 

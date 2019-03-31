@@ -190,7 +190,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Modules\Games.cs" />
-    <Compile Include="Modules\General.cs" />
+    <Compile Include="Modules\Fun.cs" />
     <Compile Include="BaseClasses\MBCommand.cs" />
     <Compile Include="Modules\Moderation.cs" />
     <Compile Include="BaseClasses\Item.cs" />
@@ -198,11 +198,14 @@
     <Compile Include="BaseClasses\Difficulty.cs" />
     <Compile Include="BaseClasses\Attack.cs" />
     <Compile Include="Modules\Roles.cs" />
-    <Compile Include="Modules\YT.cs" />
+    <Compile Include="Modules\Sneak.cs" />
+    <Compile Include="Modules\Utility.cs" />
+    <Compile Include="Modules\YouTube.cs" />
     <Compile Include="Modules\Economy.cs" />
     <Compile Include="BaseClasses\MBUser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Usage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

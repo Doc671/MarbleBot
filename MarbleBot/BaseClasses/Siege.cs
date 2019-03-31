@@ -1,21 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MarbleBot.BaseClasses
 {
     public class Siege
     {
-        public bool Active;
-        public Boss Boss;
-        public double DMGMultiplier;
-        public DateTime LastMorale;
-        public List<Marble> Marbles;
-        public int Morales;
-        public string PowerUp;
-        public string PUImageUrl;
+        public bool Active { get; set; } = false;
+        public Boss Boss { get; set; } = Boss.Empty;
+        public double DamageMultiplier { get {
+                var deathCount = Marbles.Aggregate(0, (totalDeaths, m) => {
+                    if (m.HP < 1) totalDeaths++;
+                    return totalDeaths;
+                });
+                return (1.0 + (deathCount * 0.2)) * (Morales + 1);
+            }
+        }
+        public DateTime LastMorale { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
+        public List<Marble> Marbles { get; set; } = new List<Marble>();
+        public byte Morales { get; set; } = 0;
+        public string PowerUp { get; set; } = "";
+        public string PUImageUrl { get; set; } = "";
 
-        public void SetPowerUp(string PU)
-        {
+        public void SetPowerUp(string PU) {
             PowerUp = PU;
             switch (PU) {
                 case "Clone": PUImageUrl = "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png"; break;
@@ -28,37 +35,6 @@ namespace MarbleBot.BaseClasses
             }
         }
 
-        public Siege(Boss boss, Marble[] marbles)
-        {
-            Active = false;
-            Boss = boss;
-            DMGMultiplier = 1; 
-            LastMorale = DateTime.Parse("01/01/2019 00:00:00");
-            Marbles = new List<Marble>(marbles);
-            Morales = 0;
-            PowerUp = "";
-        }
-
-        public Siege(Boss boss)
-        {
-            Active = false;
-            Boss = boss;
-            DMGMultiplier = 1;
-            LastMorale = DateTime.Parse("01/01/2019 00:00:00");
-            Marbles = new List<Marble>();
-            Morales = 0;
-            PowerUp = "";
-        }
-
-        public Siege(Marble[] marbles)
-        {
-            Active = false;
-            Boss = Boss.Empty;
-            DMGMultiplier = 1;
-            LastMorale = DateTime.Parse("01/01/2019 00:00:00");
-            Marbles = new List<Marble>(marbles);
-            Morales = 0;
-            PowerUp = "";
-        }
+        public Siege(Marble[] marbles) { Marbles = new List<Marble>(marbles); }
     }
 }

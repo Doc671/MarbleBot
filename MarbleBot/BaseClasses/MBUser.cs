@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace MarbleBot.BaseClasses
 {
-    public class MBUser // Class for users when using money-based commands and games
+    /// <summary> Class for users when using money-based commands and games. </summary>
+    public class MBUser 
     {
         public string Name { get; set; } = "";
         public string Discriminator { get; set; } = "0000";
