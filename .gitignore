@@ -1,10 +1,6 @@
 # ignore Visual Studio solution settings
 .vs
 
-# ignore Visual Studio files
-*.suo
-*.pdb
-
 # ignore NuGet packages
 packages
 

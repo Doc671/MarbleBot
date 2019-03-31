@@ -1,9 +1,0 @@
-MarbleBot by Doc671
-Started running: 2019-02-26 07:54:28
-
-[2019-02-26 12:55:34] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\223616088263491595race.csv' because it is being used by another process.
-[2019-02-26 13:33:14] Exception: Object reference not set to an instance of an object.
-[2019-02-26 13:55:17] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\Users.json' because it is being used by another process.
-[2019-02-26 14:30:15] Exception: The process cannot access the file 'C:\Users\hesar\source\repos\MarbleBot\MarbleBot\bin\Debug\SiegeMostUsed.txt' because it is being used by another process.
-[2019-02-26 15:31:27] Exception: Object reference not set to an instance of an object.
-[2019-02-26 15:31:54] Exception: Object reference not set to an instance of an object.
