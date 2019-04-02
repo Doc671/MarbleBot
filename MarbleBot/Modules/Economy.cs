@@ -68,16 +68,54 @@ namespace MarbleBot.Modules {
                         user.Balance -= item.Price * noOfItems;
                         Global.WriteUsers(obj, Context.User, user);
                         await ReplyAsync($"**{user.Name}** has successfully purchased **{item.Name}** x**{noOfItems}** for <:unitofmoney:372385317581488128>**{item.Price:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{item.Price * noOfItems:n}**\nNew balance: <:unitofmoney:372385317581488128>**{user.Balance:n}**.");
-                    } else await ReplyAsync(":warning: | You can't afford this!");
-                } else await ReplyAsync(":warning: | This item is not on sale!");
-            } else await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                    } else await ReplyAsync($":warning: | You can't afford this!");
+                } else await ReplyAsync($":warning: | This item is not on sale!");
+            } else await ReplyAsync($":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
         }
 
         [Command("craft")]
-        [Summary("Not implemented yet.")]
-        public async Task CraftCommandAsync()
+        [Summary("Crafts an item out of other items.")]
+        public async Task CraftCommandAsync(string searchTerm)
         {
-            await ReplyAsync("...");
+            await Context.Channel.TriggerTypingAsync();
+            string json;
+            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+            var obj = JObject.Parse(json);
+            var user = Global.GetUser(Context, obj);
+            if (user.Items.ContainsKey(17)) {
+                var requestedItem = Global.GetItem(searchTerm);
+                string json2;
+                using (var recipes = new StreamReader("Resources\\Recipes.json")) json2 = await recipes.ReadToEndAsync();
+                var rawRecipes = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(json2);
+                var formattedId = requestedItem.Id.ToString("000");
+                if (rawRecipes.ContainsKey(formattedId)) {
+                    var correctAmount = true;
+                    foreach (var item in rawRecipes[formattedId]) {
+                        if (user.Items[int.Parse(item.Key)] < item.Value) correctAmount = false;
+                    }
+                    if (correctAmount) {
+                        var embed = new EmbedBuilder()
+                            .WithCurrentTimestamp()
+                            .WithColor(Global.GetColor(Context))
+                            .WithDescription($"**{Context.User.Username}** has successfully crafted a {requestedItem.Name}!")
+                            .WithTitle("Crafting: " + requestedItem.Name);
+                        var output = new StringBuilder();
+                        var currentNetWorth = user.NetWorth;
+                        foreach (var rawItem in rawRecipes[formattedId]) {
+                            var item = Global.GetItem(rawItem.Key);
+                            output.AppendLine($"{item.Name}: {rawItem.Value}");
+                            user.Items[int.Parse(rawItem.Key)] -= rawItem.Value;
+                            user.NetWorth -= item.Price;
+                        }
+                        user.Items[requestedItem.Id] += 1;
+                        user.NetWorth += requestedItem.Price;
+                        embed.AddField("Lost items", output.ToString())
+                            .AddField("Net Worth", $"Old: {Global.UoM}{currentNetWorth}\nNew: {Global.UoM}{user.NetWorth}");
+                        Global.WriteUsers(obj, Context.User, user);
+                        await ReplyAsync(embed: embed.Build());
+                    } else await ReplyAsync($":warning: | **{Context.User.Username}**, you do not have enough items to craft this!");
+                } else await ReplyAsync($":warning: | **{Context.User.Username}**, the item {requestedItem.Name} cannot be crafted!");
+            } else await ReplyAsync($":warning: | **{Context.User.Username}**, you need a Crafting Station to craft items!");
         }
 
         [Command("daily")]
@@ -136,15 +174,26 @@ namespace MarbleBot.Modules {
             if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
             else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
             else {
-                var price = item.Price == -1 ? "N/A: Event" : string.Format("<:unitofmoney:372385317581488128>{0:n}", item.Price);
+                var price = item.Price == -1 ? "N/A" : $"{Global.UoM}{item.Price:n}";
                 var builder = new EmbedBuilder()
                     .WithColor(Global.GetColor(Context))
                     .WithCurrentTimestamp()
                     .WithDescription(item.Description)
                     .WithTitle(item.Name)
-                    .AddField("ID", string.Format("{0:000}", item.Id), true)
+                    .AddField("ID", $"{item.Id:000}", true)
                     .AddField("Price", price, true)
                     .AddField("For Sale", item.OnSale ? "Yes" : "No", true);
+                string json;
+                using (var recipes = new StreamReader("Resources\\Recipes.json")) json = await recipes.ReadToEndAsync();
+                var rawRecipes = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, int>>>(json);
+                var formattedId = item.Id.ToString("000");
+                if (rawRecipes.ContainsKey(formattedId)) {
+                    var output = new StringBuilder();
+                    foreach (var rawItem in rawRecipes[formattedId]) {
+                        output.AppendLine($"{Global.GetItem(rawItem.Key).Name}: {rawItem.Value}");
+                    }
+                    builder.AddField("Crafting Recipe", output.ToString());
+                }
                 await ReplyAsync(embed: builder.Build());
             }
         }
@@ -315,6 +364,14 @@ namespace MarbleBot.Modules {
                 .WithDescription(output.ToString())
                 .WithTitle("All items for sale");
             await ReplyAsync(embed: builder.Build());
+        }
+
+        [Command("use")]
+        [Alias("useitem")]
+        [Summary("Not implemented yet.")]
+        public async Task UseCommandAsync(string searchTerm)
+        {
+            await ReplyAsync("");
         }
     }
 }

@@ -138,14 +138,12 @@ namespace MarbleBot.Modules
                     }
 
                     if (!bCommand.Desc.IsEmpty()) {
-                        var message = new StringBuilder();
+                        builder.WithDescription(bCommand.Desc)
+                            .AddField("Usage", $"`{bCommand.Usage}`")
+                            .WithTitle($"MarbleBot Help: **{bCommand.Name[0].ToString().ToUpper() + string.Concat(bCommand.Name.Skip(1))}**");
 
-                        message.Append(bCommand.Desc + "*\n\nUsage: `" + bCommand.Usage + "`");
-                        if (!bCommand.Example.IsEmpty()) message.Append($"\nExample: `{bCommand.Example}`");
-                        if (!bCommand.Warning.IsEmpty()) message.Append($"\n\n:warning: {bCommand.Warning}");
-
-                        builder.WithDescription(message.ToString())
-                            .WithTitle($"MarbleBot Help: `{bCommand.Name}` command");
+                        if (!bCommand.Example.IsEmpty()) builder.AddField("Example", $"`bCommand.Example`");
+                        if (!bCommand.Warning.IsEmpty()) builder.AddField("Warning", $":warning: {bCommand.Warning}");
 
                         await ReplyAsync(embed: builder.Build());
                     } else await ReplyAsync("Could not find requested command!");

@@ -10,15 +10,5 @@ namespace MarbleBot.BaseClasses
         public string Usage;
         public string Example;
         public string Warning;
-        public string Group;
-
-        /*public MBCommand(CommandInfo info, UsageAttribute usage, string warning) {
-            Name = info.Name;
-            Desc = info.Summary;
-            Usage = usage.Usage;
-            Example = usage.Example;
-            Warning = warning;
-            Group = info.Module.Group;
-        }*/
     }
 }
