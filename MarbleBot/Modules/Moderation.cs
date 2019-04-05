@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MarbleBot.Modules
 {   
     /// <summary> Moderation commands. </summary>
-    public class Moderation : ModuleBase<SocketCommandContext>
+    public class Moderation : MarbleBotModule
     {
         [Command("clear")]
         [Summary("Deletes the specified amount of messages.")]
@@ -34,14 +34,14 @@ namespace MarbleBot.Modules
             var channel = ulong.Parse(rchannel);
             var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
             var srvr = new EmbedAuthorBuilder();
-            if (server == Global.THS){
-                var THS = Context.Client.GetGuild(Global.THS);
-                srvr.WithName(THS.Name);
-                srvr.WithIconUrl(THS.IconUrl);
-            } else if (server == Global.CM) {
-                var CM = Context.Client.GetGuild(Global.CM);
-                srvr.WithName(CM.Name);
-                srvr.WithIconUrl(CM.IconUrl);
+            if (server == THS){
+                var _THS = Context.Client.GetGuild(THS);
+                srvr.WithName(_THS.Name);
+                srvr.WithIconUrl(_THS.IconUrl);
+            } else if (server == CM) {
+                var _CM = Context.Client.GetGuild(CM);
+                srvr.WithName(_CM.Name);
+                srvr.WithIconUrl(_CM.IconUrl);
             }
             var builder = new EmbedBuilder()
                 .WithAuthor(srvr)
@@ -58,11 +58,11 @@ namespace MarbleBot.Modules
                     await msg.DeleteAsync();
                 }
             }
-            if (server == Global.THS)  {
-                var logs = Context.Client.GetGuild(Global.THS).GetTextChannel(327132239257272327);
+            if (server == THS)  {
+                var logs = Context.Client.GetGuild(THS).GetTextChannel(327132239257272327);
                 await logs.SendMessageAsync("", false, builder.Build());
-            } else if (server == Global.CM) {
-                var logs = Context.Client.GetGuild(Global.CM).GetTextChannel(387306347936350213);
+            } else if (server == CM) {
+                var logs = Context.Client.GetGuild(CM).GetTextChannel(387306347936350213);
                 await logs.SendMessageAsync("", false, builder.Build());
             }
         }

@@ -16,6 +16,7 @@ namespace MarbleBot.BaseClasses
         public uint SiegeWins { get; set; } = 0u;
         public DateTime LastDaily { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public DateTime LastRaceWin { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
+        public DateTime LastScavenge { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public DateTime LastSiegeWin { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public Dictionary<int, int> Items { get; set; } = new Dictionary<int, int>();
     }

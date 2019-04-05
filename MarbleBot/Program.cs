@@ -57,7 +57,7 @@ namespace MarbleBot
                 using (var stream = new StreamReader("MBK2.txt")) Global.GDKey = stream.ReadLine();
             }
 
-            using (var ar = new StreamReader("Autoresponses.txt")) {
+            using (var ar = new StreamReader("Resources\\Autoresponses.txt")) {
                 while (!ar.EndOfStream) {
                     var arar = ar.ReadLine().Split(';');
                     Global.Autoresponses.Add(arar[0], arar[1]);

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace MarbleBot.Modules
 {
     /// <summary> Utility commands. </summary>
-    public class Utility : ModuleBase<SocketCommandContext>
+    public class Utility : MarbleBotModule
     {
         [Command("help")]
         [Alias("cmds")]
@@ -22,7 +22,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var builder = new EmbedBuilder()
                 .WithCurrentTimestamp()
-                .WithColor(Global.GetColor(Context));
+                .WithColor(GetColor(Context));
             switch (command.ToLower()) {
                 case "":
                     builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube")
@@ -34,7 +34,7 @@ namespace MarbleBot.Modules
                     var allCmds = new StringBuilder();
                     var commands = Global.CommandService.Commands.Where(c => c.Module.Name.ToLower() == command.ToLower());
                     if (!Context.IsPrivate) {
-                        if (Context.Guild.Id == Global.CM) commands = commands.Where(c => c.Remarks != "Not CM");
+                        if (Context.Guild.Id == CM) commands = commands.Where(c => c.Remarks != "Not CM");
                         else commands = commands.Where(c => c.Remarks != "CM Only");
                     } else commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
                     foreach (var cmd in commands) allCmds.AppendLine($"**{cmd.Name}** - {cmd.Summary}");
@@ -56,94 +56,96 @@ namespace MarbleBot.Modules
                         .WithTimestamp(DateTime.UtcNow);
                     if (Context.IsPrivate) {
                         builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                        .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                        .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                         .AddField("Utility Commands", "help (gives command help)\nuptime (shows how long the bot has been running)")
                         .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                        .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)")
+                        .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)")
                         .WithColor(Color.DarkerGrey);
                     } else {
-                        builder.WithColor(Global.GetColor(Context));
+                        builder.WithColor(GetColor(Context));
                         switch (Context.Guild.Id) {
-                            case Global.CM:
+                            case CM:
                                 builder.AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                                     .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
                                     .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                    .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)");
+                                    .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)");
                                 break;
                             default:
                                 builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                                     .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
                                     .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                    .AddField("Games", "\nrace (participate in a marble race)\nsiege (participate in a Marble Siege)");
+                                    .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)");
                                 break;
                         }
                     }
                     await ReplyAsync(embed: builder.Build());
                     break;
                 default:
-                    MBCommand bCommand = new MBCommand();
+                    var hCommand = new HelpCommand();
                     string THSOnly = "This command cannot be used in Community Marble!";
-                    bCommand.Name = command;
+                    hCommand.Name = command;
                     switch (command) {
                         // General
-                        case "7ball": bCommand.Desc = "Predicts an outcome to an event."; bCommand.Usage = "mb/7ball <condition>"; bCommand.Example = "mb/7ball Will I break?"; break;
-                        case "best": bCommand.Desc = "Picks a random user in the server to call the best."; bCommand.Usage = "mb/best"; break;
-                        case "bet": bCommand.Desc = "Bets on a marble to win from a list of up to 100."; bCommand.Usage = "mb/bet [number of marbles]"; bCommand.Example = "mb/bet 30"; break;
-                        case "buyhat": bCommand.Desc = "Picks a random user in the server to call the best."; bCommand.Usage = "mb/buyhat"; bCommand.Warning = THSOnly; break;
-                        case "choose": bCommand.Desc = "Chooses between several choices"; bCommand.Usage = "mb/choose <choice1> | <choice2>"; bCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
-                        case "orange": bCommand.Desc = "Gives a random statement in Orange Language."; bCommand.Usage = "mb/orange"; bCommand.Warning = THSOnly; break;
-                        case "orangeify": bCommand.Desc = "Translates text into Orange Language."; bCommand.Usage = "mb/orangeify <text>"; bCommand.Example = "mb/orangeify Drink Poup Soop!"; bCommand.Warning = THSOnly; break;
-                        case "random": bCommand.Desc = "Gives a random number between user-defined bounds."; bCommand.Usage = "mb/random <number1> <number2>"; bCommand.Example = "mb/random 1 5"; break;
-                        case "rank": bCommand.Desc = "Returns the XP and level of the user."; bCommand.Usage = "mb/rank"; break;
-                        case "rate": bCommand.Desc = "Rates something between 0 and 10."; bCommand.Usage = "mb/rate <text>"; bCommand.Example = "mb/rate Marbles"; break;
-                        case "repeat": bCommand.Desc = "Repeats given text."; bCommand.Usage = "mb/repeat <text>"; bCommand.Example = "mb/repeat Hello!"; break;
-                        case "reverse": bCommand.Desc = "Reverses text."; bCommand.Usage = "mb/reverse <text>"; bCommand.Example = "mb/reverse Bowl"; break;
-                        case "vinhglish": bCommand.Desc = "Displays information about a Vinhglish word."; bCommand.Usage = "mb/vinglish OR mb/vinhglish <word>"; bCommand.Example = "mb/vinhglish Am Will You"; bCommand.Warning = THSOnly; break;
+                        case "7ball": hCommand.Desc = "Predicts an outcome to an event."; hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
+                        case "best": hCommand.Desc = "Picks a random user in the server to call the best."; hCommand.Usage = "mb/best"; break;
+                        case "bet": hCommand.Desc = "Bets on a marble to win from a list of up to 100."; hCommand.Usage = "mb/bet [number of marbles]"; hCommand.Example = "mb/bet 30"; break;
+                        case "buyhat": hCommand.Desc = "Picks a random user in the server to call the best."; hCommand.Usage = "mb/buyhat"; hCommand.Warning = THSOnly; break;
+                        case "choose": hCommand.Desc = "Chooses between several choices"; hCommand.Usage = "mb/choose <choice1> | <choice2>"; hCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
+                        case "orange": hCommand.Desc = "Gives a random statement in Orange Language."; hCommand.Usage = "mb/orange"; hCommand.Warning = THSOnly; break;
+                        case "orangeify": hCommand.Desc = "Translates text into Orange Language."; hCommand.Usage = "mb/orangeify <text>"; hCommand.Example = "mb/orangeify Drink Poup Soop!"; hCommand.Warning = THSOnly; break;
+                        case "random": hCommand.Desc = "Gives a random number between user-defined bounds."; hCommand.Usage = "mb/random <number1> <number2>"; hCommand.Example = "mb/random 1 5"; break;
+                        case "rank": hCommand.Desc = "Returns the XP and level of the user."; hCommand.Usage = "mb/rank"; break;
+                        case "rate": hCommand.Desc = "Rates something between 0 and 10."; hCommand.Usage = "mb/rate <text>"; hCommand.Example = "mb/rate Marbles"; break;
+                        case "repeat": hCommand.Desc = "Repeats given text."; hCommand.Usage = "mb/repeat <text>"; hCommand.Example = "mb/repeat Hello!"; break;
+                        case "reverse": hCommand.Desc = "Reverses text."; hCommand.Usage = "mb/reverse <text>"; hCommand.Example = "mb/reverse Bowl"; break;
+                        case "vinhglish": hCommand.Desc = "Displays information about a Vinhglish word."; hCommand.Usage = "mb/vinglish OR mb/vinhglish <word>"; hCommand.Example = "mb/vinhglish Am Will You"; hCommand.Warning = THSOnly; break;
 
                         // Utility
-                        case "serverinfo": bCommand.Desc = "Displays information about a server."; bCommand.Usage = "mb/serverinfo"; break;
-                        case "staffcheck": bCommand.Desc = "Displays a list of all staff members and their statuses."; bCommand.Usage = "mb/staffcheck"; break;
-                        case "uptime": bCommand.Desc = "Displays how long the bot has been running for."; bCommand.Usage = "mb/uptime"; break;
-                        case "userinfo": bCommand.Desc = "Displays information about a user."; bCommand.Usage = "mb/userinfo <user>"; bCommand.Example = "mb/userinfo MarbleBot"; break;
+                        case "serverinfo": hCommand.Desc = "Displays information about a server."; hCommand.Usage = "mb/serverinfo"; break;
+                        case "staffcheck": hCommand.Desc = "Displays a list of all staff members and their statuses."; hCommand.Usage = "mb/staffcheck"; break;
+                        case "uptime": hCommand.Desc = "Displays how long the bot has been running for."; hCommand.Usage = "mb/uptime"; break;
+                        case "userinfo": hCommand.Desc = "Displays information about a user."; hCommand.Usage = "mb/userinfo <user>"; hCommand.Example = "mb/userinfo MarbleBot"; break;
 
                         // Economy
-                        case "balance": bCommand.Desc = "Returns how much money you or someone else has."; bCommand.Usage = "mb/balance <optional user>"; break;
-                        case "buy": bCommand.Desc = "Buys items."; bCommand.Usage = "mb/buy <item ID> <# of items>"; bCommand.Example = "mb/buy 1 1"; break;
-                        case "daily": bCommand.Desc = "Gives daily Units of Money (200 to the power of your streak minus one). You can only do this every 24 hours."; bCommand.Usage = "mb/balance"; break;
-                        case "item": bCommand.Desc = "Returns information about an item."; bCommand.Usage = "mb/item <item ID>"; break;
-                        case "poupsoop": bCommand.Desc = "Calculates the total price of Poup Soop."; bCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; bCommand.Example = "mb/poupsoop 3 | 1"; break;
-                        case "profile": bCommand.Desc = "Returns the profile of you or someone else."; bCommand.Usage = "mb/profile <optional user>"; break;
-                        case "richlist": bCommand.Desc = "Shows the ten richest people globally by Net Worth."; bCommand.Usage = "mb/richlist"; break;
-                        case "sell": bCommand.Desc = "Sells items."; bCommand.Usage = "mb/sell <item ID> <# of items>"; bCommand.Example = "mb/sell 1 1"; break;
-                        case "shop": bCommand.Desc = "Shows all items available for sale, their IDs and their prices."; bCommand.Usage = "mb/shop"; break;
+                        case "balance": hCommand.Desc = "Returns how much money you or someone else has."; hCommand.Usage = "mb/balance <optional user>"; break;
+                        case "buy": hCommand.Desc = "Buys items."; hCommand.Usage = "mb/buy <item ID> <# of items>"; hCommand.Example = "mb/buy 1 1"; break;
+                        case "craft": hCommand.Desc = "Crafts an item out of other items."; hCommand.Usage = "mb/craft <item ID>"; hCommand.Example = "mb/craft 014"; break;
+                        case "daily": hCommand.Desc = "Gives daily Units of Money (200 to the power of your streak minus one). You can only do this every 24 hours."; hCommand.Usage = "mb/balance"; break;
+                        case "item": hCommand.Desc = "Returns information about an item."; hCommand.Usage = "mb/item <item ID>"; break;
+                        case "poupsoop": hCommand.Desc = "Calculates the total price of Poup Soop."; hCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; hCommand.Example = "mb/poupsoop 3 | 1"; break;
+                        case "profile": hCommand.Desc = "Returns the profile of you or someone else."; hCommand.Usage = "mb/profile <optional user>"; break;
+                        case "richlist": hCommand.Desc = "Shows the ten richest people globally by Net Worth."; hCommand.Usage = "mb/richlist"; break;
+                        case "sell": hCommand.Desc = "Sells items."; hCommand.Usage = "mb/sell <item ID> <# of items>"; hCommand.Example = "mb/sell 1 1"; break;
+                        case "shop": hCommand.Desc = "Shows all items available for sale, their IDs and their prices."; hCommand.Usage = "mb/shop"; break;
 
                         // Roles
-                        case "give": bCommand.Desc = "Gives a role if it is on the role list."; bCommand.Usage = "mb/give <role>"; bCommand.Example = "mb/give Owner"; break;
-                        case "role": bCommand.Desc = "Toggles role list roles."; bCommand.Usage = "mb/role <role>"; bCommand.Example = "mb/role Bots"; break;
-                        case "rolelist": bCommand.Desc = "Shows a list of roles that can be given/taken by `mb/give` and `mb/take`."; bCommand.Usage = "mb/rolelist"; break;
-                        case "take": bCommand.Desc = "Takes a role if it is on the role list."; bCommand.Usage = "mb/take <role>"; bCommand.Example = "mb/take Criminal"; break;
+                        case "give": hCommand.Desc = "Gives a role if it is on the role list."; hCommand.Usage = "mb/give <role>"; hCommand.Example = "mb/give Owner"; break;
+                        case "role": hCommand.Desc = "Toggles role list roles."; hCommand.Usage = "mb/role <role>"; hCommand.Example = "mb/role Bots"; break;
+                        case "rolelist": hCommand.Desc = "Shows a list of roles that can be given/taken by `mb/give` and `mb/take`."; hCommand.Usage = "mb/rolelist"; break;
+                        case "take": hCommand.Desc = "Takes a role if it is on the role list."; hCommand.Usage = "mb/take <role>"; hCommand.Example = "mb/take Criminal"; break;
 
                         // YT
-                        case "cv": bCommand.Desc = "Posts a video in #community-videos."; bCommand.Usage = "mb/cv <video link> <optional description>"; bCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; bCommand.Warning = "This command only works in DMs!"; break;
-                        case "searchchannel": bCommand.Desc = "Displays a list of channels that match the search criteria."; bCommand.Usage = "mb/searchchannel <channelname>"; bCommand.Example = "mb/searchchannel carykh"; break;
-                        case "searchvideo": bCommand.Desc = "Displays a list of videos that match the search critera."; bCommand.Usage = "mb/searchvideo <videoname>"; bCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
+                        case "cv": hCommand.Desc = "Posts a video in #community-videos."; hCommand.Usage = "mb/cv <video link> <optional description>"; hCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; hCommand.Warning = "This command only works in DMs!"; break;
+                        case "searchchannel": hCommand.Desc = "Displays a list of channels that match the search criteria."; hCommand.Usage = "mb/searchchannel <channelname>"; hCommand.Example = "mb/searchchannel carykh"; break;
+                        case "searchvideo": hCommand.Desc = "Displays a list of videos that match the search critera."; hCommand.Usage = "mb/searchvideo <videoname>"; hCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
 
                         // Games
-                        case "race": bCommand.Desc = "Participate in a marble race!"; bCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
-                        case "siege": bCommand.Desc = "Participate in a Marble Siege boss battle!"; bCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege bosslist, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
+                        case "race": hCommand.Desc = "Participate in a marble race!"; hCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
+                        case "scavenge": hCommand.Desc = "Scavenge for items!"; hCommand.Usage = "mb/scavenge locations, mb/scavenge <location name>, mb/scavenge <grab>, mb/scavenge <sell>"; break;
+                        case "siege": hCommand.Desc = "Participate in a Marble Siege boss battle!"; hCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege bosslist, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
                     }
 
-                    if (!bCommand.Desc.IsEmpty()) {
-                        builder.WithDescription(bCommand.Desc)
-                            .AddField("Usage", $"`{bCommand.Usage}`")
-                            .WithTitle($"MarbleBot Help: **{bCommand.Name[0].ToString().ToUpper() + string.Concat(bCommand.Name.Skip(1))}**");
+                    if (!hCommand.Desc.IsEmpty()) {
+                        builder.WithDescription(hCommand.Desc)
+                            .AddField("Usage", $"`{hCommand.Usage}`")
+                            .WithTitle($"MarbleBot Help: **{hCommand.Name[0].ToString().ToUpper() + string.Concat(hCommand.Name.Skip(1))}**");
 
-                        if (!bCommand.Example.IsEmpty()) builder.AddField("Example", $"`bCommand.Example`");
-                        if (!bCommand.Warning.IsEmpty()) builder.AddField("Warning", $":warning: {bCommand.Warning}");
+                        if (!hCommand.Example.IsEmpty()) builder.AddField("Example", $"`{hCommand.Example}`");
+                        if (!hCommand.Warning.IsEmpty()) builder.AddField("Warning", $":warning: {hCommand.Warning}");
 
                         await ReplyAsync(embed: builder.Build());
                     } else await ReplyAsync("Could not find requested command!");
@@ -177,7 +179,7 @@ namespace MarbleBot.Modules
                     .AddField("Bots", botUsers, true)
                     .AddField("Online", onlineUsers)
                     .AddField("Roles", Context.Guild.Roles.Count, true)
-                    .WithColor(Global.GetColor(Context))
+                    .WithColor(GetColor(Context))
                     .WithTimestamp(DateTime.UtcNow)
                     .WithFooter(Context.Guild.Id.ToString());
                 await ReplyAsync(embed: builder.Build());
@@ -192,7 +194,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             if (!Context.IsPrivate) {
                 IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                if (Context.Guild.Id == Global.CM) {
+                if (Context.Guild.Id == CM) {
                     IGuildUser Erikfassett = Context.Guild.GetUser(161258738429329408);
                     IGuildUser JohnDubuc = Context.Guild.GetUser(161247044713840642);
                     IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
@@ -219,7 +221,7 @@ namespace MarbleBot.Modules
                     output.Append("\n\n**__Mods:__** \n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**");
                     output.Append("**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**");
                     await ReplyAsync(output.ToString());
-                } else if (Context.Guild.Id == Global.THS) {
+                } else if (Context.Guild.Id == THS) {
                     IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
                     IGuildUser DannyPlayz = Context.Guild.GetUser(329532528031563777);
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
@@ -244,7 +246,7 @@ namespace MarbleBot.Modules
                     output.Append($"**\n{nicks[3]} ({users[3].Username}#{users[3].Discriminator}): **{statuses[3]}**");
                     output.Append($"**\n{nicks[4]} ({users[4].Username}#{users[4].Discriminator}): **{statuses[4]}**");
                     await ReplyAsync(output.ToString());
-                } else if (Context.Guild.Id == Global.MT) {
+                } else if (Context.Guild.Id == MT) {
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                     IGuildUser[] users = { Doc671, George012 };
                     string[] nicks = { users[0].Nickname, users[1].Nickname, };
@@ -254,7 +256,7 @@ namespace MarbleBot.Modules
                         if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
                     }
                     await ReplyAsync(nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
-                } else if (Context.Guild.Id == Global.VFC) {
+                } else if (Context.Guild.Id == VFC) {
                     IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
                     IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
@@ -293,7 +295,7 @@ namespace MarbleBot.Modules
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommandAsync() {
             var timeDiff = DateTime.UtcNow.Subtract(Global.StartTime);
-            await ReplyAsync("The bot has been running for **" + Global.GetDateString(timeDiff) + "**.");
+            await ReplyAsync("The bot has been running for **" + GetDateString(timeDiff) + "**.");
         }
 
         [Command("userinfo")]
@@ -350,7 +352,7 @@ namespace MarbleBot.Modules
                         .AddField("Registered", user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"), true)
                         .AddField("Joined", ((DateTimeOffset)user.JoinedAt).ToString("yyyy-MM-dd HH:mm:ss"), true)
                         .AddField("Roles", roles.ToString(), true)
-                        .WithColor(Global.GetColor(Context))
+                        .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
                         .WithFooter("All times in UTC, all dates YYYY-MM-DD.");
 

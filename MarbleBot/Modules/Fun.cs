@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace MarbleBot.Modules
 {
     /// <summary> Fun non-game commands. </summary>
-    public class Fun : ModuleBase<SocketCommandContext>
+    public class Fun : MarbleBotModule
     {
         [Command("7ball")]
         [Summary("Predicts an outcome of a user-defined event.")]
@@ -48,7 +48,7 @@ namespace MarbleBot.Modules
                 case "time": await ReplyAsync(string.Format("Last Use: {0}\nCurrent Time: {1}", Global.ARLastUse.ToString(), DateTime.UtcNow.ToString())); break;
                 case "update": {
                     Global.Autoresponses = new Dictionary<string, string>();
-                    using (var ar = new StreamReader("Autoresponses.txt")) {
+                    using (var ar = new StreamReader("Resources\\Autoresponses.txt")) {
                         while (!ar.EndOfStream) {
                             var arar = ar.ReadLine().Split(';');
                             Global.Autoresponses.Add(arar[0], arar[1]);
@@ -87,7 +87,7 @@ namespace MarbleBot.Modules
             if (noOfMarbles > 100) await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
             else if (noOfMarbles < 1) await ReplyAsync("The number you gave is too small.");
             string[,] marbles = new string[10, 10];
-            using (StreamReader stream = new StreamReader("Marbles.csv")) {
+            using (StreamReader stream = new StreamReader("Resources\\Marbles.csv")) {
                 int a = 0;
                 while (!stream.EndOfStream) {
                     string[] row = stream.ReadLine().Split(',');
@@ -108,7 +108,7 @@ namespace MarbleBot.Modules
         [Remarks("Not CM")]
         public async Task BuyHatCommandAsync()
         {
-            if (Context.Guild.Id != Global.CM) {
+            if (Context.Guild.Id != CM) {
                 await Context.Channel.TriggerTypingAsync();
                 var price = Global.Rand.Next(0, int.MaxValue);
                 var hatNo = Global.Rand.Next(0, 69042);
@@ -150,7 +150,7 @@ namespace MarbleBot.Modules
                 case 5: egnaro = "!haoW"; break;
                 case 6: egnaro = "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"; break;
             }
-            if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) await ReplyAsync(egnaro);
+            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC) await ReplyAsync(egnaro);
         }
 
         [Command("orangeify")]
@@ -165,7 +165,7 @@ namespace MarbleBot.Modules
                 orangeified += input[length];
                 length--;
             }
-            if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC) {
+            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC) {
                 if (Moderation.CheckSwear(input) || Moderation.CheckSwear(orangeified)) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
@@ -287,7 +287,7 @@ namespace MarbleBot.Modules
 
             builder.AddField("Level", level, true)
                 .AddField("Total XP", xp, true)
-                .WithColor(Global.GetColor(Context))
+                .WithColor(GetColor(Context))
                 .WithTimestamp(DateTime.UtcNow)
                 .WithAuthor(Context.User)
                 .WithFooter(flavour);
@@ -431,7 +431,7 @@ namespace MarbleBot.Modules
         public async Task RepeatCommandAsync([Remainder] string repeat)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (repeat == "Am Melmon" && (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT)) {
+            if (repeat == "Am Melmon" && (Context.Guild.Id == THS || Context.Guild.Id == MT)) {
                 await ReplyAsync("No U");
             } else if (Moderation.CheckSwear(repeat)) {
                 if (Context.IsPrivate) {
@@ -489,7 +489,7 @@ namespace MarbleBot.Modules
             string[] descList = new string[100];
             int a = 0;
             if (word == "") {
-                using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
+                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv")) {
                     while (!stream.EndOfStream) {
                         string list = stream.ReadLine();
                         string[] vocab = list.Split(',');
@@ -501,7 +501,7 @@ namespace MarbleBot.Modules
                 }
                 randNo = Global.Rand.Next(1, a);
             } else {
-                using (StreamReader stream = new StreamReader("Vinhglish.csv")) {
+                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv")) {
                     while (!stream.EndOfStream) {
                         string list = stream.ReadLine();
                         string[] vocab = list.Split(',');
@@ -520,7 +520,7 @@ namespace MarbleBot.Modules
                     if (!wordSet) randNo = Global.Rand.Next(1, a);
                 }
             }
-            if (Context.IsPrivate || Context.Guild.Id == Global.THS || Context.Guild.Id == Global.MT || Context.Guild.Id == Global.VFC)
+            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC)
                 await ReplyAsync("**__" + wordList[randNo] + "__**\nInventor: " + invList[randNo] + "\nDescription: " + descList[randNo]);
         }
     }

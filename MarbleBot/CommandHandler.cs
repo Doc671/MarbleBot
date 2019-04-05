@@ -49,7 +49,7 @@ namespace MarbleBot
                 var msgs = await Context.Channel.GetMessagesAsync().FlattenAsync();
                 foreach (var mesg in msgs) if (mesg.Content.ToLower().Contains("no your")) await Context.Channel.SendMessageAsync(":warning: A No Your has been detected in the past 100 messages! The No U has been nullified!");
 
-            } else if (!(IsLett) && Context.Channel.Id != 252481530130202624 && (Context.Guild.Id == Global.THS || Context.Guild.Id == Global.CM)) {
+            } else if (!(IsLett) && Context.Channel.Id != 252481530130202624 && (Context.Guild.Id == 224277738608001024 || Context.Guild.Id == 223616088263491595)) {
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithAuthor(Context.User)
                     .WithDescription(string.Format("**Message sent by {0} deleted in {1}**\n{2}", Context.User.Mention, "<#" + Context.Channel.Id + ">", Context.Message.Content))
@@ -57,10 +57,10 @@ namespace MarbleBot
                     .WithColor(Color.Red)
                     .WithFooter("ID: " + Context.User.Id)
                     .WithCurrentTimestamp();
-                if (Context.Guild.Id == Global.THS) {
+                if (Context.Guild.Id == 224277738608001024) {
                     var logs = Context.Guild.GetTextChannel(327132239257272327);
                     await logs.SendMessageAsync("", false, builder.Build());
-                } else if (Context.Guild.Id == Global.CM) {
+                } else if (Context.Guild.Id == 223616088263491595) {
                     var logs = Context.Guild.GetTextChannel(387306347936350213);
                     await logs.SendMessageAsync("", false, builder.Build());
                 }

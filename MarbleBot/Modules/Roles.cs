@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MarbleBot.Modules
 {        
     /// <summary> Role-handling commands. </summary>
-    public class Roles : ModuleBase<SocketCommandContext>
+    public class Roles : MarbleBotModule
     {
         [Command("give")]
         [Alias("giverole")]
@@ -22,15 +22,15 @@ namespace MarbleBot.Modules
                 bool roleExists = true;
                 switch (roleName.ToLower())
                 {
-                    case "roleplayer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242052397784891392); break;
-                    case "spammer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(315212474909720577); break;
-                    case "dead": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242048058580402177); break;
-                    case "archivist": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(339782998742532098); break;
-                    case "gamer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(330036318895734786); break;
-                    case "algodoodlers": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(353958723548610561); break;
-                    case "bot commander": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242048341247000577); break;
-                    case "spoiler": if (Context.Guild.Id == Global.CM) role = Context.Guild.GetRole(422479447686643712); break;
-                    case "spoilers": if (Context.Guild.Id == Global.CM) role = Context.Guild.GetRole(422479447686643712); break;
+                    case "roleplayer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242052397784891392); break;
+                    case "spammer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(315212474909720577); break;
+                    case "dead": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242048058580402177); break;
+                    case "archivist": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(339782998742532098); break;
+                    case "gamer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(330036318895734786); break;
+                    case "algodoodlers": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(353958723548610561); break;
+                    case "bot commander": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242048341247000577); break;
+                    case "spoiler": if (Context.Guild.Id == CM) role = Context.Guild.GetRole(422479447686643712); break;
+                    case "spoilers": if (Context.Guild.Id == CM) role = Context.Guild.GetRole(422479447686643712); break;
                     default: roleExists = false; break;
                 };
                 if (roleExists)
@@ -55,15 +55,15 @@ namespace MarbleBot.Modules
                 bool roleExists = true;
                 switch (roleName.ToLower())
                 {
-                    case "roleplayer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242052397784891392); break;
-                    case "spammer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(315212474909720577); break;
-                    case "dead": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242048058580402177); break;
-                    case "archivist": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(339782998742532098); break;
-                    case "gamer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(330036318895734786); break;
-                    case "algodoodlers": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(353958723548610561); break;
-                    case "bot commander": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242048341247000577); break;
-                    case "spoiler": if (Context.Guild.Id == Global.CM) role = Context.Guild.GetRole(422479447686643712); break;
-                    case "spoilers": if (Context.Guild.Id == Global.CM) role = Context.Guild.GetRole(422479447686643712); break;
+                    case "roleplayer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242052397784891392); break;
+                    case "spammer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(315212474909720577); break;
+                    case "dead": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242048058580402177); break;
+                    case "archivist": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(339782998742532098); break;
+                    case "gamer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(330036318895734786); break;
+                    case "algodoodlers": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(353958723548610561); break;
+                    case "bot commander": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242048341247000577); break;
+                    case "spoiler": if (Context.Guild.Id == CM) role = Context.Guild.GetRole(422479447686643712); break;
+                    case "spoilers": if (Context.Guild.Id == CM) role = Context.Guild.GetRole(422479447686643712); break;
                     default: roleExists = false; break;
                 };
                 if (roleExists)
@@ -88,15 +88,15 @@ namespace MarbleBot.Modules
                 bool roleExists = true;
                 SocketGuildUser user = Context.Guild.GetUser(Context.User.Id);
                 switch (roleName.ToLower()) {
-                    case "roleplayer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242052397784891392); break;
-                    case "spammer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(315212474909720577); break;
-                    case "dead": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242048058580402177); break;
-                    case "archivist": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(339782998742532098); break;
-                    case "gamer": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(330036318895734786); break;
-                    case "algodoodlers": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(353958723548610561); break;
-                    case "bot commander": if (Context.Guild.Id == Global.THS) role = Context.Guild.GetRole(242048341247000577); break;
-                    case "spoiler": if (Context.Guild.Id == Global.CM) role = Context.Guild.GetRole(422479447686643712); break;
-                    case "spoilers": if (Context.Guild.Id == Global.CM) role = Context.Guild.GetRole(422479447686643712); break;
+                    case "roleplayer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242052397784891392); break;
+                    case "spammer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(315212474909720577); break;
+                    case "dead": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242048058580402177); break;
+                    case "archivist": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(339782998742532098); break;
+                    case "gamer": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(330036318895734786); break;
+                    case "algodoodlers": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(353958723548610561); break;
+                    case "bot commander": if (Context.Guild.Id == THS) role = Context.Guild.GetRole(242048341247000577); break;
+                    case "spoiler": if (Context.Guild.Id == CM) role = Context.Guild.GetRole(422479447686643712); break;
+                    case "spoilers": if (Context.Guild.Id == CM) role = Context.Guild.GetRole(422479447686643712); break;
                     default: roleExists = false; break;
                 };
                 if (roleExists) {
@@ -127,25 +127,25 @@ namespace MarbleBot.Modules
             }
             else {
                 EmbedBuilder builder = new EmbedBuilder();
-                builder.WithColor(Global.GetColor(Context));
+                builder.WithColor(GetColor(Context));
                 switch (Context.Guild.Id) {
-                    case Global.CM:
+                    case CM:
                         builder.AddField("MarbleBot Role List", "Spoilers")
                             .WithTimestamp(DateTime.UtcNow);
                         break;
-                    case Global.THS:
+                    case THS:
                         builder.AddField("MarbleBot Role List", "Roleplayer\nGamer\nSpammer\nArchivist\nDead\nAlgodoodlers\nBot Commander")
                             .WithTimestamp(DateTime.UtcNow);
                         break;
-                    case Global.THSC:
+                    case THSC:
                         builder.AddField("MarbleBot Role List", "There aren't any roles here!")
                            .WithTimestamp(DateTime.UtcNow);
                         break;
-                    case Global.MT:
+                    case MT:
                         builder.AddField("MarbleBot Role List", "There aren't any roles here!")
                            .WithTimestamp(DateTime.UtcNow);
                         break;
-                    case Global.VFC:
+                    case VFC:
                         builder.AddField("MarbleBot Role List", "There aren't any roles here!")
                            .WithTimestamp(DateTime.UtcNow);
                         break;

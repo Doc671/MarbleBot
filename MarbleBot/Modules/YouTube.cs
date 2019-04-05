@@ -13,7 +13,7 @@ using Google.Apis.YouTube.v3.Data;
 namespace MarbleBot.Modules
 {
     /// <summary> YouTube API-related commands. </summary>
-    public class YouTube : ModuleBase<SocketCommandContext>
+    public class YouTube : MarbleBotModule
     {
         [Command("channelinfo")]
         [Summary("[BROKEN] Returns information about a channel.")]
@@ -35,11 +35,11 @@ namespace MarbleBot.Modules
             Color coloure = Color.LightGrey;
             switch (Context.Guild.Id)
             {
-                case Global.CM: coloure = Color.Teal; break;
-                case Global.THS: coloure = Color.Orange; break;
-                case Global.MT: coloure = Color.DarkGrey; break;
-                case Global.VFC: coloure = Color.Blue; break;
-                case Global.THSC: coloure = Color.Orange; break;
+                case CM: coloure = Color.Teal; break;
+                case THS: coloure = Color.Orange; break;
+                case MT: coloure = Color.DarkGrey; break;
+                case VFC: coloure = Color.Blue; break;
+                case THSC: coloure = Color.Orange; break;
             }
 
             builder.WithTitle(display.Snippet.Title)
@@ -65,7 +65,7 @@ namespace MarbleBot.Modules
             {
                 var validUser = false;
                 var channelLink = "";
-                using (var CVID = new StreamReader("CVID.csv")) {
+                using (var CVID = new StreamReader("Resources\\CVID.csv")) {
                     while (!CVID.EndOfStream) {
                         var person = (await CVID.ReadLineAsync()).Split(',');
                         if (Context.User.Id == Convert.ToUInt64(person[0])) {
@@ -103,7 +103,7 @@ namespace MarbleBot.Modules
                         } else {
                             if (desc.Length > 200) await ReplyAsync("Your description length is too long!");
                             else {
-                                var CV = (IMessageChannel)Context.Client.GetGuild(Global.CM).GetChannel(442474624417005589);
+                                var CV = (IMessageChannel)Context.Client.GetGuild(CM).GetChannel(442474624417005589);
                                 var msgs = await CV.GetMessagesAsync(100).FlattenAsync();
                                 var already = false;
                                 foreach (var msg in msgs) {

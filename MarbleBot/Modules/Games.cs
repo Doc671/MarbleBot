@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace MarbleBot.Modules
 {
     /// <summary> Game commands. </summary>
-    public class Games : ModuleBase<SocketCommandContext>
+    public class Games : MarbleBotModule
     {
         [Command("race")]
         [Summary("Participate in a marble race!")]
@@ -21,7 +21,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             ulong fileID = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
             EmbedBuilder builder = new EmbedBuilder()
-                .WithColor(Global.GetColor(Context))
+                .WithColor(GetColor(Context))
                 .WithCurrentTimestamp();
 
             switch (command.ToLower()) {
@@ -107,7 +107,7 @@ namespace MarbleBot.Modules
                             var mName = marbles[eliminated].Item1.ToLower();
                             if (deathmsg.Contains("was") && (mName.Contains("you ") || mName.Contains("we ") || mName.Contains("they ")))
                                 deathmsg = "were " + string.Concat(deathmsg.Skip(4));
-                            builder.AddField("**" + marbles[eliminated].Item1 + "** is eliminated!", marbles[eliminated].Item1 + " " + deathmsg + " and is now out of the competition!");
+                            builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathmsg} and is now out of the competition!");
                             marbles[eliminated] = Tuple.Create("///out", marbles[eliminated].Item2);
                             alive--;
                             await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
@@ -135,7 +135,7 @@ namespace MarbleBot.Modules
                         string json;
                         using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                         var obj = JObject.Parse(json);
-                        var user = Global.GetUser(Context, obj, winnerID);
+                        var user = GetUser(Context, obj, winnerID);
                         if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6) {
                             var noOfSameUser = 0;
                             foreach (var marble in marbles) if (marble.Item2 == winnerID) noOfSameUser++;
@@ -147,7 +147,7 @@ namespace MarbleBot.Modules
                                 user.RaceWins++;
                                 obj.Remove(winnerID.ToString());
                                 obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(user)));
-                                Global.WriteUsers(obj);
+                                WriteUsers(obj);
                                 await ReplyAsync($"**{user.Name}** won <:unitofmoney:372385317581488128>**{gift:n}** for winning the race!");
                             }
                         }
@@ -257,10 +257,10 @@ namespace MarbleBot.Modules
                     break;
                 }
                 case "checkearn": {
-                    var User = Global.GetUser(Context);
+                    var User = GetUser(Context);
                     var nextDaily = DateTime.UtcNow.Subtract(User.LastRaceWin);
                     var output = "";
-                    if (nextDaily.TotalHours < 6) output = $"You can earn money from racing in **{Global.GetDateString(User.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!";
+                    if (nextDaily.TotalHours < 6) output = $"You can earn money from racing in **{GetDateString(User.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!";
                     else output = "You can earn money from racing now!";
                     builder.WithAuthor(Context.User)
                         .WithDescription(output);
@@ -298,12 +298,122 @@ namespace MarbleBot.Modules
                     break;
                 }
                 default: {
-                    builder.AddField("How to play", "Use `mb/race signup <marble name>` to sign up as a marble!\nWhen everyone's done, use `mb/race start`! This happens automatically if 10 people have signed up.\n\nCheck who's participating with `mb/race contestants`!\n\nYou can earn Units of Money if you win! (6 hour cooldown)")
+                    builder.AddField("How to play", 
+                        "Use `mb/race signup <marble name>` to sign up as a marble!\nWhen everyone's done, use `mb/race start`! This happens automatically if 10 people have signed up.\n\nCheck who's participating with `mb/race contestants`!\n\nYou can earn Units of Money if you win! (6 hour cooldown)")
                         .WithTitle("Marble Race!");
                     await ReplyAsync(embed: builder.Build());
                     break;
                 }
             }
+        }
+
+        [Command("scavenge")]
+        [Summary("Scavenge for items!")]
+        public async Task ScavengeCommandAsync([Remainder] string command = "")
+        {
+            await Context.Channel.TriggerTypingAsync();
+            var embed = new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp();
+            string location;
+
+            string json;
+            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+            var obj = JObject.Parse(json);
+            var user = GetUser(Context, obj);
+
+            switch (command.ToLower().Trim()) {
+                case "canary beach":
+                    if (DateTime.UtcNow.Subtract(user.LastScavenge).TotalHours < 6) {
+                        var sixHoursAgo = DateTime.UtcNow.AddHours(-6);
+                        await ReplyAsync($"You need to wait for **{GetDateString(user.LastScavenge.Subtract(sixHoursAgo))}**");
+                    } else {
+                        user.LastScavenge = DateTime.UtcNow;
+                        WriteUsers(obj, Context.User, user);
+                        location = "Canary Beach";
+                        Global.ScavengeInfo.Add(Context.User.Id, new Queue<Item>());
+                        Global.ScavengeSessions.Add(Task.Run(async () => { await ScavengeSession(Context, location); }));
+                        embed.WithDescription($"**{Context.User.Username}** has begun scavenging in {location}!")
+                            .WithTitle("Item Scavenge Begin!");
+                        await ReplyAsync(embed: embed.Build());
+                    }
+                    break;
+                case "grab":
+                    if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) {
+                        if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to scavenge!");
+                        else {
+                            var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
+                            if (user.Items != null) {
+                                if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
+                                else user.Items.Add(item.Id, 1);
+                            } else {
+                                user.Items = new Dictionary<int, int> {
+                                    { item.Id, 1 }
+                                };
+                            }
+                            user.NetWorth += item.Price;
+                            WriteUsers(obj, Context.User, user);
+                            await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
+                        }
+                    } else await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
+                    break;
+                case "locations":
+                    embed.WithDescription("Canary Beach\n\nMore coming eventually!")
+                        .WithTitle("Scavenge Locations");
+                    await ReplyAsync(embed: embed.Build());
+                    break;
+                case "sell":
+                    if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) {
+                        if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to scavenge!");
+                        else {
+                            var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
+                            user.Balance += item.Price;
+                            user.NetWorth += item.Price;
+                            WriteUsers(obj, Context.User, user);
+                            await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {Global.UoM}**{item.Price}**!");
+                        }
+                    } else await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
+                    break;
+                default:
+                    var helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
+                    var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
+                    var helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
+                    embed.AddField("How to play", helpP1 + helpP2 + helpP3)
+                        .WithTitle("Item Scavenge!");
+                    await ReplyAsync(embed: embed.Build());
+                    break;
+            }
+        }
+
+        public async Task ScavengeSession(SocketCommandContext context, string location)
+        {
+            var startTime = DateTime.UtcNow;
+            do {
+                await Task.Delay(8000);
+                if (Global.Rand.Next(0, 5) < 4) {
+                    var collectableItems = new List<Item>();
+                    using (var items = new StreamReader("Resources\\ShopItems.csv")) {
+                        while (!items.EndOfStream){
+                            var properties = items.ReadLine().Split(',');
+                            var collectable = bool.Parse(properties[5]);
+                            if (collectable) {
+                                collectableItems.Add(new Item() {
+                                    Id = properties[0].ToInt(),
+                                    Name = properties[1],
+                                    Price = properties[2].ToLower().Contains("unsellable") ? -1 : properties[2].ToDecimal(),
+                                    Description = properties[3],
+                                    OnSale = bool.Parse(properties[4]),
+                                    DiveCollectable = collectable
+                                });
+                            }
+                        }
+                    }
+                    var item = collectableItems[Global.Rand.Next(0, collectableItems.Count - 1)];
+                    Global.ScavengeInfo[Context.User.Id].Enqueue(item);
+                    await ReplyAsync($"**{context.User.Username}**, you have found {item.Name} x**1**! Use `mb/scavenge grab` to keep it or `mb/scavenge sell` to sell it.");
+                }
+            } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60));
+            await ReplyAsync("The scavenge session is over!");
         }
 
         [Command("siege")]
@@ -313,7 +423,7 @@ namespace MarbleBot.Modules
             ulong fileID = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
             bool IsBetween(int no, int lower, int upper) { return lower <= no && no <= upper; }
             EmbedBuilder builder = new EmbedBuilder()
-                .WithColor(Global.GetColor(Context))
+                .WithColor(GetColor(Context))
                 .WithCurrentTimestamp();
 
             switch (command.ToLower()) {
@@ -458,7 +568,7 @@ namespace MarbleBot.Modules
                         var pings = new StringBuilder();
                         foreach (var marble in Global.SiegeInfo[fileID].Marbles) {
                             marbles.AppendLine($"**{marble.Name}** [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
-                            if (Global.GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
+                            if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
                         }
                         builder.WithTitle("The Siege has begun!")
                             .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
@@ -516,7 +626,7 @@ namespace MarbleBot.Modules
                                     builder.WithTitle(title)
                                         .WithThumbnailUrl(url)
                                         .WithDescription(string.Format("**{0}** dealt **{1}** damage to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, dmg, Global.SiegeInfo[fileID].Boss.Name))
-                                        .AddField("Boss HP", "**" + Global.SiegeInfo[fileID].Boss.HP + "**/" + Global.SiegeInfo[fileID].Boss.MaxHP);
+                                        .AddField("Boss HP", "**" + Global.SiegeInfo[fileID].Boss.HP + "**" + Global.SiegeInfo[fileID].Boss.MaxHP);
                                     await ReplyAsync(embed: builder.Build());
                                     if (clone && marble.Name[marble.Name.Length - 1] != 's') await ReplyAsync($"{marble.Name}'s clones disappeared!");
                                     else if (clone) await ReplyAsync($"{marble.Name}' clones disappeared!");
@@ -598,10 +708,10 @@ namespace MarbleBot.Modules
                     break;
                 }
                 case "checkearn": {
-                    var User = Global.GetUser(Context);
+                    var User = GetUser(Context);
                     var nextDaily = DateTime.UtcNow.Subtract(User.LastSiegeWin);
                     var output = "";
-                    if (nextDaily.TotalHours < 6) output = string.Format("You can earn money from Sieges in **{0}**!", Global.GetDateString(User.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6))));
+                    if (nextDaily.TotalHours < 6) output = string.Format("You can earn money from Sieges in **{0}**!", GetDateString(User.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6))));
                     else output = "You can earn money from Sieges now!";
                     builder.WithAuthor(Context.User)
                         .WithDescription(output);
@@ -839,7 +949,7 @@ namespace MarbleBot.Modules
                     string json;
                     using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                     var obj = JObject.Parse(json);
-                    var user = Global.GetUser(Context, obj);
+                    var user = GetUser(Context, obj);
                     switch (option) {
                         case "on": user.SiegePing = true; break;
                         case "off": user.SiegePing = false; break;
@@ -847,7 +957,7 @@ namespace MarbleBot.Modules
                     }
                     obj.Remove(Context.User.Id.ToString());
                     obj.Add(new JProperty(Context.User.Id.ToString(), JObject.FromObject(user)));
-                    Global.WriteUsers(obj);
+                    WriteUsers(obj);
                     if (user.SiegePing) await ReplyAsync($"**{Context.User.Username}**, you will now be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn off)");
                     else await ReplyAsync($"**{Context.User.Username}**, you will no longer be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn on)");
                     break;
@@ -868,14 +978,14 @@ namespace MarbleBot.Modules
 
         // Separate task dealing with time-based boss responses
         public async Task SiegeBossActionsAsync(ulong Id) {
-            var StartTime = DateTime.UtcNow;
+            var startTime = DateTime.UtcNow;
             var timeout = false;
             do {
                 await Task.Delay(15000);
                 if (Global.SiegeInfo[Id].Boss.HP < 1) {
                     await SiegeVictoryAsync(Id);
                     break;
-                } else if (DateTime.UtcNow.Subtract(StartTime).TotalMinutes >= 10) {
+                } else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10) {
                     timeout = true;
                     break;
                 } else {
@@ -883,7 +993,7 @@ namespace MarbleBot.Modules
                     var rand = Global.Rand.Next(0, Global.SiegeInfo[Id].Boss.Attacks.Length);
                     var atk = Global.SiegeInfo[Id].Boss.Attacks[rand];
                     var builder = new EmbedBuilder()
-                        .WithColor(Global.GetColor(Context))
+                        .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
                         .WithDescription($"**{Global.SiegeInfo[Id].Boss.Name}** used **{atk.Name}**!")
                         .WithThumbnailUrl(Global.SiegeInfo[Id].Boss.ImageUrl)
@@ -963,7 +1073,7 @@ namespace MarbleBot.Modules
                             marbles.AppendLine($"**{marble.Name}** (DMG: **{marble.BossHits}**, PU Hits: **{marble.PUHits}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
                         }
                         builder = new EmbedBuilder()
-                            .WithColor(Global.GetColor(Context))
+                            .WithColor(GetColor(Context))
                             .WithCurrentTimestamp()
                             .WithDescription($"All the marbles died!\n**{Global.SiegeInfo[Id].Boss.Name}** won!\nFinal HP: **{Global.SiegeInfo[Id].Boss.HP}**/{Global.SiegeInfo[Id].Boss.MaxHP}")
                             .AddField($"Fallen Marbles: **{Global.SiegeInfo[Id].Marbles.Count}**", marbles.ToString())
@@ -980,7 +1090,7 @@ namespace MarbleBot.Modules
                             case 0: {
                                 Global.SiegeInfo[Id].SetPowerUp("Morale Boost");
                                 builder = new EmbedBuilder()
-                                    .WithColor(Global.GetColor(Context))
+                                    .WithColor(GetColor(Context))
                                     .WithCurrentTimestamp()
                                     .WithDescription("A **Morale Boost** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                     .WithThumbnailUrl(Global.SiegeInfo[Id].PUImageUrl)
@@ -991,7 +1101,7 @@ namespace MarbleBot.Modules
                             case 1: {
                                 Global.SiegeInfo[Id].SetPowerUp("Clone");
                                 builder = new EmbedBuilder()
-                                    .WithColor(Global.GetColor(Context))
+                                    .WithColor(GetColor(Context))
                                     .WithCurrentTimestamp()
                                     .WithDescription("A **Clone** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                     .WithThumbnailUrl(Global.SiegeInfo[Id].PUImageUrl)
@@ -1002,7 +1112,7 @@ namespace MarbleBot.Modules
                             case 2: {
                                 Global.SiegeInfo[Id].SetPowerUp("Summon");
                                 builder = new EmbedBuilder()
-                                    .WithColor(Global.GetColor(Context))
+                                    .WithColor(GetColor(Context))
                                     .WithCurrentTimestamp()
                                     .WithDescription("A **Summon** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                     .WithThumbnailUrl(Global.SiegeInfo[Id].PUImageUrl)
@@ -1014,7 +1124,7 @@ namespace MarbleBot.Modules
                                 if (Global.SiegeInfo[Id].Marbles.Any(m => m.StatusEffect != MSE.None)) {
                                     Global.SiegeInfo[Id].SetPowerUp("Cure");
                                     builder = new EmbedBuilder()
-                                        .WithColor(Global.GetColor(Context))
+                                        .WithColor(GetColor(Context))
                                         .WithCurrentTimestamp()
                                         .WithDescription("A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                         .WithThumbnailUrl(Global.SiegeInfo[Id].PUImageUrl)
@@ -1042,7 +1152,7 @@ namespace MarbleBot.Modules
         public async Task SiegeVictoryAsync(ulong Id) {
             var siege = Global.SiegeInfo[Id];
             var builder = new EmbedBuilder()
-                .WithColor(Global.GetColor(Context))
+                .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithTitle("Siege Victory!")
                 .WithDescription($"**{siege.Boss.Name}** has been defeated!");
@@ -1051,7 +1161,7 @@ namespace MarbleBot.Modules
                 string json;
                 using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                 var obj = JObject.Parse(json);
-                var user = Global.GetUser(Context, obj, marble.Id);
+                var user = GetUser(Context, obj, marble.Id);
                 int earnings = marble.BossHits + (marble.PUHits * 50);
                 if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6) {
                     var output = new StringBuilder();
@@ -1079,7 +1189,7 @@ namespace MarbleBot.Modules
                 }
                 obj.Remove(marble.Id.ToString());
                 obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
-                Global.WriteUsers(obj);
+                WriteUsers(obj);
             }
             await ReplyAsync(embed: builder.Build());
             Global.SiegeInfo[Id].Boss.ResetHP();
@@ -1101,12 +1211,5 @@ namespace MarbleBot.Modules
         [Command("powerup")]
         [Summary("Alias for `mb/siege powerup`.")]
         public async Task PowerUpCommandAsync([Remainder] string searchTerm) => await SiegeCommandAsync("powerup", searchTerm);
-
-        [Command("dive")]
-        [Summary("Not implemented yet.")]
-        public async Task DiveCommandAsync()
-        {
-            await ReplyAsync("...");
-        }
     }
 }
