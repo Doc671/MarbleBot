@@ -36,7 +36,7 @@ namespace MarbleBot.Modules
                         name = option;
                     }
                     builder.AddField("Marble Race: Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
-                    using (var racers = new StreamWriter("RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
+                    using (var racers = new StreamWriter("Resources\\RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
                     if (!File.Exists(fileID.ToString() + "race.csv")) File.Create(fileID.ToString() + "race.csv").Close();
                     byte alive = 0;
                     using (var marbleList = new StreamReader(fileID.ToString() + "race.csv", true)) {
@@ -96,7 +96,7 @@ namespace MarbleBot.Modules
                             var deathmsg = "";
                             var msgs = new List<string>();
                             byte msgCount = 0;
-                            using (var msgFile = new StreamReader("racedeathmsgs.txt")) {
+                            using (var msgFile = new StreamReader("Resources\\RaceDeathMessages.txt")) {
                                 while (!msgFile.EndOfStream) {
                                     msgCount++;
                                     msgs.Add(await msgFile.ReadLineAsync());
@@ -123,7 +123,7 @@ namespace MarbleBot.Modules
                                 winnerID = marble.Item2;
                                 builder.AddField("**" + marble.Item1 + "** wins!", marble.Item1 + " is the winner!");
                                 if (id > 1) {
-                                    using (var racers = new StreamWriter("RaceWinners.txt", true)) await racers.WriteLineAsync(marble.Item1);
+                                    using (var racers = new StreamWriter("Resources\\RaceWinners.txt", true)) await racers.WriteLineAsync(marble.Item1);
                                 }
                                 await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                                 await ReplyAsync("**" + marble.Item1 + "** won the race!");
@@ -198,7 +198,7 @@ namespace MarbleBot.Modules
                     switch (option.ToLower()) {
                         case "winners": {
                             var winners = new SortedDictionary<string, int>();
-                            using (var win = new StreamReader("RaceWinners.txt")) {
+                            using (var win = new StreamReader("Resources\\RaceWinners.txt")) {
                                 while (!win.EndOfStream) {
                                     var racerInfo = await win.ReadLineAsync();
                                     if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
@@ -226,7 +226,7 @@ namespace MarbleBot.Modules
                         }
                         case "mostused": {
                             var winners = new SortedDictionary<string, int>();
-                            using (var win = new StreamReader("RaceMostUsed.txt")) {
+                            using (var win = new StreamReader("Resources\\RaceMostUsed.txt")) {
                                 while (!win.EndOfStream) {
                                     var racerInfo = await win.ReadLineAsync();
                                     if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
@@ -326,7 +326,7 @@ namespace MarbleBot.Modules
                 case "canary beach":
                     if (DateTime.UtcNow.Subtract(user.LastScavenge).TotalHours < 6) {
                         var sixHoursAgo = DateTime.UtcNow.AddHours(-6);
-                        await ReplyAsync($"You need to wait for **{GetDateString(user.LastScavenge.Subtract(sixHoursAgo))}**");
+                        await ReplyAsync($"**{Context.User.Username}**, you need to wait for **{GetDateString(user.LastScavenge.Subtract(sixHoursAgo))}** until you can scavenge again.");
                     } else {
                         user.LastScavenge = DateTime.UtcNow;
                         WriteUsers(obj, Context.User, user);
@@ -454,7 +454,7 @@ namespace MarbleBot.Modules
                     option = option.Replace("\n", " ").Replace(",", ";");
                     name = option;
                     builder.AddField("Marble Siege: Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
-                    using (var Siegers = new StreamWriter("SiegeMostUsed.txt", true)) await Siegers.WriteLineAsync(name);
+                    using (var Siegers = new StreamWriter("Resources\\SiegeMostUsed.txt", true)) await Siegers.WriteLineAsync(name);
                     if (name.Contains(',')) {
                         var newName = new char[name.Length];
                         for (int i = 0; i < name.Length - 1; i++) {
@@ -626,7 +626,7 @@ namespace MarbleBot.Modules
                                     builder.WithTitle(title)
                                         .WithThumbnailUrl(url)
                                         .WithDescription(string.Format("**{0}** dealt **{1}** damage to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, dmg, Global.SiegeInfo[fileID].Boss.Name))
-                                        .AddField("Boss HP", "**" + Global.SiegeInfo[fileID].Boss.HP + "**" + Global.SiegeInfo[fileID].Boss.MaxHP);
+                                        .AddField("Boss HP", $"**{Global.SiegeInfo[fileID].Boss.HP}**/{Global.SiegeInfo[fileID].Boss.MaxHP}");
                                     await ReplyAsync(embed: builder.Build());
                                     if (clone && marble.Name[marble.Name.Length - 1] != 's') await ReplyAsync($"{marble.Name}'s clones disappeared!");
                                     else if (clone) await ReplyAsync($"{marble.Name}' clones disappeared!");
@@ -808,7 +808,7 @@ namespace MarbleBot.Modules
                 }
                 case "leaderboard": {
                     var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader("SiegeMostUsed.txt")) {
+                    using (var win = new StreamReader("Resources\\SiegeMostUsed.txt")) {
                         while (!win.EndOfStream) {
                             var racerInfo = await win.ReadLineAsync();
                             if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;

@@ -231,6 +231,10 @@
     <Content Include="Resources\Autoresponses.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\RaceDeathMessages.txt" />
+    <Content Include="Resources\RaceMostUsed.txt" />
+    <Content Include="Resources\RaceWinners.txt" />
+    <Content Include="Resources\SiegeMostUsed.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
