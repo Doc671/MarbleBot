@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
@@ -15,7 +16,7 @@ namespace MarbleBot.Modules
     public class Fun : MarbleBotModule
     {
         [Command("7ball")]
-        [Summary("Predicts an outcome of a user-defined event.")]
+        [Summary("Predicts the outcome to a user-defined event.")]
         public async Task SevenBallCommandAsync([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
@@ -45,7 +46,7 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task AutoresponseCommandAsync(string option) {
             switch (option) {
-                case "time": await ReplyAsync(string.Format("Last Use: {0}\nCurrent Time: {1}", Global.ARLastUse.ToString(), DateTime.UtcNow.ToString())); break;
+                case "time": await ReplyAsync($"Last Use: {Global.ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
                 case "update": {
                     Global.Autoresponses = new Dictionary<string, string>();
                     using (var ar = new StreamReader("Resources\\Autoresponses.txt")) {
@@ -73,7 +74,7 @@ namespace MarbleBot.Modules
                     for (int i = 0; i < Context.Guild.MemberCount - 1; i++) {
                         names[i] = users[i].Username;
                     }
-                    await ReplyAsync("**" + names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)] + "** is the best!");
+                    await ReplyAsync($"**{names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
                 } else Trace.WriteLine("oof");
             } else await ReplyAsync("That command doesn't work here!");
         }
@@ -117,7 +118,7 @@ namespace MarbleBot.Modules
         }
 
         [Command("choose")]
-        [Summary("Chooses between several choices.")]
+        [Summary("Chooses between several provided choices.")]
         public async Task ChooseCommandAsync([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
@@ -126,11 +127,11 @@ namespace MarbleBot.Modules
             if (Moderation.CheckSwear(input) || Moderation.CheckSwear(choices[choice])) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
                 else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
             } else {
-                await ReplyAsync("**" + Context.User.Username + "**, I choose **" + choices[choice].Trim() + "**!");
+                await ReplyAsync($"**{Context.User.Username} **, I choose **{choices[choice].Trim()}**!");
             }
         }
 
@@ -150,7 +151,8 @@ namespace MarbleBot.Modules
                 case 5: egnaro = "!haoW"; break;
                 case 6: egnaro = "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"; break;
             }
-            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC) await ReplyAsync(egnaro);
+            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC)
+                await ReplyAsync(egnaro);
         }
 
         [Command("orangeify")]
@@ -159,20 +161,20 @@ namespace MarbleBot.Modules
         public async Task OrangeifyCommandAsync([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
-            string orangeified = "";
+            var orangeified = new StringBuilder();
             int length = input.Length - 1;
             while (length >= 0) {
-                orangeified += input[length];
+                orangeified.Append(input[length]);
                 length--;
             }
             if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC) {
-                if (Moderation.CheckSwear(input) || Moderation.CheckSwear(orangeified)) {
+                if (Moderation.CheckSwear(input) || Moderation.CheckSwear(orangeified.ToString())) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                        await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                        await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                     } else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
                 } else {
-                    await ReplyAsync(orangeified);
+                    await ReplyAsync(orangeified.ToString());
                 }
             }
         }
@@ -419,7 +421,7 @@ namespace MarbleBot.Modules
                 if (Moderation.CheckSwear(input)) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                        await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                        await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                     } else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
                 }
                 else await ReplyAsync("**" + Context.User.Username + "**, I rate " + input + " **" + rating + "**/10. " + emoji + "\n(" + message + ")");
@@ -436,7 +438,7 @@ namespace MarbleBot.Modules
             } else if (Moderation.CheckSwear(repeat)) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
                 else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {repeat}");
             } else {
@@ -450,19 +452,19 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             // Another version of orangeify, but for CM (can secretly be used elsewhere)
-            string reverse = "";
+            var reverse = new StringBuilder();
             int length = input.Length - 1;
             while (length >= 0) {
-                reverse += input[length];
+                reverse.Append(input[length]);
                 length--;
             }
-            if (Moderation.CheckSwear(input) || Moderation.CheckSwear(reverse)) {
+            if (Moderation.CheckSwear(input) || Moderation.CheckSwear(reverse.ToString())) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync("Profanity detected. " + Doc671.Mention);
+                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 } else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
             } else {
-                await ReplyAsync(reverse);
+                await ReplyAsync(reverse.ToString());
             }
         }
 
@@ -521,7 +523,7 @@ namespace MarbleBot.Modules
                 }
             }
             if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC)
-                await ReplyAsync("**__" + wordList[randNo] + "__**\nInventor: " + invList[randNo] + "\nDescription: " + descList[randNo]);
+                await ReplyAsync($"**__{wordList[randNo]}__**\nInventor: {invList[randNo]}\nDescription: {descList[randNo]}");
         }
     }
 }

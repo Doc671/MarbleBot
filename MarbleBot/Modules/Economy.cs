@@ -26,8 +26,9 @@ namespace MarbleBot.Modules {
                 string json;
                 using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
-                var search = from user in rawUsers where searchTerm.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchTerm.ToLower()) || searchTerm.ToLower().Contains(user.Value.Discriminator) select user;
-                var foundUser = search.FirstOrDefault();
+                var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
+                || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
+                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).FirstOrDefault();
                 id = ulong.Parse(foundUser.Key);
                 User = foundUser.Value;
             }
@@ -165,6 +166,40 @@ namespace MarbleBot.Modules {
             }
         }*/
 
+        [Command("inventory")]
+        [Alias("inv", "items")]
+        [Summary("Shows all the items a user has.")]
+        public async Task InventoryCommandAsync(string searchTerm = "")
+        {
+            var user = new MBUser();
+            var id = Context.User.Id;
+            if (searchTerm.IsEmpty()) user = GetUser(Context);
+            else {
+                string json;
+                using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
+                var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
+                || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
+                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).FirstOrDefault();
+                id = ulong.Parse(foundUser.Key);
+                user = foundUser.Value;
+            }
+            var itemOutput = new StringBuilder();
+            if (user.Items.Count > 0) {
+                foreach (var item in user.Items) {
+                    if (item.Value > 0)
+                        itemOutput.AppendLine($"{GetItem(item.Key.ToString()).Name}: {item.Value}");
+                }
+            } else itemOutput.Append("None");
+            var author = Context.Client.GetUser(id);
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithAuthor(author)
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithDescription(itemOutput.ToString())
+                .Build());
+        }
+
         [Command("item")]
         [Alias("iteminfo")]
         [Summary("Returns information about an item.")]
@@ -239,30 +274,31 @@ namespace MarbleBot.Modules {
         [Summary("Returns the profile of you or someone else.")]
         public async Task ProfileCommandAsync([Remainder] string searchTerm = "") {
             await Context.Channel.TriggerTypingAsync();
-            var User = new MBUser();
+            var user = new MBUser();
             var id = Context.User.Id;
-            if (searchTerm.IsEmpty()) User = GetUser(Context);
+            if (searchTerm.IsEmpty()) user = GetUser(Context);
             else {
                 string json;
                 using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
-                var search = from user in rawUsers where searchTerm.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchTerm.ToLower()) || searchTerm.ToLower().Contains(user.Value.Discriminator) select user;
-                var foundUser = search.FirstOrDefault();
+                var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
+                || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
+                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).FirstOrDefault();
                 id = ulong.Parse(foundUser.Key);
-                User = foundUser.Value;
+                user = foundUser.Value;
             }
-            var lastDaily = User.LastDaily.ToString("yyyy-MM-dd hh:mm:ss");
-            if (User.LastDaily.Year == 2019 && User.LastDaily.DayOfYear == 1) lastDaily = "N/A";
-            var lastRaceWin = User.LastRaceWin.ToString("yyyy-MM-dd hh:mm:ss");
-            if (User.LastRaceWin.Year == 2019 && User.LastRaceWin.DayOfYear == 1) lastRaceWin = "N/A";
-            var lastScavenge = User.LastScavenge.ToString("yyyy-MM-dd hh:mm:ss");
-            if (User.LastScavenge.Year == 2019 && User.LastScavenge.DayOfYear == 1) lastScavenge = "N/A";
-            var lastSiegeWin = User.LastSiegeWin.ToString("yyyy-MM-dd hh:mm:ss");
-            if (User.LastSiegeWin.Year == 2019 && User.LastSiegeWin.DayOfYear == 1) lastSiegeWin = "N/A";
+            var lastDaily = user.LastDaily.ToString("yyyy-MM-dd hh:mm:ss");
+            if (user.LastDaily.Year == 2019 && user.LastDaily.DayOfYear == 1) lastDaily = "N/A";
+            var lastRaceWin = user.LastRaceWin.ToString("yyyy-MM-dd hh:mm:ss");
+            if (user.LastRaceWin.Year == 2019 && user.LastRaceWin.DayOfYear == 1) lastRaceWin = "N/A";
+            var lastScavenge = user.LastScavenge.ToString("yyyy-MM-dd hh:mm:ss");
+            if (user.LastScavenge.Year == 2019 && user.LastScavenge.DayOfYear == 1) lastScavenge = "N/A";
+            var lastSiegeWin = user.LastSiegeWin.ToString("yyyy-MM-dd hh:mm:ss");
+            if (user.LastSiegeWin.Year == 2019 && user.LastSiegeWin.DayOfYear == 1) lastSiegeWin = "N/A";
             var author = Context.Client.GetUser(id);
             var itemOutput = new StringBuilder();
-            if (User.Items.Count > 0) {
-                foreach (var item in User.Items) {
+            if (user.Items.Count > 0) {
+                foreach (var item in user.Items) {
                     itemOutput.AppendLine($"{GetItem(item.Key.ToString()).Name}: {item.Value}");
                 }
             } else itemOutput.Append("None");
@@ -271,12 +307,12 @@ namespace MarbleBot.Modules {
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .WithFooter("All times in UTC, all dates YYYY-MM-DD.")
-                .AddField("Balance", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.Balance), true)
-                .AddField("Net Worth", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.NetWorth), true)
-                .AddField("Daily Streak", User.DailyStreak, true)
-                .AddField("Siege Mentions", User.SiegePing, true)
-                .AddField("Race Wins", User.RaceWins, true)
-                .AddField("Siege Wins", User.SiegeWins, true)
+                .AddField("Balance", string.Format("<:unitofmoney:372385317581488128>{0:n}", user.Balance), true)
+                .AddField("Net Worth", string.Format("<:unitofmoney:372385317581488128>{0:n}", user.NetWorth), true)
+                .AddField("Daily Streak", user.DailyStreak, true)
+                .AddField("Siege Mentions", user.SiegePing, true)
+                .AddField("Race Wins", user.RaceWins, true)
+                .AddField("Siege Wins", user.SiegeWins, true)
                 .AddField("Last Daily", lastDaily, true)
                 .AddField("Last Race Win", lastRaceWin, true)
                 .AddField("Last Siege Win", lastSiegeWin, true)

@@ -56,7 +56,7 @@ namespace MarbleBot.Modules
                         .WithTimestamp(DateTime.UtcNow);
                     if (Context.IsPrivate) {
                         builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                        .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                        .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                         .AddField("Utility Commands", "help (gives command help)\nuptime (shows how long the bot has been running)")
                         .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                         .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)")
@@ -66,7 +66,7 @@ namespace MarbleBot.Modules
                         switch (Context.Guild.Id) {
                             case CM:
                                 builder.AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                                     .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
                                     .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -74,7 +74,7 @@ namespace MarbleBot.Modules
                                 break;
                             default:
                                 builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
                                     .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
                                     .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -85,9 +85,13 @@ namespace MarbleBot.Modules
                     await ReplyAsync(embed: builder.Build());
                     break;
                 default:
-                    var hCommand = new HelpCommand();
+                    var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower()).First();
+                    if (rawCommand == null) {
+                        await ReplyAsync("Could not find requested command!");
+                        break;
+                    }
+                    var hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, aliases: rawCommand.Aliases);
                     string THSOnly = "This command cannot be used in Community Marble!";
-                    hCommand.Name = command;
                     switch (command) {
                         // General
                         case "7ball": hCommand.Desc = "Predicts an outcome to an event."; hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
@@ -115,6 +119,7 @@ namespace MarbleBot.Modules
                         case "buy": hCommand.Desc = "Buys items."; hCommand.Usage = "mb/buy <item ID> <# of items>"; hCommand.Example = "mb/buy 1 1"; break;
                         case "craft": hCommand.Desc = "Crafts an item out of other items."; hCommand.Usage = "mb/craft <item ID>"; hCommand.Example = "mb/craft 014"; break;
                         case "daily": hCommand.Desc = "Gives daily Units of Money (200 to the power of your streak minus one). You can only do this every 24 hours."; hCommand.Usage = "mb/balance"; break;
+                        case "inventory": hCommand.Desc = "Returns all the items of you or someone else."; hCommand.Usage = "mb/inventory <optional user>"; break;
                         case "item": hCommand.Desc = "Returns information about an item."; hCommand.Usage = "mb/item <item ID>"; break;
                         case "poupsoop": hCommand.Desc = "Calculates the total price of Poup Soop."; hCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; hCommand.Example = "mb/poupsoop 3 | 1"; break;
                         case "profile": hCommand.Desc = "Returns the profile of you or someone else."; hCommand.Usage = "mb/profile <optional user>"; break;
@@ -143,6 +148,13 @@ namespace MarbleBot.Modules
                         builder.WithDescription(hCommand.Desc)
                             .AddField("Usage", $"`{hCommand.Usage}`")
                             .WithTitle($"MarbleBot Help: **{hCommand.Name[0].ToString().ToUpper() + string.Concat(hCommand.Name.Skip(1))}**");
+
+                        if (hCommand.Aliases.Length > 1) {
+                            var aliases = new StringBuilder();
+                            foreach (var alias in hCommand.Aliases)
+                                aliases.AppendLine($"mb/{alias}");
+                            builder.AddField("Aliases", aliases.ToString());
+                        }
 
                         if (!hCommand.Example.IsEmpty()) builder.AddField("Example", $"`{hCommand.Example}`");
                         if (!hCommand.Warning.IsEmpty()) builder.AddField("Warning", $":warning: {hCommand.Warning}");
@@ -200,7 +212,7 @@ namespace MarbleBot.Modules
                     IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
                     IGuildUser Algorox = Context.Guild.GetUser(323680030724980736);
                     IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
-                    IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, FlameVapour};
+                    IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, FlameVapour };
                     string[] nicks = new string[users.Length];
                     string[] statuses = new string[users.Length];
                     int h = 0;
@@ -214,12 +226,12 @@ namespace MarbleBot.Modules
                         if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
                     }
                     var output = new StringBuilder();
-                    output.Append("**__Admins:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**");
-                    output.Append("**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
-                    output.Append("**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2] + "**");
-                    output.Append("**\n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3] + "**");
-                    output.Append("\n\n**__Mods:__** \n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4] + "**");
-                    output.Append("**\n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5] + "**");
+                    output.Append($"**__Admins:__** \n{nicks[0]} ({users[0].Username}#{users[0].Discriminator}): **{statuses[0]}**");
+                    output.Append($"**\n{nicks[1]} ({users[1].Username}#{users[1].Discriminator}): **{statuses[1]}**");
+                    output.Append($"**\n{nicks[2]} ({users[2].Username}#{users[2].Discriminator}): **{statuses[2]}**");
+                    output.Append($"**\n{nicks[3]} ({users[3].Username}#{users[3].Discriminator}): **{statuses[3]}**");
+                    output.Append($"\n\n**__Mods:__** \n{nicks[4]} ({users[4].Username}#{users[4].Discriminator}): **{statuses[4]}**");
+                    output.Append($"**\n{nicks[5]} ({users[5].Username}#{users[5].Discriminator}): **{statuses[5]}**");
                     await ReplyAsync(output.ToString());
                 } else if (Context.Guild.Id == THS) {
                     IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
@@ -278,14 +290,14 @@ namespace MarbleBot.Modules
                         if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
                     }
                     var output = new StringBuilder();
-                    output.Append("**__Owner:__** \n" + nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0]);
-                    output.Append("**\n\n**__Co-owners:__** \n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1]);
-                    output.Append("**\n" + nicks[2] + " (" + users[2].Username + "#" + users[2].Discriminator + "): **" + statuses[2]);
-                    output.Append("\n\n**__Admins:__** \n" + nicks[3] + " (" + users[3].Username + "#" + users[3].Discriminator + "): **" + statuses[3]);
-                    output.Append("**\n" + nicks[4] + " (" + users[4].Username + "#" + users[4].Discriminator + "): **" + statuses[4]);
-                    output.Append("\n\n**__Mods:__** \n" + nicks[5] + " (" + users[5].Username + "#" + users[5].Discriminator + "): **" + statuses[5]);
-                    output.Append("**\n" + nicks[6] + " (" + users[6].Username + "#" + users[6].Discriminator + "): **" + statuses[6]);
-                    output.Append("**\n" + nicks[7] + " (" + users[7].Username + "#" + users[7].Discriminator + "): **" + statuses[7]);
+                    output.Append($"**__Owner:__** \n{nicks[0]} ){users[0].Username}#{users[0].Discriminator}): **{statuses[0]}");
+                    output.Append($"**\n\n**__Co-owners:__** \n{nicks[1]} ({users[1].Username}#{users[1].Discriminator}): **{statuses[1]}");
+                    output.Append($"**\n{nicks[2]} ({users[2].Username}#{users[2].Discriminator}): **{statuses[2]}");
+                    output.Append($"\n\n**__Admins:__** \n{nicks[3]} ({users[3].Username}#{users[3].Discriminator}): **{statuses[3]}");
+                    output.Append($"**\n{nicks[4]} ({users[4].Username}#{users[4].Discriminator}): **{statuses[4]}");
+                    output.Append($"\n\n**__Mods:__** \n{nicks[5]} ({users[5].Username}#{users[5].Discriminator}): **{statuses[5]}");
+                    output.Append($"**\n{nicks[6]} ({users[6].Username}#{users[6].Discriminator}): **{statuses[6]}");
+                    output.Append($"**\n{nicks[7]} ({users[7].Username}#{users[7].Discriminator}): **{statuses[7]}");
                     await ReplyAsync(output.ToString());
                 }
             } else await ReplyAsync("There are no staff members in a DM!");
@@ -295,7 +307,7 @@ namespace MarbleBot.Modules
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommandAsync() {
             var timeDiff = DateTime.UtcNow.Subtract(Global.StartTime);
-            await ReplyAsync("The bot has been running for **" + GetDateString(timeDiff) + "**.");
+            await ReplyAsync($"The bot has been running for **{GetDateString(timeDiff)}**.");
         }
 
         [Command("userinfo")]

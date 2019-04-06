@@ -342,18 +342,20 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) {
                         if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to scavenge!");
                         else {
-                            var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
-                            if (user.Items != null) {
-                                if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
-                                else user.Items.Add(item.Id, 1);
-                            } else {
-                                user.Items = new Dictionary<int, int> {
-                                    { item.Id, 1 }
-                                };
-                            }
-                            user.NetWorth += item.Price;
-                            WriteUsers(obj, Context.User, user);
-                            await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
+                            if (Global.ScavengeInfo[Context.User.Id].Count < 1) {
+                                var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
+                                if (user.Items != null) {
+                                    if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
+                                    else user.Items.Add(item.Id, 1);
+                                } else {
+                                    user.Items = new Dictionary<int, int> {
+                                        { item.Id, 1 }
+                                    };
+                                }
+                                user.NetWorth += item.Price;
+                                WriteUsers(obj, Context.User, user);
+                                await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
+                            } else await ReplyAsync($"**{Context.User.Username}**, there is nothing to grab!");
                         }
                     } else await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                     break;
@@ -366,11 +368,13 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) {
                         if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to scavenge!");
                         else {
-                            var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
-                            user.Balance += item.Price;
-                            user.NetWorth += item.Price;
-                            WriteUsers(obj, Context.User, user);
-                            await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {Global.UoM}**{item.Price}**!");
+                            if (Global.ScavengeInfo[Context.User.Id].Count < 1) {
+                                var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
+                                user.Balance += item.Price;
+                                user.NetWorth += item.Price;
+                                WriteUsers(obj, Context.User, user);
+                                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {Global.UoM}**{item.Price}**!");
+                            } else await ReplyAsync($"**{Context.User.Username}**, there is nothing to sell!");
                         }
                     } else await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                     break;
