@@ -2,7 +2,13 @@ namespace MarbleBot.BaseClasses
 {
     public class Boss {
         public string Name { get; set; }
-        public int HP { get; set; }
+        private int _HP;
+        public int HP
+        {
+            get { return _HP; }
+            set { _HP = value > MaxHP ? MaxHP : value < 1 ? 0 : value; }
+        }
+
         public int MaxHP { get; }
         public Difficulty Difficulty { get; set; }
         public Attack[] Attacks { get; set; }

@@ -328,8 +328,6 @@ namespace MarbleBot.Modules
                         var sixHoursAgo = DateTime.UtcNow.AddHours(-6);
                         await ReplyAsync($"**{Context.User.Username}**, you need to wait for **{GetDateString(user.LastScavenge.Subtract(sixHoursAgo))}** until you can scavenge again.");
                     } else {
-                        user.LastScavenge = DateTime.UtcNow;
-                        WriteUsers(obj, Context.User, user);
                         location = "Canary Beach";
                         Global.ScavengeInfo.Add(Context.User.Id, new Queue<Item>());
                         Global.ScavengeSessions.Add(Task.Run(async () => { await ScavengeSession(Context, location); }));
@@ -342,7 +340,7 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) {
                         if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to scavenge!");
                         else {
-                            if (Global.ScavengeInfo[Context.User.Id].Count < 1) {
+                            if (Global.ScavengeInfo[Context.User.Id].Count > 0) {
                                 var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
                                 if (user.Items != null) {
                                     if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -368,7 +366,7 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) {
                         if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to scavenge!");
                         else {
-                            if (Global.ScavengeInfo[Context.User.Id].Count < 1) {
+                            if (Global.ScavengeInfo[Context.User.Id].Count > 0) {
                                 var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
                                 user.Balance += item.Price;
                                 user.NetWorth += item.Price;
@@ -389,27 +387,24 @@ namespace MarbleBot.Modules
             }
         }
 
+#pragma warning disable IDE0060 // Remove unused parameter
         public async Task ScavengeSession(SocketCommandContext context, string location)
         {
+#pragma warning restore IDE0060 // Remove unused parameter
             var startTime = DateTime.UtcNow;
             do {
                 await Task.Delay(8000);
                 if (Global.Rand.Next(0, 5) < 4) {
                     var collectableItems = new List<Item>();
-                    using (var items = new StreamReader("Resources\\ShopItems.csv")) {
-                        while (!items.EndOfStream){
-                            var properties = items.ReadLine().Split(',');
-                            var collectable = bool.Parse(properties[5]);
-                            if (collectable) {
-                                collectableItems.Add(new Item() {
-                                    Id = properties[0].ToInt(),
-                                    Name = properties[1],
-                                    Price = properties[2].ToLower().Contains("unsellable") ? -1 : properties[2].ToDecimal(),
-                                    Description = properties[3],
-                                    OnSale = bool.Parse(properties[4]),
-                                    DiveCollectable = collectable
-                                });
-                            }
+                    string json;
+                    using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+                    var obj = JObject.Parse(json);
+                    var items = obj.ToObject<Dictionary<string, Item>>();
+                    foreach (var itemPair in items) {
+                        if (itemPair.Value.ScavengeCollectable) {
+                            var outputItem = itemPair.Value;
+                            outputItem.Id = int.Parse(itemPair.Key);
+                            collectableItems.Add(outputItem);
                         }
                     }
                     var item = collectableItems[Global.Rand.Next(0, collectableItems.Count - 1)];
@@ -417,7 +412,20 @@ namespace MarbleBot.Modules
                     await ReplyAsync($"**{context.User.Username}**, you have found {item.Name} x**1**! Use `mb/scavenge grab` to keep it or `mb/scavenge sell` to sell it.");
                 }
             } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60));
-            await ReplyAsync("The scavenge session is over!");
+
+            string json2;
+            using (var users = new StreamReader("Users.json")) json2 = users.ReadToEnd();
+            var obj2 = JObject.Parse(json2);
+            var user = GetUser(Context, obj2);
+            user.LastScavenge = DateTime.UtcNow;
+            foreach (var item in Global.ScavengeInfo[context.User.Id]) {
+                if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
+                else user.Items.Add(item.Id, 1);
+            }
+            WriteUsers(obj2, Context.User, user);
+
+            Global.ScavengeInfo.Remove(context.User.Id);
+            await ReplyAsync("The scavenge session is over! Any remaining items have been added to your inventory!");
         }
 
         [Command("siege")]
@@ -624,9 +632,6 @@ namespace MarbleBot.Modules
                                     }
                                     Global.SiegeInfo[fileID].Boss.HP -= dmg;
                                     Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).BossHits += dmg;
-                                    if (Global.SiegeInfo[fileID].Boss.HP < 1) {
-                                        Global.SiegeInfo[fileID].Boss.HP = 0;
-                                    }
                                     builder.WithTitle(title)
                                         .WithThumbnailUrl(url)
                                         .WithDescription(string.Format("**{0}** dealt **{1}** damage to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, dmg, Global.SiegeInfo[fileID].Boss.Name))

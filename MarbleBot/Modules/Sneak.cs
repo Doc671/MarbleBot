@@ -1,7 +1,10 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
@@ -9,6 +12,27 @@ namespace MarbleBot.Modules
     /// <summary> Owner-only commands. >:) </summary>
     public class Sneak : MarbleBotModule
     {
+        [Command("autoresponse")]
+        [Summary("Things to do with autoresponses.")]
+        [RequireOwner]
+        public async Task AutoresponseCommandAsync(string option) {
+            switch (option) {
+                case "time": await ReplyAsync($"Last Use: {Global.ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
+                case "update": {
+                    Global.Autoresponses = new Dictionary<string, string>();
+                    using (var ar = new StreamReader("Resources\\Autoresponses.txt")) {
+                        while (!ar.EndOfStream) {
+                            var arar = ar.ReadLine().Split(';');
+                            Global.Autoresponses.Add(arar[0], arar[1]);
+                        }
+                    }
+                    await ReplyAsync("Dictionary update complete!");
+                    break;
+                }
+                default: break;
+            }
+        }
+
         [Command("melmon")]
         [Summary("melmon")]
         [RequireOwner]
@@ -25,8 +49,8 @@ namespace MarbleBot.Modules
                 case "brady": chnl = srvr.GetTextChannel(237158048282443776); await chnl.SendMessageAsync(msg); break;
                 default:
                     var split = melmon.Split(',');
-                    ulong.TryParse(split[0], out ulong chnlId);
-                    ulong.TryParse(split[1], out ulong srvrId);
+                    ulong.TryParse(split[0], out ulong srvrId);
+                    ulong.TryParse(split[1], out ulong chnlId);
                     srvr = Context.Client.GetGuild(srvrId);
                     chnl = srvr.GetTextChannel(chnlId);
                     await chnl.SendMessageAsync(msg);

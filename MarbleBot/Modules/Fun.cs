@@ -17,7 +17,9 @@ namespace MarbleBot.Modules
     {
         [Command("7ball")]
         [Summary("Predicts the outcome to a user-defined event.")]
+#pragma warning disable IDE0060 // Remove unused parameter
         public async Task SevenBallCommandAsync([Remainder] string input)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             await Context.Channel.TriggerTypingAsync();
             int choice = Global.Rand.Next(0, 13);
@@ -39,27 +41,6 @@ namespace MarbleBot.Modules
                 case 13: outcome = "probably not, but there is still a chance..."; break;
             }
             await ReplyAsync(":seven: |  **" + Context.User.Username + "**, " + outcome);
-        }
-
-        [Command("autoresponse")]
-        [Summary("Things to do with autoresponses.")]
-        [RequireOwner]
-        public async Task AutoresponseCommandAsync(string option) {
-            switch (option) {
-                case "time": await ReplyAsync($"Last Use: {Global.ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
-                case "update": {
-                    Global.Autoresponses = new Dictionary<string, string>();
-                    using (var ar = new StreamReader("Resources\\Autoresponses.txt")) {
-                        while (!ar.EndOfStream) {
-                            var arar = ar.ReadLine().Split(';');
-                            Global.Autoresponses.Add(arar[0], arar[1]);
-                        }
-                    }
-                    await ReplyAsync("Dictionary update complete!");
-                    break;
-                }
-                default: break;
-            }
         }
 
         [Command("best")]

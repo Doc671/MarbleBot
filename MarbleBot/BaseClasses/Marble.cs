@@ -11,6 +11,7 @@ namespace MarbleBot.BaseClasses
         public int BossHits { get; set; }
         public int PUHits { get; set; }
         public bool Cloned { get; set; }
+        public bool QefpedunCharmUsed { get; set; }
         public MSE StatusEffect { get; set; }
         public DateTime DoomStart { get; set; }
         public DateTime LastPoisonTick { get; set; }
@@ -21,6 +22,7 @@ namespace MarbleBot.BaseClasses
             BossHits = 0;
             PUHits = 0;
             Cloned = false;
+            QefpedunCharmUsed = false;
             StatusEffect = MSE.None;
             DoomStart = DateTime.Parse("2019-01-01 00:00:00");
             LastStun = DateTime.Parse("2019-01-01 00:00:00");

@@ -63,101 +63,105 @@ namespace MarbleBot
         protected static Item GetItem(string searchTerm) {
             var item = new Item();
             if (int.TryParse(searchTerm, out int itemID)) {
-                var itemFound = false;
-                using (var items = new StreamReader("Resources\\ShopItems.csv")) {
-                    while (!items.EndOfStream) {
-                        var properties = items.ReadLine().Split(',');
-                        if (properties[0].ToInt() == itemID) {
-                            itemFound = true;
-                            item.Id = properties[0].ToInt();
-                            item.Name = properties[1];
-                            if (properties[2].ToLower().Contains("unsellable")) item.Price = -1;
-                            else item.Price = properties[2].ToDecimal();
-                            item.Description = properties[3];
-                            item.OnSale = bool.Parse(properties[4]);
-                            item.DiveCollectable = bool.Parse(properties[5]);
-                        }
-                    }
-                }
-                if (itemFound) return item;
-                else {
+                string json;
+                using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+                var obj = JObject.Parse(json);
+                if (obj[itemID.ToString("000")] != null){
+                    item = obj[itemID.ToString("000")].ToObject<Item>();
+                    item.Id = itemID;
+                    if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
+                    return item;
+                } else {
                     item.Id = -1;
                     return item;
                 }
             } else {
+                var newSearchTerm = searchTerm.ToLower().RemoveChar(' ');
+                string json;
+                using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+                var obj = JObject.Parse(json);
+                foreach (var objItemPair in obj) {
+                    var objItem = objItemPair.Value.ToObject<Item>();
+                    objItem.Id = int.Parse(objItemPair.Key);
+                    if (objItem.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(objItem.Name.ToLower())) {
+                        item = objItem;
+                        if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
+                        return item;
+                    }
+                }
                 item.Id = -2;
                 return item;
             }
         }
 
         // Returns a MoneyUser with the ID of the user
-        protected static MBUser GetUser(SocketCommandContext Context) {
+        protected static MBUser GetUser(SocketCommandContext context) {
             string json;
             using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
             var obj = JObject.Parse(json);
-            MBUser User;
-            if (obj.ContainsKey(Context.User.Id.ToString())) {
-                User = obj[Context.User.Id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[Context.User.Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
+            MBUser user;
+            if (obj.ContainsKey(context.User.Id.ToString())) {
+                user = obj[context.User.Id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
             } else {
-                User = new MBUser() {
-                    Name = Context.User.Username,
-                    Discriminator = Context.User.Discriminator,
+                user = new MBUser() {
+                    Name = context.User.Username,
+                    Discriminator = context.User.Discriminator,
                 };
             }
-            return User;
+            return user;
         }
 
-        protected static MBUser GetUser(SocketCommandContext Context, ulong Id) {
+        protected static MBUser GetUser(SocketCommandContext context, ulong Id) {
             string json;
             using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
             var obj = JObject.Parse(json);
-            MBUser User;
+            MBUser user;
             if (obj.ContainsKey(Id.ToString())) {
-                User = obj[Id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
+                user = obj[Id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
             } else {
-                User = new MBUser() {
-                    Name = Context.User.Username,
-                    Discriminator = Context.User.Discriminator,
+                user = new MBUser() {
+                    Name = context.User.Username,
+                    Discriminator = context.User.Discriminator,
                 };
             }
-            return User;
+            return user;
         }
 
-        protected static MBUser GetUser(SocketCommandContext Context, JObject obj) {
-            MBUser User;
-            if (obj.ContainsKey(Context.User.Id.ToString())) {
-                User = obj[Context.User.Id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[Context.User.Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
+        protected static MBUser GetUser(SocketCommandContext context, JObject obj) {
+            MBUser user;
+            if (obj.ContainsKey(context.User.Id.ToString())) {
+                user = obj[context.User.Id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
             } else {
-                User = new MBUser() {
-                    Name = Context.User.Username,
-                    Discriminator = Context.User.Discriminator,
+                user = new MBUser() {
+                    Name = context.User.Username,
+                    Discriminator = context.User.Discriminator,
                 };
             }
-            return User;
+            return user;
         }
 
-        protected static MBUser GetUser(SocketCommandContext Context, JObject obj, ulong id) {
-            MBUser User;
+        protected static MBUser GetUser(SocketCommandContext context, JObject obj, ulong id) {
+            MBUser user;
             if (obj.ContainsKey(id.ToString())) {
-                User = obj[id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[Context.User.Id.ToString()]?.ToString())) User.Items = new Dictionary<int, int>();
+                user = obj[id.ToString()].ToObject<MBUser>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
             } else {
-                if (Context.IsPrivate) {
-                    User = new MBUser() {
-                        Name = Context.User.Username,
-                        Discriminator = Context.User.Discriminator,
+                if (context.IsPrivate) {
+                    user = new MBUser() {
+                        Name = context.User.Username,
+                        Discriminator = context.User.Discriminator,
                     };
                 } else {
-                    User = new MBUser() {
-                        Name = Context.Guild.GetUser(id).Username,
-                        Discriminator = Context.Guild.GetUser(id).Discriminator,
+                    user = new MBUser() {
+                        Name = context.Guild.GetUser(id).Username,
+                        Discriminator = context.Guild.GetUser(id).Discriminator,
                     };
                 }
             }
-            return User;
+            return user;
         }
 
         // Writes users to appropriate JSON file
