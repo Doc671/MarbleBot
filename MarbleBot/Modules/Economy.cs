@@ -107,10 +107,11 @@ namespace MarbleBot.Modules {
                             user.Items[int.Parse(rawItem.Key)] -= rawItem.Value;
                             user.NetWorth -= item.Price;
                         }
-                        user.Items[requestedItem.Id] += 1;
+                        if (!user.Items.ContainsKey(requestedItem.Id)) user.Items.Add(requestedItem.Id, 1);
+                        else user.Items[requestedItem.Id] += 1;
                         user.NetWorth += requestedItem.Price;
                         embed.AddField("Lost items", output.ToString())
-                            .AddField("Net Worth", $"Old: {Global.UoM}{currentNetWorth}\nNew: {Global.UoM}{user.NetWorth}");
+                            .AddField("Net Worth", $"Old: {Global.UoM}{currentNetWorth:n}\nNew: {Global.UoM}{user.NetWorth:n}");
                         WriteUsers(obj, Context.User, user);
                         await ReplyAsync(embed: embed.Build());
                     } else await ReplyAsync($":warning: | **{Context.User.Username}**, you do not have enough items to craft this!");

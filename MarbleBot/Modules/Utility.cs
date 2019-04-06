@@ -56,7 +56,7 @@ namespace MarbleBot.Modules
                         .WithTimestamp(DateTime.UtcNow);
                     if (Context.IsPrivate) {
                         builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                        .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                        .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
                         .AddField("Utility Commands", "help (gives command help)\nuptime (shows how long the bot has been running)")
                         .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                         .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)")
@@ -66,7 +66,7 @@ namespace MarbleBot.Modules
                         switch (Context.Guild.Id) {
                             case CM:
                                 builder.AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
                                     .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
                                     .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -74,7 +74,7 @@ namespace MarbleBot.Modules
                                 break;
                             default:
                                 builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)")
+                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
                                     .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
                                     .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
                                     .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
@@ -123,9 +123,11 @@ namespace MarbleBot.Modules
                         case "item": hCommand.Desc = "Returns information about an item."; hCommand.Usage = "mb/item <item ID>"; break;
                         case "poupsoop": hCommand.Desc = "Calculates the total price of Poup Soop."; hCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; hCommand.Example = "mb/poupsoop 3 | 1"; break;
                         case "profile": hCommand.Desc = "Returns the profile of you or someone else."; hCommand.Usage = "mb/profile <optional user>"; break;
+                        case "recipes": hCommand.Usage = "mb/recipes"; break;
                         case "richlist": hCommand.Desc = "Shows the ten richest people globally by Net Worth."; hCommand.Usage = "mb/richlist"; break;
                         case "sell": hCommand.Desc = "Sells items."; hCommand.Usage = "mb/sell <item ID> <# of items>"; hCommand.Example = "mb/sell 1 1"; break;
                         case "shop": hCommand.Desc = "Shows all items available for sale, their IDs and their prices."; hCommand.Usage = "mb/shop"; break;
+                        case "use": hCommand.Usage = "mb/use <item ID>"; break;
 
                         // Roles
                         case "give": hCommand.Desc = "Gives a role if it is on the role list."; hCommand.Usage = "mb/give <role>"; hCommand.Example = "mb/give Owner"; break;
@@ -152,7 +154,7 @@ namespace MarbleBot.Modules
                         if (hCommand.Aliases.Length > 1) {
                             var aliases = new StringBuilder();
                             foreach (var alias in hCommand.Aliases)
-                                aliases.AppendLine($"mb/{alias}");
+                                aliases.AppendLine($"`mb/{alias}`");
                             builder.AddField("Aliases", aliases.ToString());
                         }
 
