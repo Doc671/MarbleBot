@@ -328,12 +328,15 @@ namespace MarbleBot.Modules
                         var sixHoursAgo = DateTime.UtcNow.AddHours(-6);
                         await ReplyAsync($"**{Context.User.Username}**, you need to wait for **{GetDateString(user.LastScavenge.Subtract(sixHoursAgo))}** until you can scavenge again.");
                     } else {
-                        location = "Canary Beach";
-                        Global.ScavengeInfo.Add(Context.User.Id, new Queue<Item>());
-                        Global.ScavengeSessions.Add(Task.Run(async () => { await ScavengeSession(Context, location); }));
-                        embed.WithDescription($"**{Context.User.Username}** has begun scavenging in {location}!")
-                            .WithTitle("Item Scavenge Begin!");
-                        await ReplyAsync(embed: embed.Build());
+                        if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
+                        else {
+                            location = "Canary Beach";
+                            Global.ScavengeInfo.Add(Context.User.Id, new Queue<Item>());
+                            Global.ScavengeSessions.Add(Task.Run(async () => { await ScavengeSession(Context, location); }));
+                            embed.WithDescription($"**{Context.User.Username}** has begun scavenging in {location}!")
+                                .WithTitle("Item Scavenge Begin!");
+                            await ReplyAsync(embed: embed.Build());
+                        }
                     }
                     break;
                 case "grab":
@@ -409,7 +412,7 @@ namespace MarbleBot.Modules
                     }
                     var item = collectableItems[Global.Rand.Next(0, collectableItems.Count - 1)];
                     Global.ScavengeInfo[Context.User.Id].Enqueue(item);
-                    await ReplyAsync($"**{context.User.Username}**, you have found {item.Name} x**1**! Use `mb/scavenge grab` to keep it or `mb/scavenge sell` to sell it.");
+                    await ReplyAsync($"**{context.User.Username}**, you have found **{item.Name}** x**1**! Use `mb/scavenge grab` to keep it or `mb/scavenge sell` to sell it.");
                 }
             } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60));
 
