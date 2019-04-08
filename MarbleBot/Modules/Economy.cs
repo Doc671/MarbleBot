@@ -37,8 +37,8 @@ namespace MarbleBot.Modules {
                 .WithAuthor(author)
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
-                .AddField("Balance", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.Balance), true)
-                .AddField("Net Worth", string.Format("<:unitofmoney:372385317581488128>{0:n}", User.NetWorth), true);
+                .AddField("Balance", $":{Global.UoM}{User.Balance:n}", true)
+                .AddField("Net Worth", $"{Global.UoM}{User.NetWorth:n}", true);
             await ReplyAsync(embed: builder.Build());
         }
 
@@ -53,16 +53,14 @@ namespace MarbleBot.Modules {
                 else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
                 else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else if (item.OnSale) {
-                    string json;
-                    using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-                    var obj = JObject.Parse(json);
+                    var obj = GetUsersObj();
                     var user = GetUser(Context, obj);
                     if (user.Balance >= item.Price * noOfItems) {
                         if (user.Items != null) {
                             if (user.Items.ContainsKey(item.Id)) user.Items[item.Id] += noOfItems;
                             else user.Items.Add(item.Id, noOfItems);
                         } else {
-                            user.Items = new Dictionary<int, int> {
+                            user.Items = new SortedDictionary<int, int> {
                                 { item.Id, noOfItems }
                             };
                         }
@@ -76,12 +74,10 @@ namespace MarbleBot.Modules {
 
         [Command("craft")]
         [Summary("Crafts an item out of other items.")]
-        public async Task CraftCommandAsync(string searchTerm)
+        public async Task CraftCommandAsync([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
-            string json;
-            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-            var obj = JObject.Parse(json);
+            var obj = GetUsersObj();
             var user = GetUser(Context, obj);
             if (user.Items.ContainsKey(17)) {
                 var requestedItem = GetItem(searchTerm);
@@ -97,7 +93,7 @@ namespace MarbleBot.Modules {
                         var embed = new EmbedBuilder()
                                .WithCurrentTimestamp()
                                .WithColor(GetColor(Context))
-                               .WithDescription($"**{Context.User.Username}** has successfully crafted a {requestedItem.Name}!")
+                               .WithDescription($"**{Context.User.Username}** has successfully crafted **{requestedItem.Name}** x**{requestedItem.CraftingProduced}**!")
                                .WithTitle("Crafting: " + requestedItem.Name);
                         var output = new StringBuilder();
                         var currentNetWorth = user.NetWorth;
@@ -107,15 +103,15 @@ namespace MarbleBot.Modules {
                             user.Items[int.Parse(rawItem.Key)] -= rawItem.Value;
                             user.NetWorth -= item.Price;
                         }
-                        if (!user.Items.ContainsKey(requestedItem.Id)) user.Items.Add(requestedItem.Id, 1);
-                        else user.Items[requestedItem.Id] += 1;
+                        if (!user.Items.ContainsKey(requestedItem.Id)) user.Items.Add(requestedItem.Id, (int)requestedItem.CraftingProduced);
+                        else user.Items[requestedItem.Id] += (int)requestedItem.CraftingProduced;
                         user.NetWorth += requestedItem.Price;
                         embed.AddField("Lost items", output.ToString())
                             .AddField("Net Worth", $"Old: {Global.UoM}{currentNetWorth:n}\nNew: {Global.UoM}{user.NetWorth:n}");
                         WriteUsers(obj, Context.User, user);
                         await ReplyAsync(embed: embed.Build());
                     } else await ReplyAsync($":warning: | **{Context.User.Username}**, you do not have enough items to craft this!");
-                } else await ReplyAsync($":warning: | **{Context.User.Username}**, the item {requestedItem.Name} cannot be crafted!");
+                } else await ReplyAsync($":warning: | **{Context.User.Username}**, the item **{requestedItem.Name}** cannot be crafted!");
             } else await ReplyAsync($":warning: | **{Context.User.Username}**, you need a Crafting Station to craft items!");
         }
 
@@ -123,9 +119,7 @@ namespace MarbleBot.Modules {
         [Summary("Gives daily Units of Money (200 to the power of your streak minus one).")]
         public async Task DailyCommandAsync() {
             await Context.Channel.TriggerTypingAsync();
-            string json;
-            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-            var obj = JObject.Parse(json);
+            var obj = GetUsersObj();
             var user = GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 24) {
                 if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 48) user.DailyStreak = 0;
@@ -160,8 +154,8 @@ namespace MarbleBot.Modules {
 
             } else {
                 var gift = ulong.Parse(money.Trim());
-                string json;
-                using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+                
+                
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MoneyUser>>(json);
                 var search = from user in rawUsers where searchUser.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchUser.ToLower()) || searchUser.ToLower().Contains(user.Value.Discriminator) select user;
                 var foundUser = search.FirstOrDefault();
@@ -172,7 +166,7 @@ namespace MarbleBot.Modules {
         [Command("inventory")]
         [Alias("inv", "items")]
         [Summary("Shows all the items a user has.")]
-        public async Task InventoryCommandAsync(string searchTerm = "")
+        public async Task InventoryCommandAsync([Remainder] string searchTerm = "")
         {
             var user = new MBUser();
             var id = Context.User.Id;
@@ -191,7 +185,7 @@ namespace MarbleBot.Modules {
             if (user.Items.Count > 0) {
                 foreach (var item in user.Items) {
                     if (item.Value > 0)
-                        itemOutput.AppendLine($"{GetItem(item.Key.ToString()).Name}: {item.Value}");
+                        itemOutput.AppendLine($"`[{item.Key.ToString("000")}]` {GetItem(item.Key.ToString()).Name}: {item.Value}");
                 }
             } else itemOutput.Append("None");
             var author = Context.Client.GetUser(id);
@@ -220,14 +214,15 @@ namespace MarbleBot.Modules {
                     .WithTitle(item.Name)
                     .AddField("ID", $"{item.Id:000}", true)
                     .AddField("Price", price, true)
-                    .AddField("For Sale", item.OnSale ? "Yes" : "No", true);
+                    .AddField("For Sale", item.OnSale ? "Yes" : "No", true)
+                    .AddField("Scavenge Location", Enum.GetName(typeof(ScavengeLocation), item.ScavengeLocation));
 
                 if (item.CraftingRecipe.Count > 0) {
                     var output = new StringBuilder();
                     foreach (var rawItem in item.CraftingRecipe) {
-                        output.AppendLine($"{GetItem(rawItem.Key).Name}: {rawItem.Value}");
+                        output.AppendLine($"`[{rawItem.Key}]` {GetItem(rawItem.Key).Name}: {rawItem.Value}");
                     }
-                    builder.AddField("Crafting Recipe", output.ToString());
+                    builder.AddField($"Crafting Recipe (produces **{item.CraftingProduced}**)", output.ToString());
                 }
                 await ReplyAsync(embed: builder.Build());
             }
@@ -261,9 +256,9 @@ namespace MarbleBot.Modules {
                     case 7: type = "Ulteymut"; break;
                     case 8: type = "Variety Pack"; break;
                 }
-                builder.AddField(type + " x" + no, string.Format("Cost: <:unitofmoney:372385317581488128>{0:n}", subtot));
+                builder.AddField($"{type} x{no}", $"Cost: {Global.UoM}{subtot:n}");
             }
-            builder.AddField("Total Cost", string.Format("<:unitofmoney:372385317581488128>{0:n}", totalCost));
+            builder.AddField("Total Cost", $"{Global.UoM}{totalCost:n}");
             await ReplyAsync(embed: builder.Build());
         }
 
@@ -298,7 +293,7 @@ namespace MarbleBot.Modules {
             if (user.Items.Count > 0) {
                 foreach (var item in user.Items) {
                     if (item.Value > 0)
-                        itemOutput.AppendLine($"{GetItem(item.Key.ToString()).Name}: {item.Value}");
+                        itemOutput.AppendLine($"`[{item.Key.ToString("000")}]` {GetItem(item.Key.ToString()).Name}: {item.Value}");
                 }
             } else itemOutput.Append("None");
             var builder = new EmbedBuilder()
@@ -330,15 +325,15 @@ namespace MarbleBot.Modules {
                 .WithCurrentTimestamp()
                 .WithTitle("All crafting recipes");
             string json;
-            using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+            using (var userFile = new StreamReader("Resources\\Items.json")) json = userFile.ReadToEnd();
             var obj = JObject.Parse(json);
             var items = obj.ToObject<Dictionary<string, Item>>();
             foreach (var itemPair in items) {
-                if (itemPair.Value.CraftingRecipe != null) {
+                if (itemPair.Value.CraftingProduced != 0) {
                     var output = new StringBuilder();
                     foreach (var ingredient in itemPair.Value.CraftingRecipe)
-                        output.AppendLine($"{GetItem(ingredient.Key).Name}: {ingredient.Value}");
-                    embed.AddField(itemPair.Value.Name, output.ToString());
+                        output.AppendLine($"`[{ingredient.Key}]` {GetItem(ingredient.Key).Name}: {ingredient.Value}");
+                    embed.AddField($"`[{itemPair.Key}]` {itemPair.Value.Name} (produces **{itemPair.Value.CraftingProduced}**)", output.ToString());
                 }
             }
             await ReplyAsync(embed: embed.Build());
@@ -396,9 +391,7 @@ namespace MarbleBot.Modules {
                 else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
                 else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else {
-                    string json;
-                    using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-                    var obj = JObject.Parse(json);
+                    var obj = GetUsersObj();
                     var user = GetUser(Context, obj);
                     if (user.Items.ContainsKey(item.Id) && user.Items[item.Id] >= noOfItems) {
                         user.Balance += item.Price * noOfItems;
@@ -417,7 +410,7 @@ namespace MarbleBot.Modules {
             await Context.Channel.TriggerTypingAsync();
             var output = new StringBuilder();
             string json;
-            using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+            using (var userFile = new StreamReader("Resources\\Items.json")) json = userFile.ReadToEnd();
             var obj = JObject.Parse(json);
             var items = obj.ToObject<Dictionary<string, Item>>();
             foreach (var item in items) {
@@ -435,10 +428,18 @@ namespace MarbleBot.Modules {
         [Command("use")]
         [Alias("useitem")]
         [Summary("Uses an item.")]
-        public async Task UseCommandAsync(string searchTerm)
+        public async Task UseCommandAsync([Remainder] string searchTerm)
         {
             var item = GetItem(searchTerm);
-            var user = GetUser(Context);
+            var obj = GetUsersObj();
+            var user = GetUser(Context, obj);
+
+            void UpdateUser(Item itm, int noOfItems) {
+                user.Items[itm.Id] -= noOfItems;
+                user.NetWorth -= item.Price * noOfItems;
+                WriteUsers(obj, Context.User, user);
+            } 
+
             if (user.Items.ContainsKey(item.Id) && user.Items[item.Id] > 0) {
                 switch (item.Id) {
                     case 1: {
@@ -448,7 +449,7 @@ namespace MarbleBot.Modules {
                             var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                             foreach (var marble in Global.SiegeInfo[fileId].Marbles) {
                                 marble.HP = marble.MaxHP;
-                                output.AppendLine($"**{marble.Name}** (HP: **{marble.HP}**/{marble.MaxHP}, DMG: **{marble.BossHits}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
+                                output.AppendLine($"**{marble.Name}** (HP: **{marble.HP}**/{marble.MaxHP}, DMG: **{marble.DamageDealt}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
                             }
                             await ReplyAsync(embed: new EmbedBuilder()
                                 .AddField("Marbles", output.ToString())
@@ -457,7 +458,7 @@ namespace MarbleBot.Modules {
                                 .WithDescription($"**{userMarble.Name}** used **{item.Name}**! Everyone was healed!")
                                 .WithTitle(item.Name)
                                 .Build());
-                            user.Items[item.Id]--;
+                            UpdateUser(item, 1);
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     }
@@ -474,6 +475,7 @@ namespace MarbleBot.Modules {
                                 .WithDescription($"**{userMarble.Name}** used their **{item.Name}**, dealing {dmg} damage to the boss!")
                                 .WithTitle(item.Name)
                                 .Build());
+                            userMarble.DamageDealt += dmg;
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     }
@@ -490,7 +492,8 @@ namespace MarbleBot.Modules {
                                 .WithDescription($"**{userMarble.Name}** used a **{item.Name}**, dealing {dmg} damage to the boss!")
                                 .WithTitle(item.Name)
                                 .Build());
-                            user.Items[item.Id]--;
+                            UpdateUser(item, 1);
+                            userMarble.DamageDealt += dmg;
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     }
@@ -510,7 +513,7 @@ namespace MarbleBot.Modules {
                                 .WithDescription($"**{userMarble.Name}** used **{item.Name}**! Everyone was poisoned!")
                                 .WithTitle(item.Name)
                                 .Build());
-                            user.Items[item.Id]--;
+                            UpdateUser(item, 1);
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     }
@@ -538,7 +541,7 @@ namespace MarbleBot.Modules {
                                 .WithDescription($"**{userMarble.Name}** used **{item.Name}**! Everyone is doomed!")
                                 .WithTitle(item.Name)
                                 .Build());
-                            user.Items[item.Id]--;
+                            UpdateUser(item, 1);
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     }
@@ -553,7 +556,67 @@ namespace MarbleBot.Modules {
                                 .WithDescription($"**{userMarble.Name}** used **{item.Name}** and is now cured!")
                                 .WithTitle(item.Name)
                                 .Build());
-                            user.Items[item.Id]--;
+                            UpdateUser(item, 1);
+                        } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        break;
+                    }
+                    case 50: {
+                        ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+                        if (Global.SiegeInfo.ContainsKey(fileId)) {
+                            if (user.Items.ContainsKey(048) && user.Items[048] > 0) {
+                                var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                if (Global.Rand.Next(0, 3) < 2) {
+                                    var dmg = (int)Math.Round(75 + 12.5 * (int)Global.SiegeInfo[fileId].Boss.Difficulty);
+                                    Global.SiegeInfo[fileId].Boss.HP -= dmg;
+                                    await ReplyAsync(embed: new EmbedBuilder()
+                                        .AddField("Boss HP", $"**{Global.SiegeInfo[fileId].Boss.HP}**/{Global.SiegeInfo[fileId].Boss.MaxHP}")
+                                        .WithColor(GetColor(Context))
+                                        .WithCurrentTimestamp()
+                                        .WithDescription($"**{userMarble.Name}** used a **{item.Name}**, dealing {dmg} damage to the boss!")
+                                        .WithTitle(item.Name)
+                                        .Build());
+                                    UpdateUser(GetItem("048"), 1);
+                                    userMarble.DamageDealt += dmg;
+                                } else await ReplyAsync(embed: new EmbedBuilder()
+                                        .WithColor(GetColor(Context))
+                                        .WithCurrentTimestamp()
+                                        .WithDescription($"**{userMarble.Name}** used a **{item.Name}** but missed!")
+                                        .WithTitle(item.Name)
+                                        .Build());
+                            } else await ReplyAsync($"**{Context.User.Username}**, you do not have enough ammo for this item!");
+                        } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        break;
+                    }
+                    case 51: goto case 50;
+                    case 52: goto case 50;
+                    case 53: {
+                        ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+                        var dmgs = new int[3];
+                        var embed = new EmbedBuilder()
+                            .WithColor(GetColor(Context))
+                            .WithCurrentTimestamp()
+                            .WithTitle(item.Name);
+                        if (Global.SiegeInfo.ContainsKey(fileId)) {
+                            if (user.Items.ContainsKey(048) && user.Items[048] > 2) {
+                                var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                for (int i = 0; i < 3; i++) {
+                                    if (Global.Rand.Next(0, 3) < 2) {
+                                        var dmg = (int)Math.Round(75 + 12.5 * (int)Global.SiegeInfo[fileId].Boss.Difficulty);
+                                        Global.SiegeInfo[fileId].Boss.HP -= dmg;
+                                        dmgs[i] = dmg;
+                                        embed.AddField($"Trebuchet {i + 1}", $"**{dmg}** damage to **{Global.SiegeInfo[fileId].Boss.Name}**");
+                                    }
+                                    else {
+                                        dmgs[i] = 0;
+                                        embed.AddField($"Trebuchet {i + 1}", "Missed!");
+                                    }
+                                }
+                                embed.AddField("Boss HP", $"**{Global.SiegeInfo[fileId].Boss.HP}**/{Global.SiegeInfo[fileId].Boss.MaxHP}")
+                                    .WithDescription($"**{userMarble.Name}** used a **{item.Name}**, dealing a total of {dmgs.Sum()} damage to the boss!");
+                                await ReplyAsync(embed: embed.Build());
+                                userMarble.DamageDealt += dmgs.Sum();
+                                UpdateUser(GetItem("048"), 3);
+                            } else await ReplyAsync($"**{Context.User.Username}**, you do not have enough ammo for this item!");
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     }

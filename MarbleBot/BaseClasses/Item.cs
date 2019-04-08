@@ -10,7 +10,12 @@ namespace MarbleBot.BaseClasses
         public decimal Price { get; set; }
         public string Description { get; set; }
         public bool OnSale { get; set; }
-        public bool ScavengeCollectable { get; set; }
+        public ScavengeLocation ScavengeLocation { get; set; }
+        public uint CraftingProduced { get; set; }
         public Dictionary<string, int> CraftingRecipe { get; set; }
+
+        public override string ToString() {
+            return $"[{Id}] {Name}";
+        }
     }
 }

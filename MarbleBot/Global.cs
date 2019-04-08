@@ -14,9 +14,8 @@ namespace MarbleBot
         internal static Random Rand = new Random();
         internal static DateTime StartTime = new DateTime();
         internal static string YTKey = "";
-        internal static string GDKey = "";
-        internal static string UoM = "<:unitofmoney:372385317581488128>";
-        internal static ulong BotId = 286228526234075136;
+        internal const string UoM = "<:unitofmoney:372385317581488128>";
+        internal const ulong BotId = 286228526234075136;
         internal static Dictionary<string, string> Autoresponses = new Dictionary<string, string>();
         internal static DateTime ARLastUse = new DateTime();
         internal static ulong[] BotChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 540638882740305932 };

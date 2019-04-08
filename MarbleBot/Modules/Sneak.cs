@@ -40,7 +40,7 @@ namespace MarbleBot.Modules
         {
             SocketGuild srvr = Context.Client.GetGuild(THS);
             ISocketMessageChannel chnl = srvr.GetTextChannel(THS);
-            Trace.WriteLine("Time For MElmonry >:)");
+            Log("Time For MElmonry >:)");
             switch(melmon) {
                 case "desk": await chnl.SendMessageAsync(msg); break;
                 case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;

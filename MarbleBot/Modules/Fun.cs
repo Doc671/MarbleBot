@@ -3,8 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -40,7 +38,7 @@ namespace MarbleBot.Modules
                 case 12: outcome = "and the sign points to... no!"; break;
                 case 13: outcome = "probably not, but there is still a chance..."; break;
             }
-            await ReplyAsync(":seven: |  **" + Context.User.Username + "**, " + outcome);
+            await ReplyAsync($":seven: |  **{Context.User.Username }**, {outcome}");
         }
 
         [Command("best")]
@@ -56,7 +54,7 @@ namespace MarbleBot.Modules
                         names[i] = users[i].Username;
                     }
                     await ReplyAsync($"**{names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
-                } else Trace.WriteLine("oof");
+                } else Log("oof");
             } else await ReplyAsync("That command doesn't work here!");
         }
 
@@ -110,10 +108,8 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
-                else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
-            } else {
-                await ReplyAsync($"**{Context.User.Username} **, I choose **{choices[choice].Trim()}**!");
-            }
+                else Log($"Profanity detected: {input}");
+            } else await ReplyAsync($"**{Context.User.Username} **, I choose **{choices[choice].Trim()}**!");
         }
 
         [Command("orange")]
@@ -153,7 +149,7 @@ namespace MarbleBot.Modules
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                    } else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
+                    } else Log($"Profanity detected: {input}");
                 } else {
                     await ReplyAsync(orangeified.ToString());
                 }
@@ -297,7 +293,7 @@ namespace MarbleBot.Modules
                 case "dGFibGVz": rating = -999; message = "do not mention those unholy creatures near me"; break;
                 case "doc671": rating = -1; message = "terrible at everything"; break;
                 case "dockque the rockque": rating = -1; message = "AM NOT ROCKQUE YOU MELMON"; break;
-                case "egnaro":  rating = 10; message = "!egnarO"; break;
+                case "egnaro": rating = 10; message = "!egnarO"; break;
                 case "erango": rating = 0; message = "stoP noW"; break;
                 case "marblebot's creator": input = "Doc671"; goto case "doc671";
                 case "marblebot's dad": input = "Doc671"; goto case "doc671";
@@ -347,7 +343,7 @@ namespace MarbleBot.Modules
                 case "no your": message = "No You're"; break;
                 case "no you're": message = "N'Yuroe"; break;
                 case "oh so muches": message = "Is To Much"; break;
-                case "rackquette":  message = "WHACC"; break;
+                case "rackquette": message = "WHACC"; break;
                 case "sand dollar": message = "XXX"; break;
                 case "shotgun": message = "Vinh Shotgun All"; break;
                 case "you silly desk": message = "Now I\nCry"; break;
@@ -355,7 +351,7 @@ namespace MarbleBot.Modules
             // Dann Annoy Me >:((((
             if (input.ToLower() == "dann" || input.ToLower() == "danny playz") {
                 int choice = Global.Rand.Next(0, 2);
-                if (choice == 1)  message = "you guys, are a rat kids";
+                if (choice == 1) message = "you guys, are a rat kids";
                 else message = "I don’t know who you are I don’t know what you want but if I don’t get my t-shirt tomorrow i will find you and I will rob you.";
                 rating = Global.Rand.Next(9, 11);
             }
@@ -397,15 +393,15 @@ namespace MarbleBot.Modules
                     default: message = "Uhhhhhhhh\nNot"; break;
                 }
             }
-            if (rating == -2)  await ReplyAsync("**" + Context.User.Username + "**, I rATE " + input + " UNd3FINED10. " + emoji + "\n(" + message + ")");
+            if (rating == -2) await ReplyAsync($"**{Context.User.Username}**, I rATE {input} UNd3FINED10. {emoji}\n({message})");
             else {
                 if (Moderation.CheckSwear(input)) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                    } else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
+                    } else Log($"Profanity detected: {input}");
                 }
-                else await ReplyAsync("**" + Context.User.Username + "**, I rate " + input + " **" + rating + "**/10. " + emoji + "\n(" + message + ")");
+                else await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
             }
         }
 
@@ -421,10 +417,8 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
-                else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {repeat}");
-            } else {
-                await ReplyAsync(repeat);
-            }
+                else Log($"Profanity detected: {repeat}");
+            } else await ReplyAsync(repeat);
         }
 
         [Command("reverse")]
@@ -443,22 +437,9 @@ namespace MarbleBot.Modules
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                } else Trace.WriteLine($"[{DateTime.UtcNow}] Profanity detected: {input}");
-            } else {
-                await ReplyAsync(reverse.ToString());
-            }
+                } else Log($"Profanity detected: {input}");
+            } else await ReplyAsync(reverse.ToString());
         }
-
-        /*[Command("stats")]
-        [Summary("Returns some stats.")]
-        public async Task StatsCommandAsync()
-        {
-            string mensage = "";
-            SocketGuildChannel[] channels = Context.Guild.TextChannels.ToArray();
-            Array.Sort(channels, (x, y) => string.Compare(x.Name, y.Name));
-            for (int i = 0; i < Context.Guild.Channels.Count - 1; i++) mensage += channels[i] + " ";
-            await ReplyAsync(mensage);
-        }*/
 
         [Command("vinhglish")]
         [Summary("Returns a Vinhglish word, its inventor and meaning.")]
@@ -467,9 +448,9 @@ namespace MarbleBot.Modules
         {
             int randNo = 0;
             bool wordSet = false;
-            string[] wordList = new string[100];
-            string[] invList = new string[100];
-            string[] descList = new string[100];
+            var wordList = new string[100];
+            var invList = new string[100];
+            var descList = new string[100];
             int a = 0;
             if (word == "") {
                 using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv")) {
@@ -503,7 +484,7 @@ namespace MarbleBot.Modules
                     if (!wordSet) randNo = Global.Rand.Next(1, a);
                 }
             }
-            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC)
+            if (Context.IsPrivate || Context.Guild.Id != CM)
                 await ReplyAsync($"**__{wordList[randNo]}__**\nInventor: {invList[randNo]}\nDescription: {descList[randNo]}");
         }
     }

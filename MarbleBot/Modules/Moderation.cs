@@ -29,7 +29,7 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task ClearRecentSpamCommandAsync(string rserver, string rchannel) {
-            Trace.WriteLine("hi");
+            Log("hi");
             var server = ulong.Parse(rserver);
             var channel = ulong.Parse(rchannel);
             var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
@@ -84,7 +84,7 @@ namespace MarbleBot.Modules
                     break;
                 }
             }
-            if (swearPresent) Trace.WriteLine($"Profanity detected, violation: {msg}");
+            if (swearPresent) Log($"Profanity detected, violation: {msg}");
             return swearPresent;
         }
     }

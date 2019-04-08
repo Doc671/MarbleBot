@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using MarbleBot.BaseClasses;
 using MarbleBot.Extensions;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +37,7 @@ namespace MarbleBot.Modules
                         else commands = commands.Where(c => c.Remarks != "CM Only");
                     } else commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
                     foreach (var cmd in commands) allCmds.AppendLine($"**{cmd.Name}** - {cmd.Summary}");
-                    builder.AddField($"{Global.CommandService.Modules.Where(m => m.Name.ToLower() == command).First().Name} Commands", allCmds.ToString())
+                    builder.AddField($"{Global.CommandService.Modules.Where(m => m.Name.ToLower() == command.ToLower()).First().Name} Commands", allCmds.ToString())
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help");
                     await ReplyAsync(embed: builder.Build());
@@ -328,7 +327,7 @@ namespace MarbleBot.Modules
                         ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID);
                         user = Context.Guild.GetUser(ID);
                     } catch (NullReferenceException ex) {
-                        Trace.WriteLine($"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {ex}");
+                        Log(ex.ToString());
                         await ReplyAsync("Invalid ID!");
                         userFound = false;
                     }
@@ -336,7 +335,7 @@ namespace MarbleBot.Modules
                     try {
                         user = Context.Guild.Users.Where(u => u.Username.ToLower().Contains(username) || username.Contains(u.Username.ToLower())).FirstOrDefault();
                     } catch (NullReferenceException ex) {
-                        Trace.WriteLine($"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {ex}");
+                        Log(ex.ToString());
                         await ReplyAsync("Could not find the requested user!");
                         userFound = false;
                     }

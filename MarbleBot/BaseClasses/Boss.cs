@@ -16,11 +16,11 @@ namespace MarbleBot.BaseClasses
 
         public static Boss Empty = new Boss("", 0, Difficulty.None, "", new Attack[] { Attack.Empty });
 
-        public void ResetHP() { HP = MaxHP; }
+        public void ResetHP() { _HP = MaxHP; }
      
         public Boss(string name, int hp, Difficulty diff, string imgUrl, Attack[] atks) {
             Name = name;
-            HP = hp;
+            _HP = hp;
             MaxHP = hp;
             Difficulty = diff;
             Attacks = atks;

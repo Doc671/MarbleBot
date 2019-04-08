@@ -8,16 +8,20 @@ namespace MarbleBot.BaseClasses
     {
         public string Name { get; set; } = "";
         public string Discriminator { get; set; } = "0000";
-        public decimal Balance { get; set; } = 0m;
-        public decimal NetWorth { get; set; } = 0m;
-        public uint DailyStreak { get; set; } = 0u;
-        public bool SiegePing { get; set; } = false;
-        public uint RaceWins { get; set; } = 0u;
-        public uint SiegeWins { get; set; } = 0u;
+        public decimal Balance { get; set; }
+        public decimal NetWorth { get; set; }
+        public uint DailyStreak { get; set; }
+        public bool SiegePing { get; set; }
+        public uint RaceWins { get; set; }
+        public uint SiegeWins { get; set; }
         public DateTime LastDaily { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public DateTime LastRaceWin { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public DateTime LastScavenge { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public DateTime LastSiegeWin { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
-        public Dictionary<int, int> Items { get; set; } = new Dictionary<int, int>();
+        public SortedDictionary<int, int> Items { get; set; } = new SortedDictionary<int, int>();
+
+        public override string ToString() {
+            return $"{Name}#{Discriminator}";
+        }
     }
 }

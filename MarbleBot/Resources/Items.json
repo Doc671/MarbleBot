@@ -4,14 +4,15 @@
     "Price": 0.01,
     "Description": "A ticket to go see The Amazing Marble Race! But... which one?",
     "OnSale": true,
-    "ScavengeCollectable": true
+    "ScavengeLocation": 1
   },
   "001": {
     "Name": "Poup Soop",
     "Price": 364400.00,
     "Description": "A hole-y drink of Qefpedun origin that contains Poup; acid; lava; rotten flesh and 13 different lethal diseases. Approved by Orange.",
     "OnSale": true,
-    "ScavengeCollectable": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
     "CraftingRecipe": {
       "020": 1,
       "021": 1,
@@ -37,91 +38,92 @@
     "Price": 552387946.00,
     "Description": "A special edition of Poup Soop that contains extra Poup; extra acid; extra lava; rotten-er flesh; 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "003": {
     "Name": "Frozen Edition Poup Soop",
     "Price": 140732609585.00,
     "Description": "A special edition of Poup Soop with all the ingredients of regular Poup Soop frozen with solid chunks of ice. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "004": {
     "Name": "Orange Edition Poup Soop",
     "Price": 180269042735.00,
     "Description": "A special edition of Poup Soop with twice the ingredients of regular Poup Soop and the essence of Orange. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "005": {
     "Name": "Electric Edition Poup Soop",
     "Price": 221548933670.00,
     "Description": "A special edition of Poup Soop with 20% more lava; 20% more acid and electricity generators inside the barrel. Very good conductor of electricity. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "006": {
     "Name": "Burning Edition Poup Soop",
     "Price": 262310854791.00,
     "Description": "A special edition of Poup Soop with three times as much lava. Everything including the barrel is flammable and on fire. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "007": {
     "Name": "Rotten Edition Poup Soop",
     "Price": 303496572188.00,
     "Description": "A special edition of Poup Soop with 6.66 times as much rotten flesh; twice as much acid and 21.25 lethal diseases. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "008": {
     "Name": "Ulteymut Edition Poup Soop",
     "Price": 1802201667100.00,
     "Description": "The final edition of Poup Soop with three times as much Poup; lava and acid; 47.41394 lethal diseases and several classified ingredients. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "009": {
     "Name": "Poup Soop Variety Pack",
     "Price": 374180952623987.00,
     "Description": "Contains 50 of each Poup Soop version currently on sale + Poup Bwedd + Poup Stoo + Poup Joos + HATT MANN action figure. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "010": {
     "Name": "Qefpedun Charm",
     "Price": -1.00,
     "Description": "A special charm given to those who got dailies in the run up to Orange Day 2019. Imbued with special Qefpedun powers.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "011": {
     "Name": "Old Boot",
     "Price": 0.40,
     "Description": "An old boot - once worn long ago...",
     "OnSale": false,
-    "ScavengeCollectable": true
+    "ScavengeLocation": 1
   },
   "012": {
     "Name": "Broken Plastic Bottle",
     "Price": 0.35,
     "Description": "A broken plastic bottle which was releasing harmful microplastics into the ocean.",
     "OnSale": false,
-    "ScavengeCollectable": true
+    "ScavengeLocation": 1
   },
   "013": {
     "Name": "Baking Powder",
     "Price": 1.00,
     "Description": "A jar containing powdered sodium bicarbonate.",
     "OnSale": true,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "014": {
     "Name": "Bottle Rocket",
     "Price": 12.00,
     "Description": "An explosive plastic bottle that can be used as a weapon. Consumable.",
     "OnSale": false,
-    "ScavengeCollectable": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
     "CraftingRecipe": {
       "012": 1,
       "013": 1,
@@ -134,168 +136,169 @@
     "Price": 0.25,
     "Description": "A pair of wings made from cardboard.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 1
   },
   "016": {
     "Name": "Vinegar Bottle",
     "Price": 1.00,
     "Description": "A bottle containing an aqueous solution of acetic acid with trace chemicals.",
     "OnSale": true,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "017": {
     "Name": "Crafting Station Mk.I",
     "Price": -1.00,
     "Description": "A workbench providing several different utilities allowing you to craft items.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "018": {
     "Name": "Steel Bucket",
     "Price": 3.00,
     "Description": "A bucket made of stainless steel.",
     "OnSale": true,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 1
   },
   "019": {
     "Name": "Water Bucket",
     "Price": 0.00,
     "Description": "A stainless steel bucket containing water.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "020": {
     "Name": "Lava Bucket",
     "Price": 0.00,
     "Description": "A stainless steel bucket containing lava.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "021": {
     "Name": "Rotten Flesh",
     "Price": 0.00,
     "Description": "A piece of rotting flesh.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 1
   },
   "022": {
     "Name": "Petri Dish",
     "Price": 0.80,
     "Description": "A shallow cylindrical glass dish.",
     "OnSale": true,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "023": {
     "Name": "Plague Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Yersinia pestis*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "024": {
     "Name": "Nipah Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Nipah henipavirus*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "025": {
     "Name": "Flu Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Influenza A* subtype H1N1.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "026": {
     "Name": "TB Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Mycobacterium tuberculosis*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "027": {
     "Name": "Aureus Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Staphylococcus aureus*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "028": {
     "Name": "Malaria Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the parasite *Plasmodium malariae*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "029": {
     "Name": "Ebola Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Sudan ebolavirus*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "030": {
     "Name": "Cholera Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Vibrio cholerae*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "031": {
     "Name": "Tetanus Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Clostridium tetani*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "032": {
     "Name": "Salmonella Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Salmonella enterica*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "033": {
     "Name": "Smallpox Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Variola major*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "034": {
     "Name": "Measles Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Measles morbillivirus*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "035": {
     "Name": "Toxoplasmosis Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the parasite *Toxoplasma gondii*.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "036": {
     "Name": "Acid Bucket",
     "Price": -1.00,
     "Description": "A stainless steel bucket containing hydrofluoric acid.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "037": {
     "Name": "Animal Faecal Matter",
     "Price": -1.00,
     "Description": "A polythene bag containing the faeces of an animal.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "038": {
     "Name": "Poop Soup",
     "Price": 0.00,
     "Description": "An unholy combination of faeces; lava; acid; rotten flesh and 13 different lethal diseases.",
     "OnSale": false,
-    "ScavengeCollectable": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
     "CraftingRecipe": {
       "020": 1,
       "021": 1,
@@ -321,17 +324,146 @@
     "Price": 100.00,
     "Description": "An orange fluid containing the essence of Qefped. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false
+    "ScavengeLocation": 0
   },
   "040": {
     "Name": "Poup",
     "Price": 1000.00,
     "Description": "Qefpedun matter formed of the faeces of an animal endowed with the raw essence of Orange. Approved by Orange.",
     "OnSale": false,
-    "ScavengeCollectable": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
     "CraftingRecipe": {
       "037": 1,
       "039": 1
+    }
+  },
+  "041": {
+    "Name": "Stick",
+    "Price": 0.00,
+    "Description": "A stick. Wow.",
+    "OnSale": false,
+    "ScavengeLocation": 2
+  },
+  "042": {
+    "Name": "Oak Log",
+    "Price": 1.50,
+    "Description": "A log from an oak tree.",
+    "OnSale": false,
+    "ScavengeLocation": 2
+  },
+  "043": {
+    "Name": "Ash Log",
+    "Price": 1.70,
+    "Description": "A log from an ash tree.",
+    "OnSale": false,
+    "ScavengeLocation": 2
+  },
+  "044": {
+    "Name": "Elm Log",
+    "Price": 1.40,
+    "Description": "A log from an elm tree.",
+    "OnSale": false,
+    "ScavengeLocation": 2
+  },
+  "045": {
+    "Name": "Oak Plank",
+    "Price": 7.50,
+    "Description": "A plank of oak wood.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 4,
+    "CraftingRecipe": {
+      "042": 1
+    }
+  },
+  "046": {
+    "Name": "Ash Plank",
+    "Price": 8.50,
+    "Description": "A plank of ash wood.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 4,
+    "CraftingRecipe": {
+      "043": 1
+    }
+  },
+  "047": {
+    "Name": "Elm Plank",
+    "Price": 7.00,
+    "Description": "A plank of elm wood.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 4,
+    "CraftingRecipe": {
+      "044": 1
+    }
+  },
+  "048": {
+    "Name": "Rock",
+    "Price": 0.00,
+    "Description": "A rock.",
+    "OnSale": false,
+    "ScavengeLocation": 2
+  },
+  "049": {
+    "Name": "Rope",
+    "Price": 4.00,
+    "Description": "A 4m-long strong cord of twisted nylon strands.",
+    "OnSale": true,
+    "ScavengeLocation": 1
+  },
+  "050": {
+    "Name": "Oak Trebuchet",
+    "Price": 40.00,
+    "Description": "A trebuchet made from oak wood and rope. Requires ammo (rocks).",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "041": 5,
+      "045": 3,
+      "049": 1
+    }
+  },
+  "051": {
+    "Name": "Ash Trebuchet",
+    "Price": 40.00,
+    "Description": "A trebuchet made from ash wood and rope. Requires ammo (rocks).",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "041": 5,
+      "046": 3,
+      "049": 1
+    }
+  },
+  "052": {
+    "Name": "Elm Trebuchet",
+    "Price": 40.00,
+    "Description": "A trebuchet made from elm wood and rope. Requires ammo (rocks).",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "041": 5,
+      "047": 3,
+      "049": 1
+    }
+  },
+  "053": {
+    "Name": "Trebuchet Array",
+    "Price": 125.00,
+    "Description": "An array of three trebuchets. Requires ammo (rocks) - uses three per shot.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "049": 1,
+      "050": 1,
+      "051": 1,
+      "052": 1
     }
   }
 }

@@ -84,9 +84,7 @@ namespace MarbleBot.Modules
                         builder.WithTitle("The race has started!");
                         var msg = await ReplyAsync(embed: builder.Build());
                         await Task.Delay(1500);
-                        byte alive = 255;
-                        if (Context.IsPrivate) alive = Global.RaceAlive[Context.User.Id];
-                        else alive = Global.RaceAlive[Context.Guild.Id];
+                        byte alive = Context.IsPrivate ? Global.RaceAlive[Context.User.Id] : Global.RaceAlive[Context.Guild.Id];
                         byte id = alive;
                         while (alive > 1) {
                             int eliminated = 0;
@@ -132,9 +130,7 @@ namespace MarbleBot.Modules
                         }
 
                         // Reward winner
-                        string json;
-                        using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-                        var obj = JObject.Parse(json);
+                        var obj = GetUsersObj();
                         var user = GetUser(Context, obj, winnerID);
                         if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6) {
                             var noOfSameUser = 0;
@@ -315,25 +311,22 @@ namespace MarbleBot.Modules
             var embed = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp();
-            string location;
-
-            string json;
-            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-            var obj = JObject.Parse(json);
+            var location = ScavengeLocation.CanaryBeach;
+            
+            var obj = GetUsersObj();
             var user = GetUser(Context, obj);
 
-            switch (command.ToLower().Trim()) {
-                case "canary beach":
+            switch (command.ToLower().RemoveChar(' ')) {
+                case "canarybeach":
                     if (DateTime.UtcNow.Subtract(user.LastScavenge).TotalHours < 6) {
                         var sixHoursAgo = DateTime.UtcNow.AddHours(-6);
                         await ReplyAsync($"**{Context.User.Username}**, you need to wait for **{GetDateString(user.LastScavenge.Subtract(sixHoursAgo))}** until you can scavenge again.");
                     } else {
                         if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
                         else {
-                            location = "Canary Beach";
                             Global.ScavengeInfo.Add(Context.User.Id, new Queue<Item>());
                             Global.ScavengeSessions.Add(Task.Run(async () => { await ScavengeSession(Context, location); }));
-                            embed.WithDescription($"**{Context.User.Username}** has begun scavenging in {location}!")
+                            embed.WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)}**!")
                                 .WithTitle("Item Scavenge Begin!");
                             await ReplyAsync(embed: embed.Build());
                         }
@@ -349,7 +342,7 @@ namespace MarbleBot.Modules
                                     if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
                                     else user.Items.Add(item.Id, 1);
                                 } else {
-                                    user.Items = new Dictionary<int, int> {
+                                    user.Items = new SortedDictionary<int, int> {
                                         { item.Id, 1 }
                                     };
                                 }
@@ -360,8 +353,31 @@ namespace MarbleBot.Modules
                         }
                     } else await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                     break;
+                case "info":
+                    await ReplyAsync("Select a location to view the info of!");
+                    break;
+                case "infocanarybeach":
+                    var output = new StringBuilder();
+                    string json2;
+                    using (var users = new StreamReader("Resources\\Items.json")) json2 = users.ReadToEnd();
+                    var obj2 = JObject.Parse(json2);
+                    var items = obj2.ToObject<Dictionary<string, Item>>();
+                    foreach (var itemPair in items) {
+                        if (itemPair.Value.ScavengeLocation == location)
+                            output.AppendLine($"`[{int.Parse(itemPair.Key).ToString("000")}]` {itemPair.Value.Name}");
+                    }
+                    await ReplyAsync(embed: new EmbedBuilder()
+                        .WithColor(GetColor(Context))
+                        .WithCurrentTimestamp()
+                        .WithDescription(output.ToString())
+                        .WithTitle($"Scavenge Location Info: {Enum.GetName(typeof(ScavengeLocation), location)}")
+                        .Build());
+                    break;
+                case "infotreewurld":
+                    location = ScavengeLocation.TreeWurld;
+                    goto case "infocanarybeach";
                 case "locations":
-                    embed.WithDescription("Canary Beach\n\nMore coming eventually!")
+                    embed.WithDescription("Canary Beach\nTree Wurld\n\nUse `mb/scavenge info <location name>` to see which items you can get!")
                         .WithTitle("Scavenge Locations");
                     await ReplyAsync(embed: embed.Build());
                     break;
@@ -374,11 +390,14 @@ namespace MarbleBot.Modules
                                 user.Balance += item.Price;
                                 user.NetWorth += item.Price;
                                 WriteUsers(obj, Context.User, user);
-                                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {Global.UoM}**{item.Price}**!");
+                                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {Global.UoM}**{item.Price:n}**!");
                             } else await ReplyAsync($"**{Context.User.Username}**, there is nothing to sell!");
                         }
                     } else await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                     break;
+                case "treewurld":
+                    location = ScavengeLocation.TreeWurld;
+                    goto case "canarybeach";
                 default:
                     var helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
                     var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
@@ -390,31 +409,29 @@ namespace MarbleBot.Modules
             }
         }
 
-#pragma warning disable IDE0060 // Remove unused parameter
-        public async Task ScavengeSession(SocketCommandContext context, string location)
+        public async Task ScavengeSession(SocketCommandContext context, ScavengeLocation location)
         {
-#pragma warning restore IDE0060 // Remove unused parameter
             var startTime = DateTime.UtcNow;
+            var collectableItems = new List<Item>();
+            string json;
+            using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+            var obj = JObject.Parse(json);
+            var items = obj.ToObject<Dictionary<string, Item>>();
+            foreach (var itemPair in items) {
+                if (itemPair.Value.ScavengeLocation == location) {
+                    var outputItem = itemPair.Value;
+                    outputItem.Id = int.Parse(itemPair.Key);
+                    collectableItems.Add(outputItem);
+                }
+            }
             do {
                 await Task.Delay(8000);
                 if (Global.Rand.Next(0, 5) < 4) {
-                    var collectableItems = new List<Item>();
-                    string json;
-                    using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
-                    var obj = JObject.Parse(json);
-                    var items = obj.ToObject<Dictionary<string, Item>>();
-                    foreach (var itemPair in items) {
-                        if (itemPair.Value.ScavengeCollectable) {
-                            var outputItem = itemPair.Value;
-                            outputItem.Id = int.Parse(itemPair.Key);
-                            collectableItems.Add(outputItem);
-                        }
-                    }
-                    var item = collectableItems[Global.Rand.Next(0, collectableItems.Count - 1)];
+                    var item = collectableItems[Global.Rand.Next(0, collectableItems.Count)];
                     Global.ScavengeInfo[Context.User.Id].Enqueue(item);
                     await ReplyAsync($"**{context.User.Username}**, you have found **{item.Name}** x**1**! Use `mb/scavenge grab` to keep it or `mb/scavenge sell` to sell it.");
                 }
-            } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60));
+            } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 63));
 
             string json2;
             using (var users = new StreamReader("Users.json")) json2 = users.ReadToEnd();
@@ -634,7 +651,7 @@ namespace MarbleBot.Modules
                                         Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Cloned = false;
                                     }
                                     Global.SiegeInfo[fileID].Boss.HP -= dmg;
-                                    Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).BossHits += dmg;
+                                    Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).DamageDealt += dmg;
                                     builder.WithTitle(title)
                                         .WithThumbnailUrl(url)
                                         .WithDescription(string.Format("**{0}** dealt **{1}** damage to **{2}**!", Global.SiegeInfo[fileID].Marbles.Find(m => m.Id == Context.User.Id).Name, dmg, Global.SiegeInfo[fileID].Boss.Name))
@@ -792,7 +809,7 @@ namespace MarbleBot.Modules
                     if (Global.SiegeInfo.ContainsKey(fileID)) {
                         var siege = Global.SiegeInfo[fileID];
                         foreach (var marble in siege.Marbles) {
-                            marbles.AppendLine($"**{marble.Name}** (HP: **{marble.HP}**/{marble.MaxHP}, DMG: **{marble.BossHits}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
+                            marbles.AppendLine($"**{marble.Name}** (HP: **{marble.HP}**/{marble.MaxHP}, DMG: **{marble.DamageDealt}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
                         }
                         var PU = siege.PowerUp.IsEmpty() ? "None" : siege.PowerUp;
                         builder.AddField($"Boss: **{siege.Boss.Name}**", string.Format("\nHP: **{0}**/{3}\nAttacks: **{1}**\nDifficulty: **{2}**", siege.Boss.HP, siege.Boss.Attacks.Length, Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty), siege.Boss.MaxHP))
@@ -958,9 +975,7 @@ namespace MarbleBot.Modules
                 case "powerupinfo": goto case "powerup";
                 case "puinfo": goto case "powerup";
                 case "ping": {
-                    string json;
-                    using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-                    var obj = JObject.Parse(json);
+                    var obj = GetUsersObj();
                     var user = GetUser(Context, obj);
                     switch (option) {
                         case "on": user.SiegePing = true; break;
@@ -1082,7 +1097,7 @@ namespace MarbleBot.Modules
                     if (Global.SiegeInfo[Id].Marbles.Aggregate(0, (agg, m) => { agg += m.HP; return agg; }) < 1) {
                         var marbles = new StringBuilder();
                         foreach (var marble in Global.SiegeInfo[Id].Marbles) {
-                            marbles.AppendLine($"**{marble.Name}** (DMG: **{marble.BossHits}**, PU Hits: **{marble.PUHits}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
+                            marbles.AppendLine($"**{marble.Name}** (DMG: **{marble.DamageDealt}**, PU Hits: **{marble.PUHits}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
                         }
                         builder = new EmbedBuilder()
                             .WithColor(GetColor(Context))
@@ -1170,16 +1185,14 @@ namespace MarbleBot.Modules
                 .WithDescription($"**{siege.Boss.Name}** has been defeated!");
             for (int i = 0; i < siege.Marbles.Count; i++) {
                 var marble = siege.Marbles[i];
-                string json;
-                using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-                var obj = JObject.Parse(json);
+                var obj = GetUsersObj();
                 var user = GetUser(Context, obj, marble.Id);
-                int earnings = marble.BossHits + (marble.PUHits * 50);
+                int earnings = marble.DamageDealt + (marble.PUHits * 50);
                 if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6) {
                     var output = new StringBuilder();
                     var didNothing = true;
-                    if (marble.BossHits > 0) {
-                        output.AppendLine($"Damage dealt: {Global.UoM}**{marble.BossHits:n}**");
+                    if (marble.DamageDealt > 0) {
+                        output.AppendLine($"Damage dealt: {Global.UoM}**{marble.DamageDealt:n}**");
                         didNothing = false;
                     }
                     if (marble.PUHits > 0) {

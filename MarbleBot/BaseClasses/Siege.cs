@@ -6,7 +6,7 @@ namespace MarbleBot.BaseClasses
 {
     public class Siege
     {
-        public bool Active { get; set; } = false;
+        public bool Active { get; set; }
         public Boss Boss { get; set; } = Boss.Empty;
         public double DamageMultiplier { get {
                 var deathCount = Marbles.Aggregate(0, (totalDeaths, m) => {
@@ -18,7 +18,7 @@ namespace MarbleBot.BaseClasses
         }
         public DateTime LastMorale { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public List<Marble> Marbles { get; set; } = new List<Marble>();
-        public byte Morales { get; set; } = 0;
+        public byte Morales { get; set; }
         public string PowerUp { get; set; } = "";
         public string PUImageUrl { get; set; } = "";
 
@@ -33,6 +33,10 @@ namespace MarbleBot.BaseClasses
                 case "Summon": PUImageUrl = "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png"; break;
                 default: PUImageUrl = ""; break;
             }
+        }
+
+        public override string ToString() {
+            return $"{Boss.Name}: {Marbles.Count}";
         }
 
         public Siege(Marble[] marbles) { Marbles = new List<Marble>(marbles); }

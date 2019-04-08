@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace MarbleBot
@@ -64,11 +65,12 @@ namespace MarbleBot
             var item = new Item();
             if (int.TryParse(searchTerm, out int itemID)) {
                 string json;
-                using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+                using (var userFile = new StreamReader("Resources\\Items.json")) json = userFile.ReadToEnd();
                 var obj = JObject.Parse(json);
                 if (obj[itemID.ToString("000")] != null){
                     item = obj[itemID.ToString("000")].ToObject<Item>();
                     item.Id = itemID;
+                    item.Description.Replace(';', ',');
                     if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
                     return item;
                 } else {
@@ -78,13 +80,14 @@ namespace MarbleBot
             } else {
                 var newSearchTerm = searchTerm.ToLower().RemoveChar(' ');
                 string json;
-                using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+                using (var userFile = new StreamReader("Resources\\Items.json")) json = userFile.ReadToEnd();
                 var obj = JObject.Parse(json);
                 foreach (var objItemPair in obj) {
                     var objItem = objItemPair.Value.ToObject<Item>();
                     objItem.Id = int.Parse(objItemPair.Key);
                     if (objItem.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(objItem.Name.ToLower())) {
                         item = objItem;
+                        item.Description.Replace(';', ',');
                         if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
                         return item;
                     }
@@ -96,13 +99,11 @@ namespace MarbleBot
 
         // Returns a MoneyUser with the ID of the user
         protected static MBUser GetUser(SocketCommandContext context) {
-            string json;
-            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-            var obj = JObject.Parse(json);
+            var obj = GetUsersObj();
             MBUser user;
             if (obj.ContainsKey(context.User.Id.ToString())) {
                 user = obj[context.User.Id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
             } else {
                 user = new MBUser() {
                     Name = context.User.Username,
@@ -113,13 +114,11 @@ namespace MarbleBot
         }
 
         protected static MBUser GetUser(SocketCommandContext context, ulong Id) {
-            string json;
-            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
-            var obj = JObject.Parse(json);
+            var obj = GetUsersObj();
             MBUser user;
             if (obj.ContainsKey(Id.ToString())) {
                 user = obj[Id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
             } else {
                 user = new MBUser() {
                     Name = context.User.Username,
@@ -133,7 +132,7 @@ namespace MarbleBot
             MBUser user;
             if (obj.ContainsKey(context.User.Id.ToString())) {
                 user = obj[context.User.Id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
             } else {
                 user = new MBUser() {
                     Name = context.User.Username,
@@ -147,7 +146,7 @@ namespace MarbleBot
             MBUser user;
             if (obj.ContainsKey(id.ToString())) {
                 user = obj[id.ToString()].ToObject<MBUser>();
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new Dictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
             } else {
                 if (context.IsPrivate) {
                     user = new MBUser() {
@@ -163,6 +162,14 @@ namespace MarbleBot
             }
             return user;
         }
+
+        protected static JObject GetUsersObj() {
+            string json;
+            using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
+            return JObject.Parse(json);
+        }
+
+        protected static void Log(string log) => Program.Log(log);
 
         // Writes users to appropriate JSON file
         protected static void WriteUsers(JObject obj) {

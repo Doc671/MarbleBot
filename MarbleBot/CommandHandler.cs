@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
 
 namespace MarbleBot
 {
@@ -42,7 +42,7 @@ namespace MarbleBot
                 var result = await _service.ExecuteAsync(Context, argPos, null);
                 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
-                    Trace.WriteLine($"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {result.Error.Value}: {result.ErrorReason}");
+                    Program.Log($"{result.Error.Value}: {result.ErrorReason}");
                 if (result.Error == CommandError.BadArgCount) await Context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
 
             } else if (msg.HasMentionPrefix(await Context.Channel.GetUserAsync(Global.BotId), ref argPos) && msg.Content.ToLower().Contains("no u")) {
@@ -73,7 +73,7 @@ namespace MarbleBot
                     }
                 }
             }
-            if (Context.IsPrivate) Trace.WriteLine(string.Format("[{0}] {1}: {2}", DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"), Context.User, Context.Message));
+            if (Context.IsPrivate) Program.Log($"{Context.User}: {Context.Message}");
         }
     }
 }

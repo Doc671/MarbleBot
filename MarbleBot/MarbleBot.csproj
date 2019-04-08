@@ -186,13 +186,14 @@
     <Compile Include="BaseClasses\HelpCommand.cs" />
     <Compile Include="BaseClasses\Marble.cs" />
     <Compile Include="BaseClasses\MSE.cs" />
+    <Compile Include="BaseClasses\ScavengeLocation.cs" />
     <Compile Include="BaseClasses\Siege.cs" />
     <Compile Include="CommandHandler.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MarbleBotModule.cs" />
     <Compile Include="Modules\Games.cs" />
-    <Compile Include="Modules\Fun.cs" />
+    <Content Include="Modules\Fun.cs" />
     <Compile Include="Modules\Moderation.cs" />
     <Compile Include="BaseClasses\Item.cs" />
     <Compile Include="BaseClasses\Boss.cs" />
@@ -229,15 +230,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\RaceDeathMessages.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RaceMostUsed.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\RaceWinners.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\SiegeMostUsed.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
