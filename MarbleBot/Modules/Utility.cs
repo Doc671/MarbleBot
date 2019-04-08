@@ -182,9 +182,12 @@ namespace MarbleBot.Modules
                     if (users[i].IsBot) botUsers++;
                     if (users[i].Status.ToString().ToLower() == "online") onlineUsers++;
                 }
+
+                var owner = Context.Guild.GetUser(Context.Guild.OwnerId);
+
                 builder.WithThumbnailUrl(Context.Guild.IconUrl)
                     .WithTitle(Context.Guild.Name)
-                    .AddField("Owner", Context.Guild.GetUser(Context.Guild.OwnerId).Username + "#" + Context.Guild.GetUser(Context.Guild.OwnerId).Discriminator, true)
+                    .AddField("Owner", $"{owner.Username}#{owner.Discriminator}", true)
                     .AddField("Voice Region", Context.Guild.VoiceRegionId, true)
                     .AddField("Text Channels", Context.Guild.TextChannels.Count, true)
                     .AddField("Voice Channels", Context.Guild.VoiceChannels.Count, true)
@@ -268,7 +271,7 @@ namespace MarbleBot.Modules
                         if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
                         if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
                     }
-                    await ReplyAsync(nicks[0] + " (" + users[0].Username + "#" + users[0].Discriminator + "): **" + statuses[0] + "**\n" + nicks[1] + " (" + users[1].Username + "#" + users[1].Discriminator + "): **" + statuses[1] + "**");
+                    await ReplyAsync($"{nicks[0]} ({users[0].Username}#{users[0].Discriminator}): **{statuses[0]}**\n{nicks[1]} ({users[1].Username}#{users[1].Discriminator}): **{statuses[1]}**");
                 } else if (Context.Guild.Id == VFC) {
                     IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
                     IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
@@ -322,22 +325,25 @@ namespace MarbleBot.Modules
                 SocketGuildUser user = (SocketGuildUser)Context.User;
                 var userFound = true;
                 username = username.ToLower();
-                if (username[0] == '<') {
-                    try {
-                        ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID);
-                        user = Context.Guild.GetUser(ID);
-                    } catch (NullReferenceException ex) {
-                        Log(ex.ToString());
-                        await ReplyAsync("Invalid ID!");
-                        userFound = false;
-                    }
-                } else {
-                    try {
-                        user = Context.Guild.Users.Where(u => u.Username.ToLower().Contains(username) || username.Contains(u.Username.ToLower())).FirstOrDefault();
-                    } catch (NullReferenceException ex) {
-                        Log(ex.ToString());
-                        await ReplyAsync("Could not find the requested user!");
-                        userFound = false;
+                if (!username.IsEmpty()) {
+                    if (username[0] == '<') {
+                        try {
+                            ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID);
+                            user = Context.Guild.GetUser(ID);
+                        } catch (NullReferenceException ex) {
+                            Log(ex.ToString());
+                            await ReplyAsync("Invalid ID!");
+                            userFound = false;
+                        }
+                    } else {
+                        try {
+                            user = Context.Guild.Users.Where(u => u.Username.ToLower().Contains(username) 
+                            || username.Contains(u.Username.ToLower())).FirstOrDefault();
+                        } catch (NullReferenceException ex) {
+                            Log(ex.ToString());
+                            await ReplyAsync("Could not find the requested user!");
+                            userFound = false;
+                        }
                     }
                 }
                 if (userFound) { 

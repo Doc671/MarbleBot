@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MarbleBot")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A Discord bot created for Algodoo marble race servers.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("MarbleBot")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright © Doc671 2018-19")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

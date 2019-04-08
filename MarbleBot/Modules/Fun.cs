@@ -50,9 +50,8 @@ namespace MarbleBot.Modules
                 if (Context.Guild.MemberCount > 1) {
                     string[] names = new string[Context.Guild.MemberCount];
                     SocketGuildUser[] users = Context.Guild.Users.ToArray();
-                    for (int i = 0; i < Context.Guild.MemberCount - 1; i++) {
+                    for (int i = 0; i < Context.Guild.MemberCount - 1; i++)
                         names[i] = users[i].Username;
-                    }
                     await ReplyAsync($"**{names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
                 } else Log("oof");
             } else await ReplyAsync("That command doesn't work here!");
@@ -71,9 +70,8 @@ namespace MarbleBot.Modules
                 int a = 0;
                 while (!stream.EndOfStream) {
                     string[] row = stream.ReadLine().Split(',');
-                    for (int b = 0; b < row.Length - 1; b++) {
+                    for (int b = 0; b < row.Length - 1; b++)
                         marbles[a, b] = row[b];
-                    }
                     a++;
                 }
             }
