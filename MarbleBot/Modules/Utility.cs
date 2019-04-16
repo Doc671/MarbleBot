@@ -170,7 +170,7 @@ namespace MarbleBot.Modules
         }
 
         [Command("serverinfo")]
-        [Summary("Displays information about a server.")]
+        [Summary("Displays information about the current server.")]
         [Remarks("Not DMs")]
         public async Task ServerInfoCommandAsync()
         {

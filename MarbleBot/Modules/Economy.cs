@@ -367,7 +367,6 @@ namespace MarbleBot.Modules {
         }
 
         [Command("recipes")]
-        [Alias("craftableitems")]
         [Summary("Shows all crafting recipes in a range of IDs.")]
         public async Task RecipesCommandAsync(string rawIndex = "1")
         {
