@@ -3,21 +3,17 @@ using System.Text;
 
 namespace MarbleBot.Extensions
 {
-    /// <summary>
-    /// Extension methods
-    /// </summary>
-    
+    /// <summary> Extension methods </summary>
     public static class Extensions
     {
-        public static bool IsEmpty(this String str) {
-            return (str == "" || str == " " || str == null || str == string.Empty || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str));
-        }
+        public static bool IsEmpty(this String str) 
+            => str == "" || str == " " || str == null || str == string.Empty || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
 
         public static string Ordinal(this int no) {
             var ns = no.ToString();
-            if (ns.Length > 2) ns.Substring((ns.Length - 3));
+            if (ns.Length > 2) ns.Substring(ns.Length - 3);
             no = int.Parse(ns);
-            if (no > 20) no = no % 10;
+            if (no > 20) no %= 10;
             string ord;
             switch (no) {
                 case 1: ord = "st"; break;
@@ -31,9 +27,8 @@ namespace MarbleBot.Extensions
         public static string RemoveChar(this String str, char charToRemove) {
             var chr = str.ToCharArray();
             var output = new StringBuilder();
-            foreach (var c in chr) {
+            foreach (var c in chr)
                 if (c != charToRemove) output.Append(c);
-            }
             return output.ToString();
         }
 

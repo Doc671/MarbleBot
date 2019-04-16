@@ -70,6 +70,7 @@ namespace MarbleBot
                     item = obj[itemID.ToString("000")].ToObject<Item>();
                     item.Id = itemID;
                     item.Description.Replace(';', ',');
+                    if (item.Stage == 0) item.Stage = 1;
                     if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
                     return item;
                 } else {
@@ -87,6 +88,7 @@ namespace MarbleBot
                     if (objItem.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(objItem.Name.ToLower())) {
                         item = objItem;
                         item.Description.Replace(';', ',');
+                        if (item.Stage == 0) item.Stage = 1;
                         if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
                         return item;
                     }

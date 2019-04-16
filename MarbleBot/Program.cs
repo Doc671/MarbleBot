@@ -30,13 +30,8 @@ namespace MarbleBot
             _client = new DiscordSocketClient();
 
             string token = "";
-            if (File.Exists("C:/Folder/MBT.txt")) {
-                using (var stream = new StreamReader("C:/Folder/MBT.txt")) token = stream.ReadLine();
-                using (var stream = new StreamReader("C:/Folder/MBK.txt")) Global.YTKey = stream.ReadLine();
-            } else {
-                using (var stream = new StreamReader("MBT.txt")) token = stream.ReadLine();
-                using (var stream = new StreamReader("MBK.txt")) Global.YTKey = stream.ReadLine();
-            }
+            using (var stream = new StreamReader("MBT.txt")) token = stream.ReadLine();
+            using (var stream = new StreamReader("MBK.txt")) Global.YTKey = stream.ReadLine();
 
             using (var ar = new StreamReader("Resources\\Autoresponses.txt")) {
                 while (!ar.EndOfStream) {
@@ -48,6 +43,8 @@ namespace MarbleBot
             await _client.LoginAsync(TokenType.Bot, token);
 
             await _client.StartAsync();
+
+            await _client.SetGameAsync("Try mb/help!");
 
             Log($"MarbleBot by Doc671\nStarted running: {Global.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}\n", true);
 

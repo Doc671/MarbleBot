@@ -10,6 +10,7 @@ namespace MarbleBot.BaseClasses
         public string Discriminator { get; set; } = "0000";
         public decimal Balance { get; set; }
         public decimal NetWorth { get; set; }
+        public byte Stage { get; set; } = 1;
         public uint DailyStreak { get; set; }
         public bool SiegePing { get; set; }
         public uint RaceWins { get; set; }

@@ -183,6 +183,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseClasses\BossDrops.cs" />
     <Compile Include="BaseClasses\HelpCommand.cs" />
     <Compile Include="BaseClasses\Marble.cs" />
     <Compile Include="BaseClasses\MSE.cs" />
@@ -192,8 +193,10 @@
     <Compile Include="Global.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MarbleBotModule.cs" />
-    <Compile Include="Modules\Games.cs" />
     <Compile Include="Modules\Fun.cs" />
+    <Compile Include="Modules\Games\ScavengeCommand.cs" />
+    <Compile Include="Modules\Games\RaceCommand.cs" />
+    <Compile Include="Modules\Games\SiegeCommand.cs" />
     <Compile Include="Modules\Moderation.cs" />
     <Compile Include="BaseClasses\Item.cs" />
     <Compile Include="BaseClasses\Boss.cs" />

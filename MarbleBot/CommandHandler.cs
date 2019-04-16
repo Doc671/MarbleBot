@@ -31,8 +31,6 @@ namespace MarbleBot
 
             var Context = new SocketCommandContext(_client, msg);
 
-            await Context.Client.SetGameAsync("Try mb/help!");
-
             int argPos = 0;
 
             var IsLett = !char.TryParse(msg.Content.Trim('`'), out char e);

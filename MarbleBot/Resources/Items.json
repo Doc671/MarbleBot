@@ -161,14 +161,14 @@
   },
   "019": {
     "Name": "Water Bucket",
-    "Price": 0.00,
+    "Price": 3.00,
     "Description": "A stainless steel bucket containing water.",
     "OnSale": false,
     "ScavengeLocation": 0
   },
   "020": {
     "Name": "Lava Bucket",
-    "Price": 0.00,
+    "Price": 3.00,
     "Description": "A stainless steel bucket containing lava.",
     "OnSale": false,
     "ScavengeLocation": 0
@@ -465,5 +465,109 @@
       "051": 1,
       "052": 1
     }
+  },
+  "054": {
+    "Name": "Duct Tape",
+    "Price": 2.15,
+    "Description": "Strong cloth-backed waterproof adhesive tape.",
+    "OnSale": true,
+    "ScavengeLocation": 0
+  },
+  "055": {
+    "Name": "Leather Piece",
+    "Price": 0.55,
+    "Description": "A material made from the skin of an animal by tanning.",
+    "OnSale": false,
+    "ScavengeLocation": 1
+  },
+  "056": {
+    "Name": "Leather Boots",
+    "Price": 13.00,
+    "Description": "A pair of boots made of leather.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "011": 2,
+      "055": 5
+    }
+  },
+  "057": {
+    "Name": "Rocket Boots",
+    "Price": 40.00,
+    "Description": "Boots with bottle rockets strapped on both sides.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "014": 4,
+      "054": 1,
+      "056": 1
+    }
+  },
+  "058": {
+    "Name": "Phase Orb",
+    "Price": 1500.00,
+    "Description": "A light blue orb of unknown origin that could be used as a power source.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
+  },
+  "059": {
+    "Name": "Repulsor Arm Fragment",
+    "Price": 550.00,
+    "Description": "The remnants of an arm-mounted repulsor, once belonging to a dangerous cyborg.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
+  },
+  "060": {
+    "Name": "Flamethrower Fragment",
+    "Price": 650.00,
+    "Description": "The remnants of a flamethrower, once belonging to a dangerous cyborg.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
+  },
+  "061": {
+    "Name": "Composite Protection Fragment",
+    "Price": 75.00,
+    "Description": "Reinforced stainless steel plating around a mesh of ceramic and kevlar, once part of a dangerous cyborg.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
+  },
+  "062": {
+    "Name": "Crafting Station Mk.II",
+    "Price": -1.00,
+    "Description": "A large, advanced workbench providing complex crafting and smelting utilities.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "017": 1,
+      "020": 3,
+      "045": 3,
+      "046": 3,
+      "047": 3,
+      "054": 2,
+      "058": 1,
+      "060": 1,
+      "061": 6
+    }
+  },
+  "063": {
+    "Name": "Coating of Destruction",
+    "Price": -1.00,
+    "Description": "A marble coating formed of steel plating, ceramic and kevlar. Reduces all inbound damage by 20%.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "061": 35
+    },
+    "CraftingStationRequired": 2
   }
 }

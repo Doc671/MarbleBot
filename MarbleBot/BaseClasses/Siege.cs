@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MarbleBot.BaseClasses
 {
     public class Siege
     {
+        public Task Actions { get; set; }
         public bool Active { get; set; }
+        public int AttackTime { get; set; } = 15000;
         public Boss Boss { get; set; } = Boss.Empty;
         public double DamageMultiplier { get {
                 var deathCount = Marbles.Aggregate(0, (totalDeaths, m) => {
@@ -22,6 +25,14 @@ namespace MarbleBot.BaseClasses
         public string PowerUp { get; set; } = "";
         public string PUImageUrl { get; set; } = "";
 
+        public void DealDamage(int dmg) {
+            Boss.HP -= dmg;
+            if (Boss.Name == "Destroyer" && Boss.HP <= Boss.MaxHP / 2f) {
+                AttackTime = 12000;
+                Boss.ImageUrl = "https://cdn.discordapp.com/attachments/296376584238137355/567456912430333962/DestroyerCorrupted.png";
+            }
+        }
+
         public void SetPowerUp(string PU) {
             PowerUp = PU;
             switch (PU) {
@@ -35,9 +46,7 @@ namespace MarbleBot.BaseClasses
             }
         }
 
-        public override string ToString() {
-            return $"{Boss.Name}: {Marbles.Count}";
-        }
+        public override string ToString() => $"{Boss.Name}: {Marbles.Count}";
 
         public Siege(Marble[] marbles) { Marbles = new List<Marble>(marbles); }
     }

@@ -43,7 +43,16 @@ namespace MarbleBot.Modules
                     await ReplyAsync(embed: builder.Build());
                     break;
                 case "fun": goto case "economy";
-                case "games": goto case "economy";
+                case "games":
+                    await ReplyAsync(embed: builder
+                        .AddField("Games commands", new StringBuilder()
+                            .AppendLine("**race** - Participate in a marble race!")
+                            .AppendLine("**scavenge - Scavenge for items!")
+                            .AppendLine("**siege** - Participate in a Marble Siege!"))
+                        .WithDescription("*by Doc671#1965*")
+                        .WithTitle("MarbleBot Help")
+                        .Build());
+                    goto case "economy";
                 case "roles": goto case "economy";
                 case "utility": goto case "economy";
                 case "youtube": goto case "economy";
@@ -89,60 +98,54 @@ namespace MarbleBot.Modules
                         await ReplyAsync("Could not find requested command!");
                         break;
                     }
-                    var hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, aliases: rawCommand.Aliases);
+                    var hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
                     string THSOnly = "This command cannot be used in Community Marble!";
                     switch (command) {
                         // General
-                        case "7ball": hCommand.Desc = "Predicts an outcome to an event."; hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
-                        case "best": hCommand.Desc = "Picks a random user in the server to call the best."; hCommand.Usage = "mb/best"; break;
-                        case "bet": hCommand.Desc = "Bets on a marble to win from a list of up to 100."; hCommand.Usage = "mb/bet [number of marbles]"; hCommand.Example = "mb/bet 30"; break;
-                        case "buyhat": hCommand.Desc = "Picks a random user in the server to call the best."; hCommand.Usage = "mb/buyhat"; hCommand.Warning = THSOnly; break;
-                        case "choose": hCommand.Desc = "Chooses between several choices"; hCommand.Usage = "mb/choose <choice1> | <choice2>"; hCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
-                        case "orange": hCommand.Desc = "Gives a random statement in Orange Language."; hCommand.Usage = "mb/orange"; hCommand.Warning = THSOnly; break;
-                        case "orangeify": hCommand.Desc = "Translates text into Orange Language."; hCommand.Usage = "mb/orangeify <text>"; hCommand.Example = "mb/orangeify Drink Poup Soop!"; hCommand.Warning = THSOnly; break;
-                        case "random": hCommand.Desc = "Gives a random number between user-defined bounds."; hCommand.Usage = "mb/random <number1> <number2>"; hCommand.Example = "mb/random 1 5"; break;
-                        case "rank": hCommand.Desc = "Returns the XP and level of the user."; hCommand.Usage = "mb/rank"; break;
-                        case "rate": hCommand.Desc = "Rates something between 0 and 10."; hCommand.Usage = "mb/rate <text>"; hCommand.Example = "mb/rate Marbles"; break;
-                        case "repeat": hCommand.Desc = "Repeats given text."; hCommand.Usage = "mb/repeat <text>"; hCommand.Example = "mb/repeat Hello!"; break;
-                        case "reverse": hCommand.Desc = "Reverses text."; hCommand.Usage = "mb/reverse <text>"; hCommand.Example = "mb/reverse Bowl"; break;
-                        case "vinhglish": hCommand.Desc = "Displays information about a Vinhglish word."; hCommand.Usage = "mb/vinglish OR mb/vinhglish <word>"; hCommand.Example = "mb/vinhglish Am Will You"; hCommand.Warning = THSOnly; break;
+                        case "7ball": hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
+                        case "bet": hCommand.Usage = "mb/bet [number of marbles]"; hCommand.Example = "mb/bet 30"; break;
+                        case "buyhat": hCommand.Warning = THSOnly; break;
+                        case "choose": hCommand.Usage = "mb/choose <choice1> | <choice2>"; hCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
+                        case "orange": hCommand.Warning = THSOnly; break;
+                        case "orangeify": hCommand.Usage = "mb/orangeify <text>"; hCommand.Example = "mb/orangeify Drink Poup Soop!"; hCommand.Warning = THSOnly; break;
+                        case "random": hCommand.Usage = "mb/random <number1> <number2>"; hCommand.Example = "mb/random 1 5"; break;
+                        case "rate": hCommand.Usage = "mb/rate <text>"; hCommand.Example = "mb/rate Marbles"; break;
+                        case "repeat": hCommand.Usage = "mb/repeat <text>"; hCommand.Example = "mb/repeat Hello!"; break;
+                        case "reverse": hCommand.Usage = "mb/reverse <text>"; hCommand.Example = "mb/reverse Bowl"; break;
+                        case "vinhglish": hCommand.Usage = "mb/vinglish <optional word>"; hCommand.Example = "mb/vinhglish Am Will You"; hCommand.Warning = THSOnly; break;
 
                         // Utility
-                        case "serverinfo": hCommand.Desc = "Displays information about a server."; hCommand.Usage = "mb/serverinfo"; break;
-                        case "staffcheck": hCommand.Desc = "Displays a list of all staff members and their statuses."; hCommand.Usage = "mb/staffcheck"; break;
-                        case "uptime": hCommand.Desc = "Displays how long the bot has been running for."; hCommand.Usage = "mb/uptime"; break;
                         case "userinfo": hCommand.Desc = "Displays information about a user."; hCommand.Usage = "mb/userinfo <user>"; hCommand.Example = "mb/userinfo MarbleBot"; break;
 
                         // Economy
-                        case "balance": hCommand.Desc = "Returns how much money you or someone else has."; hCommand.Usage = "mb/balance <optional user>"; break;
-                        case "buy": hCommand.Desc = "Buys items."; hCommand.Usage = "mb/buy <item ID> <# of items>"; hCommand.Example = "mb/buy 1 1"; break;
-                        case "craft": hCommand.Desc = "Crafts an item out of other items."; hCommand.Usage = "mb/craft <item ID>"; hCommand.Example = "mb/craft 014"; break;
-                        case "daily": hCommand.Desc = "Gives daily Units of Money (200 to the power of your streak minus one). You can only do this every 24 hours."; hCommand.Usage = "mb/balance"; break;
-                        case "inventory": hCommand.Desc = "Returns all the items of you or someone else."; hCommand.Usage = "mb/inventory <optional user>"; break;
-                        case "item": hCommand.Desc = "Returns information about an item."; hCommand.Usage = "mb/item <item ID>"; break;
-                        case "poupsoop": hCommand.Desc = "Calculates the total price of Poup Soop."; hCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; hCommand.Example = "mb/poupsoop 3 | 1"; break;
-                        case "profile": hCommand.Desc = "Returns the profile of you or someone else."; hCommand.Usage = "mb/profile <optional user>"; break;
-                        case "recipes": hCommand.Usage = "mb/recipes"; break;
-                        case "richlist": hCommand.Desc = "Shows the ten richest people globally by Net Worth."; hCommand.Usage = "mb/richlist"; break;
-                        case "sell": hCommand.Desc = "Sells items."; hCommand.Usage = "mb/sell <item ID> <# of items>"; hCommand.Example = "mb/sell 1 1"; break;
-                        case "shop": hCommand.Desc = "Shows all items available for sale, their IDs and their prices."; hCommand.Usage = "mb/shop"; break;
+                        case "balance": hCommand.Usage = "mb/balance <optional user>"; break;
+                        case "buy": hCommand.Usage = "mb/buy <item ID> <# of items>"; hCommand.Example = "mb/buy 1 1"; break;
+                        case "craft": hCommand.Usage = "mb/craft <item ID>"; hCommand.Example = "mb/craft 014"; break;
+                        case "inventory": hCommand.Usage = "mb/inventory <optional user>"; break;
+                        case "item": hCommand.Usage = "mb/item <item ID>"; break;
+                        case "poupsoop": hCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; hCommand.Example = "mb/poupsoop 3 | 1"; break;
+                        case "profile": hCommand.Usage = "mb/profile <optional user>"; break;
+                        case "recipes": hCommand.Usage = "mb/recipes <optional group number>"; hCommand.Example = "mb/recipes 2"; break;
+                        case "sell": hCommand.Usage = "mb/sell <item ID> <# of items>"; hCommand.Example = "mb/sell 1 1"; break;
                         case "use": hCommand.Usage = "mb/use <item ID>"; break;
 
                         // Roles
-                        case "give": hCommand.Desc = "Gives a role if it is on the role list."; hCommand.Usage = "mb/give <role>"; hCommand.Example = "mb/give Owner"; break;
-                        case "role": hCommand.Desc = "Toggles role list roles."; hCommand.Usage = "mb/role <role>"; hCommand.Example = "mb/role Bots"; break;
-                        case "rolelist": hCommand.Desc = "Shows a list of roles that can be given/taken by `mb/give` and `mb/take`."; hCommand.Usage = "mb/rolelist"; break;
-                        case "take": hCommand.Desc = "Takes a role if it is on the role list."; hCommand.Usage = "mb/take <role>"; hCommand.Example = "mb/take Criminal"; break;
+                        case "give": hCommand.Usage = "mb/give <role>"; hCommand.Example = "mb/give Owner"; break;
+                        case "role": hCommand.Usage = "mb/role <role>"; hCommand.Example = "mb/role Bots"; break;
+                        case "rolelist": hCommand.Usage = "mb/rolelist"; break;
+                        case "take": hCommand.Usage = "mb/take <role>"; hCommand.Example = "mb/take Criminal"; break;
 
                         // YT
-                        case "cv": hCommand.Desc = "Posts a video in #community-videos."; hCommand.Usage = "mb/cv <video link> <optional description>"; hCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; hCommand.Warning = "This command only works in DMs!"; break;
-                        case "searchchannel": hCommand.Desc = "Displays a list of channels that match the search criteria."; hCommand.Usage = "mb/searchchannel <channelname>"; hCommand.Example = "mb/searchchannel carykh"; break;
-                        case "searchvideo": hCommand.Desc = "Displays a list of videos that match the search critera."; hCommand.Usage = "mb/searchvideo <videoname>"; hCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
+                        case "cv": hCommand.Usage = "mb/cv <video link> <optional description>"; hCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; hCommand.Warning = "This command only works in DMs!"; break;
+                        case "searchchannel": hCommand.Usage = "mb/searchchannel <channelname>"; hCommand.Example = "mb/searchchannel carykh"; break;
+                        case "searchvideo": hCommand.Usage = "mb/searchvideo <videoname>"; hCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
 
                         // Games
-                        case "race": hCommand.Desc = "Participate in a marble race!"; hCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
-                        case "scavenge": hCommand.Desc = "Scavenge for items!"; hCommand.Usage = "mb/scavenge locations, mb/scavenge <location name>, mb/scavenge <grab>, mb/scavenge <sell>"; break;
-                        case "siege": hCommand.Desc = "Participate in a Marble Siege boss battle!"; hCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege bosslist, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
+                        case "boss": hCommand.Usage = "mb/boss <boss name>"; hCommand.Example = "mb/boss Orange"; break;
+                        case "powerup": hCommand.Usage = "mb/powerup <power-up name>"; hCommand.Example = "mb/power-up Clone"; break;
+                        case "race": hCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
+                        case "scavenge": hCommand.Usage = "mb/scavenge locations, mb/scavenge <location name>, mb/scavenge <grab>, mb/scavenge <sell>"; break;
+                        case "siege": hCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege bosslist, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
                     }
 
                     if (!hCommand.Desc.IsEmpty()) {
