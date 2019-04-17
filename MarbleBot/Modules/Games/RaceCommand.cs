@@ -111,9 +111,8 @@ namespace MarbleBot.Modules
                     byte id = alive;
                     while (alive > 1) {
                         int eliminated = 0;
-                        do {
-                            eliminated = Global.Rand.Next(0, id);
-                        } while (marbles[eliminated].Item1 == "///out");
+                        do eliminated = Global.Rand.Next(0, id);
+                        while (marbles[eliminated].Item1 == "///out");
                         var deathmsg = "";
                         var msgs = new List<string>();
                         byte msgCount = 0;
@@ -129,9 +128,9 @@ namespace MarbleBot.Modules
                         if (deathmsg.Contains("was") && (mName.Contains("you ") || mName.Contains("we ") || mName.Contains("they ") || mName.Last() == 's'))
                             deathmsg = "were " + string.Concat(deathmsg.Skip(4));
                         builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathmsg} and is now out of the competition!");
-                        marbles[eliminated] = Tuple.Create("///out", marbles[eliminated].Item2);
                         if (id > 1 && alive == id && marbles[eliminated].Item1.ToLower().RemoveChar(' ') == "sanddollar")
                             builder.WithDescription("*Really, Sand Dollar? Again?*");
+                        marbles[eliminated] = Tuple.Create("///out", marbles[eliminated].Item2);
                         alive--;
                         await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                         await Task.Delay(1500);
