@@ -470,36 +470,28 @@ namespace MarbleBot.Modules
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
             [Summary("Shows a leaderboard of most used marbles in Sieges.")]
-            public async Task SiegeLeaderboardCommandAsync()
+            public async Task SiegeLeaderboardCommandAsync(string rawNo = "1")
             {
-                var winners = new SortedDictionary<string, int>();
-                using (var win = new StreamReader("Resources\\SiegeMostUsed.txt")) {
-                    while (!win.EndOfStream) {
-                        var racerInfo = await win.ReadLineAsync();
-                        if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
-                        else winners.Add(racerInfo, 1);
+                if (int.TryParse(rawNo, out int no)) {
+                    var winners = new SortedDictionary<string, int>();
+                    using (var win = new StreamReader("Resources\\SiegeMostUsed.txt")) {
+                        while (!win.EndOfStream) {
+                            var racerInfo = await win.ReadLineAsync();
+                            if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
+                            else winners.Add(racerInfo, 1);
+                        }
                     }
-                }
-                var winList = new List<Tuple<string, int>>();
-                foreach (var winner in winners)
-                    winList.Add(Tuple.Create(winner.Key, winner.Value));
-                winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
-                int i = 1, j = 1;
-                var desc = new StringBuilder();
-                foreach (var winner in winList) {
-                    if (i < 11) {
-                        desc.Append($"{i}{i.Ordinal()}: {winner.Item1} {winner.Item2}\n");
-                        if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
-                        j++;
-                    }
-                    else break;
-                }
-                await ReplyAsync(embed: new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithDescription(desc.ToString())
-                    .WithTitle("Siege Leaderboard: Most Used")
-                    .Build());
+                    var winList = new List<Tuple<string, int>>();
+                    foreach (var winner in winners)
+                        winList.Add(Tuple.Create(winner.Key, winner.Value));
+                    winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                    await ReplyAsync(embed: new EmbedBuilder()
+                        .WithColor(GetColor(Context))
+                        .WithCurrentTimestamp()
+                        .WithDescription(Global.Leaderboard(winList, no))
+                        .WithTitle("Siege Leaderboard: Most Used")
+                        .Build());
+                } else await ReplyAsync("This is not a valid number! Format: `mb/siege leaderboard <optional number>`");
             }
 
             [Command("boss")]

@@ -1,7 +1,10 @@
 ﻿using Discord.Commands;
 using MarbleBot.BaseClasses;
+using MarbleBot.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MarbleBot
@@ -21,12 +24,35 @@ namespace MarbleBot
         internal static ulong[] BotChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 540638882740305932 };
         internal static ulong[] UsableChannels = { 229280519697727488, 269922990936948737, 318053391777660929, 394090786578366474, 409655798730326016, 540638882740305932, 252481530130202624, 224478087046234112, 293837572130603008 };
 
+        /// <summary> Shows leaderboards for mb/race and mb/siege. </summary>
+        /// <param name="orderedData"> The data to be made into a leaderboard. </param>
+        /// <param name="no"> The part of the leaderboard that will be displayed. </param>
+        /// <returns> A string ready to be output. </returns>
+        internal static string Leaderboard(IEnumerable<Tuple<string, int>> orderedData, int no) {
+            // This displays in groups of ten (i.e. if no is 1, first 10 displayed;
+            // no = 2, next 10, etc.
+            int displayedPlace = 1, dataIndex = 1, minValue = (no - 1) * 10 + 1, maxValue = no * 10;
+            var output = new StringBuilder();
+            foreach (var item in orderedData) {
+                if (displayedPlace < maxValue + 1 && displayedPlace >= minValue) { // i.e. if item is within range
+                    output.AppendLine($"{displayedPlace}{displayedPlace.Ordinal()}: {item.Item1} {item.Item2}");
+                    if (dataIndex < orderedData.Count() && !(orderedData.ElementAt(dataIndex).Item2 == item.Item2))
+                        displayedPlace++;
+                }
+                if (displayedPlace < maxValue + 1 && !(displayedPlace >= minValue)) displayedPlace++;
+                else if(displayedPlace > maxValue) break;
+                dataIndex++;
+            }
+            return output.ToString();
+        }
+
         // Games
         internal static Dictionary<ulong, byte> RaceAlive = new Dictionary<ulong, byte>();
         internal static Dictionary<ulong, Queue<Item>> ScavengeInfo = new Dictionary<ulong, Queue<Item>>();
         internal static List<Task> ScavengeSessions = new List<Task>();
         internal static Dictionary<ulong, Siege> SiegeInfo = new Dictionary<ulong, Siege>();
-        internal static readonly Boss PreeTheTree = new Boss("Pree the Tree", 300, Difficulty.Simple, "https://cdn.discordapp.com/attachments/296376584238137355/541383182197719040/BossPreeTheTree.png", new Attack[] {
+        internal static readonly Boss PreeTheTree = new Boss("Pree the Tree", 300, Difficulty.Simple, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/541383182197719040/BossPreeTheTree.png", new Attack[] {
             new Attack("Falling Leaves", 3, 40, MSE.None),
             new Attack("Spinning Leaves", 3, 50, MSE.None),
             new Attack("Acorn Bomb", 5, 55, MSE.None),
@@ -36,7 +62,8 @@ namespace MarbleBot
             new BossDrops(42, 1, 1, 30),
             new BossDrops(45, 1, 1, 60),
         });
-        internal static readonly Boss HATTMANN = new Boss("HATT MANN", 600, Difficulty.Easy, "https://cdn.discordapp.com/attachments/296376584238137355/541383185481596940/BossHATTMANN.png", new Attack[] {
+        internal static readonly Boss HATTMANN = new Boss("HATT MANN", 600, Difficulty.Easy, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/541383185481596940/BossHATTMANN.png", new Attack[] {
             new Attack("Hat Trap", 4, 45, MSE.None),
             new Attack("Inverted Hat", 3, 45, MSE.None),
             new Attack("HATT GUNN", 6, 40, MSE.None),
@@ -44,7 +71,8 @@ namespace MarbleBot
         }, new BossDrops[] {
             new BossDrops(0, 75, 200, 100),
         });
-        internal static readonly Boss Orange = new Boss("Orange", 1200, Difficulty.Decent, "https://cdn.discordapp.com/attachments/296376584238137355/541383189114126339/BossOrange.png", new Attack[] {
+        internal static readonly Boss Orange = new Boss("Orange", 1200, Difficulty.Decent, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/541383189114126339/BossOrange.png", new Attack[] {
             new Attack("Poup Soop Barrel", 4, 45, MSE.None),
             new Attack("Poup Krumb", 8, 50, MSE.None),
             new Attack("ORANGE HEDDS", 5, 40, MSE.None),
@@ -53,7 +81,8 @@ namespace MarbleBot
             new BossDrops(0, 250, 500, 100),
             new BossDrops(39, 1, 1, 1)
         });
-        internal static readonly Boss Green = new Boss("Green", 1500, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png", new Attack[] {
+        internal static readonly Boss Green = new Boss("Green", 1500, Difficulty.Risky, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png", new Attack[] {
             new Attack("Wobbly Toxicut", 10, 50, MSE.Poison),
             new Attack("Falling Hellslash", 12, 50, MSE.None),
             new Attack("Attractive Domesday", 18, 25, MSE.None),
@@ -63,7 +92,8 @@ namespace MarbleBot
             new BossDrops(15, 2, 3, 80),
             new BossDrops(18, 1, 2, 80)
         });
-        internal static readonly Boss Destroyer = new Boss("Destroyer", 3720, Difficulty.Insane, "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png", new Attack[] {
+        internal static readonly Boss Destroyer = new Boss("Destroyer", 3720, Difficulty.Insane, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png", new Attack[] {
             new Attack("Antimatter Missile", 16, 50, MSE.None),
             new Attack("Annihilator-A", 14, 45, MSE.None),
             new Attack("Flamethrower", 13, 55, MSE.None),
@@ -75,7 +105,8 @@ namespace MarbleBot
             new BossDrops(60, 1, 1, 45),
             new BossDrops(61, 8, 15, 100)
         });
-        internal static readonly Boss HelpMeTheTree = new Boss("Help Me the Tree", 500, Difficulty.Easy, "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png", new Attack[] {
+        internal static readonly Boss HelpMeTheTree = new Boss("Help Me the Tree", 500, Difficulty.Easy, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png", new Attack[] {
             new Attack("Donation Box", 5, 45, MSE.None),
             new Attack("Cry For Help", 0, 40, MSE.Doom),
             new Attack("Sandstorm", 3, 75, MSE.None),
@@ -83,7 +114,8 @@ namespace MarbleBot
         }, new BossDrops[] {
             new BossDrops(35, 1, 1, 65)
         });
-        internal static readonly Boss Erango = new Boss("erangO", 1200, Difficulty.Moderate, "https://cdn.discordapp.com/attachments/296376584238137355/548221808294232071/unknown.png", new Attack[] {
+        internal static readonly Boss Erango = new Boss("erangO", 1200, Difficulty.Moderate, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/548221808294232071/unknown.png", new Attack[] {
             new Attack("erangO Pellets", 6, 90, MSE.None),
             new Attack("Doom Beam", 10, 45, MSE.Doom),
             new Attack("Fake Poup Soop", 8, 55, MSE.None),
@@ -91,7 +123,8 @@ namespace MarbleBot
         }, new BossDrops[] {
             new BossDrops(38, 1, 1, 100)
         });
-        internal static readonly Boss Octopheesh = new Boss("Octopheesh", 800, Difficulty.Risky, "https://cdn.discordapp.com/attachments/296376584238137355/548220914488049665/BossOctopheesh.png", new Attack[] {
+        internal static readonly Boss Octopheesh = new Boss("Octopheesh", 800, Difficulty.Risky, 
+            "https://cdn.discordapp.com/attachments/296376584238137355/548220914488049665/BossOctopheesh.png", new Attack[] {
             new Attack("Two Bipheesh", 13, 75, MSE.None),
             new Attack("EMP Burst", 11, 45, MSE.Stun),
             new Attack("Vile Beam", 18, 40, MSE.None),

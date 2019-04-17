@@ -568,7 +568,7 @@ namespace MarbleBot.Modules {
                         if (Global.SiegeInfo.ContainsKey(fileId)) {
                             var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                             if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy) {
-                               var dmg = (int)Math.Round(75 + 12.5 * (int)Global.SiegeInfo[fileId].Boss.Difficulty);
+                                var dmg = (int)Math.Round(75 + 12.5 * (int)Global.SiegeInfo[fileId].Boss.Difficulty);
                                 Global.SiegeInfo[fileId].DealDamage(dmg);
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .AddField("Boss HP", $"**{Global.SiegeInfo[fileId].Boss.HP}**/{Global.SiegeInfo[fileId].Boss.MaxHP}")

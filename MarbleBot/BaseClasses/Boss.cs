@@ -3,27 +3,43 @@ using System.Linq;
 
 namespace MarbleBot.BaseClasses
 {
+    /// <summary> Represents a boss in a Marble Siege battle. </summary>
     public class Boss {
+        /// <summary> The name of the boss. </summary>
         public string Name { get; set; }
         private int _HP;
+        /// <summary> The number of health points the boss currently has. </summary>
         public int HP {
             get { return _HP; }
             set { _HP = value > MaxHP ? MaxHP : value < 1 ? 0 : value; }
         }
-
+        /// <summary> The maximum number of health points the boss can have. </summary>
         public int MaxHP { get; }
+        /// <summary> The boss' attacks. </summary>
         public Attack[] Attacks { get; set; }
+        /// <summary> The boss' difficulty. </summary>
         public Difficulty Difficulty { get; set; }
+        /// <summary> The items that drop from the boss, the number of them and the chance each one has of dropping. </summary>
         public BossDrops[] Drops { get; set; }
+        /// <summary> A URL to the boss' image. </summary>
         public string ImageUrl { get; set; }
 
+        /// <summary> An empty instance of a boss. </summary>
         public static Boss Empty = new Boss("", 0, Difficulty.None, "",
             new Attack[] { Attack.Empty },
             new BossDrops[] { new BossDrops(0, 0, 0, 0) }
         );
 
+        /// <summary> Resets the boss' HP. </summary>
         public void ResetHP() { _HP = MaxHP; }
-     
+
+        /// <summary> Represents a boss in a Marble Siege battle. </summary>
+        /// <param name="name"> The name of the boss. </param>
+        /// <param name="hp"> The boss' health points. </param>
+        /// <param name="diff"> The boss' difficulty. </param>
+        /// <param name="imgUrl"> A URL to the boss' image. </param>
+        /// <param name="atks"> The boss' attacks. </param>
+        /// <param name="itemDrops"> The items that drop from the boss, the number of them and the chance each one has of dropping. </param>
         public Boss(string name, int hp, Difficulty diff, string imgUrl, Attack[] atks, IEnumerable<BossDrops> itemDrops) {
             Name = name;
             _HP = hp;

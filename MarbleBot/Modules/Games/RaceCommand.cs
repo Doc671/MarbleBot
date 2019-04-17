@@ -126,10 +126,12 @@ namespace MarbleBot.Modules
                         int choice = Global.Rand.Next(0, msgCount - 1);
                         deathmsg = msgs[choice];
                         var mName = marbles[eliminated].Item1.ToLower();
-                        if (deathmsg.Contains("was") && (mName.Contains("you ") || mName.Contains("we ") || mName.Contains("they ")))
+                        if (deathmsg.Contains("was") && (mName.Contains("you ") || mName.Contains("we ") || mName.Contains("they ") || mName.Last() == 's'))
                             deathmsg = "were " + string.Concat(deathmsg.Skip(4));
                         builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathmsg} and is now out of the competition!");
                         marbles[eliminated] = Tuple.Create("///out", marbles[eliminated].Item2);
+                        if (id > 1 && alive == id && marbles[eliminated].Item1.ToLower().RemoveChar(' ') == "sanddollar")
+                            builder.WithDescription("*Really, Sand Dollar? Again?*");
                         alive--;
                         await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                         await Task.Delay(1500);
@@ -227,65 +229,48 @@ namespace MarbleBot.Modules
 
             [Command("leaderboard")]
             [Summary("Shows a leaderboard of most used marbles or winning marbles.")]
-            public async Task RaceLeaderboardCommandAsync([Remainder] string option)
+            public async Task RaceLeaderboardCommandAsync(string option, string rawNo = "1")
             {
                 await Context.Channel.TriggerTypingAsync();
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                var builder = new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp();
-                if (option.ToLower().RemoveChar(' ') == "winners") {
-                    var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader("Resources\\RaceWinners.txt")) {
-                        while (!win.EndOfStream) {
-                            var racerInfo = await win.ReadLineAsync();
-                            if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
-                            else winners.Add(racerInfo, 1);
+                if (int.TryParse(rawNo, out int no)) {
+                    ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+                    var builder = new EmbedBuilder()
+                        .WithColor(GetColor(Context))
+                        .WithCurrentTimestamp();
+                    if (option.ToLower().RemoveChar(' ') == "winners") {
+                        var winners = new SortedDictionary<string, int>();
+                        using (var win = new StreamReader("Resources\\RaceWinners.txt")) {
+                            while (!win.EndOfStream) {
+                                var racerInfo = await win.ReadLineAsync();
+                                if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
+                                else winners.Add(racerInfo, 1);
+                            }
                         }
-                    }
-                    var winList = new List<Tuple<string, int>>();
-                    foreach (var winner in winners)
-                        winList.Add(Tuple.Create(winner.Key, winner.Value));
-                    winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
-                    int i = 1, j = 1;
-                    var desc = new StringBuilder();
-                    foreach (var winner in winList) {
-                        if (i < 11) {
-                            desc.Append($"{i}{i.Ordinal()}: {winner.Item1} {winner.Item2}\n");
-                            if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
-                            j++;
-                        } else break;
-                    }
-                    builder.WithTitle("Race Leaderboard: Winners")
-                        .WithDescription(desc.ToString());
-                    await ReplyAsync(embed: builder.Build());
-                } else {
-                    var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader("Resources\\RaceMostUsed.txt")) {
-                        while (!win.EndOfStream) {
-                            var racerInfo = await win.ReadLineAsync();
-                            if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
-                            else winners.Add(racerInfo, 1);
+                        var winList = new List<Tuple<string, int>>();
+                        foreach (var winner in winners)
+                            winList.Add(Tuple.Create(winner.Key, winner.Value));
+                        winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                        builder.WithTitle("Race Leaderboard: Winners")
+                            .WithDescription(Global.Leaderboard(winList, no));
+                        await ReplyAsync(embed: builder.Build());
+                    } else {
+                        var winners = new SortedDictionary<string, int>();
+                        using (var win = new StreamReader("Resources\\RaceMostUsed.txt")) {
+                            while (!win.EndOfStream) {
+                                var racerInfo = await win.ReadLineAsync();
+                                if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
+                                else winners.Add(racerInfo, 1);
+                            }
                         }
+                        var winList = new List<Tuple<string, int>>();
+                        foreach (var winner in winners)
+                            winList.Add(Tuple.Create(winner.Key, winner.Value));
+                        winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                        builder.WithTitle("Race Leaderboard: Most Used")
+                            .WithDescription(Global.Leaderboard(winList, no));
+                        await ReplyAsync(embed: builder.Build());
                     }
-                    var winList = new List<Tuple<string, int>>();
-                    foreach (var winner in winners)
-                        winList.Add(Tuple.Create(winner.Key, winner.Value));
-                    winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
-                    int i = 1, j = 1;
-                    var desc = new StringBuilder();
-                    foreach (var winner in winList) {
-                        if (i < 11) {
-                            desc.Append($"{i}{i.Ordinal()}: {winner.Item1} {winner.Item2}\n");
-                            if (j < winners.Count) if (!(winList[j].Item2 == winner.Item2)) i++;
-                            j++;
-                        }
-                        else break;
-                    }
-                    builder.WithTitle("Race Leaderboard: Most Used")
-                        .WithDescription(desc.ToString());
-                    await ReplyAsync(embed: builder.Build());
-                }
+                } else await ReplyAsync("This is not a valid number! Format: `mb/race leaderboard <winners/mostused> <optional number>`");
             }
 
             [Command("checkearn")]

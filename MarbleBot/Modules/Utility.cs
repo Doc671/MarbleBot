@@ -143,7 +143,7 @@ namespace MarbleBot.Modules
                         // Games
                         case "boss": hCommand.Usage = "mb/boss <boss name>"; hCommand.Example = "mb/boss Orange"; break;
                         case "powerup": hCommand.Usage = "mb/powerup <power-up name>"; hCommand.Example = "mb/power-up Clone"; break;
-                        case "race": hCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed>, mb/race checkearn"; break;
+                        case "race": hCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed> <optional number>, mb/race checkearn"; break;
                         case "scavenge": hCommand.Usage = "mb/scavenge locations, mb/scavenge <location name>, mb/scavenge <grab>, mb/scavenge <sell>"; break;
                         case "siege": hCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege bosslist, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
                     }
