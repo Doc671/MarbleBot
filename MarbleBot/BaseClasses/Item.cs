@@ -2,7 +2,7 @@
 
 namespace MarbleBot.BaseClasses
 {
-    /// <summary> Class for items when using money-based commands </summary> 
+    /// <summary> Represents an inventory item. </summary> 
     public struct Item
     {
         public int Id { get; set; }
@@ -17,6 +17,6 @@ namespace MarbleBot.BaseClasses
         public byte CraftingStationRequired { get; set; }
 
         public override string ToString()
-            => $"[{Id}] {Name}";
+            => $"`[{Id.ToString("000")}]` **{Name}**";
     }
 }

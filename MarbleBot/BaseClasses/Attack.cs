@@ -1,7 +1,7 @@
 namespace MarbleBot.BaseClasses
 {
     /// <summary> Represents a boss' attack during a Marble Siege. </summary>
-    public class Attack {
+    public readonly struct Attack {
         /// <summary> The name of the attack. </summary>
         public string Name { get; }
         /// <summary> The amount of damage dealt by the attack. </summary>

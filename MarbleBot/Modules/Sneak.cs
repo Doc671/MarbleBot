@@ -20,10 +20,10 @@ namespace MarbleBot.Modules
                 case "time": await ReplyAsync($"Last Use: {Global.ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
                 case "update": {
                     Global.Autoresponses = new Dictionary<string, string>();
-                    using (var ar = new StreamReader("Resources\\Autoresponses.txt")) {
-                        while (!ar.EndOfStream) {
-                            var arar = ar.ReadLine().Split(';');
-                            Global.Autoresponses.Add(arar[0], arar[1]);
+                    using (var arFile = new StreamReader("Resources\\Autoresponses.txt")) {
+                        while (!arFile.EndOfStream) {
+                            var arPair = arFile.ReadLine().Split(';');
+                            Global.Autoresponses.Add(arPair[0], arPair[1]);
                         }
                     }
                     await ReplyAsync("Dictionary update complete!");
@@ -40,7 +40,6 @@ namespace MarbleBot.Modules
         {
             SocketGuild srvr = Context.Client.GetGuild(THS);
             ISocketMessageChannel chnl = srvr.GetTextChannel(THS);
-            Log("Time For MElmonry >:)");
             switch(melmon) {
                 case "desk": await chnl.SendMessageAsync(msg); break;
                 case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;

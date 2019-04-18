@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MarbleBot
 {
@@ -21,7 +22,7 @@ namespace MarbleBot
         protected const ulong VFC = 394086559676235776; // Vinh Fan Club
         protected const ulong MT = 408694288604463114; // Melmon Test
 
-        // Gets colour for embed depending on server
+        /// <summary> Gets colour for embed depending on server </summary>
         protected static Color GetColor(SocketCommandContext Context) {
             Color coloure;
             var id = 0ul;
@@ -37,7 +38,7 @@ namespace MarbleBot
             return coloure;
         }
 
-        // Gets a date string
+        /// <summary> Gets a date string </summary>
         protected static string GetDateString(TimeSpan dateTime) {
             var output = new StringBuilder();
             if (dateTime.Days > 1) output.Append(dateTime.Days + " days, ");
@@ -59,7 +60,7 @@ namespace MarbleBot
             return output.ToString();
         }
 
-        // Returns an item using its ID
+        /// <summary> Returns an item using its ID </summary> 
         protected static Item GetItem(string searchTerm) {
             var item = new Item();
             if (int.TryParse(searchTerm, out int itemID)) {
@@ -98,7 +99,7 @@ namespace MarbleBot
             }
         }
 
-        // Returns a MoneyUser with the ID of the user
+        /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser </summary>
         protected static MBUser GetUser(SocketCommandContext context) {
             var obj = GetUsersObj();
             MBUser user;
@@ -170,15 +171,13 @@ namespace MarbleBot
             return JObject.Parse(json);
         }
 
-        protected static void Log(string log) => Program.Log(log);
+        protected async static Task Log(string log) => await Program.Log(log);
 
-        // Writes users to appropriate JSON file
+        /// <summary> Writes users to appropriate JSON file </summary>
         protected static void WriteUsers(JObject obj) {
-            using (var users = new StreamWriter("Users.json")) {
-                using (var users2 = new JsonTextWriter(users)) {
-                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                    serialiser.Serialize(users2, obj);
-                }
+            using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
+                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                serialiser.Serialize(users, obj);
             }
         }
 
@@ -187,12 +186,10 @@ namespace MarbleBot
             mbUser.Discriminator = socketUser.Discriminator;
             obj.Remove(socketUser.Id.ToString());
             obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
-            using (var users = new StreamWriter("Users.json")) {
-                using (var users2 = new JsonTextWriter(users)) {
-                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                    serialiser.Serialize(users2, obj);
-                }
-            }
+            using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
+                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                serialiser.Serialize(users, obj);
+            }   
         } 
     }
 }

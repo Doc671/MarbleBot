@@ -79,10 +79,10 @@ namespace MarbleBot.Modules {
             await Context.Channel.TriggerTypingAsync();
             var obj = GetUsersObj();
             var user = GetUser(Context, obj);
-            if (user.Items.ContainsKey(17) || user.Items.ContainsKey(58)) {
+            if (user.Items.ContainsKey(17) || user.Items.ContainsKey(62)) {
                 if (!byte.TryParse(rawNo, out byte noOfItems)) searchTerm += rawNo;
                 var requestedItem = GetItem(searchTerm);
-                if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(58))
+                if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(62))
                     await ReplyAsync($":warning: | **{Context.User.Username}**, your current Crafting Station cannot craft this item!");
                 else if (requestedItem.CraftingRecipe.Count > 0) {
                     var sufficientMaterials = true;
@@ -93,10 +93,11 @@ namespace MarbleBot.Modules {
                         }
                     }
                     if (sufficientMaterials) {
+                        var noCrafted = (int)requestedItem.CraftingProduced * noOfItems;
                         var embed = new EmbedBuilder()
                                .WithCurrentTimestamp()
                                .WithColor(GetColor(Context))
-                               .WithDescription($"**{Context.User.Username}** has successfully crafted **{requestedItem.Name}** x**{requestedItem.CraftingProduced}**!")
+                               .WithDescription($"**{Context.User.Username}** has successfully crafted **{requestedItem.Name}** x**{noCrafted}**!")
                                .WithTitle("Crafting: " + requestedItem.Name);
                         var output = new StringBuilder();
                         var currentNetWorth = user.NetWorth;
@@ -107,8 +108,8 @@ namespace MarbleBot.Modules {
                             user.Items[int.Parse(rawItem.Key)] -= noLost;
                             user.NetWorth -= item.Price * noOfItems;
                         }
-                        if (!user.Items.ContainsKey(requestedItem.Id)) user.Items.Add(requestedItem.Id, (int)requestedItem.CraftingProduced * noOfItems);
-                        else user.Items[requestedItem.Id] += (int)requestedItem.CraftingProduced * noOfItems;
+                        if (!user.Items.ContainsKey(requestedItem.Id)) user.Items.Add(requestedItem.Id, noCrafted);
+                        else user.Items[requestedItem.Id] += noCrafted;
                         user.NetWorth += requestedItem.Price * noOfItems;
                         embed.AddField("Lost items", output.ToString())
                             .AddField("Net Worth", $"Old: {Global.UoM}**{currentNetWorth:n}**\nNew: {Global.UoM}**{user.NetWorth:n}**");
