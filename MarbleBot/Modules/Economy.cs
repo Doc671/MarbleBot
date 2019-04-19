@@ -104,7 +104,7 @@ namespace MarbleBot.Modules {
                         foreach (var rawItem in requestedItem.CraftingRecipe) {
                             var item = GetItem(rawItem.Key);
                             var noLost = rawItem.Value * noOfItems;
-                            output.AppendLine($"{item.Name}: {noLost}");
+                            output.AppendLine($"`[{item.Id.ToString("000")}]` {item.Name}: {noLost}");
                             user.Items[int.Parse(rawItem.Key)] -= noLost;
                             user.NetWorth -= item.Price * noOfItems;
                         }

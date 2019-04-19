@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.BaseClasses
 {
-    public class Siege
+    public class Siege : IDisposable
     {
         public Task Actions { get; set; }
         public bool Active { get; set; }
@@ -33,6 +33,17 @@ namespace MarbleBot.BaseClasses
             }
         }
 
+        private bool disposed = false;
+        public void Dispose() => Dispose(true);
+
+        private void Dispose(bool disposing) {
+            if (disposed) return;
+            if (disposing) Actions.Dispose();
+            Boss.ResetHP();
+            Marbles = null;
+            disposed = true;
+        }
+
         public void SetPowerUp(string PU) {
             PowerUp = PU;
             switch (PU) {
@@ -49,5 +60,7 @@ namespace MarbleBot.BaseClasses
         public override string ToString() => $"{Boss.Name}: {Marbles.Count}";
 
         public Siege(Marble[] marbles) { Marbles = new List<Marble>(marbles); }
+
+        ~Siege() => Dispose(true);
     }
 }

@@ -29,49 +29,45 @@ namespace MarbleBot
         {
             if (!(s is SocketUserMessage msg)) return;
 
-            var Context = new SocketCommandContext(_client, msg);
+            var context = new SocketCommandContext(_client, msg);
 
             int argPos = 0;
 
             var IsLett = !char.TryParse(msg.Content.Trim('`'), out char e);
             if (!IsLett) IsLett = char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e);
 
-            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (Global.UsableChannels.Any(chnl => chnl == Context.Channel.Id) || Context.IsPrivate)) {
-                var result = await _service.ExecuteAsync(Context, argPos, null);
+            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (Global.UsableChannels.Any(chnl => chnl == context.Channel.Id) || context.IsPrivate)) {
+                var result = await _service.ExecuteAsync(context, argPos, null);
                 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
-                    Program.Log($"{result.Error.Value}: {result.ErrorReason}");
-                if (result.Error == CommandError.BadArgCount) await Context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
+                    await Program.Log($"{result.Error.Value}: {result.ErrorReason}");
+                if (result.Error == CommandError.BadArgCount) await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
 
-            } else if (msg.HasMentionPrefix(await Context.Channel.GetUserAsync(Global.BotId), ref argPos) && msg.Content.ToLower().Contains("no u")) {
-                var msgs = await Context.Channel.GetMessagesAsync().FlattenAsync();
-                foreach (var mesg in msgs) if (mesg.Content.ToLower().Contains("no your")) await Context.Channel.SendMessageAsync(":warning: A No Your has been detected in the past 100 messages! The No U has been nullified!");
-
-            } else if (!(IsLett) && Context.Channel.Id != 252481530130202624 && (Context.Guild.Id == 224277738608001024 || Context.Guild.Id == 223616088263491595)) {
+            } else if (!(IsLett) && context.Channel.Id != 252481530130202624 && (context.Guild.Id == 224277738608001024 || context.Guild.Id == 223616088263491595)) {
                 EmbedBuilder builder = new EmbedBuilder()
-                    .WithAuthor(Context.User)
-                    .WithDescription(string.Format("**Message sent by {0} deleted in {1}**\n{2}", Context.User.Mention, "<#" + Context.Channel.Id + ">", Context.Message.Content))
+                    .WithAuthor(context.User)
+                    .WithDescription($"**Message sent by { context.User.Mention} deleted in <#{context.Channel.Id }>** {context.Message.Content}")
                     .AddField("Reason", "Empty Message")
                     .WithColor(Color.Red)
-                    .WithFooter("ID: " + Context.User.Id)
+                    .WithFooter("ID: " + context.User.Id)
                     .WithCurrentTimestamp();
-                if (Context.Guild.Id == 224277738608001024) {
-                    var logs = Context.Guild.GetTextChannel(327132239257272327);
+                if (context.Guild.Id == 224277738608001024) {
+                    var logs = context.Guild.GetTextChannel(327132239257272327);
                     await logs.SendMessageAsync("", false, builder.Build());
-                } else if (Context.Guild.Id == 223616088263491595) {
-                    var logs = Context.Guild.GetTextChannel(387306347936350213);
+                } else if (context.Guild.Id == 223616088263491595) {
+                    var logs = context.Guild.GetTextChannel(387306347936350213);
                     await logs.SendMessageAsync("", false, builder.Build());
                 }
-                await Context.Message.DeleteAsync();
-            } else if (Context.Channel.Id == 252481530130202624 && DateTime.UtcNow.Subtract(Global.ARLastUse).TotalSeconds > 2) {
+                await context.Message.DeleteAsync();
+            } else if (context.Channel.Id == 252481530130202624 && DateTime.UtcNow.Subtract(Global.ARLastUse).TotalSeconds > 2) {
                 foreach (var response in Global.Autoresponses) {
-                    if (Context.Message.Content.ToLower() == response.Key) {
+                    if (context.Message.Content.ToLower() == response.Key) {
                         Global.ARLastUse = DateTime.UtcNow;
-                        await Context.Channel.SendMessageAsync(response.Value); break;
+                        await context.Channel.SendMessageAsync(response.Value); break;
                     }
                 }
             }
-            if (Context.IsPrivate) Program.Log($"{Context.User}: {Context.Message}");
+            if (context.IsPrivate) await Program.Log($"{context.User}: {context.Message}");
         }
     }
 }

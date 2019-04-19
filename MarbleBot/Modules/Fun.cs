@@ -53,7 +53,7 @@ namespace MarbleBot.Modules
                     for (int i = 0; i < Context.Guild.MemberCount - 1; i++)
                         names[i] = users[i].Username;
                     await ReplyAsync($"**{names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
-                } else await Log("oof");
+                }
             } else await ReplyAsync("That command doesn't work here!");
         }
 
@@ -101,7 +101,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             string[] choices = input.Split('|');
             int choice = Global.Rand.Next(0, choices.Length);
-            if (Moderation.CheckSwear(input) || Moderation.CheckSwear(choices[choice])) {
+            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(choices[choice]))) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
@@ -143,7 +143,7 @@ namespace MarbleBot.Modules
                 length--;
             }
             if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC) {
-                if (Moderation.CheckSwear(input) || Moderation.CheckSwear(orangeified.ToString())) {
+                if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(orangeified.ToString()))) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync($"Profanity detected. {Doc671.Mention}");
@@ -393,7 +393,7 @@ namespace MarbleBot.Modules
             }
             if (rating == -2) await ReplyAsync($"**{Context.User.Username}**, I rATE {input} UNd3FINED10. {emoji}\n({message})");
             else {
-                if (Moderation.CheckSwear(input)) {
+                if (await Moderation.CheckSwearAsync(input)) {
                     if (Context.IsPrivate) {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync($"Profanity detected. {Doc671.Mention}");
@@ -410,7 +410,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             if (repeat == "Am Melmon" && (Context.Guild.Id == THS || Context.Guild.Id == MT)) {
                 await ReplyAsync("No U");
-            } else if (Moderation.CheckSwear(repeat)) {
+            } else if (await Moderation.CheckSwearAsync(repeat)) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
@@ -431,7 +431,7 @@ namespace MarbleBot.Modules
                 reverse.Append(input[length]);
                 length--;
             }
-            if (Moderation.CheckSwear(input) || Moderation.CheckSwear(reverse.ToString())) {
+            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(reverse.ToString()))) {
                 if (Context.IsPrivate) {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");

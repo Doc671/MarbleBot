@@ -30,8 +30,7 @@ namespace MarbleBot.BaseClasses
             new BossDrops[] { new BossDrops(0, 0, 0, 0) }
         );
 
-        /// <summary> Resets the boss' HP. </summary>
-        public void ResetHP() { _HP = MaxHP; }
+        public void ResetHP() => _HP = MaxHP;
 
         /// <summary> Represents a boss in a Marble Siege battle. </summary>
         /// <param name="name"> The name of the boss. </param>

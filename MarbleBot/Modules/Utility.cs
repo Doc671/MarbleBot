@@ -334,7 +334,7 @@ namespace MarbleBot.Modules
                             ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID);
                             user = Context.Guild.GetUser(ID);
                         } catch (NullReferenceException ex) {
-                            Log(ex.ToString());
+                            await Log(ex.ToString());
                             await ReplyAsync("Invalid ID!");
                             userFound = false;
                         }
@@ -343,7 +343,7 @@ namespace MarbleBot.Modules
                             user = Context.Guild.Users.Where(u => u.Username.ToLower().Contains(username) 
                             || username.Contains(u.Username.ToLower())).FirstOrDefault();
                         } catch (NullReferenceException ex) {
-                            Log(ex.ToString());
+                            await Log(ex.ToString());
                             await ReplyAsync("Could not find the requested user!");
                             userFound = false;
                         }

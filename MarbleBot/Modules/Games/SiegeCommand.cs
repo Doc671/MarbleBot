@@ -747,22 +747,6 @@ namespace MarbleBot.Modules
                             currentSiege.Morales--;
                             await ReplyAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{currentSiege.DamageMultiplier}**!");
                         }
-
-                        // Siege failure
-                        if (currentSiege.Marbles.Aggregate(0, (agg, m) => { agg += m.HP; return agg; }) < 1) {
-                            var marbles = new StringBuilder();
-                            foreach (var marble in currentSiege.Marbles)
-                                marbles.AppendLine(marble.ToString(Context));
-                            await ReplyAsync(embed: new EmbedBuilder()
-                                .WithColor(GetColor(Context))
-                                .WithCurrentTimestamp()
-                                .WithDescription($"All the marbles died!\n**{currentSiege.Boss.Name}** won!\nFinal HP: **{currentSiege.Boss.HP}**/{currentSiege.Boss.MaxHP}")
-                                .AddField($"Fallen Marbles: **{currentSiege.Marbles.Count}**", marbles.ToString())
-                                .WithThumbnailUrl(currentSiege.Boss.ImageUrl)
-                                .WithTitle("Siege Failure!")
-                                .Build());
-                            break;
-                        }
                     
                         // Cause new power-up to appear
                         if (currentSiege.PowerUp == "") {
@@ -811,10 +795,26 @@ namespace MarbleBot.Modules
                                     break;
                             }
                         }
+
+                        // Siege failure
+                        if (currentSiege.Marbles.Sum(m => m.HP) < 1) {
+                            var marbles = new StringBuilder();
+                            foreach (var marble in currentSiege.Marbles)
+                                marbles.AppendLine(marble.ToString(Context));
+                            await ReplyAsync(embed: new EmbedBuilder()
+                                .WithColor(GetColor(Context))
+                                .WithCurrentTimestamp()
+                                .WithDescription($"All the marbles died!\n**{currentSiege.Boss.Name}** won!\nFinal HP: **{currentSiege.Boss.HP}**/{currentSiege.Boss.MaxHP}")
+                                .AddField($"Fallen Marbles: **{currentSiege.Marbles.Count}**", marbles.ToString())
+                                .WithThumbnailUrl(currentSiege.Boss.ImageUrl)
+                                .WithTitle("Siege Failure!")
+                                .Build());
+                            break;
+                        }
                     }
-                } while (currentSiege.Boss.HP > 0 || !timeout || currentSiege.Marbles.Aggregate(0, (agg, m) => { agg += m.HP; return agg; }) > 0);
-                if (timeout || currentSiege.Marbles.Aggregate(0, (agg, m) => { agg += m.HP; return agg; }) < 1) {
-                    currentSiege.Boss.ResetHP();
+                } while (currentSiege.Boss.HP > 0 || !timeout || currentSiege.Marbles.Sum(m => m.HP) < 1);
+                if (timeout || currentSiege.Marbles.Sum(m => m.HP) < 1) {
+                    currentSiege.Dispose();
                     Global.SiegeInfo.Remove(id);
                 }
                 using (var marbleList = new StreamWriter(id + "siege.csv", false)) {
@@ -836,13 +836,13 @@ namespace MarbleBot.Modules
                     var obj = GetUsersObj();
                     var user = GetUser(Context, obj, marble.Id);
                     var output = new StringBuilder();
-                    if (user.Stage == 1 && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149)) {
+                    if (user.Stage == 1 && siege.Boss.Name == "Destroyer" && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149)) {
                         user.Stage = 2;
                         output.AppendLine($"Stage II! New items unlocked!");
                     }
                     int earnings = marble.DamageDealt + (marble.PUHits * 50);
+                    var didNothing = true;
                     if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6) {
-                        var didNothing = true;
                         if (marble.DamageDealt > 0) {
                             output.AppendLine($"Damage dealt: {Global.UoM}**{marble.DamageDealt:n}**");
                             didNothing = false;
@@ -870,7 +870,7 @@ namespace MarbleBot.Modules
                                     var item = GetItem(itemDrops.ItemId.ToString("000"));
                                     user.NetWorth += item.Price * amount;
                                     drops++;
-                                    output.AppendLine($"`[{itemDrops.ItemId.ToString("000")}]` {GetItem(itemDrops.ItemId.ToString()).Name} x{amount}");
+                                    output.AppendLine($"`[{itemDrops.ItemId.ToString("000")}]` {item.Name} x{amount}");
                                 }
                             }
                             if (drops == 0) output.AppendLine("None");
@@ -879,16 +879,15 @@ namespace MarbleBot.Modules
                             user.NetWorth += earnings;
                         }
                     }
-                    if (output.Length > 1)
+                    if (output.Length > 1 && !didNothing)
                         builder.AddField($"**{Context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
                     obj.Remove(marble.Id.ToString());
                     obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
                     WriteUsers(obj);
                 }
                 await ReplyAsync(embed: builder.Build());
-                var boss = Global.SiegeInfo[id].Boss;
                 Global.SiegeInfo.Remove(id);
-                boss.ResetHP();
+                siege.Dispose();
                 using (var marbleList = new StreamWriter(id.ToString() + "siege.csv", false)) {
                     await marbleList.WriteAsync("");
                     marbleList.Close();

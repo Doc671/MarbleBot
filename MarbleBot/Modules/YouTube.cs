@@ -104,7 +104,7 @@ namespace MarbleBot.Modules
                             }
                         }
                     } else await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
-                    if (!validUser) Log($"Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
+                    if (!validUser) await Log($"Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
                 } else {
                     var output = new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n");
                     output.Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n");
@@ -141,7 +141,7 @@ namespace MarbleBot.Modules
 
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (searchResult.Id.Kind == "youtube#channel" && !Moderation.CheckSwear(searchResult.Snippet.Title)) {
+                if (searchResult.Id.Kind == "youtube#channel" && !(await Moderation.CheckSwearAsync(searchResult.Snippet.Title))) {
                     channels.Add(string.Format("{0} (<https://www.youtube.com/channel/{1}>)", searchResult.Snippet.Title, searchResult.Id.ChannelId));
                     found = true;
                 } else {
@@ -183,7 +183,7 @@ namespace MarbleBot.Modules
             // matching videos, channels, and playlists.
             bool found = false;
             foreach (var searchResult in searchListResponse.Items) {
-                if (searchResult.Id.Kind == "youtube#video" && Moderation.CheckSwear(searchResult.Snippet.Title))
+                if (searchResult.Id.Kind == "youtube#video" && (await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
                     profaneCount++;
                 else if (searchResult.Id.Kind == "youtube#video") {
                     videos.Add($"{searchResult.Snippet.Title} (<https://youtu.be/{searchResult.Id.VideoId}>)");

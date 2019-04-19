@@ -29,7 +29,6 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task ClearRecentSpamCommandAsync(string rserver, string rchannel) {
-            Log("hi");
             var server = ulong.Parse(rserver);
             var channel = ulong.Parse(rchannel);
             var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
@@ -69,10 +68,10 @@ namespace MarbleBot.Modules
 
 
         // Checks if a string contains a swear; returns true if profanity is present
-        public static bool CheckSwear(string msg)
+        public async static Task<bool> CheckSwearAsync(string msg)
         {
             string swears;
-            using (var FS = new StreamReader("ListOfBand.txt")) swears = FS.ReadLine();
+            using (var FS = new StreamReader("ListOfBand.txt")) swears = await FS.ReadLineAsync();
             string[] swearList = swears.Split(',');
             var swearPresent = false;
             foreach (var swear in swearList) {
@@ -81,7 +80,7 @@ namespace MarbleBot.Modules
                     break;
                 }
             }
-            if (swearPresent) Log($"Profanity detected, violation: {msg}");
+            if (swearPresent) await Log($"Profanity detected, violation: {msg}");
             return swearPresent;
         }
     }
