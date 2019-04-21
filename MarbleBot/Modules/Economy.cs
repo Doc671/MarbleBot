@@ -153,7 +153,7 @@ namespace MarbleBot.Modules {
         }
 
         [Command("daily")]
-        [Summary("Gives daily Units of Money (200 to the power of your streak minus one).")]
+        [Summary("Gives daily Units of Money (200 to the power of [your streak / 100] minus one).")]
         public async Task DailyCommandAsync() {
             await Context.Channel.TriggerTypingAsync();
             var obj = GetUsersObj();
@@ -542,8 +542,8 @@ namespace MarbleBot.Modules {
                             if (userMarble.QefpedunCharmUsed) await ReplyAsync($"**{Context.User.Username}**, you can only use the **{item.Name}** once per battle!");
                             else {
                                 if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy) {
-                                    var dmg = (int)Math.Round(100 + Global.SiegeInfo[fileId].Boss.MaxHP * 0.06 * (Global.Rand.NextDouble() * 0.04 + 0.98));
-                                    Global.SiegeInfo[fileId].DealDamage(dmg);
+                                    var dmg = (int)Math.Round(85 + Global.SiegeInfo[fileId].Boss.MaxHP * 0.08 * (Global.Rand.NextDouble() * 0.12 + 0.94));
+                                    await Global.SiegeInfo[fileId].DealDamageAsync(Context, dmg);
                                     await ReplyAsync(embed: new EmbedBuilder()
                                         .AddField("Boss HP", $"**{Global.SiegeInfo[fileId].Boss.HP}**/{Global.SiegeInfo[fileId].Boss.MaxHP}")
                                         .WithColor(GetColor(Context))
@@ -569,8 +569,8 @@ namespace MarbleBot.Modules {
                         if (Global.SiegeInfo.ContainsKey(fileId)) {
                             var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                             if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy) {
-                                var dmg = (int)Math.Round(75 + 12.5 * (int)Global.SiegeInfo[fileId].Boss.Difficulty);
-                                Global.SiegeInfo[fileId].DealDamage(dmg);
+                                var dmg = 70 + 10 * (int)Global.SiegeInfo[fileId].Boss.Difficulty;
+                                await Global.SiegeInfo[fileId].DealDamageAsync(Context, dmg);
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .AddField("Boss HP", $"**{Global.SiegeInfo[fileId].Boss.HP}**/{Global.SiegeInfo[fileId].Boss.MaxHP}")
                                     .WithColor(GetColor(Context))
@@ -674,7 +674,7 @@ namespace MarbleBot.Modules {
                                 var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy / 3) {
                                     var dmg = (int)Math.Round(75 + 12.5 * (int)Global.SiegeInfo[fileId].Boss.Difficulty);
-                                    Global.SiegeInfo[fileId].DealDamage(dmg);
+                                    await Global.SiegeInfo[fileId].DealDamageAsync(Context, dmg);
                                     await ReplyAsync(embed: new EmbedBuilder()
                                         .AddField("Boss HP", $"**{Global.SiegeInfo[fileId].Boss.HP}**/{Global.SiegeInfo[fileId].Boss.MaxHP}")
                                         .WithColor(GetColor(Context))
@@ -710,11 +710,10 @@ namespace MarbleBot.Modules {
                                 for (int i = 0; i < 3; i++) {
                                     if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy / 3) {
                                         var dmg = 110 + 9 * (int)Global.SiegeInfo[fileId].Boss.Difficulty;
-                                        Global.SiegeInfo[fileId].DealDamage(dmg);
+                                        await Global.SiegeInfo[fileId].DealDamageAsync(Context, dmg);
                                         dmgs[i] = dmg;
                                         embed.AddField($"Trebuchet {i + 1}", $"**{dmg}** damage to **{Global.SiegeInfo[fileId].Boss.Name}**");
-                                    }
-                                    else {
+                                    } else {
                                         dmgs[i] = 0;
                                         embed.AddField($"Trebuchet {i + 1}", "Missed!");
                                     }

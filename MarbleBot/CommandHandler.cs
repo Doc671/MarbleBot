@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;

@@ -16,14 +16,14 @@ namespace MarbleBot
     public abstract class MarbleBotModule : ModuleBase<SocketCommandContext>
     {
         // Server IDs
-        protected const ulong CM = 223616088263491595; // Community Marble
-        protected const ulong THS = 224277738608001024; // The Hat Stoar
-        protected const ulong THSC = 318053169999511554; // The Hat Stoar Crew
-        protected const ulong VFC = 394086559676235776; // Vinh Fan Club
-        protected const ulong MT = 408694288604463114; // Melmon Test
+        public const ulong CM = 223616088263491595; // Community Marble
+        public const ulong THS = 224277738608001024; // The Hat Stoar
+        public const ulong THSC = 318053169999511554; // The Hat Stoar Crew
+        public const ulong VFC = 394086559676235776; // Vinh Fan Club
+        public const ulong MT = 408694288604463114; // Melmon Test
 
         /// <summary> Gets colour for embed depending on server </summary>
-        protected static Color GetColor(SocketCommandContext Context) {
+        public static Color GetColor(SocketCommandContext Context) {
             Color coloure;
             var id = 0ul;
             if (!Context.IsPrivate) id = Context.Guild.Id;
@@ -39,7 +39,7 @@ namespace MarbleBot
         }
 
         /// <summary> Gets a date string </summary>
-        protected static string GetDateString(TimeSpan dateTime) {
+        public static string GetDateString(TimeSpan dateTime) {
             var output = new StringBuilder();
             if (dateTime.Days > 1) output.Append(dateTime.Days + " days, ");
             else if (dateTime.Days > 0) output.Append(dateTime.Days + " day, ");
@@ -61,7 +61,7 @@ namespace MarbleBot
         }
 
         /// <summary> Returns an item using its ID </summary> 
-        protected static Item GetItem(string searchTerm) {
+        public static Item GetItem(string searchTerm) {
             var item = new Item();
             if (int.TryParse(searchTerm, out int itemID)) {
                 string json;
@@ -100,7 +100,7 @@ namespace MarbleBot
         }
 
         /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser </summary>
-        protected static MBUser GetUser(SocketCommandContext context) {
+        public static MBUser GetUser(SocketCommandContext context) {
             var obj = GetUsersObj();
             MBUser user;
             if (obj.ContainsKey(context.User.Id.ToString())) {
@@ -115,7 +115,7 @@ namespace MarbleBot
             return user;
         }
 
-        protected static MBUser GetUser(SocketCommandContext context, ulong Id) {
+        public static MBUser GetUser(SocketCommandContext context, ulong Id) {
             var obj = GetUsersObj();
             MBUser user;
             if (obj.ContainsKey(Id.ToString())) {
@@ -130,7 +130,7 @@ namespace MarbleBot
             return user;
         }
 
-        protected static MBUser GetUser(SocketCommandContext context, JObject obj) {
+        public static MBUser GetUser(SocketCommandContext context, JObject obj) {
             MBUser user;
             if (obj.ContainsKey(context.User.Id.ToString())) {
                 user = obj[context.User.Id.ToString()].ToObject<MBUser>();
@@ -144,7 +144,7 @@ namespace MarbleBot
             return user;
         }
 
-        protected static MBUser GetUser(SocketCommandContext context, JObject obj, ulong id) {
+        public static MBUser GetUser(SocketCommandContext context, JObject obj, ulong id) {
             MBUser user;
             if (obj.ContainsKey(id.ToString())) {
                 user = obj[id.ToString()].ToObject<MBUser>();
@@ -165,23 +165,23 @@ namespace MarbleBot
             return user;
         }
 
-        protected static JObject GetUsersObj() {
+        public static JObject GetUsersObj() {
             string json;
             using (var users = new StreamReader("Users.json")) json = users.ReadToEnd();
             return JObject.Parse(json);
         }
 
-        protected async static Task Log(string log) => await Program.Log(log);
+        public async static Task Log(string log) => await Program.Log(log);
 
         /// <summary> Writes users to appropriate JSON file </summary>
-        protected static void WriteUsers(JObject obj) {
+        public static void WriteUsers(JObject obj) {
             using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
                 var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
                 serialiser.Serialize(users, obj);
             }
         }
 
-        protected static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser) {
+        public static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser) {
             mbUser.Name = socketUser.Username;
             mbUser.Discriminator = socketUser.Discriminator;
             obj.Remove(socketUser.Id.ToString());

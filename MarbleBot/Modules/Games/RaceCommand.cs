@@ -36,22 +36,24 @@ namespace MarbleBot.Modules
             [Command("signup")]
             [Alias("join")]
             [Summary("Sign up to the marble race!")]
-            public async Task RaceSignupCommandAsync([Remainder] string marbleName)
+            public async Task RaceSignupCommandAsync([Remainder] string marbleName = "")
             {
                 await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp();
-                var name = "";
+                string name;
                 if (marbleName.IsEmpty() || marbleName.Contains("@")) name = Context.User.Username;
-                else if (marbleName.Length > 100) await ReplyAsync("Your entry exceeds the 100 character limit.");
-                else {
+                else if (marbleName.Length > 100) {
+                    await ReplyAsync("Your entry exceeds the 100 character limit.");
+                    return;
+                } else {
                     marbleName = marbleName.Replace("\n", " ").Replace(",", ";");
                     name = marbleName;
                 }
                 builder.AddField("Marble Race: Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
-                using (var racers = new StreamWriter("Resources\\RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
+                using (var racers = new StreamWriter("RaceMostUsed.txt", true)) await racers.WriteLineAsync(name);
                 if (!File.Exists(fileId.ToString() + "race.csv")) File.Create(fileId.ToString() + "race.csv").Close();
                 byte alive = 0;
                 using (var marbleList = new StreamReader(fileId.ToString() + "race.csv", true)) {
@@ -128,8 +130,17 @@ namespace MarbleBot.Modules
                         if (deathmsg.Contains("was") && (mName.Contains("you ") || mName.Contains("we ") || mName.Contains("they ") || mName.Last() == 's'))
                             deathmsg = "were " + string.Concat(deathmsg.Skip(4));
                         builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathmsg} and is now out of the competition!");
-                        if (id > 1 && alive == id && marbles[eliminated].Item1.ToLower().RemoveChar(' ') == "sanddollar")
-                            builder.WithDescription("*Really, Sand Dollar? Again?*");
+                        if (id > 1 && alive == id) {
+                            switch (marbles[eliminated].Item1.ToLower().RemoveChar(' ')) {
+                                case "deletion": builder.WithDescription("*Deletion got deleted...*"); break;
+                                case "desk": builder.WithDescription("*You Silly Desk*"); break;
+                                case "desk176": goto case "desk";
+                                case "doc671": goto case "desk";
+                                case "gold": builder.WithDescription("*Ironic, isn't it?*"); break;
+                                case "lorddeskument": goto case "desk";
+                                case "sanddollar": builder.WithDescription("*Really, Sand Dollar? Again?*"); break;
+                            }   
+                        }
                         marbles[eliminated] = Tuple.Create("///out", marbles[eliminated].Item2);
                         alive--;
                         await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
@@ -145,7 +156,7 @@ namespace MarbleBot.Modules
                             winnerID = marble.Item2;
                             builder.AddField("**" + marble.Item1 + "** wins!", marble.Item1 + " is the winner!");
                             if (id > 1) {
-                                using (var racers = new StreamWriter("Resources\\RaceWinners.txt", true)) await racers.WriteLineAsync(marble.Item1);
+                                using (var racers = new StreamWriter("RaceWinners.txt", true)) await racers.WriteLineAsync(marble.Item1);
                             }
                             await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                             await ReplyAsync("**" + marble.Item1 + "** won the race!");
@@ -238,7 +249,7 @@ namespace MarbleBot.Modules
                         .WithCurrentTimestamp();
                     if (option.ToLower().RemoveChar(' ') == "winners") {
                         var winners = new SortedDictionary<string, int>();
-                        using (var win = new StreamReader("Resources\\RaceWinners.txt")) {
+                        using (var win = new StreamReader("RaceWinners.txt")) {
                             while (!win.EndOfStream) {
                                 var racerInfo = await win.ReadLineAsync();
                                 if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
@@ -254,7 +265,7 @@ namespace MarbleBot.Modules
                         await ReplyAsync(embed: builder.Build());
                     } else {
                         var winners = new SortedDictionary<string, int>();
-                        using (var win = new StreamReader("Resources\\RaceMostUsed.txt")) {
+                        using (var win = new StreamReader("RaceMostUsed.txt")) {
                             while (!win.EndOfStream) {
                                 var racerInfo = await win.ReadLineAsync();
                                 if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
