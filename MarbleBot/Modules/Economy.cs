@@ -66,7 +66,7 @@ namespace MarbleBot.Modules {
                         }
                         user.Balance -= item.Price * noOfItems;
                         WriteUsers(obj, Context.User, user);
-                        await ReplyAsync($"**{user.Name}** has successfully purchased **{item.Name}** x**{noOfItems}** for <:unitofmoney:372385317581488128>**{item.Price:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{item.Price * noOfItems:n}**\nNew balance: <:unitofmoney:372385317581488128>**{user.Balance:n}**.");
+                        await ReplyAsync($"**{user.Name}** has successfully purchased **{item.Name}** x**{noOfItems}** for {Global.UoM}**{item.Price:n}** each!\nTotal price: {Global.UoM}**{item.Price * noOfItems:n}**\nNew balance: {Global.UoM}**{user.Balance:n}**.");
                     } else await ReplyAsync($":warning: | You can't afford this!");
                 } else await ReplyAsync($":warning: | This item is not on sale!");
             } else await ReplyAsync($":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
@@ -175,7 +175,7 @@ namespace MarbleBot.Modules {
                     user.Items.Add(10, 1);
                 }
                 WriteUsers(obj, Context.User, user);
-                await ReplyAsync($"**{Context.User.Username}**, you have received <:unitofmoney:372385317581488128>**{gift:n}**!\n(Streak: **{user.DailyStreak}**)");
+                await ReplyAsync($"**{Context.User.Username}**, you have received {Global.UoM}**{gift:n}**!\n(Streak: **{user.DailyStreak}**)");
                 if (craftingStation) await ReplyAsync("You have been given a **Crafting Station Mk.I**!");
                 if (orange) await ReplyAsync("You have been given a **Qefpedun Charm**!");
             } else {
@@ -353,8 +353,8 @@ namespace MarbleBot.Modules {
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .WithFooter("All times in UTC, all dates YYYY-MM-DD.")
-                .AddField("Balance", $"<:unitofmoney:372385317581488128>{user.Balance:n}", true)
-                .AddField("Net Worth", $"<:unitofmoney:372385317581488128>{user.NetWorth:n}", true)
+                .AddField("Balance", $"{Global.UoM}{user.Balance:n}", true)
+                .AddField("Net Worth", $"{Global.UoM}{user.NetWorth:n}", true)
                 .AddField("Daily Streak", user.DailyStreak, true)
                 .AddField("Siege Mentions", user.SiegePing, true)
                 .AddField("Race Wins", user.RaceWins, true)
@@ -429,7 +429,7 @@ namespace MarbleBot.Modules {
                 var output = new StringBuilder();
                 foreach (var user in richList) {
                     if (i < maxValue + 1 && i >= minValue) {
-                        output.Append($"**{i}{i.Ordinal()}:** {user.Name}#{user.Discriminator} - <:unitofmoney:372385317581488128>**{user.NetWorth:n}**\n");
+                        output.Append($"**{i}{i.Ordinal()}:** {user.Name}#{user.Discriminator} - {Global.UoM}**{user.NetWorth:n}**\n");
                         if (j < richList.Count) if (richList[j].NetWorth != user.NetWorth) i++;
                         if (user.Name == Context.User.Username && user.Discriminator == Context.User.Discriminator) yourPos = i - 1;
                     } else {
@@ -470,7 +470,7 @@ namespace MarbleBot.Modules {
                         user.Balance += item.Price * noOfItems;
                         user.Items[item.Id] -= noOfItems;
                         WriteUsers(obj, Context.User, user);
-                        await ReplyAsync($"**{user.Name}** has successfully sold **{item.Name}** x**{noOfItems}** for <:unitofmoney:372385317581488128>**{item.Price:n}** each!\nTotal price: <:unitofmoney:372385317581488128>**{item.Price * noOfItems:n}**\nNew balance: <:unitofmoney:372385317581488128>**{user.Balance:n}**.");
+                        await ReplyAsync($"**{user.Name}** has successfully sold **{item.Name}** x**{noOfItems}** for {Global.UoM}**{item.Price:n}** each!\nTotal price: {Global.UoM}**{item.Price * noOfItems:n}**\nNew balance: {Global.UoM}**{user.Balance:n}**.");
                     } else await ReplyAsync(":warning: | You don't have enough of this item!");
                 }
             } else await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
@@ -488,7 +488,7 @@ namespace MarbleBot.Modules {
             var items = obj.ToObject<Dictionary<string, Item>>();
             foreach (var item in items) {
                 if (item.Value.OnSale)
-                    output.AppendLine($"`[{item.Key:000}]` **{item.Value.Name}** - <:unitofmoney:372385317581488128>**{item.Value.Price:n}**");
+                    output.AppendLine($"`[{item.Key:000}]` **{item.Value.Name}** - {Global.UoM}**{item.Value.Price:n}**");
             }
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -496,6 +496,28 @@ namespace MarbleBot.Modules {
                 .WithDescription(output.ToString())
                 .WithTitle("All items for sale");
             await ReplyAsync(embed: builder.Build());
+        }
+
+        [Command("srs")]
+        [Summary("Call the streak revival service!")]
+        public async Task SRSCommandAsync()
+        {
+            var user = GetUser(Context);
+            IUser Doc671 = Context.Client.GetUser(224267581370925056);
+            var lastDaily = user.LastDaily.ToString("yyyy-MM-dd hh:mm:ss");
+            if (user.LastDaily.Year == 2019 && user.LastDaily.DayOfYear == 1) lastDaily = "N/A";
+            await Doc671.SendMessageAsync(embed: new EmbedBuilder()
+                .WithAuthor(Context.User)
+                .WithCurrentTimestamp()
+                .WithColor(GetColor(Context))
+                .WithFooter(Context.User.Id.ToString())
+                .AddField("Balance", $"{Global.UoM}{user.Balance:n}", true)
+                .AddField("Net Worth", $"{Global.UoM}{user.NetWorth:n}", true)
+                .AddField("Daily Streak", user.DailyStreak, true)
+                .AddField("Last Daily", lastDaily, true)
+                .Build());
+            var msg = Doc671.Status == UserStatus.Offline ? " You might not get a reply soon, though..." : "";
+            await ReplyAsync($"The streak revival service has been called!{msg}");
         }
 
         [Command("use")]

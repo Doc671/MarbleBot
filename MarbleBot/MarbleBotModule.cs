@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MarbleBot
@@ -175,21 +176,25 @@ namespace MarbleBot
 
         /// <summary> Writes users to appropriate JSON file </summary>
         public static void WriteUsers(JObject obj) {
-            using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
-                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                serialiser.Serialize(users, obj);
-            }
+            new Thread(() => {
+                using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
+                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                    serialiser.Serialize(users, obj);
+                }
+            }).Start();
         }
 
         public static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser) {
-            mbUser.Name = socketUser.Username;
-            mbUser.Discriminator = socketUser.Discriminator;
-            obj.Remove(socketUser.Id.ToString());
-            obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
-            using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
-                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                serialiser.Serialize(users, obj);
-            }   
+            new Thread(() => {
+                mbUser.Name = socketUser.Username;
+                mbUser.Discriminator = socketUser.Discriminator;
+                obj.Remove(socketUser.Id.ToString());
+                obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
+                using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
+                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                    serialiser.Serialize(users, obj);
+                }
+            }).Start();
         } 
     }
 }

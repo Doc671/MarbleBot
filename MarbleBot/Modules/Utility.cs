@@ -47,7 +47,7 @@ namespace MarbleBot.Modules
                     await ReplyAsync(embed: builder
                         .AddField("Games commands", new StringBuilder()
                             .AppendLine("**race** - Participate in a marble race!")
-                            .AppendLine("**scavenge - Scavenge for items!")
+                            .AppendLine("**scavenge** - Scavenge for items!")
                             .AppendLine("**siege** - Participate in a Marble Siege!"))
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help")
