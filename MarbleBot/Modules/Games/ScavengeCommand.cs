@@ -61,7 +61,7 @@ namespace MarbleBot.Modules
                 => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.CanaryBeach);
 
             [Command("treewurld")]
-            [Alias("canary wurld")]
+            [Alias("tree wurld")]
             [Summary("Starts a scavenge session in Tree Wurld.")]
             public async Task ScavengeTreeCommandAsync()
                 => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.TreeWurld);

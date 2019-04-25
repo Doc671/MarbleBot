@@ -21,6 +21,7 @@ namespace MarbleBot.Modules
             private static bool IsBetween(int no, int lower, int upper) => lower <= no && no <= upper;
 
             [Command("help")]
+            [Alias("")]
             [Summary("Siege help.")]
             public async Task SiegeHelpCommandAsync()
                 => await ReplyAsync(embed: new EmbedBuilder()
@@ -32,8 +33,8 @@ namespace MarbleBot.Modules
                         .AppendLine("Check who's participating with `mb/siege contestants` and view Siege information with `mb/siege info`!")
                         .ToString())
                     .AddField("Mechanics", new StringBuilder()
-                        .AppendLine("There are a few differences between this and normal Marble Sieges.\n\n")
-                        .AppendLine("**HP Scaling**\nMarble HP scales with difficulty ((difficulty + 2) * 5).\n\n")
+                        .AppendLine("There are a few differences between this and normal Marble Sieges.\n")
+                        .AppendLine("**HP Scaling**\nMarble HP scales with difficulty ((difficulty + 2) * 5).\n")
                         .AppendLine("**Vengeance**\nWhen a marble dies, the damage multiplier goes up by 0.2 (0.4 if Morale Boost is active).")
                         .ToString())
                     .WithColor(GetColor(Context))
@@ -63,9 +64,9 @@ namespace MarbleBot.Modules
                         return;
                     }
                 }
-                if (!File.Exists(fileId.ToString() + "siege.csv")) File.Create(fileId.ToString() + "siege.csv").Close();
+                if (!File.Exists($"{fileId}siege.csv")) File.Create($"{fileId}siege.csv").Close();
                 var found = false;
-                using (var marbleList = new StreamReader(fileId.ToString() + "siege.csv")) {
+                using (var marbleList = new StreamReader($"{fileId}siege.csv")) {
                     while (!marbleList.EndOfStream) {
                         var line = await marbleList.ReadLineAsync();
                         found = line.Contains(Context.User.Id.ToString());
@@ -79,20 +80,12 @@ namespace MarbleBot.Modules
                 name = marbleName;
                 builder.AddField("Marble Siege: Signed up!", "**" + Context.User.Username + "** has successfully signed up as **" + name + "**!");
                 using (var siegers = new StreamWriter("SiegeMostUsed.txt", true)) await siegers.WriteLineAsync(name);
-                if (name.Contains(',')) {
-                    var newName = new char[name.Length];
-                    for (int i = 0; i < name.Length - 1; i++) {
-                        if (name[i] == ',') newName[i] = ';';
-                        else newName[i] = name[i];
-                    }
-                    name = new string(newName);
-                }
-                using (var marbleList = new StreamWriter(fileId.ToString() + "siege.csv", true)) {
+                using (var marbleList = new StreamWriter($"{fileId}siege.csv", true)) {
                     await marbleList.WriteLineAsync($"{name},{Context.User.Id}");
                     marbleList.Close();
                 }
                 byte alive = 0;
-                using (var marbleList = new StreamReader(fileId.ToString() + "siege.csv")) {
+                using (var marbleList = new StreamReader($"{fileId}siege.csv")) {
                     var allLines = (await marbleList.ReadToEndAsync()).Split('\n');
                     alive = (byte)allLines.Length;
                     marbleList.Close();
@@ -111,9 +104,6 @@ namespace MarbleBot.Modules
             {
                 await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                EmbedBuilder builder = new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp();
 
                 if (Global.SiegeInfo.ContainsKey(fileId)) {
                     if (Global.SiegeInfo[fileId].Active)
@@ -121,7 +111,7 @@ namespace MarbleBot.Modules
                 } else {
                     // Get marbles
                     byte marbleCount = 0;
-                    using (var marbleList = new StreamReader(fileId.ToString() + "siege.csv")) {
+                    using (var marbleList = new StreamReader($"{fileId}siege.csv")) {
                         while (!marbleList.EndOfStream) {
                             var line = await marbleList.ReadLineAsync();
                             if (!line.IsEmpty()) marbleCount++;
@@ -130,6 +120,9 @@ namespace MarbleBot.Modules
                                 Id = ulong.Parse(sLine[1]),
                                 Name = sLine[0]
                             };
+                            var user = GetUser(Context, marble.Id);
+                            if (user.Items.ContainsKey(063) && user.Items[063] >= 1)
+                                marble.Shield = GetItem("063");
                             if (Global.SiegeInfo.ContainsKey(fileId)) {
                                 if (!Global.SiegeInfo[fileId].Marbles.Contains(marble)) Global.SiegeInfo[fileId].Marbles.Add(marble);
                             }
@@ -189,17 +182,19 @@ namespace MarbleBot.Modules
                             marbles.AppendLine($"**{marble.Name}** [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
                             if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
                         }
-                        var bossInfo = new StringBuilder()
-                            .AppendLine($"HP: **{boss.HP}**")
-                            .AppendLine($"Attacks: **{boss.Attacks.Length}**")
-                            .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
-                            .ToString();
-                        builder.WithTitle("The Siege has begun!")
+                        await ReplyAsync(embed: new EmbedBuilder()
+                            .WithColor(GetColor(Context))
+                            .WithCurrentTimestamp()
                             .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
+                            .WithTitle("The Siege has begun!")
                             .WithThumbnailUrl(boss.ImageUrl)
                             .AddField($"Marbles: **{currentSiege.Marbles.Count}**", marbles.ToString())
-                            .AddField($"Boss: **{boss.Name}**", bossInfo);
-                        await ReplyAsync(embed: builder.Build());
+                            .AddField($"Boss: **{boss.Name}**", new StringBuilder()
+                                .AppendLine($"HP: **{boss.HP}**")
+                                .AppendLine($"Attacks: **{boss.Attacks.Length}**")
+                                .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
+                                .ToString())
+                            .Build());
                         if (pings.Length != 0) await ReplyAsync(pings.ToString());
                     }
                 }
@@ -348,7 +343,7 @@ namespace MarbleBot.Modules
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 if (Context.User.Id == 224267581370925056 || Context.IsPrivate) {
-                    using (var marbleList = new StreamWriter(fileId.ToString() + "siege.csv", false)) {
+                    using (var marbleList = new StreamWriter($"{fileId}siege.csv", false)) {
                         await marbleList.WriteAsync("");
                         await ReplyAsync("Contestant list successfully cleared!");
                         marbleList.Close();
@@ -381,7 +376,7 @@ namespace MarbleBot.Modules
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var marbles = new StringBuilder();
                 byte cCount = 0;
-                using (var marbleList = new StreamReader(fileId.ToString() + "siege.csv")) {
+                using (var marbleList = new StreamReader($"{fileId}siege.csv")) {
                     var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
                     foreach (var marble in allMarbles) {
                         if (marble.Length > 16) {
@@ -411,7 +406,7 @@ namespace MarbleBot.Modules
                 // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
                 byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0;
                 var wholeFile = new StringBuilder();
-                using (var marbleList = new StreamReader(fileId.ToString() + "siege.csv")) {
+                using (var marbleList = new StreamReader($"{fileId}siege.csv")) {
                     while (!marbleList.EndOfStream) {
                         var line = await marbleList.ReadLineAsync();
                         if (line.Split(',')[0] == marbleToRemove) {
@@ -429,7 +424,7 @@ namespace MarbleBot.Modules
                     case 0: await ReplyAsync("Could not find the requested marble!"); break;
                     case 1: await ReplyAsync("This is not your marble!"); break;
                     case 2:
-                        using (var marbleList = new StreamWriter(fileId.ToString() + "siege.csv", false)) {
+                        using (var marbleList = new StreamWriter($"{fileId}siege.csv", false)) {
                             await marbleList.WriteAsync(wholeFile.ToString());
                             await ReplyAsync("Removed contestant **" + marbleToRemove + "**!");
                         }
@@ -458,7 +453,7 @@ namespace MarbleBot.Modules
                         .WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{PU}**")
                         .WithThumbnailUrl(siege.Boss.ImageUrl);
                 } else {
-                    using (var marbleList = new StreamReader(fileId.ToString() + "siege.csv")){
+                    using (var marbleList = new StreamReader($"{fileId}siege.csv")){
                         var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
                         if (allMarbles.Length > 1) {
                             foreach (var marble in allMarbles) {
@@ -550,14 +545,6 @@ namespace MarbleBot.Modules
                     case "vinemonster": await ReplyAsync("Excuse me?"); state = 3; break;
                     case "vinemonsters": goto case "vinemonster";
                     case "floatingore": goto case "vinemonster";
-                    case "veronica": await ReplyAsync("Woah there! Calm down!"); state = 3; break;
-                    case "rockgolem": goto case "veronica";
-                    case "minideletion": goto case "veronica";
-                    case "alphadeletion": goto case "veronica";
-                    case "viii": goto case "veronica";
-                    case "triacontapheesh": goto case "veronica";
-                    case "hyperguard": goto case "veronica";
-                    case "creator": await ReplyAsync("*No...\n\nThis is wrong...*"); state = 3; break;
                     case "doc671": await ReplyAsync("No spoilers here!"); state = 4; break;
                     default: state = 0; break;
                 }
@@ -595,7 +582,8 @@ namespace MarbleBot.Modules
                 Boss[] playableBosses = { Global.PreeTheTree, Global.HelpMeTheTree, Global.HATTMANN, Global.Orange,
                     Global.Erango, Global.Octopheesh, Global.Green, Global.Destroyer };
                 foreach (var boss in playableBosses)
-                    builder.AddField($"{boss.Name}", $"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10, HP: **{boss.MaxHP}**, Attacks: **{boss.Attacks.Count()}**");
+                    builder.AddField($"{boss.Name}", 
+                        $"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10, HP: **{boss.MaxHP}**, Attacks: **{boss.Attacks.Count()}**");
                 builder.WithDescription("Use `mb/siege boss <boss name>` for more info!")
                     .WithTitle("Playable MS Bosses");
                 await ReplyAsync(embed: builder.Build());

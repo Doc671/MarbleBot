@@ -159,7 +159,7 @@ namespace MarbleBot.Modules {
             var obj = GetUsersObj();
             var user = GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 24) {
-                if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 60) user.DailyStreak = 0;
+                if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 72) user.DailyStreak = 0;
                 decimal gift;
                 var power = user.DailyStreak > 100 ? 100 : user.DailyStreak;
                 gift = Convert.ToDecimal(Math.Round(Math.Pow(200, 1 + (Convert.ToDouble(power) / 100)), 2));
@@ -629,6 +629,17 @@ namespace MarbleBot.Modules {
                         else user.Items.Add(18, 1);
                         await ReplyAsync($"**{Context.User.Username}** poured all the water out from a **{item.Name}**, turning it into a **Steel Bucket**!");
                         break;
+                    case 22: {
+                        ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+                        if (Global.SiegeInfo.ContainsKey(fileId) && Global.SiegeInfo[fileId].Boss.Name == "Help Me The Tree") {
+                            var randDish = 22 + Global.Rand.Next(0, 13);
+                            user.Items[22]--;
+                            if (user.Items.ContainsKey(randDish)) user.Items[randDish]++;
+                            else user.Items.Add(randDish, 1);
+                            await ReplyAsync($"**{Context.User.Username}** used their **{item.Name}**! It somehow picked up a disease and is now a **{GetItem(randDish.ToString("000")).Name}**!");
+                        } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        break;
+                    }
                     case 23: {
                         ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                         if (Global.SiegeInfo.ContainsKey(fileId)) {
@@ -749,6 +760,7 @@ namespace MarbleBot.Modules {
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     }
+                    case 62: goto case 17;
                     default:
                         await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;

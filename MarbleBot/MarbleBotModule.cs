@@ -176,25 +176,21 @@ namespace MarbleBot
 
         /// <summary> Writes users to appropriate JSON file </summary>
         public static void WriteUsers(JObject obj) {
-            new Thread(() => {
-                using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
-                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                    serialiser.Serialize(users, obj);
-                }
-            }).Start();
+            using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
+                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                serialiser.Serialize(users, obj);
+            }
         }
 
         public static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser) {
-            new Thread(() => {
-                mbUser.Name = socketUser.Username;
-                mbUser.Discriminator = socketUser.Discriminator;
-                obj.Remove(socketUser.Id.ToString());
-                obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
-                using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
-                    var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                    serialiser.Serialize(users, obj);
-                }
-            }).Start();
+            mbUser.Name = socketUser.Username;
+            mbUser.Discriminator = socketUser.Discriminator;
+            obj.Remove(socketUser.Id.ToString());
+            obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
+            using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {
+                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+                serialiser.Serialize(users, obj);
+            }
         } 
     }
 }

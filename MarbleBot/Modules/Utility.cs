@@ -93,12 +93,13 @@ namespace MarbleBot.Modules
                     await ReplyAsync(embed: builder.Build());
                     break;
                 default:
-                    var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower()).First();
-                    if (rawCommand == null) {
-                        await ReplyAsync("Could not find requested command!");
-                        break;
+                    var hCommand = new HelpCommand();
+                    try {
+                        var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower()).First();
+                        hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
+                    } catch (NullReferenceException ex) {
+                        await Log(ex.ToString());
                     }
-                    var hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
                     string THSOnly = "This command cannot be used in Community Marble!";
                     switch (command) {
                         // General

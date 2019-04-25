@@ -96,7 +96,7 @@ namespace MarbleBot.BaseClasses
                     foreach (var marble in Marbles) {
                         if (marble.HP > 0) {
                             if (!(Global.Rand.Next(0, 100) > atk.Accuracy)) {
-                                marble.HP -= atk.Damage;
+                                marble.DealDamage(atk.Damage);
                                 hits++;
                                 if (marble.HP < 1) {
                                     marble.HP = 0;
@@ -301,7 +301,7 @@ namespace MarbleBot.BaseClasses
             await context.Channel.SendMessageAsync(embed: builder.Build());
             Global.SiegeInfo.Remove(id);
             Dispose();
-            using (var marbleList = new StreamWriter(id.ToString() + "csv", false)) {
+            using (var marbleList = new StreamWriter($"{id}csv", false)) {
                 await marbleList.WriteAsync("");
                 marbleList.Close();
             }
