@@ -136,9 +136,8 @@ namespace MarbleBot.Modules
                         var currentSiege = Global.SiegeInfo[fileId];
                         currentSiege.Active = true;
                         // Pick boss & set battle stats based on boss
-                        var boss = currentSiege.Boss;
                         if (over.Contains("override") && (Context.User.Id == 224267581370925056 || Context.IsPrivate)) {
-                            boss = Siege.GetBoss(over.Split(' ')[1]);
+                            currentSiege.Boss = Siege.GetBoss(over.Split(' ')[1]);
                         } else {
                             byte stageTotal = 0;
                             foreach (var marble in currentSiege.Marbles) {
@@ -154,11 +153,9 @@ namespace MarbleBot.Modules
                                 else StageOneBossChooser(currentSiege);
                             }
                         }
-                        var hp = ((int)boss.Difficulty + 2) * 5;
-                        foreach (var marble in currentSiege.Marbles) {
-                            marble.HP = hp;
-                            marble.MaxHP = hp;
-                        }
+                        var hp = ((int)currentSiege.Boss.Difficulty + 2) * 5;
+                        foreach (var marble in currentSiege.Marbles)
+                            marble.SetHP(hp);
 
                         // Siege Start
                         var cdown = await ReplyAsync("**3**");
@@ -180,12 +177,12 @@ namespace MarbleBot.Modules
                             .WithCurrentTimestamp()
                             .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
                             .WithTitle("The Siege has begun!")
-                            .WithThumbnailUrl(boss.ImageUrl)
+                            .WithThumbnailUrl(currentSiege.Boss.ImageUrl)
                             .AddField($"Marbles: **{currentSiege.Marbles.Count}**", marbles.ToString())
-                            .AddField($"Boss: **{boss.Name}**", new StringBuilder()
-                                .AppendLine($"HP: **{boss.HP}**")
-                                .AppendLine($"Attacks: **{boss.Attacks.Length}**")
-                                .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
+                            .AddField($"Boss: **{currentSiege.Boss.Name}**", new StringBuilder()
+                                .AppendLine($"HP: **{currentSiege.Boss.HP}**")
+                                .AppendLine($"Attacks: **{currentSiege.Boss.Attacks.Length}**")
+                                .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), currentSiege.Boss.Difficulty)} {(int)currentSiege.Boss.Difficulty}**/10")
                                 .ToString())
                             .Build());
                         if (pings.Length != 0) await ReplyAsync(pings.ToString());
@@ -512,32 +509,32 @@ namespace MarbleBot.Modules
                     case "helpmethetree": boss = Siege.GetBoss("HelpMeTheTree"); break;
                     case "erango": boss = Siege.GetBoss("Erango"); break;
                     case "octopheesh": boss = Siege.GetBoss("Octopheesh"); break;
-                    case "frigidium": await ReplyAsync("No."); state = 3; break;
-                    case "highwaystickman": goto case "frigidium";
-                    case "outcast": goto case "frigidium";
-                    case "doon": goto case "frigidium";
-                    case "shardberg": goto case "frigidium";
-                    case "iceelemental": goto case "frigidium";
-                    case "snowjoke": goto case "frigidium";
-                    case "pheesh": goto case "frigidium";
-                    case "shark": goto case "frigidium";
-                    case "pufferfish": goto case "frigidium";
-                    case "neptune": goto case "frigidium";
-                    case "lavachunk": goto case "frigidium";
-                    case "pyromaniac": goto case "frigidium";
-                    case "volcano": goto case "frigidium";
-                    case "red": Siege.GetBoss("Red"); break;
-                    case "spaceman": goto case "frigidium";
-                    case "rgvzdhjvewvy": goto case "frigidium";
-                    case "corruptsoldier": goto case "frigidium";
-                    case "corruptpurple": Siege.GetBoss("CorruptPurple"); break;
-                    case "chest": goto case "frigidium";
-                    case "scaryface": goto case "frigidium";
-                    case "marblebot": goto case "frigidium";
-                    case "overlord": Siege.GetBoss("Overlord"); break;
-                    case "vinemonster": await ReplyAsync("Excuse me?"); state = 3; break;
-                    case "vinemonsters": goto case "vinemonster";
-                    case "floatingore": goto case "vinemonster";
+                    case "frigidium":
+                    case "highwaystickman":
+                    case "outcast":
+                    case "doon":
+                    case "shardberg":
+                    case "iceelemental":
+                    case "snowjoke":
+                    case "pheesh":
+                    case "shark":
+                    case "pufferfish":
+                    case "neptune":
+                    case "lavachunk":
+                    case "pyromaniac":
+                    case "volcano": await ReplyAsync("No."); state = 3; break;
+                    case "red": boss = Siege.GetBoss("Red"); break;
+                    case "spaceman":
+                    case "rgvzdhjvewvy":
+                    case "corruptsoldier": goto case "volcano";
+                    case "corruptpurple": boss = Siege.GetBoss("CorruptPurple"); break;
+                    case "chest":
+                    case "scaryface":
+                    case "marblebot": goto case "volcano";
+                    case "overlord": boss = Siege.GetBoss("Overlord"); break;
+                    case "vinemonster": 
+                    case "vinemonsters":
+                    case "floatingore": await ReplyAsync("Excuse me?"); state = 3; break;
                     case "doc671": await ReplyAsync("No spoilers here!"); state = 4; break;
                     default: state = 0; break;
                 }
@@ -573,8 +570,47 @@ namespace MarbleBot.Modules
                 }
                 else if (state == 0) await ReplyAsync("Could not find the requested boss!");
             }
+
+            [Command("bosschance")]
+            [Alias("spawnchance", "boss chance", "spawn chance", "chance")]
+            [Summary("Displays the spawn chances of each boss.")]
+            public async Task SiegeBossChanceCommandAsync([Remainder] string option)
+            {
+                var builder = new EmbedBuilder()
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp();
+                switch (option.ToLower().RemoveChar(' ')) {
+                    case "graph1":
+                    case "1":
+                        await ReplyAsync(embed: builder
+                            .WithImageUrl("https://cdn.discordapp.com/attachments/229280519697727488/572121299485327360/unknown.png")
+                            .WithTitle("Siege Boss Spawn Chances: Stage I (Graph)")
+                            .Build());
+                        break;
+                    case "graph2":
+                    case "2":
+                        await ReplyAsync(embed: builder
+                            .WithImageUrl("https://cdn.discordapp.com/attachments/229280519697727488/572121574187073537/unknown.png")
+                            .WithTitle("Siege Boss Spawn Chances: Stage II (Graph)")
+                            .Build());
+                        break;
+                    case "raw1":
+                        await ReplyAsync(embed: builder
+                            .WithImageUrl("https://cdn.discordapp.com/attachments/229280519697727488/572121173828173844/unknown.png")
+                            .WithTitle("Siege Boss Spawn Chances: Stage I (Raw)")
+                            .Build());
+                        break;
+                    case "raw2":
+                        await ReplyAsync(embed: builder
+                            .WithImageUrl("https://cdn.discordapp.com/attachments/229280519697727488/572121457359060993/unknown.png")
+                            .WithTitle("Siege Boss Spawn Chances: Stage II (Raw)")
+                            .Build());
+                        break;
+                }
+            }
                 
             [Command("bosslist")]
+            [Alias("bosses")]
             [Summary("Returns a list of bosses.")]
             public async Task SiegeBosslistCommandAsync()
             {
@@ -655,8 +691,8 @@ namespace MarbleBot.Modules
 
             public void StageOneBossChooser(Siege currentSiege) {
                 var bossWeight = (int)Math.Round(currentSiege.Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
-                if (IsBetween(bossWeight, 0, 5)) currentSiege.Boss = Siege.GetBoss("PreeTheTree");
-                else if (IsBetween(bossWeight, 6, 13)) currentSiege.Boss = Siege.GetBoss("HelpMeTheTree");
+                if (IsBetween(bossWeight, 0, 6)) currentSiege.Boss = Siege.GetBoss("PreeTheTree");
+                else if (IsBetween(bossWeight, 7, 13)) currentSiege.Boss = Siege.GetBoss("HelpMeTheTree");
                 else if (IsBetween(bossWeight, 14, 21)) currentSiege.Boss = Siege.GetBoss("HattMann");
                 else if (IsBetween(bossWeight, 22, 29)) currentSiege.Boss = Siege.GetBoss("Orange");
                 else if (IsBetween(bossWeight, 30, 37)) currentSiege.Boss = Siege.GetBoss("Erango");
@@ -668,7 +704,7 @@ namespace MarbleBot.Modules
             public void StageTwoBossChooser(Siege currentSiege) {
                 var bossWeight = (int)Math.Round(currentSiege.Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
                 if (IsBetween(bossWeight, 0, 25)) currentSiege.Boss = Siege.GetBoss("Red");
-                else if (IsBetween(bossWeight, 25, 50)) currentSiege.Boss = Siege.GetBoss("CorruptPurple");
+                else if (IsBetween(bossWeight, 26, 50)) currentSiege.Boss = Siege.GetBoss("CorruptPurple");
                 else currentSiege.Boss = Siege.GetBoss("Overlord");
             }
         }

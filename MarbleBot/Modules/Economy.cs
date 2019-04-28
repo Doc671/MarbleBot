@@ -357,6 +357,17 @@ namespace MarbleBot.Modules {
                 .AddField("Last Scavenge", lastScavenge, true)
                 .AddField("Last Siege Win", lastSiegeWin, true)
                 .AddField("Items", itemOutput.ToString());
+            if (user.Stage == 2) {
+                var shield = user.Items.ContainsKey(063) && user.Items[063] > 0 ? "Coating of Destruction" : "None";
+                var spikes = "None";
+                foreach (var itemPair in user.Items) {
+                    var item = GetItem(itemPair.Value.ToString("000"));
+                    if (item.Name.Contains("Spikes")) spikes = item.Name;
+                }
+                builder.AddField("Stage", user.Stage, true)
+                  .AddField("Shield", shield, true)
+                  .AddField("Spikes", spikes, true);
+            }
             await ReplyAsync(embed: builder.Build());
         }
 
@@ -373,7 +384,7 @@ namespace MarbleBot.Modules {
             var items = obj.ToObject<Dictionary<string, Item>>();
             if (int.TryParse(rawIndex, out int index)) {
                 var minValue = index * 20 - 20;
-                if (minValue > 63) await ReplyAsync("The last item has ID `063`!");
+                if (minValue > 74) await ReplyAsync("The last item has ID `074`!");
                 else {
                     var maxValue = index * 20 - 1;
                     embed.WithTitle($"Recipes in IDs `{minValue.ToString("000")}`-`{maxValue.ToString("000")}`");
@@ -394,8 +405,8 @@ namespace MarbleBot.Modules {
                             if (itemId > maxValue) break;
                         }
                     }
+                    await ReplyAsync(embed: embed.Build());
                 }
-                await ReplyAsync(embed: embed.Build());
             } else await ReplyAsync("Invalid number! Use `mb/help recipes` for more info.");
         }
 

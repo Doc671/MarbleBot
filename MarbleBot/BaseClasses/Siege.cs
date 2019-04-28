@@ -64,7 +64,8 @@ namespace MarbleBot.BaseClasses
             using (var bosses = new StreamReader("Resources\\Bosses.json")) json = bosses.ReadToEnd();
             var obj = JObject.Parse(json);
             var boss = Boss.Empty;
-            if (searchTerm.Contains(' ')) searchTerm = searchTerm.ToPascalCase();
+            if (searchTerm.Contains(' ') || searchTerm[0].ToString() == searchTerm[0].ToString().ToLower())
+                searchTerm = searchTerm.ToPascalCase();
             if (obj.ContainsKey(searchTerm)) boss = obj[searchTerm].ToObject<Boss>();
             return boss;
         }

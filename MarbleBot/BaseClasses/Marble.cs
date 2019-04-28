@@ -13,7 +13,7 @@ namespace MarbleBot.BaseClasses
             get { return _HP; }
             set { _HP = value > MaxHP ? MaxHP : value < 1 ? 0 : value; }
         }
-        public int MaxHP { get; set; }
+        public int MaxHP { get; private set; }
         public int DamageDealt { get; set; }
         public int PUHits { get; set; }
         public Item Shield { get; set; }
@@ -37,8 +37,13 @@ namespace MarbleBot.BaseClasses
             HP -= damage;
         }
 
-        public override string ToString() => $"{Name} HP: {HP}/20 [{Id}] BH: {DamageDealt} PH: {PUHits} Cloned: {Cloned}";
+        public void SetHP(int hp) {
+            _HP = hp;
+            MaxHP = hp;
+        }
 
+        public override string ToString() => $"{Name} HP: {HP}/20 [{Id}] BH: {DamageDealt} PH: {PUHits} Cloned: {Cloned}";
+        
         public string ToString(SocketCommandContext context) {
             var user = context.Client.GetUser(Id);
             return $"**{Name}** (HP: **{HP}**/{MaxHP}, DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";

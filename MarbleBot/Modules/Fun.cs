@@ -255,11 +255,8 @@ namespace MarbleBot.Modules
                 case 20: flavour = "Don't you have anything better to do?"; break;
                 case 21: flavour = "No? I suppose not. You've used this command 21 times in the past 100 messages, after all."; break;
                 case 22: flavour = "Do you just want to see how far I'll go?"; break;
-                case 23: flavour = "Fine. I'll stop then."; break;
-                case 24: flavour = "Bye."; break;
-                case 25: flavour = "Wasn't fun talking to you."; break;
-                case 26: flavour = "ok really this is the last message"; break;
-                default: flavour = ""; break;
+                case 23: flavour = "You know... I do actually have something for you..."; break;
+                default: flavour = $"Your stage is {GetUser(Context).Stage}!"; break;
             }
 
             builder.AddField("Level", level, true)
