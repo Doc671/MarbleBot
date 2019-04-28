@@ -18,7 +18,6 @@ namespace MarbleBot.Modules
         public class RaceCommand : MarbleBotModule
         {
             [Command("help")]
-            [Alias("")]
             [Summary("Race help.")]
             public async Task RaceHelpCommandAsync([Remainder] string _ = "")
                 => await ReplyAsync(embed: new EmbedBuilder()

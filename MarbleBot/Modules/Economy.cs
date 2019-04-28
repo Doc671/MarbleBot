@@ -243,21 +243,14 @@ namespace MarbleBot.Modules {
             if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
             else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
             else {
-                if (item.Stage > GetUser(Context).Stage) {
-                    string cannotViewMsg;
-                    switch (Global.Rand.Next(0, 4)) {
-                        case 0: cannotViewMsg = "Your inexperience blinds you..."; break;
-                        case 1: cannotViewMsg = "Your vision is blurry..."; break;
-                        case 2: cannotViewMsg = "Screams echo in your head..."; break;
-                        default: cannotViewMsg = "Your mind is wracked with pain..."; break;
-                    }
+                if (item.Stage > GetUser(Context).Stage) 
                     await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
-                        .WithDescription($"*{cannotViewMsg}*\n\nYou are unable to view information about this item!")
+                        .WithDescription($"{StageTooHighString()}\n\nYou are unable to view information about this item!")
                         .WithTitle(item.Name)
                         .Build());
-                } else {
+                else {
                     var price = item.Price == -1 ? "N/A" : $"{Global.UoM}{item.Price:n}";
                     var builder = new EmbedBuilder()
                         .WithColor(GetColor(Context))
@@ -388,16 +381,10 @@ namespace MarbleBot.Modules {
                         if (itemPair.Value.CraftingProduced != 0) {
                             var itemId = int.Parse(itemPair.Key);
                             if (itemId >= minValue && itemId <= maxValue) {
-                                if (itemPair.Value.Stage > GetUser(Context).Stage) {
-                                    string cannotViewMsg;
-                                    switch (Global.Rand.Next(0, 4)) {
-                                        case 0: cannotViewMsg = "Your inexperience blinds you..."; break;
-                                        case 1: cannotViewMsg = "Your vision is blurry..."; break;
-                                        case 2: cannotViewMsg = "Screams echo in your head..."; break;
-                                        default: cannotViewMsg = "Your mind is wracked with pain..."; break;
-                                    }
-                                    embed.AddField($"`[{itemPair.Key}]` {GetItem(itemPair.Key).Name}", $"*{cannotViewMsg}*\n\nYou are unable to view information about this item!");
-                                } else {
+                                if (itemPair.Value.Stage > GetUser(Context).Stage)
+                                    embed.AddField($"`[{itemPair.Key}]` {GetItem(itemPair.Key).Name}", 
+                                        $"{StageTooHighString()}\n\nYou are unable to view information about this item!");
+                                else {
                                     var output = new StringBuilder();
                                     foreach (var ingredient in itemPair.Value.CraftingRecipe)
                                         output.AppendLine($"`[{ingredient.Key}]` {GetItem(ingredient.Key).Name}: {ingredient.Value}");

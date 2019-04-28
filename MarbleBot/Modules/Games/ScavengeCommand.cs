@@ -25,7 +25,7 @@ namespace MarbleBot.Modules
                 var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
                 var helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
                 await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("How to play", helpP1 + helpP2 + helpP3)
+                    .AddField("How to play", $"{helpP1} {helpP2} {helpP3}")
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
                     .WithTitle("Item Scavenge!")
@@ -60,11 +60,39 @@ namespace MarbleBot.Modules
             public async Task ScavengeCanaryCommandAsync()
                 => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.CanaryBeach);
 
+            [Command("destroyersremains")]
+            [Alias("destroyer'sremains", "destroyer's remains")]
+            [Summary("Starts a scavenge session in Destroyer's Remains")]
+            public async Task ScavengeDestroyerCommandAsync()
+            {
+                if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
+                    .WithTitle("Scavenge: Destroyer's Remains")
+                    .Build());
+                else await ScavengeStartAsync(GetUser(Context), ScavengeLocation.DestroyersRemains);
+            }
+
             [Command("treewurld")]
             [Alias("tree wurld")]
             [Summary("Starts a scavenge session in Tree Wurld.")]
             public async Task ScavengeTreeCommandAsync()
                 => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.TreeWurld);
+
+            [Command("violetvolcanoes")]
+            [Alias("violet volcanoes")]
+            [Summary("Starts a scavenge session in Destroyer's Remains")]
+            public async Task ScavengeVolcanoCommandAsync()
+            {
+                if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
+                    .WithTitle("Scavenge: Violet Volcanoes")
+                    .Build());
+                else await ScavengeStartAsync(GetUser(Context), ScavengeLocation.VioletVolcanoes);
+            }
 
             [Command("grab")]
             [Alias("take")]
@@ -123,10 +151,12 @@ namespace MarbleBot.Modules
             public async Task ScavengeLocationCommandAsync()
             {
                 await Context.Channel.TriggerTypingAsync();
+                var stageTwoLocations = GetUser(Context).Stage > 1 ? "Destroyer's Remains\nViolet Volcanoes" 
+                    : $":lock: LOCKED\n:lock: LOCKED";
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
-                    .WithDescription("Canary Beach\nTree Wurld\n\nUse `mb/scavenge info <location name>` to see which items you can get!")
+                    .WithDescription($"Canary Beach\nTree Wurld\n{stageTwoLocations}\n\nUse `mb/scavenge info <location name>` to see which items you can get!")
                     .WithTitle("Scavenge Locations")
                     .Build());
             }
@@ -157,11 +187,39 @@ namespace MarbleBot.Modules
             public async Task ScavengeLocationCanaryCommandAsync()
                 => await ScavengeInfoAsync(ScavengeLocation.CanaryBeach);
 
+            [Command("location destroyersremains")]
+            [Alias("location destroyer'sremains", "location destroyer's remains", "info destroyersremains", "info destroyer'sremains", "info destroyer's remains")]
+            [Summary("Shows scavenge location info for Destroyer's Remains")]
+            public async Task ScavengeLocationDestroyerCommandAsync()
+            {
+                if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
+                    .WithTitle("Scavenge Location Info: Destroyer's Remains")
+                    .Build());
+                else await ScavengeInfoAsync(ScavengeLocation.DestroyersRemains);
+            }
+
             [Command("location treewurld")]
             [Alias("location tree", "location tree wurld", "info tree wurld", "info tree", "info tree wurld")]
             [Summary("Shows scavenge location info for Tree Wurld")]
             public async Task ScavengeLocationTreeCommandAsync()
                 => await ScavengeInfoAsync(ScavengeLocation.TreeWurld);
+
+            [Command("location violetvolcanoes")]
+            [Alias("location violet volcanoes", "info violetvolcanoes", "info violet volcanoes")]
+            [Summary("Starts a scavenge session in Destroyer's Remains")]
+            public async Task ScavengeLocationVolcanoCommandAsync()
+            {
+                if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
+                    .WithTitle("Scavenge Location Info: Violet Volcanoes")
+                    .Build());
+                else await ScavengeInfoAsync(ScavengeLocation.VioletVolcanoes);
+            }
 
             public async Task ScavengeSessionAsync(SocketCommandContext context, ScavengeLocation location)
             {

@@ -16,14 +16,14 @@ namespace MarbleBot.BaseClasses
 
         /// <summary> Represents a boss' attack during a Marble Siege. </summary>
         /// <param name="name"> The name of the attack. </param>
-        /// <param name="pwr"> The amount of damage dealt by the attack. </param>
-        /// <param name="acc"> The chance the attack will hit each marble out of 100. </param>
-        /// <param name="mse"> The status effect the attack inflicts. </param>
-        public Attack(string name, byte pwr, byte acc, MSE mse) {
+        /// <param name="damage"> The amount of damage dealt by the attack. </param>
+        /// <param name="accuracy"> The chance the attack will hit each marble out of 100. </param>
+        /// <param name="statusEffect"> The status effect the attack inflicts. </param>
+        public Attack(string name, byte damage, byte accuracy, MSE statusEffect) {
             Name = name;
-            Damage = pwr;
-            Accuracy = acc;
-            StatusEffect = mse;
+            Damage = damage;
+            Accuracy = accuracy;
+            StatusEffect = statusEffect;
         }
     }
 }

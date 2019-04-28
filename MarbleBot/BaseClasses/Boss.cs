@@ -23,9 +23,11 @@ namespace MarbleBot.BaseClasses
         public BossDrops[] Drops { get; set; }
         /// <summary> A URL to the boss' image. </summary>
         public string ImageUrl { get; set; }
+        /// <summary> The Stage the boss appears at. </summary>
+        public byte Stage { get; set; }
 
         /// <summary> An empty instance of a boss. </summary>
-        public static Boss Empty = new Boss("", 0, Difficulty.None, "",
+        public static Boss Empty = new Boss("", 0, Difficulty.None, 1, "",
             new Attack[] { Attack.Empty },
             new BossDrops[] { new BossDrops(0, 0, 0, 0) }
         );
@@ -39,13 +41,14 @@ namespace MarbleBot.BaseClasses
         /// <param name="imgUrl"> A URL to the boss' image. </param>
         /// <param name="atks"> The boss' attacks. </param>
         /// <param name="itemDrops"> The items that drop from the boss, the number of them and the chance each one has of dropping. </param>
-        public Boss(string name, int hp, Difficulty diff, string imgUrl, Attack[] atks, IEnumerable<BossDrops> itemDrops) {
+        public Boss(string name, int hp, Difficulty diff, byte stage, string imgUrl, Attack[] atks, BossDrops[] itemDrops) {
             Name = name;
             _HP = hp;
             MaxHP = hp;
             Difficulty = diff;
+            Stage = stage;
             Attacks = atks;
-            Drops = itemDrops.ToArray();
+            Drops = itemDrops;
             ImageUrl = imgUrl;
         }
     }

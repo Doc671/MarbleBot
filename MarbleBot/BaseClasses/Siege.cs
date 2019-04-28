@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using MarbleBot.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,16 @@ namespace MarbleBot.BaseClasses
             Boss.ResetHP();
             Marbles = null;
             disposed = true;
+        }
+
+        public static Boss GetBoss(string searchTerm) {
+            string json;
+            using (var bosses = new StreamReader("Resources\\Bosses.json")) json = bosses.ReadToEnd();
+            var obj = JObject.Parse(json);
+            var boss = Boss.Empty;
+            if (searchTerm.Contains(' ')) searchTerm = searchTerm.ToPascalCase();
+            if (obj.ContainsKey(searchTerm)) boss = obj[searchTerm].ToObject<Boss>();
+            return boss;
         }
 
         public void SetPowerUp(string PU) {

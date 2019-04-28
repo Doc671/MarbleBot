@@ -21,7 +21,6 @@ namespace MarbleBot.Modules
             private static bool IsBetween(int no, int lower, int upper) => lower <= no && no <= upper;
 
             [Command("help")]
-            [Alias("")]
             [Summary("Siege help.")]
             public async Task SiegeHelpCommandAsync()
                 => await ReplyAsync(embed: new EmbedBuilder()
@@ -123,6 +122,9 @@ namespace MarbleBot.Modules
                             var user = GetUser(Context, marble.Id);
                             if (user.Items.ContainsKey(063) && user.Items[063] >= 1)
                                 marble.Shield = GetItem("063");
+                            if (user.Items.ContainsKey(074)) marble.DamageIncrease = 25;
+                            else if (user.Items.ContainsKey(071)) marble.DamageIncrease = 15;
+                            else if (user.Items.ContainsKey(066)) marble.DamageIncrease = 10;
                             if (Global.SiegeInfo.ContainsKey(fileId)) {
                                 if (!Global.SiegeInfo[fileId].Marbles.Contains(marble)) Global.SiegeInfo[fileId].Marbles.Add(marble);
                             }
@@ -134,33 +136,24 @@ namespace MarbleBot.Modules
                         var currentSiege = Global.SiegeInfo[fileId];
                         currentSiege.Active = true;
                         // Pick boss & set battle stats based on boss
-                        if (over.Contains("override") && (Context.User.Id == 224267581370925056 || Context.IsPrivate)) {
-                            switch (over.Split(' ')[1].ToLower()) {
-                                case "pree": currentSiege.Boss = Global.PreeTheTree; break;
-                                case "preethetree": goto case "pree";
-                                case "helpme": currentSiege.Boss = Global.HelpMeTheTree; break;
-                                case "help": goto case "help";
-                                case "helpmethetree": goto case "helpme";
-                                case "hattmann": currentSiege.Boss = Global.HATTMANN; break;
-                                case "hatt": currentSiege.Boss = Global.HATTMANN; break;
-                                case "orange": currentSiege.Boss = Global.Orange; break;
-                                case "erango": currentSiege.Boss = Global.Erango; break;
-                                case "octopheesh": currentSiege.Boss = Global.Octopheesh; break;
-                                case "green": currentSiege.Boss = Global.Green; break;
-                                case "destroyer": currentSiege.Boss = Global.Destroyer; break;
-                            }
-                        } else {
-                            var bossWeight = (int)Math.Round(currentSiege.Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
-                            if (IsBetween(bossWeight, 0, 8)) currentSiege.Boss = Global.PreeTheTree;
-                            else if (IsBetween(bossWeight, 9, 16)) currentSiege.Boss = Global.HelpMeTheTree;
-                            else if (IsBetween(bossWeight, 17, 24)) currentSiege.Boss = Global.HATTMANN;
-                            else if (IsBetween(bossWeight, 25, 32)) currentSiege.Boss = Global.Orange;
-                            else if (IsBetween(bossWeight, 33, 40)) currentSiege.Boss = Global.Erango;
-                            else if (IsBetween(bossWeight, 41, 48)) currentSiege.Boss = Global.Octopheesh;
-                            else if (IsBetween(bossWeight, 49, 56)) currentSiege.Boss = Global.Green;
-                            else currentSiege.Boss = Global.Destroyer;
-                        }
                         var boss = currentSiege.Boss;
+                        if (over.Contains("override") && (Context.User.Id == 224267581370925056 || Context.IsPrivate)) {
+                            boss = Siege.GetBoss(over.Split(' ')[1]);
+                        } else {
+                            byte stageTotal = 0;
+                            foreach (var marble in currentSiege.Marbles) {
+                                var user = GetUser(Context, marble.Id);
+                                stageTotal += user.Stage;
+                            }
+                            float stage = stageTotal / currentSiege.Marbles.Count;
+                            if (stage == 1f) StageOneBossChooser(currentSiege);
+                            else if (stage == 2f) StageTwoBossChooser(currentSiege);
+                            else {
+                                stage--;
+                                if (Global.Rand.NextDouble() > stage) StageTwoBossChooser(currentSiege);
+                                else StageOneBossChooser(currentSiege);
+                            }
+                        }
                         var hp = ((int)boss.Difficulty + 2) * 5;
                         foreach (var marble in currentSiege.Marbles) {
                             marble.HP = hp;
@@ -240,8 +233,8 @@ namespace MarbleBot.Modules
                                     title = "CRITICAL attack!";
                                     url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
                                 } else title = "Glitch attack!";
-                                dmg = marble.StatusEffect == MSE.Chill ? (int)Math.Round(dmg * Global.SiegeInfo[fileId].DamageMultiplier * 0.5)
-                                    : (int)Math.Round(dmg * Global.SiegeInfo[fileId].DamageMultiplier);
+                                dmg = marble.StatusEffect == MSE.Chill ? (int)Math.Round(dmg * Global.SiegeInfo[fileId].DamageMultiplier * 0.5 * (marble.DamageIncrease / 100.0 + 1))
+                                    : (int)Math.Round(dmg * Global.SiegeInfo[fileId].DamageMultiplier * (marble.DamageIncrease / 100.0 + 1));
                                 var clone = false;
                                 var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 if (marble.Cloned) {
@@ -509,16 +502,16 @@ namespace MarbleBot.Modules
                 var boss = Boss.Empty;
                 var state = 1;
                 switch (searchTerm.ToLower().RemoveChar(' ')) {
-                    case "preethetree": boss = Global.PreeTheTree; break;
-                    case "pree": goto case "preethetree";
-                    case "hattmann": boss = Global.HATTMANN; break;
-                    case "orange": boss = Global.Orange; break;
-                    case "green": boss = Global.Green; break;
-                    case "destroyer": boss = Global.Destroyer; break;
-                    case "helpmethetree": boss = Global.HelpMeTheTree; break;
-                    case "helpme": goto case "helpmethetree";
-                    case "erango": boss = Global.Erango; break;
-                    case "octopheesh": boss = Global.Octopheesh; break;
+                    case "pree":
+                    case "preethetree": boss = Siege.GetBoss("PreeTheTree"); break;
+                    case "hattmann": boss = Siege.GetBoss("HattMann");  break;
+                    case "orange": boss = Siege.GetBoss("Orange"); break;
+                    case "green": boss = Siege.GetBoss("Green"); break;
+                    case "destroyer": boss = Siege.GetBoss("Destroyer"); break;
+                    case "helpme":
+                    case "helpmethetree": boss = Siege.GetBoss("HelpMeTheTree"); break;
+                    case "erango": boss = Siege.GetBoss("Erango"); break;
+                    case "octopheesh": boss = Siege.GetBoss("Octopheesh"); break;
                     case "frigidium": await ReplyAsync("No."); state = 3; break;
                     case "highwaystickman": goto case "frigidium";
                     case "outcast": goto case "frigidium";
@@ -533,15 +526,15 @@ namespace MarbleBot.Modules
                     case "lavachunk": goto case "frigidium";
                     case "pyromaniac": goto case "frigidium";
                     case "volcano": goto case "frigidium";
-                    case "red": goto case "frigidium";
+                    case "red": Siege.GetBoss("Red"); break;
                     case "spaceman": goto case "frigidium";
                     case "rgvzdhjvewvy": goto case "frigidium";
                     case "corruptsoldier": goto case "frigidium";
-                    case "corruptpurple": goto case "frigidium";
+                    case "corruptpurple": Siege.GetBoss("CorruptPurple"); break;
                     case "chest": goto case "frigidium";
                     case "scaryface": goto case "frigidium";
                     case "marblebot": goto case "frigidium";
-                    case "overlord": await ReplyAsync("*Ahahahaha...\n\nYou are sorely mistaken.*"); state = 3; break;
+                    case "overlord": Siege.GetBoss("Overlord"); break;
                     case "vinemonster": await ReplyAsync("Excuse me?"); state = 3; break;
                     case "vinemonsters": goto case "vinemonster";
                     case "floatingore": goto case "vinemonster";
@@ -549,29 +542,38 @@ namespace MarbleBot.Modules
                     default: state = 0; break;
                 }
                 if (state == 1) {
-                    var attacks = new StringBuilder();
-                    foreach (var attack in boss.Attacks)
-                        attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(MSE), attack.StatusEffect)}>");
-                    var drops = new StringBuilder();
-                    foreach (var drop in boss.Drops) {
-                        var dropAmount = drop.MinCount == drop.MaxCount ? drop.MinCount.ToString() : $"{drop.MinCount}-{drop.MaxCount}";
-                        var idString = drop.ItemId.ToString("000");
-                        drops.AppendLine($"`[{idString}]` **{GetItem(idString).Name}**: {dropAmount} ({drop.Chance}%)");
-                    }
-                    await ReplyAsync(embed: new EmbedBuilder()
-                        .AddField("HP", $"**{boss.MaxHP}**")
-                        .AddField("Attacks", attacks.ToString())
-                        .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
-                        .AddField("Drops", drops.ToString())
+                    if (boss.Stage > GetUser(Context).Stage) await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
+                        .WithDescription(StageTooHighString())
                         .WithThumbnailUrl(boss.ImageUrl)
                         .WithTitle(boss.Name)
                         .Build());
+                    else {  
+                        var attacks = new StringBuilder();
+                        foreach (var attack in boss.Attacks)
+                            attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(MSE), attack.StatusEffect)}>");
+                        var drops = new StringBuilder();
+                        foreach (var drop in boss.Drops) {
+                            var dropAmount = drop.MinCount == drop.MaxCount ? drop.MinCount.ToString() : $"{drop.MinCount}-{drop.MaxCount}";
+                            var idString = drop.ItemId.ToString("000");
+                            drops.AppendLine($"`[{idString}]` **{GetItem(idString).Name}**: {dropAmount} ({drop.Chance}%)");
+                        }
+                        await ReplyAsync(embed: new EmbedBuilder()
+                            .AddField("HP", $"**{boss.MaxHP}**")
+                            .AddField("Attacks", attacks.ToString())
+                            .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
+                            .AddField("Drops", drops.ToString())
+                            .WithColor(GetColor(Context))
+                            .WithCurrentTimestamp()
+                            .WithThumbnailUrl(boss.ImageUrl)
+                            .WithTitle(boss.Name)
+                            .Build());
+                    }
                 }
                 else if (state == 0) await ReplyAsync("Could not find the requested boss!");
             }
-
+                
             [Command("bosslist")]
             [Summary("Returns a list of bosses.")]
             public async Task SiegeBosslistCommandAsync()
@@ -579,11 +581,15 @@ namespace MarbleBot.Modules
                 var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp();
-                Boss[] playableBosses = { Global.PreeTheTree, Global.HelpMeTheTree, Global.HATTMANN, Global.Orange,
-                    Global.Erango, Global.Octopheesh, Global.Green, Global.Destroyer };
-                foreach (var boss in playableBosses)
-                    builder.AddField($"{boss.Name}", 
-                        $"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10, HP: **{boss.MaxHP}**, Attacks: **{boss.Attacks.Count()}**");
+                string json;
+                using (var bosses = new StreamReader("Resources\\Bosses.json")) json = bosses.ReadToEnd();
+                var playableBosses = JObject.Parse(json).ToObject<Dictionary<string, Boss>>();
+                var stage = GetUser(Context).Stage;
+                foreach (var bossPair in playableBosses) {
+                    var difficulty = bossPair.Value.Stage > stage ? StageTooHighString() : 
+                        $"Difficulty: **{Enum.GetName(typeof(Difficulty), bossPair.Value.Difficulty)} {(int)bossPair.Value.Difficulty}**/10, HP: **{bossPair.Value.MaxHP}**, Attacks: **{bossPair.Value.Attacks.Count()}**";
+                    builder.AddField($"{bossPair.Value.Name}", difficulty);
+                }
                 builder.WithDescription("Use `mb/siege boss <boss name>` for more info!")
                     .WithTitle("Playable MS Bosses");
                 await ReplyAsync(embed: builder.Build());
@@ -645,6 +651,25 @@ namespace MarbleBot.Modules
                 WriteUsers(obj);
                 if (user.SiegePing) await ReplyAsync($"**{Context.User.Username}**, you will now be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn off)");
                 else await ReplyAsync($"**{Context.User.Username}**, you will no longer be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn on)");
+            }
+
+            public void StageOneBossChooser(Siege currentSiege) {
+                var bossWeight = (int)Math.Round(currentSiege.Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
+                if (IsBetween(bossWeight, 0, 5)) currentSiege.Boss = Siege.GetBoss("PreeTheTree");
+                else if (IsBetween(bossWeight, 6, 13)) currentSiege.Boss = Siege.GetBoss("HelpMeTheTree");
+                else if (IsBetween(bossWeight, 14, 21)) currentSiege.Boss = Siege.GetBoss("HattMann");
+                else if (IsBetween(bossWeight, 22, 29)) currentSiege.Boss = Siege.GetBoss("Orange");
+                else if (IsBetween(bossWeight, 30, 37)) currentSiege.Boss = Siege.GetBoss("Erango");
+                else if (IsBetween(bossWeight, 38, 45)) currentSiege.Boss = Siege.GetBoss("Octopheesh");
+                else if (IsBetween(bossWeight, 46, 53)) currentSiege.Boss = Siege.GetBoss("Green");
+                else currentSiege.Boss = Siege.GetBoss("Destroyer");
+            }
+
+            public void StageTwoBossChooser(Siege currentSiege) {
+                var bossWeight = (int)Math.Round(currentSiege.Marbles.Count * ((Global.Rand.NextDouble() * 5) + 1));
+                if (IsBetween(bossWeight, 0, 25)) currentSiege.Boss = Siege.GetBoss("Red");
+                else if (IsBetween(bossWeight, 25, 50)) currentSiege.Boss = Siege.GetBoss("CorruptPurple");
+                else currentSiege.Boss = Siege.GetBoss("Overlord");
             }
         }
     }

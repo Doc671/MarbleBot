@@ -17,6 +17,7 @@ namespace MarbleBot.BaseClasses
         public int DamageDealt { get; set; }
         public int PUHits { get; set; }
         public Item Shield { get; set; }
+        public byte DamageIncrease { get; set; }
         public byte ItemAccuracy { get; set; } = 100;
         public bool Cloned { get; set; }
         public bool QefpedunCharmUsed { get; set; }

@@ -1,0 +1,543 @@
+{
+  "PreeTheTree": {
+    "Name": "Pree the Tree",
+    "HP": 300,
+    "Difficulty": 2,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383182197719040/BossPreeTheTree.png",
+    "Attacks": [
+      {
+        "Name": "Falling Leaves",
+        "Damage": 3,
+        "Accuracy": 40,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Spinning Leaves",
+        "Damage": 3,
+        "Accuracy": 50,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Acorn Bomb",
+        "Damage": 5,
+        "Accuracy": 55,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Floating Twigs",
+        "Damage": 2,
+        "Accuracy": 65,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 41,
+        "MinCount": 1,
+        "MaxCount": 4,
+        "Chance": 90
+      },
+      {
+        "ItemId": 42,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 30
+      },
+      {
+        "ItemId": 45,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 60
+      }
+    ]
+  },
+  "HattMann": {
+    "Name": "HATT MANN",
+    "HP": 600,
+    "Difficulty": 3,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383185481596940/BossHATTMANN.png",
+    "Attacks": [
+      {
+        "Name": "Hat Trap",
+        "Damage": 4,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Inverted Hat",
+        "Damage": 3,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "HATT GUNN",
+        "Damage": 6,
+        "Accuracy": 40,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Hat Spawner",
+        "Damage": 2,
+        "Accuracy": 90,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 0,
+        "MinCount": 75,
+        "MaxCount": 200,
+        "Chance": 100
+      }
+    ]
+  },
+  "Orange": {
+    "Name": "Orange",
+    "HP": 1200,
+    "Difficulty": 4,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383189114126339/BossOrange.png",
+    "Attacks": [
+      {
+        "Name": "Poup Soop Barrel",
+        "Damage": 4,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Poup Krumb",
+        "Damage": 8,
+        "Accuracy": 50,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "ORANGE HEDDS",
+        "Damage": 5,
+        "Accuracy": 40,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "How To Be An Idiot Vol. 3",
+        "Damage": 3,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 0,
+        "MinCount": 250,
+        "MaxCount": 255,
+        "Chance": 100
+      },
+      {
+        "ItemId": 39,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 1
+      }
+    ]
+  },
+  "Green": {
+    "Name": "Green",
+    "HP": 1500,
+    "Difficulty": 6,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png",
+    "Attacks": [
+      {
+        "Name": "Wobbly Toxicut",
+        "Damage": 10,
+        "Accuracy": 50,
+        "StatusEffect": 4
+      },
+      {
+        "Name": "Falling Hellslash",
+        "Damage": 12,
+        "Accuracy": 50,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Attractive Domesday",
+        "Damage": 18,
+        "Accuracy": 25,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Spinning Pyroclash",
+        "Damage": 9,
+        "Accuracy": 70,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Accurate Flarer",
+        "Damage": 7,
+        "Accuracy": 95,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 15,
+        "MinCount": 2,
+        "MaxCount": 3,
+        "Chance": 80
+      },
+      {
+        "ItemId": 18,
+        "MinCount": 1,
+        "MaxCount": 2,
+        "Chance": 80
+      }
+    ]
+  },
+  "Destroyer": {
+    "Name": "Destroyer",
+    "HP": 3720,
+    "Difficulty": 9,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png",
+    "Attacks": [
+      {
+        "Name": "Antimatter Missile",
+        "Damage": 16,
+        "Accuracy": 50,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Annihilator-A",
+        "Damage": 14,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Flamethrower",
+        "Damage": 13,
+        "Accuracy": 55,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Black Hole",
+        "Damage": 20,
+        "Accuracy": 55,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Repulsor Blast",
+        "Damage": 11,
+        "Accuracy": 70,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 58,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 100
+      },
+      {
+        "ItemId": 59,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 35
+      },
+      {
+        "ItemId": 60,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 45
+      },
+      {
+        "ItemId": 61,
+        "MinCount": 8,
+        "MaxCount": 15,
+        "Chance": 100
+      }
+    ]
+  },
+  "HelpMeTheTree": {
+    "Name": "Help Me the Tree",
+    "HP": 500,
+    "Difficulty": 3,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png",
+    "Attacks": [
+      {
+        "Name": "DonationBox",
+        "Damage": 5,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "CryForHelp",
+        "Damage": 0,
+        "Accuracy": 40,
+        "StatusEffect": 1
+      },
+      {
+        "Name": "Sandstorm",
+        "Damage": 3,
+        "Accuracy": 75,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Decay",
+        "Damage": 2,
+        "Accuracy": 50,
+        "StatusEffect": 4
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 35,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 65
+      }
+    ]
+  },
+  "Erango": {
+    "Name": "erangO",
+    "HP": 1200,
+    "Difficulty": 5,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548221808294232071/unknown.png",
+    "Attacks": [
+      {
+        "Name": "erangO Pellets",
+        "Damage": 6,
+        "Accuracy": 90,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Doom Beam",
+        "Damage": 10,
+        "Accuracy": 45,
+        "StatusEffect": 1
+      },
+      {
+        "Name": "Fake Poup Soop",
+        "Damage": 8,
+        "Accuracy": 55,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "UnapprovedByOrange",
+        "Damage": 3,
+        "Accuracy": 55,
+        "StatusEffect": 3
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 38,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 100
+      }
+    ]
+  },
+  "Octopheesh": {
+    "Name": "Octopheesh",
+    "HP": 800,
+    "Difficulty": 6,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548220914488049665/BossOctopheesh.png",
+    "Attacks": [
+      {
+        "Name": "Two Bipheesh",
+        "Damage": 13,
+        "Accuracy": 75,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "EMP Burst",
+        "Damage": 11,
+        "Accuracy": 45,
+        "StatusEffect": 3
+      },
+      {
+        "Name": "Vile Beam",
+        "Damage": 18,
+        "Accuracy": 40,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Pheesh Swarm",
+        "Damage": 11,
+        "Accuracy": 95,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 19,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 85
+      },
+      {
+        "ItemId": 36,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 25
+      }
+    ]
+  },
+  "Red": {
+    "Name": "Red",
+    "HP": 5000,
+    "Difficulty": 8,
+    "Stage": 2,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/572031775556108318/Red.png",
+    "Attacks": [
+      {
+        "Name": "Smoke",
+        "Damage": 0,
+        "Accuracy": 65,
+        "StatusEffect": 2
+      },
+      {
+        "Name": "Fireball",
+        "Damage": 18,
+        "Accuracy": 55,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Eruption",
+        "Damage": 21,
+        "Accuracy": 40,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Firestorm",
+        "Damage": 24,
+        "Accuracy": 95,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Hellblast",
+        "Damage": 20,
+        "Accuracy": 30,
+        "StatusEffect": 1
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 20,
+        "MinCount": 1,
+        "MaxCount": 3,
+        "Chance": 90
+      },
+      {
+        "ItemId": 67,
+        "MinCount": 5,
+        "MaxCount": 10,
+        "Chance": 100
+      },
+      {
+        "ItemId": 72,
+        "MinCount": 2,
+        "MaxCount": 5,
+        "Chance": 80
+      }
+    ]
+  },
+  "CorruptPurple": {
+    "Name": "Corrupt Purple",
+    "HP": 6000,
+    "Difficulty": 9,
+    "Stage": 2,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/572031772875948041/Corrupt_Purple.png",
+    "Attacks": [
+      {
+        "Name": "Scythe Rush",
+        "Damage": 100,
+        "Accuracy": 10,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Glitch",
+        "Damage": 8,
+        "Accuracy": 65,
+        "StatusEffect": 2
+      },
+      {
+        "Name": "Fire",
+        "Damage": 25,
+        "Accuracy": 45,
+        "StatusEffect": 2
+      },
+      {
+        "Name": "Yellow's Face",
+        "Damage": 10,
+        "Accuracy": 35,
+        "StatusEffect": 1
+      },
+      {
+        "Name": "Revival",
+        "Damage": 23,
+        "Accuracy": 70,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 61,
+        "MinCount": 2,
+        "MaxCount": 3,
+        "Chance": 45
+      }
+    ]
+  },
+  "Overlord": {
+    "Name": "Overlord",
+    "HP": 15000,
+    "Difficulty": 10,
+    "Stage": 2,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/572031774222188564/Overlord.png",
+    "Attacks": [
+      {
+        "Name": "Devil Trident",
+        "Damage": 40,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Summon [1]",
+        "Damage": 10,
+        "Accuracy": 50,
+        "StatusEffect": 4
+      },
+      {
+        "Name": "Summon [2]",
+        "Damage": 15,
+        "Accuracy": 50,
+        "StatusEffect": 2
+      },
+      {
+        "Name": "Devil Scythe",
+        "Damage": 100,
+        "Accuracy": 10,
+        "StatusEffect": 1
+      },
+      {
+        "Name": "Terror",
+        "Damage": 0,
+        "Accuracy": 90,
+        "StatusEffect": 3
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 0,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 1
+      }
+    ]
+  }
+}

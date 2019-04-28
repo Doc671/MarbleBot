@@ -157,7 +157,11 @@
     "Price": 3.00,
     "Description": "A bucket made of stainless steel.",
     "OnSale": true,
-    "ScavengeLocation": 1
+    "ScavengeLocation": 1,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "070": 3
+    }
   },
   "019": {
     "Name": "Water Bucket",
@@ -519,7 +523,7 @@
     "Description": "The remnants of an arm-mounted repulsor, once belonging to a dangerous cyborg.",
     "Stage": 2,
     "OnSale": false,
-    "ScavengeLocation": 0
+    "ScavengeLocation": 3
   },
   "060": {
     "Name": "Flamethrower Fragment",
@@ -527,15 +531,15 @@
     "Description": "The remnants of a flamethrower, once belonging to a dangerous cyborg.",
     "Stage": 2,
     "OnSale": false,
-    "ScavengeLocation": 0
+    "ScavengeLocation": 3
   },
   "061": {
     "Name": "Composite Protection Fragment",
     "Price": 75.00,
-    "Description": "Reinforced stainless steel plating around a mesh of ceramic and kevlar, once part of a dangerous cyborg.",
+    "Description": "Reinforced chromium plating around a mesh of ceramic and kevlar, once part of a dangerous cyborg.",
     "Stage": 2,
     "OnSale": false,
-    "ScavengeLocation": 0
+    "ScavengeLocation": 3
   },
   "062": {
     "Name": "Crafting Station Mk.II",
@@ -559,15 +563,140 @@
   },
   "063": {
     "Name": "Coating of Destruction",
-    "Price": -1.00,
-    "Description": "A marble coating formed of steel plating, ceramic and kevlar. Reduces all inbound damage by 20%.",
+    "Price": 2000.00,
+    "Description": "A marble coating formed of chromium plating, ceramic and kevlar. Reduces all inbound damage by 20%.",
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
     "CraftingProduced": 1,
     "CraftingRecipe": {
-      "061": 35
+      "061": 20
     },
     "CraftingStationRequired": 2
+  },
+  "064": {
+    "Name": "Iron Ore",
+    "Price": 0.09,
+    "Description": "Rocks from which iron can be profitably extracted.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 3
+  },
+  "065": {
+    "Name": "Iron Bar",
+    "Price": 19.00,
+    "Description": "A piece of iron cast into a trapezoidal pyramid for further processing.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "064": 4
+    },
+    "CraftingStationRequired": 2
+  },
+  "066": {
+    "Name": "Iron Spikes",
+    "Price": 300.00,
+    "Description": "A spherical plating of iron covered with sharp spikes.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "065": 3
+    },
+    "CraftingStationRequired": 2
+  },
+  "067": {
+    "Name": "Ashes",
+    "Price": 0.02,
+    "Description": "A powdery residue left after the burning of a substance, consisting of metal carbonates.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 4
+  },
+  "068": {
+    "Name": "Nickel Ore",
+    "Price": 0.10,
+    "Description": "Rocks from which nickel can be profitably extracted.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 3
+  },
+  "069": {
+    "Name": "Nickel Bar",
+    "Price": 20.59,
+    "Description": "A piece of nickel cast into a trapezoidal pyramid for further processing.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "068": 4
+    },
+    "CraftingStationRequired": 2
+  },
+  "070": {
+    "Name": "Steel Bar",
+    "Price": 40.00,
+    "Description": "A piece of stainless steel cast into a trapezoidal pyramind for further processing.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 4,
+    "CraftingRecipe": {
+      "061": 4,
+      "065": 3,
+      "069": 1
+    }
+  },
+  "071": {
+    "Name": "Steel Spikes",
+    "Price": 620.00,
+    "Description": "A spherical plating of stainless steel covered with sharp spikes.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "070": 3
+    },
+    "CraftingStationRequired": 2
+  },
+  "072": {
+    "Name": "Infernite Ore",
+    "Price": 1.66,
+    "Description": "Heated rocks containing a strange purple-orange magma-like substance.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 4
+  },
+  "073": {
+    "Name": "Infernite Bar",
+    "Price": 66.66,
+    "Description": "A piece of infernite cast into a trapezoidal pyramind for further processing.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "072": 4
+    },
+    "CraftingStationRequired": 2
+  },
+  "074": {
+    "Name": "Infernite Spikes",
+    "Price": 1166.66,
+    "Description": "A spherical plating of infernite covered with heated sharp spikes.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "020": 2,
+      "060": 3,
+      "073": 5
+    }
   }
 }

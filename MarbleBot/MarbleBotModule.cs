@@ -174,6 +174,15 @@ namespace MarbleBot
 
         public async static Task Log(string log) => await Program.Log(log);
 
+        public static string StageTooHighString() {
+            switch (Global.Rand.Next(0, 4)) {
+                case 0: return "*Your inexperience blinds you...*";
+                case 1: return "*Your vision is blurry...*";
+                case 2: return "*Screams echo in your head...*";
+                default: return "*Your mind is wracked with pain...*";
+            }
+        }
+
         /// <summary> Writes users to appropriate JSON file </summary>
         public static void WriteUsers(JObject obj) {
             using (var users = new JsonTextWriter(new StreamWriter("Users.json"))) {

@@ -16,31 +16,33 @@ namespace MarbleBot.Modules
     public class YouTube : MarbleBotModule
     {
         [Command("channelinfo")]
-        [Summary("[BROKEN] Returns information about a channel.")]
+        [Summary("Returns information about a channel.")]
         public async Task ChannelInfoCommandAsync([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
-            Channel display;
+            //Channel display;
 
             var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
                 ApiKey = Global.YTKey,
                 ApplicationName = GetType().ToString()
             });
 
-            var searchChannels = youtubeService.Channels.List(searchTerm).Execute();
-            display = searchChannels.Items.First();
-
+            var searchListRequest = youtubeService.Search.List("snippet");
+            searchListRequest.Q = searchTerm;
+            searchListRequest.MaxResults = 10;
+            var searchListResult = (await searchListRequest.ExecuteAsync()).Items.First();
+            
             await ReplyAsync(embed: new EmbedBuilder()
-                .WithTitle(display.Snippet.Title)
+                .WithTitle(searchListResult.Snippet.Title)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithFooter(display.ETag)
-                .WithThumbnailUrl(display.Snippet.Thumbnails.Default__.Url)
-                .AddField("Subscribers", display.Statistics.SubscriberCount, true)
-                .AddField("Views", display.Statistics.ViewCount, true)
-                .AddField("Videos", display.Statistics.VideoCount, true)
-                .AddField("Country", display.Snippet.Country, true)
-                .AddField("Description", display.Snippet.Description, true)
+                .WithFooter(searchListResult.ETag)
+                .WithThumbnailUrl(searchListResult.Snippet.Thumbnails.Default__.Url)
+                //.AddField("Subscribers", display.Statistics.SubscriberCount, true)
+                //.AddField("Views", display.Statistics.ViewCount, true)
+                //.AddField("Videos", display.Statistics.VideoCount, true)
+                //.AddField("Country", display.Snippet.Country, true)
+                .AddField("Description", searchListResult.Snippet.Description, true)
                 .Build());
         }
 
@@ -49,8 +51,7 @@ namespace MarbleBot.Modules
         [Remarks("CM Only")]
         public async Task CommunityVideosCommandAsync(string url, [Remainder] string desc = "")
         {
-            if (Context.IsPrivate)
-            {
+            if (Context.IsPrivate) {
                 var validUser = false;
                 var channelLink = "";
                 using (var CVID = new StreamReader("Resources\\CVID.csv")) {
@@ -73,13 +74,13 @@ namespace MarbleBot.Modules
                     searchListRequest.MaxResults = 10;
                     var searchListResponse = await searchListRequest.ExecuteAsync();
                     var channel = new SearchResultSnippet();
-                    foreach (var e in searchListResponse.Items) {
-                        if (e.Id.Kind == "youtube#channel") channel = e.Snippet;
+                    foreach (var res in searchListResponse.Items) {
+                        if (res.Id.Kind == "youtube#channel") channel = res.Snippet;
                     }
                     if (channel == null) {
                         searchListRequest.Q = Context.User.Username;
-                        foreach (var e in searchListResponse.Items)
-                            if (e.Id.Kind == "youtube#channel") channel = e.Snippet;
+                        foreach (var res in searchListResponse.Items)
+                            if (res.Id.Kind == "youtube#channel") channel = res.Snippet;
                     }
                     searchListRequest.Q = url;
                     searchListResponse = await searchListRequest.ExecuteAsync();
@@ -105,12 +106,10 @@ namespace MarbleBot.Modules
                         }
                     } else await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
                     if (!validUser) await Log($"Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
-                } else {
-                    var output = new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n");
-                    output.Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n");
-                    output.Append("If you're an accepted user, please notify Doc671.");
-                    await ReplyAsync(output.ToString());
-                }
+                } else await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
+                        .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
+                        .Append("If you're an accepted user, please notify Doc671.")
+                        .ToString());
             }
         }
 
@@ -136,17 +135,14 @@ namespace MarbleBot.Modules
             List<string> channels = new List<string>();
 
             // Add each result to the appropriate list, and then display the lists of
-            // matching videos, channels, and playlists.
+            // matching channels.
             bool found = false;
 
-            foreach (var searchResult in searchListResponse.Items)
-            {
+            foreach (var searchResult in searchListResponse.Items) {
                 if (searchResult.Id.Kind == "youtube#channel" && !(await Moderation.CheckSwearAsync(searchResult.Snippet.Title))) {
                     channels.Add(string.Format("{0} (<https://www.youtube.com/channel/{1}>)", searchResult.Snippet.Title, searchResult.Id.ChannelId));
                     found = true;
-                } else {
-                    profaneCount++;
-                }
+                } else profaneCount++;
             }
 
             if (found) {
@@ -180,7 +176,7 @@ namespace MarbleBot.Modules
             List<string> videos = new List<string>();
 
             // Add each result to the appropriate list, and then display the lists of
-            // matching videos, channels, and playlists.
+            // matching videos.
             bool found = false;
             foreach (var searchResult in searchListResponse.Items) {
                 if (searchResult.Id.Kind == "youtube#video" && (await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))

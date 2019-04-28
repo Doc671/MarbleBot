@@ -12,7 +12,7 @@ namespace MarbleBot.Modules
         [Command("give")]
         [Alias("giverole")]
         [Summary("Gives a role if it is on the role list.")]
-        public async Task GiveRoleCommandAsync(string roleName)
+        public async Task GiveRoleCommandAsync([Remainder] string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
             if (Context.IsPrivate) await ReplyAsync("There are no roles in a DM!");
@@ -45,7 +45,7 @@ namespace MarbleBot.Modules
         [Command("take")]
         [Alias("removerole, takerole")]
         [Summary("Takes a role if it is on the role list.")]
-        public async Task TakeRoleCommandAsync(string roleName)
+        public async Task TakeRoleCommandAsync([Remainder] string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
             if (Context.IsPrivate) await ReplyAsync("There are no roles in a DM!");
@@ -78,7 +78,7 @@ namespace MarbleBot.Modules
         [Command("role")]
         [Alias("roletoggle")]
         [Summary("Toggles role list roles.")]
-        public async Task RoleToggleCommandAsync(string roleName)
+        public async Task RoleToggleCommandAsync([Remainder] string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
             if (Context.IsPrivate) await ReplyAsync("There are no roles in a DM!");

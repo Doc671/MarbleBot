@@ -4,6 +4,8 @@
     {
         None,
         CanaryBeach,
-        TreeWurld
+        TreeWurld,
+        DestroyersRemains,
+        VioletVolcanoes
     }
 }
