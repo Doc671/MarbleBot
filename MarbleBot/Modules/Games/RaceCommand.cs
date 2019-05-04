@@ -127,9 +127,6 @@ namespace MarbleBot.Modules
                         int choice = Global.Rand.Next(0, msgCount - 1);
                         deathmsg = msgs[choice];
                         var mName = marbles[eliminated].Item1.ToLower();
-                        if (deathmsg.Contains("was") && string.Concat(mName.Skip(4)).Contains("you ") || string.Concat(mName.Skip(3)).Contains("we ") 
-                            || string.Concat(mName.Skip(3)).Contains("they ") || mName.Last() == 's')
-                            deathmsg = "were " + string.Concat(deathmsg.Skip(4));
                         builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathmsg} and is now out of the competition!");
                         if (id > 1 && alive == id) {
                             switch (marbles[eliminated].Item1.ToLower().RemoveChar(' ')) {
@@ -172,6 +169,7 @@ namespace MarbleBot.Modules
                         foreach (var marble in marbles) if (marble.Item2 == winnerID) noOfSameUser++;
                         var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(id) / noOfSameUser) - 1) * 100, 2));
                         if (gift > 0) {
+                            if (user.Items.ContainsKey(83)) gift *= 3;
                             user.Balance += gift;
                             user.NetWorth += gift;
                             user.LastRaceWin = DateTime.UtcNow;

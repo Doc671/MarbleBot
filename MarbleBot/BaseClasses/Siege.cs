@@ -25,6 +25,7 @@ namespace MarbleBot.BaseClasses
                 return (1.0 + (deathCount * 0.2)) * (Morales + 1);
             }
         }
+        public ulong Id { get; private set; }
         public DateTime LastMorale { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public List<Marble> Marbles { get; set; } = new List<Marble>();
         public byte Morales { get; set; }
@@ -36,8 +37,8 @@ namespace MarbleBot.BaseClasses
             Boss.HP -= dmg;
             if (Boss.HP < 1) {
                 Active = false;
-                var id = context.IsPrivate ? context.User.Id : context.Guild.Id;
-                await SiegeVictoryAsync(context, id);
+                var Id = context.IsPrivate ? context.User.Id : context.Guild.Id;
+                await SiegeVictoryAsync(context, Id);
             }
             if (Boss.Name == "Destroyer" && Boss.HP <= Boss.MaxHP / 2f) {
                 AttackTime = 12000;
@@ -56,6 +57,8 @@ namespace MarbleBot.BaseClasses
             }
             Boss.ResetHP();
             Marbles = null;
+            using (var marbleList = new StreamWriter($"{Id}siege.csv", false))
+                marbleList.Write("");
             disposed = true;
         }
 
@@ -84,13 +87,13 @@ namespace MarbleBot.BaseClasses
         }
 
         // Separate task dealing with time-based boss responses
-        public async Task SiegeBossActionsAsync(SocketCommandContext context, ulong id) {
+        public async Task SiegeBossActionsAsync(SocketCommandContext context, ulong Id) {
             var startTime = DateTime.UtcNow;
             var timeout = false;
             do {
                 await Task.Delay(AttackTime);
                 if (Boss.HP < 1) {
-                    if (!VictoryCalled) await SiegeVictoryAsync(context, id);
+                    if (!VictoryCalled) await SiegeVictoryAsync(context, Id);
                     break;
                 } else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10) {
                     timeout = true;
@@ -238,17 +241,13 @@ namespace MarbleBot.BaseClasses
             } while (Boss.HP > 0 || !timeout || Marbles.Sum(m => m.HP) < 1);
             Active = false;
             if (timeout || Marbles.Sum(m => m.HP) < 1) {
-                Global.SiegeInfo.Remove(id);
+                Global.SiegeInfo.Remove(Id);
                 Dispose();
-            }
-            using (var marbleList = new StreamWriter(id + "siege.csv", false)) {
-                await marbleList.WriteAsync("");
-                marbleList.Close();
             }
             if (timeout) await context.Channel.SendMessageAsync("10 minute timeout reached! Siege aborted!");
         }
 
-        public async Task SiegeVictoryAsync(SocketCommandContext context, ulong id) {
+        public async Task SiegeVictoryAsync(SocketCommandContext context, ulong Id) {
             if (VictoryCalled) return;
             VictoryCalled = true;
             var builder = new EmbedBuilder()
@@ -263,25 +262,32 @@ namespace MarbleBot.BaseClasses
                 var output = new StringBuilder();
                 if (user.Stage == 1 && Boss.Name == "Destroyer" && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149)) {
                     user.Stage = 2;
-                    output.AppendLine($"Stage II! New items unlocked!");
+                    output.AppendLine($"**You have entered Stage II!** Much new content has been unlocked - see `mb/advice` for more info!");
+                } else if (user.Stage == 2 && Boss.Name == "Overlord" && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149)) {
+                    user.Stage = 3;
+                    output.AppendLine($"**You have entered Stage III!**");
                 }
                 int earnings = marble.DamageDealt + (marble.PUHits * 50);
-                var didNothing = true;
+                var dIdNothing = true;
                 if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6) {
                     if (marble.DamageDealt > 0) {
                         output.AppendLine($"Damage dealt: {Global.UoM}**{marble.DamageDealt:n}**");
-                        didNothing = false;
+                        dIdNothing = false;
                     }
                     if (marble.PUHits > 0) {
                         output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PUHits * 50:n}**");
-                        didNothing = false;
+                        dIdNothing = false;
                     }
                     if (marble.HP > 0) {
                         earnings += 200;
                         output.AppendLine($"Alive bonus: {Global.UoM}**{200:n}**");
                         user.SiegeWins++;
                     }
-                    if (output.Length > 0 && !didNothing) {
+                    if (user.Items.ContainsKey(83)) {
+                        earnings *= 3;
+                        output.AppendLine("Pendant bonus: x**3**");
+                    }
+                    if (output.Length > 0 && !dIdNothing) {
                         if (marble.HP > 0) user.LastSiegeWin = DateTime.UtcNow;
                         if (Boss.Drops.Length > 0) output.AppendLine("**Item Drops:**");
                         byte drops = 0;
@@ -304,24 +310,23 @@ namespace MarbleBot.BaseClasses
                         user.NetWorth += earnings;
                     }
                 }
-                if (output.Length > 1 && !didNothing)
+                if (output.Length > 1 && !dIdNothing)
                     builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
                 obj.Remove(marble.Id.ToString());
                 obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
                 MarbleBotModule.WriteUsers(obj);
             }
             await context.Channel.SendMessageAsync(embed: builder.Build());
-            Global.SiegeInfo.Remove(id);
+            Global.SiegeInfo.Remove(Id);
             Dispose();
-            using (var marbleList = new StreamWriter($"{id}csv", false)) {
-                await marbleList.WriteAsync("");
-                marbleList.Close();
-            }
         }
 
         public override string ToString() => $"{Boss.Name}: {Marbles.Count}";
 
-        public Siege(Marble[] marbles) { Marbles = new List<Marble>(marbles); }
+        public Siege(SocketCommandContext context, Marble[] marbles) {
+            Id = context.IsPrivate ? context.User.Id : context.Guild.Id;
+            Marbles = new List<Marble>(marbles);
+        }
 
         ~Siege() => Dispose(true);
     }

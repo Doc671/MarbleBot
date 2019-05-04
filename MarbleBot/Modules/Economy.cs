@@ -336,10 +336,13 @@ namespace MarbleBot.Modules {
             var author = Context.Client.GetUser(id);
             var itemOutput = new StringBuilder();
             if (user.Items.Count > 0) {
+                var firstItems = user.Items.Take(15);
                 foreach (var item in user.Items) {
                     if (item.Value > 0)
                         itemOutput.AppendLine($"`[{item.Key.ToString("000")}]` {GetItem(item.Key.ToString()).Name}: {item.Value}");
                 }
+                if (user.Items.Count > firstItems.Count())
+                    itemOutput.AppendLine($"\n*Only showing first 15 items. Use `mb/inv {searchTerm} to view the full inventory.");
             } else itemOutput.Append("None");
             var builder = new EmbedBuilder()
                 .WithAuthor(author)
@@ -355,8 +358,7 @@ namespace MarbleBot.Modules {
                 .AddField("Last Daily", lastDaily, true)
                 .AddField("Last Race Win", lastRaceWin, true)
                 .AddField("Last Scavenge", lastScavenge, true)
-                .AddField("Last Siege Win", lastSiegeWin, true)
-                .AddField("Items", itemOutput.ToString());
+                .AddField("Last Siege Win", lastSiegeWin, true);
             if (user.Stage == 2) {
                 var shield = user.Items.ContainsKey(063) && user.Items[063] > 0 ? "Coating of Destruction" : "None";
                 var spikes = "None";
@@ -367,8 +369,10 @@ namespace MarbleBot.Modules {
                 builder.AddField("Stage", user.Stage, true)
                   .AddField("Shield", shield, true)
                   .AddField("Spikes", spikes, true);
-            }
-            await ReplyAsync(embed: builder.Build());
+            } 
+            await ReplyAsync(embed: builder
+                .AddField("Items", itemOutput.ToString())
+                .Build());
         }
 
         [Command("recipes")]
@@ -384,7 +388,7 @@ namespace MarbleBot.Modules {
             var items = obj.ToObject<Dictionary<string, Item>>();
             if (int.TryParse(rawIndex, out int index)) {
                 var minValue = index * 20 - 20;
-                if (minValue > 74) await ReplyAsync("The last item has ID `074`!");
+                if (minValue > 83) await ReplyAsync("The last item has ID `083`!");
                 else {
                     var maxValue = index * 20 - 1;
                     embed.WithTitle($"Recipes in IDs `{minValue.ToString("000")}`-`{maxValue.ToString("000")}`");
@@ -703,7 +707,7 @@ namespace MarbleBot.Modules {
                         if (Global.SiegeInfo.ContainsKey(fileId)) {
                             if (user.Items.ContainsKey(048) && user.Items[048] > 0) {
                                 var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
-                                if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy / 3) {
+                                if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy / 2) {
                                     var dmg = (int)Math.Round(75 + 12.5 * (int)Global.SiegeInfo[fileId].Boss.Difficulty);
                                     await Global.SiegeInfo[fileId].DealDamageAsync(Context, dmg);
                                     await ReplyAsync(embed: new EmbedBuilder()
@@ -739,7 +743,7 @@ namespace MarbleBot.Modules {
                             if (user.Items.ContainsKey(048) && user.Items[048] > 2) {
                                 var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 for (int i = 0; i < 3; i++) {
-                                    if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy / 3) {
+                                    if (Global.Rand.Next(0, 100) < userMarble.ItemAccuracy / 2) {
                                         var dmg = 110 + 9 * (int)Global.SiegeInfo[fileId].Boss.Difficulty;
                                         await Global.SiegeInfo[fileId].DealDamageAsync(Context, dmg);
                                         dmgs[i] = dmg;
@@ -756,6 +760,20 @@ namespace MarbleBot.Modules {
                                 UpdateUser(GetItem("048"), 3);
                             } else await ReplyAsync($"**{Context.User.Username}**, you do not have enough ammo for this item!");
                         } else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        break;
+                    }
+                    case 57: {
+                        ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+                        if (Global.SiegeInfo.ContainsKey(fileId)) {
+                            var userMarble = Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                            userMarble.Evade = 50;
+                            userMarble.BootsUsed = true;
+                            await ReplyAsync(embed: new EmbedBuilder()
+                                .WithColor(GetColor(Context))
+                                .WithDescription($"**{userMarble.Name}** used **{item.Name}**, increasing their dodge chance to 50% for the next attack!")
+                                .WithTitle($"{item.Name}!")
+                                .Build());
+                        }
                         break;
                     }
                     case 62: goto case 17;

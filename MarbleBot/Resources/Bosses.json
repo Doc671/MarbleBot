@@ -52,6 +52,47 @@
       }
     ]
   },
+  "HelpMeTheTree": {
+    "Name": "Help Me the Tree",
+    "HP": 500,
+    "Difficulty": 3,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png",
+    "Attacks": [
+      {
+        "Name": "DonationBox",
+        "Damage": 5,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "CryForHelp",
+        "Damage": 0,
+        "Accuracy": 40,
+        "StatusEffect": 1
+      },
+      {
+        "Name": "Sandstorm",
+        "Damage": 3,
+        "Accuracy": 75,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Decay",
+        "Damage": 2,
+        "Accuracy": 50,
+        "StatusEffect": 4
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 35,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 65
+      }
+    ]
+  },
   "HattMann": {
     "Name": "HATT MANN",
     "HP": 600,
@@ -140,165 +181,6 @@
       }
     ]
   },
-  "Green": {
-    "Name": "Green",
-    "HP": 1500,
-    "Difficulty": 6,
-    "Stage": 1,
-    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png",
-    "Attacks": [
-      {
-        "Name": "Wobbly Toxicut",
-        "Damage": 10,
-        "Accuracy": 50,
-        "StatusEffect": 4
-      },
-      {
-        "Name": "Falling Hellslash",
-        "Damage": 12,
-        "Accuracy": 50,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Attractive Domesday",
-        "Damage": 18,
-        "Accuracy": 25,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Spinning Pyroclash",
-        "Damage": 9,
-        "Accuracy": 70,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Accurate Flarer",
-        "Damage": 7,
-        "Accuracy": 95,
-        "StatusEffect": 0
-      }
-    ],
-    "Drops": [
-      {
-        "ItemId": 15,
-        "MinCount": 2,
-        "MaxCount": 3,
-        "Chance": 80
-      },
-      {
-        "ItemId": 18,
-        "MinCount": 1,
-        "MaxCount": 2,
-        "Chance": 80
-      }
-    ]
-  },
-  "Destroyer": {
-    "Name": "Destroyer",
-    "HP": 3720,
-    "Difficulty": 9,
-    "Stage": 1,
-    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png",
-    "Attacks": [
-      {
-        "Name": "Antimatter Missile",
-        "Damage": 16,
-        "Accuracy": 50,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Annihilator-A",
-        "Damage": 14,
-        "Accuracy": 45,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Flamethrower",
-        "Damage": 13,
-        "Accuracy": 55,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Black Hole",
-        "Damage": 20,
-        "Accuracy": 55,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Repulsor Blast",
-        "Damage": 11,
-        "Accuracy": 70,
-        "StatusEffect": 0
-      }
-    ],
-    "Drops": [
-      {
-        "ItemId": 58,
-        "MinCount": 1,
-        "MaxCount": 1,
-        "Chance": 100
-      },
-      {
-        "ItemId": 59,
-        "MinCount": 1,
-        "MaxCount": 1,
-        "Chance": 35
-      },
-      {
-        "ItemId": 60,
-        "MinCount": 1,
-        "MaxCount": 1,
-        "Chance": 45
-      },
-      {
-        "ItemId": 61,
-        "MinCount": 8,
-        "MaxCount": 15,
-        "Chance": 100
-      }
-    ]
-  },
-  "HelpMeTheTree": {
-    "Name": "Help Me the Tree",
-    "HP": 500,
-    "Difficulty": 3,
-    "Stage": 1,
-    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png",
-    "Attacks": [
-      {
-        "Name": "DonationBox",
-        "Damage": 5,
-        "Accuracy": 45,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "CryForHelp",
-        "Damage": 0,
-        "Accuracy": 40,
-        "StatusEffect": 1
-      },
-      {
-        "Name": "Sandstorm",
-        "Damage": 3,
-        "Accuracy": 75,
-        "StatusEffect": 0
-      },
-      {
-        "Name": "Decay",
-        "Damage": 2,
-        "Accuracy": 50,
-        "StatusEffect": 4
-      }
-    ],
-    "Drops": [
-      {
-        "ItemId": 35,
-        "MinCount": 1,
-        "MaxCount": 1,
-        "Chance": 65
-      }
-    ]
-  },
   "Erango": {
     "Name": "erangO",
     "HP": 1200,
@@ -384,6 +266,224 @@
         "MinCount": 1,
         "MaxCount": 1,
         "Chance": 25
+      }
+    ]
+  },
+  "Green": {
+    "Name": "Green",
+    "HP": 1500,
+    "Difficulty": 7,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png",
+    "Attacks": [
+      {
+        "Name": "Wobbly Toxicut",
+        "Damage": 12,
+        "Accuracy": 50,
+        "StatusEffect": 4
+      },
+      {
+        "Name": "Falling Hellslash",
+        "Damage": 13,
+        "Accuracy": 50,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Attractive Domesday",
+        "Damage": 18,
+        "Accuracy": 25,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Spinning Pyroclash",
+        "Damage": 10,
+        "Accuracy": 70,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Accurate Flarer",
+        "Damage": 8,
+        "Accuracy": 95,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 15,
+        "MinCount": 2,
+        "MaxCount": 3,
+        "Chance": 80
+      },
+      {
+        "ItemId": 18,
+        "MinCount": 1,
+        "MaxCount": 2,
+        "Chance": 80
+      }
+    ]
+  },
+  "Destroyer": {
+    "Name": "Destroyer",
+    "HP": 3720,
+    "Difficulty": 9,
+    "Stage": 1,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png",
+    "Attacks": [
+      {
+        "Name": "Antimatter Missile",
+        "Damage": 16,
+        "Accuracy": 50,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Annihilator-A",
+        "Damage": 14,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Flamethrower",
+        "Damage": 13,
+        "Accuracy": 55,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Black Hole",
+        "Damage": 20,
+        "Accuracy": 55,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Repulsor Blast",
+        "Damage": 11,
+        "Accuracy": 70,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 58,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 100
+      },
+      {
+        "ItemId": 59,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 35
+      },
+      {
+        "ItemId": 60,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 45
+      },
+      {
+        "ItemId": 61,
+        "MinCount": 8,
+        "MaxCount": 15,
+        "Chance": 100
+      }
+    ]
+  },
+  "Chest": {
+    "Name": "Chest",
+    "HP": 1900,
+    "Difficulty": 4,
+    "Stage": 2,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/574238015573196810/unknown.png",
+    "Attacks": [
+      {
+        "Name": "Chest Trap",
+        "Damage": 10,
+        "Accuracy": 45,
+        "StatusEffect": 3
+      },
+      {
+        "Name": "Gold",
+        "Damage": 12,
+        "Accuracy": 60,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Leg",
+        "Damage": 14,
+        "Accuracy": 40,
+        "StatusEffect": 1
+      },
+      {
+        "Name": "Lock and Key",
+        "Damage": 4,
+        "Accuracy": 30,
+        "StatusEffect": 2
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 46,
+        "MinCount": 3,
+        "MaxCount": 5,
+        "Chance": 100
+      },
+      {
+        "ItemId": 65,
+        "MinCount": 1,
+        "MaxCount": 2,
+        "Chance": 50
+      },
+      {
+        "ItemId": 75,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 40
+      },
+      {
+        "ItemId": 78,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 100
+      }
+    ]
+  },
+  "ScaryFace": {
+    "Name": "Scary Face",
+    "HP": 2600,
+    "Difficulty": 5,
+    "Stage": 2,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/224277738608001024/299820469064957952/unknown.png",
+    "Attacks": [
+      {
+        "Name": "Scary Quake",
+        "Damage": 6,
+        "Accuracy": 95,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Scary Spasm",
+        "Damage": 16,
+        "Accuracy": 45,
+        "StatusEffect": 2
+      },
+      {
+        "Name": "Petrify",
+        "Damage": 8,
+        "Accuracy": 35,
+        "StatusEffect": 3
+      },
+      {
+        "Name": "Deletion",
+        "Damage": 12,
+        "Accuracy": 30,
+        "StatusEffect": 1
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 78,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 100
       }
     ]
   },
@@ -490,6 +590,59 @@
         "MinCount": 2,
         "MaxCount": 3,
         "Chance": 45
+      }
+    ]
+  },
+  "MarbleBotPrototype": {
+    "Name": "MarbleBot Prototype",
+    "HP": 7194,
+    "Difficulty": 9,
+    "Stage": 2,
+    "ImageUrl": "",
+    "Attacks": [
+      {
+        "Name": "7 Ball",
+        "Damage": 19,
+        "Accuracy": 80,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Daily",
+        "Damage": 16,
+        "Accuracy": 60,
+        "StatusEffect": 2
+      },
+      {
+        "Name": "Jumble",
+        "Damage": 35,
+        "Accuracy": 15,
+        "StatusEffect": 3
+      },
+      {
+        "Name": "Rate",
+        "Damage": 27,
+        "Accuracy": 45,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Uptime",
+        "Damage": 8,
+        "Accuracy": 50,
+        "StatusEffect": 3
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 61,
+        "MinCount": 5,
+        "MaxCount": 12,
+        "Chance": 90
+      },
+      {
+        "ItemId": 65,
+        "MinCount": 3,
+        "MaxCount": 7,
+        "Chance": 90
       }
     ]
   },

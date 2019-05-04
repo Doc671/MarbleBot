@@ -4,7 +4,7 @@
     "Price": 0.01,
     "Description": "A ticket to go see The Amazing Marble Race! But... which one?",
     "OnSale": true,
-    "ScavengeLocation": 1
+    "ScavengeLocation": 0
   },
   "001": {
     "Name": "Poup Soop",
@@ -157,7 +157,7 @@
     "Price": 3.00,
     "Description": "A bucket made of stainless steel.",
     "OnSale": true,
-    "ScavengeLocation": 1,
+    "ScavengeLocation": 0,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "070": 3
@@ -415,7 +415,7 @@
     "Price": 4.00,
     "Description": "A 4m-long strong cord of twisted nylon strands.",
     "OnSale": true,
-    "ScavengeLocation": 1
+    "ScavengeLocation": 0
   },
   "050": {
     "Name": "Oak Trebuchet",
@@ -695,8 +695,112 @@
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "020": 2,
-      "060": 3,
+      "061": 3,
       "073": 5
+    }
+  },
+  "075": {
+    "Name": "Gold Ore",
+    "Price": 104.00,
+    "Description": "Rocks from which nickel can be profitably extracted.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
+  },
+  "076": {
+    "Name": "Gold Bar",
+    "Price": 950.00,
+    "Description": "A piece of gold cast into a trapezoidal pyramind for further processing.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "075": 4
+    }
+  },
+  "077": {
+    "Name": "Gold Doubloon",
+    "Price": 38.00,
+    "Description": "A coin made from gold.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 25,
+    "CraftingRecipe": {
+      "076": 1
+    }
+  },
+  "078": {
+    "Name": "Raw Essence of Horror",
+    "Price": 100.00,
+    "Description": "A black-red fluid, containing the essence of a truly horrific being.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
+  },
+  "079": {
+    "Name": "Essence of Corruption",
+    "Price": 200.00,
+    "Description": "A black-orange fluid containing the mixed essence of holiness and terror. Truly an abomination.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 2,
+    "CraftingRecipe": {
+      "038": 1,
+      "078": 1
+    }
+  },
+  "080": {
+    "Name": "Cursed Inferno Spikes",
+    "Price": 1666.66,
+    "Description": "A spherical plating of cursed infernite covered with heated sharp spikes. Imbued with mixed essence.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "074": 1,
+      "079": 2
+    }
+  },
+  "081": {
+    "Name": "Chromium Drill",
+    "Price": 350.00,
+    "Description": "A drill forged from chromium. Can extract ores.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "061": 15
+    }
+  },
+  "082": {
+    "Name": "Infernite Drill",
+    "Price": 1050.00,
+    "Description": "A drill forged from infernite and steel. Can extract ores using high temperatures.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "070": 2,
+      "073": 4
+    }
+  },
+  "083": {
+    "Name": "Pendant of Fortune",
+    "Price": 1000.00,
+    "Description": "A golden pendant signifying wealth. Triples money earnt at the races.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "049": 1,
+      "076": 1
     }
   }
 }

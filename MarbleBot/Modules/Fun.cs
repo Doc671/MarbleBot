@@ -21,24 +21,82 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             int choice = Global.Rand.Next(0, 13);
-            string outcome = "";
-            switch (choice) {
-                case 0: outcome = "no."; break;
-                case 1: outcome = "looking negative."; break;
-                case 2: outcome = "probably not."; break;
-                case 3: outcome = "it is very doubtful."; break;
-                case 4: outcome = "my visions are cloudy, try again another time."; break;
-                case 5: outcome = "do you *really* want to know?"; break;
-                case 6: outcome = "I forgot."; break;
-                case 7: outcome = "possibly."; break;
-                case 8: outcome = "it is highly likely."; break;
-                case 9: outcome = "I believe so."; break;
-                case 10: outcome = "it is certain."; break;
-                case 11: outcome = "and the sign points to... yes!"; break;
-                case 12: outcome = "and the sign points to... no!"; break;
-                case 13: outcome = "probably not, but there is still a chance..."; break;
-            }
+            string outcome = choice switch {
+                0 => "no.",
+                1 => "looking negative.",
+                2 => "probably not.",
+                3 => "it is very doubtful.",
+                4 => "my visions are cloudy, try again another time.",
+                5 => "do you *really* want to know?",
+                6 => "I forgot.",
+                7 => "possibly.",
+                8 => "it is highly likely.",
+                9 => "I believe so.",
+                10 => "it is certain.",
+                11 => "and the sign points to... yes!",
+                12 => "and the sign points to... no!",
+                _ => "probably not, but there is still a chance..."
+            };
             await ReplyAsync($":seven: |  **{Context.User.Username }**, {outcome}");
+        }
+
+        [Command("advice")]
+        [Alias("progress", "sage")]
+        [Summary("Gives advice on progression.")]
+        public async Task AdviceCommandAsync()
+        {
+            var user = GetUser(Context);
+            string msg;
+            if (user.Items.ContainsKey(66) || user.Items.ContainsKey(71) || user.Items.ContainsKey(74) || user.Items.ContainsKey(80))
+                msg = new StringBuilder().Append("Your equipment will prove very useful in the upcoming battles.")
+                    .Append("Seek the Chest of sentience and the Scary Face to test your newfound power.")
+                    .ToString();
+            else if (user.Items.ContainsKey(81))
+                msg = new StringBuilder().Append("There is a way to increase the offensive capabilities of a marble.")
+                    .Append("Form a covering of spikes, made of iron, steel, infernite or even the accursed blazes.")
+                    .ToString();
+            else if (user.Items.ContainsKey(63))
+                msg = new StringBuilder().Append("The world now contains a plethora of treasures for you to gather.")
+                    .Append("Craft the drill of chromium to allow you to extract the ore of the Violet Volcanoes.")
+                    .ToString();
+            else if (user.Items.ContainsKey(62))
+                msg = new StringBuilder().Append("Before you can successfully take on the new terrors roaming the land, ")
+                    .Append("you must first improve your equipment. Use Destroyer's plating to craft your own shield.")
+                    .ToString();
+            else if (user.Stage == 2)
+                msg = new StringBuilder().Append("The cyborg's defeat has both given you new options and caught the attention of ")
+                    .Append("even more powerful foes. Head to its remains and gather the resources to upgrade your workstation.")
+                    .ToString();
+            else if (user.Items.ContainsKey(53) && user.Items.ContainsKey(57))
+                msg = new StringBuilder().Append("You have done very well, and have forged the best with the resources available ")
+                    .Append("to you. There is more to this world, however. Gather your allies and seek the cyborg Destroyer.")
+                    .AppendLine("\nDestiny awaits. The horror of such machinery must be put to an end.")
+                    .ToString();
+            else if (user.Items.ContainsKey(53))
+                msg = new StringBuilder().Append("The Trebuchet Array is a potent weapon, albeit rather inaccurate. To assist ")
+                    .Append("in your battles, create the Rocket Boots, which shall help you evade their menacing attacks.")
+                    .ToString();
+            else if (user.Items.ContainsKey(17))
+                msg = new StringBuilder().Append("With your workstation, forge the Trebuchet Array from the different woods found ")
+                    .Append("in the forest. You will have to create three separate trebuchets first, then combine them.")
+                    .ToString();
+            else if (user.LastScavenge.DayOfYear != 1 || user.LastScavenge.Year != 2019)
+                msg = new StringBuilder().Append("The items you have gathered are likely unable to be used in their current form. ")
+                    .Append("You must find a way to obtain a Crafting Station.")
+                    .ToString();
+            else if (user.NetWorth > 1000)
+                msg = new StringBuilder().Append("Well done. Your next goal is to gather for items at Canary Beach and Tree Wurld.")
+                    .Append("Use `mb/scavenge help` if you are unsure of how to proceed.")
+                    .ToString();
+            else msg = new StringBuilder().Append($"Welcome! Your first task is to gain {Global.UoM}1000! If you need help ")
+                    .Append("earning money, try using `mb/daily`, `mb/race help` or `mb/siege help`.")
+                    .ToString();
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithDescription(msg)
+                .WithTitle($"Advice: {Context.User.Username}")
+                .Build());
         }
 
         [Command("best")]
@@ -117,17 +175,15 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             int choice = Global.Rand.Next(1, 6);
-            string egnaro = "";
-            switch (choice){
-                case 1: egnaro = "!olleH"; break;
-                case 2: egnaro = "!raotS taH ehT owt oG"; break;
-                case 3: egnaro = "!pooS puoP knirD"; break;
-                case 4: egnaro = ".depfeQ ,ytiC ogitreV ni evil I"; break;
-                case 5: egnaro = "!haoW"; break;
-                case 6: egnaro = "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"; break;
-            }
             if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC)
-                await ReplyAsync(egnaro);
+                await ReplyAsync(choice switch {
+                    1 => "!olleH",
+                    2 => "!raotS taH ehT owt oG",
+                    3 => "!pooS puoP knirD",
+                    4 => ".depfeQ ,ytiC ogitreV ni evil I",
+                    5 => "!haoW",
+                    _ => "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"
+                });
         }
 
         [Command("orangeify")]
@@ -221,43 +277,37 @@ namespace MarbleBot.Modules
 
             var msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
             byte ranks = 0;
-            string flavour;
 
             foreach (IMessage msg in msgs) {
-                if (msg != null && msg.Content == "mb/rank" && msg.Author == Context.Message.Author) {
+                if (msg != null && msg.Content == "mb/rank" && msg.Author == Context.Message.Author)
                     ranks++;
-                } else if (msg == null) {
+                else if (msg == null)
                     break;
-                }
             }
 
-            switch (ranks)
-            {
-                case 1: flavour = "Pretty cool, right?"; break;
-                case 2: flavour = "100% legitimate"; break;
-                case 3: flavour = "I have a feeling you doubt me. Why is that?"; break;
-                case 4: flavour = "What? I'm telling the truth, I swear!"; break;
-                case 5: flavour = "What do you mean: \"This is random!\"?"; break;
-                case 6: flavour = "Stop! Now!"; break;
-                case 7: flavour = "I mean, you're probably breaking a no-spam rule!"; break;
-                case 8: flavour = "...or you're using this in a spam channel..."; break;
-                case 9: flavour = "...or slowmode is on..."; break;
-                case 10: flavour = "Please... don't expose me... ;-;"; break;
-                case 11: flavour = "At least I tried to generate a level..."; break;
-                case 12: flavour = ";;--;;"; break;
-                case 13: flavour = "I want to cry now. I really do."; break;
-                case 14: flavour = "...and I cry acid."; break;
-                case 15: flavour = "Just kidding, I actually cry Poup Soop..."; break;
-                case 16: flavour = "...which has acid in it..."; break;
-                case 17: flavour = "agh"; break;
-                case 18: flavour = "Why are you still going on?"; break;
-                case 19: flavour = "Aren't you bored?"; break;
-                case 20: flavour = "Don't you have anything better to do?"; break;
-                case 21: flavour = "No? I suppose not. You've used this command 21 times in the past 100 messages, after all."; break;
-                case 22: flavour = "Do you just want to see how far I'll go?"; break;
-                case 23: flavour = "You know... I do actually have something for you..."; break;
-                default: flavour = $"Your stage is {GetUser(Context).Stage}!"; break;
-            }
+            var flavour = ranks switch {
+                1 => "Pretty cool, right?",
+                2 => "100% legitimate",
+                3 => "I have a feeling you doubt me. Why is that?",
+                4 => "What? I'm telling the truth, I swear!",
+                5 => "What do you mean: \"This is random!\"?",
+                6 => "Stop! Now!",
+                7 => "I mean, you're probably breaking a no-spam rule!",
+                8 => "...or slowmode is on...",
+                9 => "Please... don't expose me... ;-;",
+                10 => "At least I tried to generate a level...",
+                11 => "I want to cry now. I really do.",
+                12 => "...and I cry acid.",
+                13 => "Just kidding, I actually cry Poup Soop...",
+                14 => "...which has acid in it...",
+                15 => "Why are you still going?",
+                16 => "Aren't you bored?",
+                17 => "Don't you have anything better to do?",
+                18 => "No? I suppose not.You've used this command 18 times in the past 100 messages, after all.",
+                19 => "Hm.",
+                20 => "You know... I do actually have something for you...",
+                _ => $"Your stage is {GetUser(Context).Stage}!"
+            };
 
             builder.AddField("Level", level, true)
                 .AddField("Total XP", xp, true)
@@ -281,25 +331,25 @@ namespace MarbleBot.Modules
                 // These inputs have custom ratings and messages:
                 case "256 mg": rating = -2; message = "I Am In Confusial Why"; break;
                 case "ddsc": rating = 0; break;
-                case "desk": rating = 11; message = "what did you expect?"; break;
-                case "desk176": rating = 11; message = "what did you expect?"; break;
-                case "desks": goto case "desk";
+                case "desk":
+                case "desk176":
+                case "desks": rating = 11; message = "what did you expect?"; break;
                 case "dGFibGU=": rating = -999; message = "do not mention that unholy creature near me"; break;
                 case "dGFibGVz": rating = -999; message = "do not mention those unholy creatures near me"; break;
                 case "doc671": rating = -1; message = "terrible at everything"; break;
                 case "dockque the rockque": rating = -1; message = "AM NOT ROCKQUE YOU MELMON"; break;
                 case "egnaro": rating = 10; message = "!egnarO"; break;
                 case "erango": rating = 0; message = "stoP noW"; break;
-                case "marblebot's creator": input = "Doc671"; goto case "doc671";
-                case "marblebot's dad": input = "Doc671"; goto case "doc671";
-                case "my creator": input = "Doc671"; goto case "doc671";
+                case "marblebot's creator":
+                case "marblebot's dad":
+                case "my creator":
                 case "my dad": input = "Doc671"; goto case "doc671";
                 case "orange": goto case "egnaro";
                 case "orange day": rating = 10; message = "!yaD egnarO"; break;
                 case "poos puop": rating = 10; message = "!pooS puoP knirD"; break;
                 case "poup soop": goto case "poos puop";
-                case "rockque": rating = -1; message = "I Hate Rocks"; break;
-                case "rockques": goto case "rockque";
+                case "rockque":
+                case "rockques": rating = -1; message = "I Hate Rocks"; break;
                 case "table": rating = -999; message = "do not mention that unholy creature near me"; input = "dGFibGU="; break;
                 case "tables": rating = -999; message = "do not mention those unholy creatures near me"; input = "dGFibGVz"; break;
                 case "the hat stoar": rating = 10; message = "!raotS taH ehT owt oG"; break;
@@ -351,26 +401,23 @@ namespace MarbleBot.Modules
                 rating = Global.Rand.Next(9, 11);
             }
 
-            string emoji;
-            switch (rating)
-            {
-                // Emoji time!
-                case -999: emoji = ":gun: :dagger: :bomb:"; break;
-                case -1: emoji = ":gun:"; break;
-                case 0: emoji = ":no_entry_sign:"; break;
-                case 1: emoji = ":nauseated_face:"; break;
-                case 2: emoji = ":rage:"; break;
-                case 3: emoji = ":angry:"; break;
-                case 4: emoji = ":slight_frown:"; break;
-                case 5: emoji = ":neutral_face:"; break;
-                case 6: emoji = ":slight_smile:"; break;
-                case 7: emoji = ":grinning:"; break;
-                case 8: emoji = ":thumbsup:"; break;
-                case 9: emoji = ":white_check_mark:"; break;
-                case 10: emoji = ":rofl:"; break;
-                case 11: emoji = ":heart:"; break;
-                default: emoji = ":thinking:"; break;
-            }
+            string emoji = rating switch {
+                -999 => ":gun: :dagger: :bomb:",
+                -1 => ":gun:",
+                0 => ":no_entry_sign:",
+                1 => ":nauseated_face:",
+                2 => ":rage:",
+                3 => ":angry:",
+                4 => ":slight_frown:",
+                5 => ":neutral_face:",
+                6 => ":slight_smile:",
+                7 => ":grinning:",
+                8 => ":thumbsup:",
+                9 => ":white_check_mark:",
+                10 => ":rofl:",
+                11 => ":heart:",
+                _ => ":thinking:",
+            };
             if (message == "") {
                 switch (rating) {
                     // If there isn't already a custom message, pick one depending on rating:
