@@ -702,7 +702,7 @@
   "075": {
     "Name": "Gold Ore",
     "Price": 104.00,
-    "Description": "Rocks from which nickel can be profitably extracted.",
+    "Description": "Rocks from which gold can be profitably extracted.",
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0
@@ -748,7 +748,7 @@
     "ScavengeLocation": 0,
     "CraftingProduced": 2,
     "CraftingRecipe": {
-      "038": 1,
+      "039": 1,
       "078": 1
     }
   },

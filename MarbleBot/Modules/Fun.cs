@@ -70,7 +70,7 @@ namespace MarbleBot.Modules
             else if (user.Items.ContainsKey(53) && user.Items.ContainsKey(57))
                 msg = new StringBuilder().Append("You have done very well, and have forged the best with the resources available ")
                     .Append("to you. There is more to this world, however. Gather your allies and seek the cyborg Destroyer.")
-                    .AppendLine("\nDestiny awaits. The horror of such machinery must be put to an end.")
+                    .AppendLine("\n\nDestiny awaits. This mechanical abomination must be put to an end.")
                     .ToString();
             else if (user.Items.ContainsKey(53))
                 msg = new StringBuilder().Append("The Trebuchet Array is a potent weapon, albeit rather inaccurate. To assist ")

@@ -337,12 +337,12 @@ namespace MarbleBot.Modules {
             var itemOutput = new StringBuilder();
             if (user.Items.Count > 0) {
                 var firstItems = user.Items.Take(15);
-                foreach (var item in user.Items) {
+                foreach (var item in firstItems) {
                     if (item.Value > 0)
                         itemOutput.AppendLine($"`[{item.Key.ToString("000")}]` {GetItem(item.Key.ToString()).Name}: {item.Value}");
                 }
                 if (user.Items.Count > firstItems.Count())
-                    itemOutput.AppendLine($"\n*Only showing first 15 items. Use `mb/inv {searchTerm} to view the full inventory.");
+                    itemOutput.AppendLine($"\n*Only showing first 15 items. Use `mb/inv {searchTerm}` to view the full inventory.");
             } else itemOutput.Append("None");
             var builder = new EmbedBuilder()
                 .WithAuthor(author)

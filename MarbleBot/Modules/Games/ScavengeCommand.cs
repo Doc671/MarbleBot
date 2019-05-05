@@ -62,7 +62,7 @@ namespace MarbleBot.Modules
 
             [Command("destroyersremains")]
             [Alias("destroyer'sremains", "destroyer's remains")]
-            [Summary("Starts a scavenge session in Destroyer's Remains")]
+            [Summary("Starts a scavenge session in Destroyer's Remains.")]
             public async Task ScavengeDestroyerCommandAsync()
             {
                 if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
@@ -82,7 +82,7 @@ namespace MarbleBot.Modules
 
             [Command("violetvolcanoes")]
             [Alias("violet volcanoes")]
-            [Summary("Starts a scavenge session in Destroyer's Remains")]
+            [Summary("Starts a scavenge session in the Violet Volcanoes.")]
             public async Task ScavengeVolcanoCommandAsync()
             {
                 if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
