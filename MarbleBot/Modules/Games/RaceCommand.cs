@@ -17,22 +17,6 @@ namespace MarbleBot.Modules
         [Summary("Participate in a marble race!")]
         public class RaceCommand : MarbleBotModule
         {
-            [Command("help")]
-            [Summary("Race help.")]
-            public async Task RaceHelpCommandAsync([Remainder] string _ = "")
-                => await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("How to play",
-                        new StringBuilder()
-                            .AppendLine("Use `mb/race signup <marble name>` to sign up as a marble!")
-                            .AppendLine("When everyone's done, use `mb/race start`! This happens automatically if 10 people have signed up.\n")
-                            .AppendLine("Check who's participating with `mb/race contestants`!\n")
-                            .AppendLine("You can earn Units of Money if you win! (6 hour cooldown)")
-                            .ToString())
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithTitle("Marble Race!")
-                    .Build());
-
             [Command("signup")]
             [Alias("join")]
             [Summary("Sign up to the marble race!")]
@@ -333,6 +317,24 @@ namespace MarbleBot.Modules
                     case 3: goto case 2;
                 }
             }
+
+            [Command("")]
+            [Alias("help")]
+            [Priority(-1)]
+            [Summary("Race help.")]
+            public async Task RaceHelpCommandAsync([Remainder] string _ = "")
+                => await ReplyAsync(embed: new EmbedBuilder()
+                    .AddField("How to play",
+                        new StringBuilder()
+                            .AppendLine("Use `mb/race signup <marble name>` to sign up as a marble!")
+                            .AppendLine("When everyone's done, use `mb/race start`! This happens automatically if 10 people have signed up.\n")
+                            .AppendLine("Check who's participating with `mb/race contestants`!\n")
+                            .AppendLine("You can earn Units of Money if you win! (6 hour cooldown)")
+                            .ToString())
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithTitle("Marble Race!")
+                    .Build());
         }
     }
 }

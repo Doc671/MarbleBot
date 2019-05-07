@@ -16,22 +16,6 @@ namespace MarbleBot.Modules
         [Summary("Scavenge for items!")]
         public class ScavengeCommand : MarbleBotModule
         {
-            [Command("help")]
-            [Summary("Scavenge help.")]
-            public async Task ScavengeHelpCommandAsync([Remainder] string _ = "")
-            {
-                await Context.Channel.TriggerTypingAsync();
-                var helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
-                var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
-                var helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
-                await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("How to play", $"{helpP1} {helpP2} {helpP3}")
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithTitle("Item Scavenge!")
-                    .Build());
-            }
-
             public async Task ScavengeStartAsync(MBUser user, ScavengeLocation location)
             {
                 await Context.Channel.TriggerTypingAsync();
@@ -62,6 +46,7 @@ namespace MarbleBot.Modules
 
             [Command("destroyersremains")]
             [Alias("destroyer'sremains", "destroyer's remains")]
+            [Remarks("Stage2")]
             [Summary("Starts a scavenge session in Destroyer's Remains.")]
             public async Task ScavengeDestroyerCommandAsync()
             {
@@ -82,6 +67,7 @@ namespace MarbleBot.Modules
 
             [Command("violetvolcanoes")]
             [Alias("violet volcanoes")]
+            [Remarks("Stage2")]
             [Summary("Starts a scavenge session in the Violet Volcanoes.")]
             public async Task ScavengeVolcanoCommandAsync()
             {
@@ -130,6 +116,7 @@ namespace MarbleBot.Modules
 
             [Command("drill")]
             [Alias("extract", "mine")]
+            [Remarks("Stage2")]
             [Summary("Extracts an ore found in a scavenge session.")]
             public async Task ScavengeDrillCommandAsync()
             {
@@ -231,6 +218,7 @@ namespace MarbleBot.Modules
 
             [Command("location destroyersremains")]
             [Alias("location destroyer'sremains", "location destroyer's remains", "info destroyersremains", "info destroyer'sremains", "info destroyer's remains")]
+            [Remarks("Stage2")]
             [Summary("Shows scavenge location info for Destroyer's Remains")]
             public async Task ScavengeLocationDestroyerCommandAsync()
             {
@@ -251,6 +239,7 @@ namespace MarbleBot.Modules
 
             [Command("location violetvolcanoes")]
             [Alias("location violet volcanoes", "info violetvolcanoes", "info violet volcanoes")]
+            [Remarks("Stage2")]
             [Summary("Starts a scavenge session in Destroyer's Remains")]
             public async Task ScavengeLocationVolcanoCommandAsync()
             {
@@ -307,6 +296,24 @@ namespace MarbleBot.Modules
                     await ReplyAsync("The scavenge session is over! Any remaining non-ore items have been added to your inventory!");
                 else
                     await ReplyAsync("The scavenge session is over! Any remaining items have been added to your inventory!");
+            }
+
+            [Command("")]
+            [Alias("help")]
+            [Priority(-1)]
+            [Summary("Scavenge help.")]
+            public async Task ScavengeHelpCommandAsync([Remainder] string _ = "")
+            {
+                await Context.Channel.TriggerTypingAsync();
+                var helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
+                var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
+                var helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
+                await ReplyAsync(embed: new EmbedBuilder()
+                    .AddField("How to play", $"{helpP1} {helpP2} {helpP3}")
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithTitle("Item Scavenge!")
+                    .Build());
             }
         }
     }

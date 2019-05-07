@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using MarbleBot.BaseClasses;
 using MarbleBot.Extensions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,13 +32,20 @@ namespace MarbleBot.Modules
                     break;
                 case "economy":
                     var allCmds = new StringBuilder();
-                    var commands = Global.CommandService.Commands.Where(c => c.Module.Name.ToLower() == command.ToLower());
+                    var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => c.Module.Name.ToLower() == command.ToLower())
+                        .OrderBy(c => c.Name);
                     if (!Context.IsPrivate) {
                         if (Context.Guild.Id == CM) commands = commands.Where(c => c.Remarks != "Not CM");
                         else commands = commands.Where(c => c.Remarks != "CM Only");
                     } else commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
-                    foreach (var cmd in commands) allCmds.AppendLine($"**{cmd.Name}** - {cmd.Summary}");
-                    builder.AddField($"{Global.CommandService.Modules.Where(m => m.Name.ToLower() == command.ToLower()).First().Name} Commands", allCmds.ToString())
+                    if (GetUser(Context).Stage < 2) commands = commands.Where(c => c.Remarks != "Stage2");
+                    foreach (var cmd in commands) {
+                        var name = cmd.Name.IsEmpty() ? "help" : cmd.Name;
+                        allCmds.AppendLine($"**{name}** - {cmd.Summary}");
+                    }
+                    builder.AddField(
+                            $"{System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Global.CommandService.Modules.Where(m => m.Name.ToLower() == command.ToLower()).First().Name)} Commands",
+                            allCmds.ToString())
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help");
                     await ReplyAsync(embed: builder.Build());
@@ -52,9 +60,12 @@ namespace MarbleBot.Modules
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help")
                         .Build());
-                    goto case "economy";
-                case "roles": goto case "economy";
-                case "utility": goto case "economy";
+                    break;
+                case "race":
+                case "roles":
+                case "scavenge":
+                case "siege":
+                case "utility":
                 case "youtube": goto case "economy";
                 case "yt":
                     command = "youtube";
@@ -140,13 +151,6 @@ namespace MarbleBot.Modules
                         case "cv": hCommand.Usage = "mb/cv <video link> <optional description>"; hCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; hCommand.Warning = "This command only works in DMs!"; break;
                         case "searchchannel": hCommand.Usage = "mb/searchchannel <channelname>"; hCommand.Example = "mb/searchchannel carykh"; break;
                         case "searchvideo": hCommand.Usage = "mb/searchvideo <videoname>"; hCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
-
-                        // Games
-                        case "boss": hCommand.Usage = "mb/boss <boss name>"; hCommand.Example = "mb/boss Orange"; break;
-                        case "powerup": hCommand.Usage = "mb/powerup <power-up name>"; hCommand.Example = "mb/power-up Clone"; break;
-                        case "race": hCommand.Usage = "mb/race signup <marble name>, mb/race contestants, mb/race remove <marble name>, mb/race start, mb/race leaderboards <winners/mostUsed> <optional number>, mb/race checkearn"; break;
-                        case "scavenge": hCommand.Usage = "mb/scavenge locations, mb/scavenge <location name>, mb/scavenge <grab>, mb/scavenge <sell>"; break;
-                        case "siege": hCommand.Usage = "mb/siege signup <marble name>, mb/siege contestants, mb/siege start, mb/siege attack, mb/siege grab, mb/siege info, mb/siege checkearn, mb/siege boss <boss name>, mb/siege bosslist, mb/siege powerup <power-up name>, mb/siege ping <on/off>"; break;
                     }
 
                     if (!hCommand.Desc.IsEmpty()) {

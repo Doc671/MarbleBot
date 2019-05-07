@@ -20,8 +20,7 @@ namespace MarbleBot.Modules
 #pragma warning restore IDE0060 // Remove unused parameter
         {
             await Context.Channel.TriggerTypingAsync();
-            int choice = Global.Rand.Next(0, 13);
-            string outcome = choice switch {
+            string outcome = Global.Rand.Next(0, 13) switch {
                 0 => "no.",
                 1 => "looking negative.",
                 2 => "probably not.",
@@ -45,6 +44,7 @@ namespace MarbleBot.Modules
         [Summary("Gives advice on progression.")]
         public async Task AdviceCommandAsync()
         {
+            await Context.Channel.TriggerTypingAsync();
             var user = GetUser(Context);
             string msg;
             if (user.Items.ContainsKey(66) || user.Items.ContainsKey(71) || user.Items.ContainsKey(74) || user.Items.ContainsKey(80))
@@ -144,6 +144,7 @@ namespace MarbleBot.Modules
         [Remarks("Not CM")]
         public async Task BuyHatCommandAsync()
         {
+            await Context.Channel.TriggerTypingAsync();
             if (Context.Guild.Id != CM) {
                 await Context.Channel.TriggerTypingAsync();
                 var price = Global.Rand.Next(0, int.MaxValue);

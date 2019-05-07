@@ -159,7 +159,7 @@ namespace MarbleBot.Modules {
             var obj = GetUsersObj();
             var user = GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 24) {
-                if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 72) user.DailyStreak = 0;
+                if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 96) user.DailyStreak = 0;
                 decimal gift;
                 var power = user.DailyStreak > 100 ? 100 : user.DailyStreak;
                 gift = Convert.ToDecimal(Math.Round(Math.Pow(200, 1 + (Convert.ToDouble(power) / 100)), 2));
@@ -183,22 +183,6 @@ namespace MarbleBot.Modules {
                 await ReplyAsync($"You need to wait for **{GetDateString(user.LastDaily.Subtract(ADayAgo))}** until you can get your daily gift again!");
             }
         }
-
-        /*[Command("donate")]
-        [Summary("Donate money to others")]
-        public async Task _donate(string money, [Remainder] string searchUser = "") {
-            if (money == "accept") {
-
-            } else {
-                var gift = ulong.Parse(money.Trim());
-                
-                
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MoneyUser>>(json);
-                var search = from user in rawUsers where searchUser.ToLower().Contains(user.Value.Name.ToLower()) || user.Value.Name.ToLower().Contains(searchUser.ToLower()) || searchUser.ToLower().Contains(user.Value.Discriminator) select user;
-                var foundUser = search.FirstOrDefault();
-
-            }
-        }*/
 
         [Command("inventory")]
         [Alias("inv", "items")]
@@ -336,13 +320,13 @@ namespace MarbleBot.Modules {
             var author = Context.Client.GetUser(id);
             var itemOutput = new StringBuilder();
             if (user.Items.Count > 0) {
-                var firstItems = user.Items.Take(15);
+                var firstItems = user.Items.Take(10);
                 foreach (var item in firstItems) {
                     if (item.Value > 0)
                         itemOutput.AppendLine($"`[{item.Key.ToString("000")}]` {GetItem(item.Key.ToString()).Name}: {item.Value}");
                 }
-                if (user.Items.Count > firstItems.Count())
-                    itemOutput.AppendLine($"\n*Only showing first 15 items. Use `mb/inv {searchTerm}` to view the full inventory.");
+                if (user.Items.Where(p => p.Value != 0).Count() > firstItems.Count())
+                    itemOutput.AppendLine($"\nOnly showing the first 10 items. Use `mb/inv {searchTerm}` to view the full inventory.");
             } else itemOutput.Append("None");
             var builder = new EmbedBuilder()
                 .WithAuthor(author)

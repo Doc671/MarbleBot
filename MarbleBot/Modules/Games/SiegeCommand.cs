@@ -20,28 +20,6 @@ namespace MarbleBot.Modules
         {
             private static bool IsBetween(int no, int lower, int upper) => lower <= no && no <= upper;
 
-            [Command("help")]
-            [Summary("Siege help.")]
-            public async Task SiegeHelpCommandAsync()
-                => await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("How to play", new StringBuilder()
-                        .AppendLine("Use `mb/siege signup <marble name>` to sign up as a marble! (you can only sign up once)")
-                        .AppendLine("When everyone's done, use `mb/siege start`! The Siege begins automatically when 20 people have signed up.\n")
-                        .AppendLine("When the Siege begins, use `mb/siege attack` to attack the boss!")
-                        .AppendLine("Power-ups occasionally appear. Use `mb/siege grab` to try and activate the power-up (1/3 chance).\n")
-                        .AppendLine("Check who's participating with `mb/siege contestants` and view Siege information with `mb/siege info`!")
-                        .ToString())
-                    .AddField("Mechanics", new StringBuilder()
-                        .AppendLine("There are a few differences between this and normal Marble Sieges.\n")
-                        .AppendLine("- **HP Scaling**: Marble HP scales with difficulty ((difficulty + 2) * 5).")
-                        .AppendLine("- **Vengeance**: When a marble dies, the damage multiplier goes up by 0.2 (0.4 if Morale Boost is active).")
-                        .ToString())
-                    .AddField("More info", "For more information, visit https://github.com/Doc671/MarbleBot/wiki/Marble-Siege.")
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithTitle("Marble Siege!")
-                    .Build());
-
             [Command("signup")]
             [Alias("join")]
             [Summary("Sign up to the Marble Siege!")]
@@ -248,7 +226,7 @@ namespace MarbleBot.Modules
                                     .WithDescription($"**{userMarble.Name}** dealt **{dmg}** damage to **{Global.SiegeInfo[fileId].Boss.Name}**!")
                                     .AddField("Boss HP", $"**{Global.SiegeInfo[fileId].Boss.HP}**/{Global.SiegeInfo[fileId].Boss.MaxHP}");
                                 await ReplyAsync(embed: builder.Build());
-                                if (clone && marble.Name[^1] != 's')
+                                if (clone && marble.Name.Last() != 's')
                                     await ReplyAsync($"{marble.Name}'s clones disappeared!");
                                 else if (clone) await ReplyAsync($"{marble.Name}' clones disappeared!");
 
@@ -280,7 +258,7 @@ namespace MarbleBot.Modules
                                 case "Morale Boost":
                                     Global.SiegeInfo[fileId].Morales++;
                                     builder.WithTitle("POWER-UP ACTIVATED!")
-                                        .WithDescription(string.Format("**{0}** activated **Morale Boost**! Damage multiplier increased to **{1}**!", Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id).Name, Global.SiegeInfo[fileId].DamageMultiplier));
+                                        .WithDescription($"**{Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id).Name}** activated **Morale Boost**! Damage multiplier increased to **{Global.SiegeInfo[fileId].DamageMultiplier}**!");
                                     await ReplyAsync(embed: builder.Build());
                                     Global.SiegeInfo[fileId].SetPowerUp("");
                                     Global.SiegeInfo[fileId].LastMorale = DateTime.UtcNow;
@@ -288,7 +266,7 @@ namespace MarbleBot.Modules
                                 case "Clone":
                                     Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id).Cloned = true;
                                     builder.WithTitle("POWER-UP ACTIVATED!")
-                                        .WithDescription(string.Format("**{0}** activated **Clone**! Five clones of {0} appeared!", Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id).Name));
+                                        .WithDescription($"**{Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id).Name}** activated **Clone**! Five clones of {Global.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id).Name} appeared!");
                                     await ReplyAsync(embed: builder.Build());
                                     Global.SiegeInfo[fileId].SetPowerUp("");
                                     break;
@@ -529,9 +507,10 @@ namespace MarbleBot.Modules
                     case "rgvzdhjvewvy":
                     case "corruptsoldier": goto case "volcano";
                     case "corruptpurple": boss = Siege.GetBoss("CorruptPurple"); break;
-                    case "chest":
-                    case "scaryface":
-                    case "marblebot": goto case "volcano";
+                    case "chest": boss = Siege.GetBoss("Chest"); break;
+                    case "scaryface": boss = Siege.GetBoss("ScaryFace"); break;
+                    case "marblebot":
+                    case "marblebotprototype": boss = Siege.GetBoss("MarbleBotPrototype"); break;
                     case "overlord": boss = Siege.GetBoss("Overlord"); break;
                     case "vinemonster": 
                     case "vinemonsters":
@@ -711,6 +690,30 @@ namespace MarbleBot.Modules
                 else if (IsBetween(bossWeight, 37, 45)) currentSiege.Boss = Siege.GetBoss("MarbleBotPrototype");
                 else currentSiege.Boss = Siege.GetBoss("Overlord");
             }
+
+            [Command("")]
+            [Alias("help")]
+            [Priority(-1)]
+            [Summary("Siege help.")]
+            public async Task SiegeHelpCommandAsync()
+                => await ReplyAsync(embed: new EmbedBuilder()
+                    .AddField("How to play", new StringBuilder()
+                        .AppendLine("Use `mb/siege signup <marble name>` to sign up as a marble! (you can only sign up once)")
+                        .AppendLine("When everyone's done, use `mb/siege start`! The Siege begins automatically when 20 people have signed up.\n")
+                        .AppendLine("When the Siege begins, use `mb/siege attack` to attack the boss!")
+                        .AppendLine("Power-ups occasionally appear. Use `mb/siege grab` to try and activate the power-up (1/3 chance).\n")
+                        .AppendLine("Check who's participating with `mb/siege contestants` and view Siege information with `mb/siege info`!")
+                        .ToString())
+                    .AddField("Mechanics", new StringBuilder()
+                        .AppendLine("There are a few differences between this and normal Marble Sieges.\n")
+                        .AppendLine("- **HP Scaling**: Marble HP scales with difficulty ((difficulty + 2) * 5).")
+                        .AppendLine("- **Vengeance**: When a marble dies, the damage multiplier goes up by 0.2 (0.4 if Morale Boost is active).")
+                        .ToString())
+                    .AddField("More info", "For more information, visit https://github.com/Doc671/MarbleBot/wiki/Marble-Siege.")
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithTitle("Marble Siege!")
+                    .Build());
         }
     }
 }

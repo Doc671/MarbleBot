@@ -140,7 +140,7 @@ namespace MarbleBot.Modules
 
             foreach (var searchResult in searchListResponse.Items) {
                 if (searchResult.Id.Kind == "youtube#channel" && !(await Moderation.CheckSwearAsync(searchResult.Snippet.Title))) {
-                    channels.Add(string.Format("{0} (<https://www.youtube.com/channel/{1}>)", searchResult.Snippet.Title, searchResult.Id.ChannelId));
+                    channels.Add($"{searchResult.Snippet.Title} (<https://www.youtube.com/channel/{searchResult.Id.ChannelId}>)");
                     found = true;
                 } else profaneCount++;
             }
