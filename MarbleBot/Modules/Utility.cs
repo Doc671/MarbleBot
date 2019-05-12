@@ -43,7 +43,7 @@ namespace MarbleBot.Modules
             switch (command.ToLower())
             {
                 case "":
-                    if (Context.Guild.CurrentUser.GuildPermissions.ManageMessages)
+                    if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
                         builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
                     else builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube");
                     builder.WithDescription("*by Doc671#1965*\n\nUse `mb/help` followed by the name of a module or a command for more info, or `mb/help full` for the old help menu.")
@@ -91,7 +91,7 @@ namespace MarbleBot.Modules
                 case "utility":
                 case "youtube": goto case "economy";
                 case "moderation":
-                    if (Context.Guild.CurrentUser.GuildPermissions.ManageMessages) goto case "economy";
+                    if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages) goto case "economy";
                     else break;
                 case "yt":
                     command = "youtube";
@@ -224,7 +224,7 @@ namespace MarbleBot.Modules
                 .AppendLine("Use this link to invite MarbleBot to your server: https://discordapp.com/oauth2/authorize?client_id=286228526234075136&scope=bot&permissions=1")
                 .Append("\nUse `mb/setchannel announcement <channel ID>` to set the channel where bot updates get posted, ")
                 .Append("`mb/setchannel autoresponse <channel ID>` to set the channel where autoresponses can be used and ")
-                .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used!")
+                .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used! ")
                 .Append("If no usable channel is set, commands can be used anywhere.")
                 .ToString());
 

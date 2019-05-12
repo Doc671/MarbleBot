@@ -21,8 +21,6 @@ namespace MarbleBot
         protected internal const ulong CM = 223616088263491595; // Community Marble
         protected internal const ulong THS = 224277738608001024; // The Hat Stoar
         protected internal const ulong THSC = 318053169999511554; // The Hat Stoar Crew
-        protected internal const ulong VFC = 394086559676235776; // Vinh Fan Club
-        protected internal const ulong MT = 408694288604463114; // Melmon Test
 
         /// <summary> Gets colour for embed depending on server </summary>
         protected internal static Color GetColor(SocketCommandContext context)

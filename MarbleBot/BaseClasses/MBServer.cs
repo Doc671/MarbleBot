@@ -1,11 +1,10 @@
-﻿using Discord;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace MarbleBot.BaseClasses
 {   
     /// <summary> Represents a server. </summary>
-    public struct MBServer
+    public class MBServer
     {
         /// <summary> The ID of the server. </summary>
         public ulong Id { get; set; }

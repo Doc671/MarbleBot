@@ -264,7 +264,7 @@ namespace MarbleBot.Modules
             }
 
             [Command("location treewurld")]
-            [Alias("location tree", "location tree wurld", "info tree wurld", "info tree", "info tree wurld")]
+            [Alias("location tree", "location tree wurld", "info treewurld", "info tree", "info tree wurld")]
             [Summary("Shows scavenge location info for Tree Wurld")]
             public async Task ScavengeLocationTreeCommandAsync()
                 => await ScavengeInfoAsync(ScavengeLocation.TreeWurld);

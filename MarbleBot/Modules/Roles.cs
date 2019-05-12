@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace MarbleBot.Modules
                 var server = GetServer(Context);
                 if (server.Roles.Any(r => r == role.Id))
                 {
-                    if (Context.Guild.CurrentUser.Roles.Any(r => r.Id == role.Id))
+                    if ((Context.User as SocketGuildUser).Roles.Any(r => r.Id == role.Id))
                     {
                         await (Context.User as IGuildUser).RemoveRoleAsync(role);
                         await ReplyAsync($"Success. The **{role.Name}** role has been taken from you.");

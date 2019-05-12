@@ -445,10 +445,7 @@ namespace MarbleBot.Modules
         public async Task RepeatCommandAsync([Remainder] string repeat)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (repeat == "Am Melmon" && (Context.Guild.Id == THS || Context.Guild.Id == MT))
-            {
-                await ReplyAsync("No U");
-            }
+            if (repeat == "Am Melmon") await ReplyAsync("No U");
             else if (await Moderation.CheckSwearAsync(repeat))
             {
                 if (Context.IsPrivate)
