@@ -22,7 +22,8 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             //Channel display;
 
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
                 ApiKey = Global.YTKey,
                 ApplicationName = GetType().ToString()
             });
@@ -31,17 +32,13 @@ namespace MarbleBot.Modules
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
             var searchListResult = (await searchListRequest.ExecuteAsync()).Items.First();
-            
+
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithTitle(searchListResult.Snippet.Title)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithFooter(searchListResult.ETag)
                 .WithThumbnailUrl(searchListResult.Snippet.Thumbnails.Default__.Url)
-                //.AddField("Subscribers", display.Statistics.SubscriberCount, true)
-                //.AddField("Views", display.Statistics.ViewCount, true)
-                //.AddField("Videos", display.Statistics.VideoCount, true)
-                //.AddField("Country", display.Snippet.Country, true)
                 .AddField("Description", searchListResult.Snippet.Description, true)
                 .Build());
         }
@@ -51,21 +48,27 @@ namespace MarbleBot.Modules
         [Remarks("CM Only")]
         public async Task CommunityVideosCommandAsync(string url, [Remainder] string desc = "")
         {
-            if (Context.IsPrivate) {
+            if (Context.IsPrivate)
+            {
                 var validUser = false;
                 var channelLink = "";
-                using (var CVID = new StreamReader("Resources\\CVID.csv")) {
-                    while (!CVID.EndOfStream) {
+                using (var CVID = new StreamReader("Resources\\CVID.csv"))
+                {
+                    while (!CVID.EndOfStream)
+                    {
                         var person = (await CVID.ReadLineAsync()).Split(',');
-                        if (Context.User.Id == Convert.ToUInt64(person[0])) {
+                        if (Context.User.Id == Convert.ToUInt64(person[0]))
+                        {
                             validUser = true;
                             channelLink = person[1];
                             break;
                         }
                     }
                 }
-                if (validUser) {
-                    var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
+                if (validUser)
+                {
+                    var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                    {
                         ApiKey = Global.YTKey,
                         ApplicationName = GetType().ToString()
                     });
@@ -74,10 +77,12 @@ namespace MarbleBot.Modules
                     searchListRequest.MaxResults = 10;
                     var searchListResponse = await searchListRequest.ExecuteAsync();
                     var channel = new SearchResultSnippet();
-                    foreach (var res in searchListResponse.Items) {
+                    foreach (var res in searchListResponse.Items)
+                    {
                         if (res.Id.Kind == "youtube#channel") channel = res.Snippet;
                     }
-                    if (channel == null) {
+                    if (channel == null)
+                    {
                         searchListRequest.Q = Context.User.Username;
                         foreach (var res in searchListResponse.Items)
                             if (res.Id.Kind == "youtube#channel") channel = res.Snippet;
@@ -85,17 +90,22 @@ namespace MarbleBot.Modules
                     searchListRequest.Q = url;
                     searchListResponse = await searchListRequest.ExecuteAsync();
                     var video = searchListResponse.Items[0].Snippet;
-                    if (channel.Title == video.ChannelTitle) {
+                    if (channel.Title == video.ChannelTitle)
+                    {
                         if (DateTime.Now.Subtract((DateTime)video.PublishedAt).Days > 1)
                             await ReplyAsync("The video cannot be more than two days old!");
-                        else {
+                        else
+                        {
                             if (desc.Length > 200) await ReplyAsync("Your description length is too long!");
-                            else {
+                            else
+                            {
                                 var CV = (IMessageChannel)Context.Client.GetGuild(CM).GetChannel(442474624417005589);
                                 var msgs = await CV.GetMessagesAsync(100).FlattenAsync();
                                 var already = false;
-                                foreach (var msg in msgs) {
-                                    if (msg.Content.Contains(url)) {
+                                foreach (var msg in msgs)
+                                {
+                                    if (msg.Content.Contains(url))
+                                    {
                                         already = true;
                                         break;
                                     }
@@ -104,12 +114,14 @@ namespace MarbleBot.Modules
                                 else await CV.SendMessageAsync($"{desc}\n{url}");
                             }
                         }
-                    } else await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
+                    }
+                    else await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
                     if (!validUser) await Log($"Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
-                } else await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
-                        .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
-                        .Append("If you're an accepted user, please notify Doc671.")
-                        .ToString());
+                }
+                else await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
+                      .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
+                      .Append("If you're an accepted user, please notify Doc671.")
+                      .ToString());
             }
         }
 
@@ -118,7 +130,8 @@ namespace MarbleBot.Modules
         public async Task SearchChannelCommandAsync([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
                 ApiKey = Global.YTKey,
                 ApplicationName = GetType().ToString()
             });
@@ -138,19 +151,24 @@ namespace MarbleBot.Modules
             // matching channels.
             bool found = false;
 
-            foreach (var searchResult in searchListResponse.Items) {
-                if (searchResult.Id.Kind == "youtube#channel" && !(await Moderation.CheckSwearAsync(searchResult.Snippet.Title))) {
+            foreach (var searchResult in searchListResponse.Items)
+            {
+                if (searchResult.Id.Kind == "youtube#channel" && !(await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
+                {
                     channels.Add($"{searchResult.Snippet.Title} (<https://www.youtube.com/channel/{searchResult.Id.ChannelId}>)");
                     found = true;
-                } else profaneCount++;
+                }
+                else profaneCount++;
             }
 
-            if (found) {
+            if (found)
+            {
                 if (profaneCount > 0)
                     await ReplyAsync($"**__Channels:__**\n{string.Join("\n", channels)}\n\n{profaneCount} results omitted (profanity detected)");
                 else
                     await ReplyAsync($"**__Channels:__**\n{string.Join("\n", channels)}\n");
-            } else await ReplyAsync("Couldn't seem to find anything...");
+            }
+            else await ReplyAsync("Couldn't seem to find anything...");
         }
 
 
@@ -159,7 +177,8 @@ namespace MarbleBot.Modules
         public async Task SearchVideoCommandAsync([Remainder] string searchTerm)
         {
             await Context.Channel.TriggerTypingAsync();
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
+            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            {
                 ApiKey = Global.YTKey,
                 ApplicationName = GetType().ToString()
             });
@@ -178,21 +197,25 @@ namespace MarbleBot.Modules
             // Add each result to the appropriate list, and then display the lists of
             // matching videos.
             bool found = false;
-            foreach (var searchResult in searchListResponse.Items) {
+            foreach (var searchResult in searchListResponse.Items)
+            {
                 if (searchResult.Id.Kind == "youtube#video" && (await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
                     profaneCount++;
-                else if (searchResult.Id.Kind == "youtube#video") {
+                else if (searchResult.Id.Kind == "youtube#video")
+                {
                     videos.Add($"{searchResult.Snippet.Title} (<https://youtu.be/{searchResult.Id.VideoId}>)");
                     found = true;
                 }
             }
 
-            if (found) {
+            if (found)
+            {
                 if (profaneCount > 0)
                     await ReplyAsync($"**__Videos__**:\n{string.Join("\n", videos)}\n\n{profaneCount} results omitted (profanity detected)");
                 else
                     await ReplyAsync($"**__Videos__**:\n{string.Join("\n", videos)}\n");
-            } else await ReplyAsync("Couldn't seem to find anything...");
+            }
+            else await ReplyAsync("Couldn't seem to find anything...");
         }
     }
 }

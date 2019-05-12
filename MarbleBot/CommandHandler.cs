@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MarbleBot.BaseClasses;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -32,33 +33,27 @@ namespace MarbleBot
 
             int argPos = 0;
 
-            var IsLett = !char.TryParse(msg.Content.Trim('`'), out char e);
-            if (!IsLett) IsLett = char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e);
+            MBServer server;
 
-            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (Global.UsableChannels.Any(chnl => chnl == context.Channel.Id) || context.IsPrivate)) {
+            if (!context.IsPrivate)
+                server = Global.Servers.Any(s => s.Id == context.Guild.Id) ?
+                    MarbleBotModule.GetServer(context) : MBServer.Empty;
+            else server = MBServer.Empty;
+
+            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate || 
+                server.UsableChannels.Count == 0 || server.UsableChannels.Contains(context.Channel.Id))) {
                 var result = await _service.ExecuteAsync(context, argPos, null);
                 
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                     await Program.Log($"{result.Error.Value}: {result.ErrorReason}");
-                if (result.Error == CommandError.BadArgCount) await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
 
-            } else if (!(IsLett) && context.Channel.Id != 252481530130202624 && (context.Guild.Id == 224277738608001024 || context.Guild.Id == 223616088263491595)) {
-                EmbedBuilder builder = new EmbedBuilder()
-                    .WithAuthor(context.User)
-                    .WithDescription($"**Message sent by { context.User.Mention} deleted in <#{context.Channel.Id }>** {context.Message.Content}")
-                    .AddField("Reason", "Empty Message")
-                    .WithColor(Color.Red)
-                    .WithFooter("ID: " + context.User.Id)
-                    .WithCurrentTimestamp();
-                if (context.Guild.Id == 224277738608001024) {
-                    var logs = context.Guild.GetTextChannel(327132239257272327);
-                    await logs.SendMessageAsync("", false, builder.Build());
-                } else if (context.Guild.Id == 223616088263491595) {
-                    var logs = context.Guild.GetTextChannel(387306347936350213);
-                    await logs.SendMessageAsync("", false, builder.Build());
+                switch (result.Error) {
+                    case CommandError.BadArgCount: await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command."); break;
+                    case CommandError.UnmetPrecondition: await context.Channel.SendMessageAsync("Insufficient permissions."); break;
                 }
-                await context.Message.DeleteAsync();
-            } else if (context.Channel.Id == 252481530130202624 && DateTime.UtcNow.Subtract(Global.ARLastUse).TotalSeconds > 2) {
+
+            } else if (!context.IsPrivate && server.AutoresponseChannel == context.Channel.Id
+                && DateTime.UtcNow.Subtract(Global.ARLastUse).TotalSeconds > 2) {
                 foreach (var response in Global.Autoresponses) {
                     if (context.Message.Content.ToLower() == response.Key) {
                         Global.ARLastUse = DateTime.UtcNow;

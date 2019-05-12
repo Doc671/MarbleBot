@@ -4,7 +4,7 @@ using System.Linq;
 namespace MarbleBot.BaseClasses
 {
     /// <summary> Stores info about a command. </summary>
-    public struct HelpCommand 
+    public struct HelpCommand
     {
         /// <summary> The command's name. </summary>
         public string Name;
@@ -31,7 +31,8 @@ namespace MarbleBot.BaseClasses
                            string usage = "",
                            IEnumerable<string> aliases = null,
                            string example = "",
-                           string warning = "") {
+                           string warning = "")
+        {
             Name = name;
             Desc = desc;
             Usage = usage;

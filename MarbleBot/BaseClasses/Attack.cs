@@ -1,7 +1,8 @@
 namespace MarbleBot.BaseClasses
 {
     /// <summary> Represents a boss' attack during a Marble Siege. </summary>
-    public readonly struct Attack {
+    public readonly struct Attack
+    {
         /// <summary> The name of the attack. </summary>
         public string Name { get; }
         /// <summary> The amount of damage dealt by the attack. </summary>
@@ -19,7 +20,8 @@ namespace MarbleBot.BaseClasses
         /// <param name="damage"> The amount of damage dealt by the attack. </param>
         /// <param name="accuracy"> The chance the attack will hit each marble out of 100. </param>
         /// <param name="statusEffect"> The status effect the attack inflicts. </param>
-        public Attack(string name, byte damage, byte accuracy, MSE statusEffect) {
+        public Attack(string name, byte damage, byte accuracy, MSE statusEffect)
+        {
             Name = name;
             Damage = damage;
             Accuracy = accuracy;

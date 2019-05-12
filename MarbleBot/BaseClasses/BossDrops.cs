@@ -17,7 +17,8 @@
         /// <param name="minCount">The minimum possible number of this item that the boss can drop.</param>
         /// <param name="maxCount">The maximum possible number of this item that the boss can drop.</param>
         /// <param name="chance">The chance as a percentage that these items will drop.</param>
-        public BossDrops(int itemId, ushort minCount, ushort maxCount, byte chance) {
+        public BossDrops(int itemId, ushort minCount, ushort maxCount, byte chance)
+        {
             ItemId = itemId;
             MinCount = minCount;
             MaxCount = maxCount;

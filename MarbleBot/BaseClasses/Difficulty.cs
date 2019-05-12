@@ -1,6 +1,7 @@
 namespace MarbleBot.BaseClasses
 {
-    public enum Difficulty {
+    public enum Difficulty
+    {
         None,
         Trivial,
         Simple,

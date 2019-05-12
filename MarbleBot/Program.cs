@@ -4,6 +4,8 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Docs.v1;
 using Google.Apis.Docs.v1.Data;
 using Google.Apis.Services;
+using MarbleBot.BaseClasses;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,9 +15,9 @@ using System.Threading.Tasks;
 
 namespace MarbleBot
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+        private static void Main()
         => new Program().StartAsync().GetAwaiter().GetResult();
 
         public static DiscordSocketClient _client;
@@ -30,13 +32,28 @@ namespace MarbleBot
             _client = new DiscordSocketClient();
 
             string token = "";
-            using (var stream = new StreamReader("MBT.txt")) token = stream.ReadLine();
-            using (var stream = new StreamReader("MBK.txt")) Global.YTKey = stream.ReadLine();
+            using (var stream = new StreamReader("Keys\\MBT.txt")) token = stream.ReadLine();
+            using (var stream = new StreamReader("Keys\\MBK.txt")) Global.YTKey = stream.ReadLine();
 
-            using (var arFile = new StreamReader("Resources\\Autoresponses.txt")) {
-                while (!arFile.EndOfStream) {
-                    var arPair = arFile.ReadLine().Split(';');
+            using (var arFile = new StreamReader("Resources\\Autoresponses.txt"))
+            {
+                while (!arFile.EndOfStream)
+                {
+                    var arPair = (await arFile.ReadLineAsync()).Split(';');
                     Global.Autoresponses.Add(arPair[0], arPair[1]);
+                }
+            }
+
+            using (var srvrFile = new StreamReader("Data\\Servers.json"))
+            {
+                string json;
+                using (var users = new StreamReader("Data\\Servers.json")) json = await users.ReadToEndAsync();
+                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MBServer>>(json);
+                foreach (var server in allServers)
+                {
+                    var server2 = server.Value;
+                    server2.Id = server.Key;
+                    Global.Servers.Add(server2);
                 }
             }
 
@@ -54,13 +71,15 @@ namespace MarbleBot
             await Task.Delay(-1);
         }
 
-        public async static Task Log(string log, bool noDate = false) {
+        public static async Task Log(string log, bool noDate = false)
+        {
             var logString = noDate ? log : $"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {log}";
             Console.WriteLine(logString);
 
             UserCredential credential;
 
-            using (var stream = new FileStream("client_id.json", FileMode.Open, FileAccess.Read)) {
+            using (var stream = new FileStream("Keys\\client_id.json", FileMode.Open, FileAccess.Read))
+            {
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
                     new string[] { DocsService.Scope.Documents },
@@ -68,7 +87,8 @@ namespace MarbleBot
                     CancellationToken.None);
             }
 
-            var service = new DocsService(new BaseClientService.Initializer() {
+            var service = new DocsService(new BaseClientService.Initializer()
+            {
                 HttpClientInitializer = credential,
                 ApplicationName = "MarbleBot",
             });

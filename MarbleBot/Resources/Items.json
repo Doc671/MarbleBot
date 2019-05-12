@@ -9,7 +9,7 @@
   "001": {
     "Name": "Poup Soop",
     "Price": 364400.00,
-    "Description": "A hole-y drink of Qefpedun origin that contains Poup; acid; lava; rotten flesh and 13 different lethal diseases. Approved by Orange.",
+    "Description": "A hole-y drink of Qefpedun origin that contains Poup, acid, lava, rotten flesh and 13 different lethal diseases. Approved by Orange.",
     "OnSale": true,
     "ScavengeLocation": 0,
     "CraftingProduced": 1,
@@ -36,7 +36,7 @@
   "002": {
     "Name": "Limited Edition Poup Soop",
     "Price": 552387946.00,
-    "Description": "A special edition of Poup Soop that contains extra Poup; extra acid; extra lava; rotten-er flesh; 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
+    "Description": "A special edition of Poup Soop that contains extra Poup, extra acid, extra lava, rotten-er flesh, 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
     "OnSale": true,
     "ScavengeLocation": 0
   },
@@ -57,7 +57,7 @@
   "005": {
     "Name": "Electric Edition Poup Soop",
     "Price": 221548933670.00,
-    "Description": "A special edition of Poup Soop with 20% more lava; 20% more acid and electricity generators inside the barrel. Very good conductor of electricity. Approved by Orange.",
+    "Description": "A special edition of Poup Soop with 20% more lava, 20% more acid and electricity generators inside the barrel. Very good conductor of electricity. Approved by Orange.",
     "OnSale": true,
     "ScavengeLocation": 0
   },
@@ -71,14 +71,14 @@
   "007": {
     "Name": "Rotten Edition Poup Soop",
     "Price": 303496572188.00,
-    "Description": "A special edition of Poup Soop with 6.66 times as much rotten flesh; twice as much acid and 21.25 lethal diseases. Approved by Orange.",
+    "Description": "A special edition of Poup Soop with 6.66 times as much rotten flesh, twice as much acid and 21.25 lethal diseases. Approved by Orange.",
     "OnSale": false,
     "ScavengeLocation": 0
   },
   "008": {
     "Name": "Ulteymut Edition Poup Soop",
     "Price": 1802201667100.00,
-    "Description": "The final edition of Poup Soop with three times as much Poup; lava and acid; 47.41394 lethal diseases and several classified ingredients. Approved by Orange.",
+    "Description": "The final edition of Poup Soop with three times as much Poup, lava and acid, 47.41394 lethal diseases and several classified ingredients. Approved by Orange.",
     "OnSale": false,
     "ScavengeLocation": 0
   },
@@ -299,7 +299,7 @@
   "038": {
     "Name": "Poop Soup",
     "Price": 0.00,
-    "Description": "An unholy combination of faeces; lava; acid; rotten flesh and 13 different lethal diseases.",
+    "Description": "An unholy combination of faeces, lava, acid, rotten flesh and 13 different lethal diseases.",
     "OnSale": false,
     "ScavengeLocation": 0,
     "CraftingProduced": 1,
@@ -697,7 +697,8 @@
       "020": 2,
       "061": 3,
       "073": 5
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "075": {
     "Name": "Gold Ore",
@@ -717,7 +718,8 @@
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "075": 4
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "077": {
     "Name": "Gold Doubloon",
@@ -729,7 +731,8 @@
     "CraftingProduced": 25,
     "CraftingRecipe": {
       "076": 1
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "078": {
     "Name": "Raw Essence of Horror",
@@ -750,7 +753,8 @@
     "CraftingRecipe": {
       "039": 1,
       "078": 1
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "080": {
     "Name": "Cursed Inferno Spikes",
@@ -763,7 +767,8 @@
     "CraftingRecipe": {
       "074": 1,
       "079": 2
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "081": {
     "Name": "Chromium Drill",
@@ -775,7 +780,8 @@
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "061": 15
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "082": {
     "Name": "Infernite Drill",
@@ -788,7 +794,8 @@
     "CraftingRecipe": {
       "070": 2,
       "073": 4
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "083": {
     "Name": "Pendant of Fortune",
@@ -801,6 +808,36 @@
     "CraftingRecipe": {
       "049": 1,
       "076": 1
+    },
+    "CraftingStationRequired": 2
+  },
+  "084": {
+    "Name": "Big Bottle Rocket",
+    "Price": 96.00,
+    "Description": "An large explosive plastic bottle that can be used as a weapon. Consumable. Requires a weapon to be launched.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "012": 3,
+      "013": 3,
+      "015": 4,
+      "016": 3
     }
+  },
+  "085": {
+    "Name": "Bottle Rocket Launcher",
+    "Price": 290.00,
+    "Description": "A device capable of launching Big Bottle Rockets. Fires normal Bottle Rockets with increased damage.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "059": 1,
+      "061": 6,
+      "070": 4
+    },
+    "CraftingStationRequired": 2
   }
 }

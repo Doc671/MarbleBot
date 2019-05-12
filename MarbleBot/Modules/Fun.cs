@@ -20,7 +20,8 @@ namespace MarbleBot.Modules
 #pragma warning restore IDE0060 // Remove unused parameter
         {
             await Context.Channel.TriggerTypingAsync();
-            string outcome = Global.Rand.Next(0, 13) switch {
+            string outcome = Global.Rand.Next(0, 13) switch
+            {
                 0 => "no.",
                 1 => "looking negative.",
                 2 => "probably not.",
@@ -47,13 +48,17 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var user = GetUser(Context);
             string msg;
-            if (user.Items.ContainsKey(66) || user.Items.ContainsKey(71) || user.Items.ContainsKey(74) || user.Items.ContainsKey(80))
+            if (user.Items.ContainsKey(78))
+                msg = new StringBuilder().Append("Combine the terror-inducing essence of the bosses you have just ")
+                    .Append("defeated with another similar, yet different liquid. Be careful with the product.")
+                    .ToString();
+            else if (user.Items.ContainsKey(66) || user.Items.ContainsKey(71) || user.Items.ContainsKey(74) || user.Items.ContainsKey(80))
                 msg = new StringBuilder().Append("Your equipment will prove very useful in the upcoming battles.")
                     .Append("Seek the Chest of sentience and the Scary Face to test your newfound power.")
                     .ToString();
             else if (user.Items.ContainsKey(81))
                 msg = new StringBuilder().Append("There is a way to increase the offensive capabilities of a marble.")
-                    .Append("Form a covering of spikes, made of iron, steel, infernite or even the accursed blazes.")
+                    .Append("Form a covering of spikes, made of iron, steel or even infernite.")
                     .ToString();
             else if (user.Items.ContainsKey(63))
                 msg = new StringBuilder().Append("The world now contains a plethora of treasures for you to gather.")
@@ -69,8 +74,8 @@ namespace MarbleBot.Modules
                     .ToString();
             else if (user.Items.ContainsKey(53) && user.Items.ContainsKey(57))
                 msg = new StringBuilder().Append("You have done very well, and have forged the best with the resources available ")
-                    .Append("to you. There is more to this world, however. Gather your allies and seek the cyborg Destroyer.")
-                    .AppendLine("\n\nDestiny awaits. This mechanical abomination must be put to an end.")
+                    .AppendLine("to you. There is more to this world, however. Gather your allies and seek the cyborg Destroyer.")
+                    .AppendLine("\nDestiny awaits. This mechanical abomination must be put to an end.")
                     .ToString();
             else if (user.Items.ContainsKey(53))
                 msg = new StringBuilder().Append("The Trebuchet Array is a potent weapon, albeit rather inaccurate. To assist ")
@@ -82,14 +87,14 @@ namespace MarbleBot.Modules
                     .ToString();
             else if (user.LastScavenge.DayOfYear != 1 || user.LastScavenge.Year != 2019)
                 msg = new StringBuilder().Append("The items you have gathered are likely unable to be used in their current form. ")
-                    .Append("You must find a way to obtain a Crafting Station.")
+                    .AppendLine("You must find a way to obtain a Crafting Station.")
                     .ToString();
             else if (user.NetWorth > 1000)
                 msg = new StringBuilder().Append("Well done. Your next goal is to gather for items at Canary Beach and Tree Wurld.")
                     .Append("Use `mb/scavenge help` if you are unsure of how to proceed.")
                     .ToString();
             else msg = new StringBuilder().Append($"Welcome! Your first task is to gain {Global.UoM}1000! If you need help ")
-                    .Append("earning money, try using `mb/daily`, `mb/race help` or `mb/siege help`.")
+                    .Append("earning money, try using `mb/daily`, `mb/race` or `mb/siege`.")
                     .ToString();
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -101,18 +106,18 @@ namespace MarbleBot.Modules
 
         [Command("best")]
         [Summary("Picks a random person to call the best.")]
+        [RequireContext(ContextType.Guild)]
         public async Task BestCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (!(Context.IsPrivate)) {
-                if (Context.Guild.MemberCount > 1) {
-                    string[] names = new string[Context.Guild.MemberCount];
-                    SocketGuildUser[] users = Context.Guild.Users.ToArray();
-                    for (int i = 0; i < Context.Guild.MemberCount - 1; i++)
-                        names[i] = users[i].Username;
-                    await ReplyAsync($"**{names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
-                }
-            } else await ReplyAsync("That command doesn't work here!");
+            if (Context.Guild.MemberCount > 1)
+            {
+                string[] names = new string[Context.Guild.MemberCount];
+                SocketGuildUser[] users = Context.Guild.Users.ToArray();
+                for (int i = 0; i < Context.Guild.MemberCount - 1; i++)
+                    names[i] = users[i].Username;
+                await ReplyAsync($"**{names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
+            }
         }
 
         [Command("bet")]
@@ -124,9 +129,11 @@ namespace MarbleBot.Modules
             if (noOfMarbles > 100) await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
             else if (noOfMarbles < 1) await ReplyAsync("The number you gave is too small.");
             string[,] marbles = new string[10, 10];
-            using (StreamReader stream = new StreamReader("Resources\\Marbles.csv")) {
+            using (StreamReader stream = new StreamReader("Resources\\Marbles.csv"))
+            {
                 int a = 0;
-                while (!stream.EndOfStream) {
+                while (!stream.EndOfStream)
+                {
                     string[] row = stream.ReadLine().Split(',');
                     for (int b = 0; b < row.Length - 1; b++)
                         marbles[a, b] = row[b];
@@ -145,7 +152,8 @@ namespace MarbleBot.Modules
         public async Task BuyHatCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (Context.Guild.Id != CM) {
+            if (Context.Guild.Id != CM)
+            {
                 await Context.Channel.TriggerTypingAsync();
                 var price = Global.Rand.Next(0, int.MaxValue);
                 var hatNo = Global.Rand.Next(0, 69042);
@@ -160,13 +168,16 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             string[] choices = input.Split('|');
             int choice = Global.Rand.Next(0, choices.Length);
-            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(choices[choice]))) {
-                if (Context.IsPrivate) {
+            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(choices[choice])))
+            {
+                if (Context.IsPrivate)
+                {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
                 else await Log($"Profanity detected: {input}");
-            } else await ReplyAsync($"**{Context.User.Username} **, I choose **{choices[choice].Trim()}**!");
+            }
+            else await ReplyAsync($"**{Context.User.Username} **, I choose **{choices[choice].Trim()}**!");
         }
 
         [Command("orange")]
@@ -176,15 +187,15 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             int choice = Global.Rand.Next(1, 6);
-            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC)
-                await ReplyAsync(choice switch {
-                    1 => "!olleH",
-                    2 => "!raotS taH ehT owt oG",
-                    3 => "!pooS puoP knirD",
-                    4 => ".depfeQ ,ytiC ogitreV ni evil I",
-                    5 => "!haoW",
-                    _ => "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"
-                });
+            await ReplyAsync(choice switch
+            {
+                1 => "!olleH",
+                2 => "!raotS taH ehT owt oG",
+                3 => "!pooS puoP knirD",
+                4 => ".depfeQ ,ytiC ogitreV ni evil I",
+                5 => "!haoW",
+                _ => "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"
+            });
         }
 
         [Command("orangeify")]
@@ -195,20 +206,21 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var orangeified = new StringBuilder();
             int length = input.Length - 1;
-            while (length >= 0) {
+            while (length >= 0)
+            {
                 orangeified.Append(input[length]);
                 length--;
             }
-            if (Context.IsPrivate || Context.Guild.Id == THS || Context.Guild.Id == MT || Context.Guild.Id == VFC) {
-                if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(orangeified.ToString()))) {
-                    if (Context.IsPrivate) {
-                        IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                        await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                    } else await Log($"Profanity detected: {input}");
-                } else {
-                    await ReplyAsync(orangeified.ToString());
+            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(orangeified.ToString())))
+            {
+                if (Context.IsPrivate)
+                {
+                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
+                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
+                else await Log($"Profanity detected: {input}");
             }
+            else await ReplyAsync(orangeified.ToString());
         }
 
         [Command("random")]
@@ -219,19 +231,28 @@ namespace MarbleBot.Modules
             var start = rStart.ToInt();
             var end = rEnd.ToInt();
             if (start < 0 || end < 0) await ReplyAsync("Only use positive numbers!");
-            else if (start > end) {
-                try {
+            else if (start > end)
+            {
+                try
+                {
                     int randNumber = Global.Rand.Next(end, start);
                     await ReplyAsync(randNumber.ToString());
-                } catch (FormatException) {
+                }
+                catch (FormatException)
+                {
                     await ReplyAsync("Number too large/small.");
                     throw;
                 }
-            } else {
-                try {
+            }
+            else
+            {
+                try
+                {
                     int randNumber = Global.Rand.Next(start, end);
                     await ReplyAsync(randNumber.ToString());
-                } catch (FormatException) {
+                }
+                catch (FormatException)
+                {
                     await ReplyAsync("Number too large/small.");
                     throw;
                 }
@@ -245,48 +266,21 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             EmbedBuilder builder = new EmbedBuilder();
             byte level = Convert.ToByte(Global.Rand.Next(0, 25));
-            int xp = 0;
-
-            switch (level) {
-                case 0: xp = Global.Rand.Next(0, 99); break;
-                case 1: xp = Global.Rand.Next(100, 254); break;
-                case 2: xp = Global.Rand.Next(255, 474); break;
-                case 3: xp = Global.Rand.Next(475, 769); break;
-                case 4: xp = Global.Rand.Next(770, 1149); break;
-                case 5: xp = Global.Rand.Next(1150, 1624); break;
-                case 6: xp = Global.Rand.Next(1625, 2204); break;
-                case 7: xp = Global.Rand.Next(2205, 2899); break;
-                case 8: xp = Global.Rand.Next(2900, 3719); break;
-                case 9: xp = Global.Rand.Next(3720, 4674); break;
-                case 10: xp = Global.Rand.Next(4674, 5774); break;
-                case 11: xp = Global.Rand.Next(5575, 7029); break;
-                case 12: xp = Global.Rand.Next(7030, 8449); break;
-                case 13: xp = Global.Rand.Next(8450, 10044); break;
-                case 14: xp = Global.Rand.Next(10045, 11824); break;
-                case 15: xp = Global.Rand.Next(11825, 13799); break;
-                case 16: xp = Global.Rand.Next(13800, 15979); break;
-                case 17: xp = Global.Rand.Next(15980, 18374); break;
-                case 18: xp = Global.Rand.Next(18735, 20994); break;
-                case 19: xp = Global.Rand.Next(20995, 23849); break;
-                case 20: xp = Global.Rand.Next(23850, 26949); break;
-                case 21: xp = Global.Rand.Next(26950, 30304); break;
-                case 22: xp = Global.Rand.Next(30305, 33924); break;
-                case 23: xp = Global.Rand.Next(33925, 37819); break;
-                case 24: xp = Global.Rand.Next(37820, 41999); break;
-                case 25: xp = Global.Rand.Next(42000, 46474); break;
-            }
+            int xp = level * 100 * Global.Rand.Next(1, 5);
 
             var msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
             byte ranks = 0;
 
-            foreach (IMessage msg in msgs) {
+            foreach (IMessage msg in msgs)
+            {
                 if (msg != null && msg.Content == "mb/rank" && msg.Author == Context.Message.Author)
                     ranks++;
                 else if (msg == null)
                     break;
             }
 
-            var flavour = ranks switch {
+            var flavour = ranks switch
+            {
                 1 => "Pretty cool, right?",
                 2 => "100% legitimate",
                 3 => "I have a feeling you doubt me. Why is that?",
@@ -342,9 +336,7 @@ namespace MarbleBot.Modules
                 case "egnaro": rating = 10; message = "!egnarO"; break;
                 case "erango": rating = 0; message = "stoP noW"; break;
                 case "marblebot's creator":
-                case "marblebot's dad":
-                case "my creator":
-                case "my dad": input = "Doc671"; goto case "doc671";
+                case "my creator": input = "Doc671"; goto case "doc671";
                 case "orange": goto case "egnaro";
                 case "orange day": rating = 10; message = "!yaD egnarO"; break;
                 case "poos puop": rating = 10; message = "!pooS puoP knirD"; break;
@@ -358,32 +350,32 @@ namespace MarbleBot.Modules
                 case "yad egnaro": goto case "orange day";
                 default: rating = Global.Rand.Next(0, 11); break;
             }
-            switch (input.ToLower()) {
+            switch (input.ToLower())
+            {
                 // These have custom messages but no preset ratings:
                 case "blueice57": message = "icccce"; break;
                 case "confusial": message = "I Am In Confusial Why"; break;
+                case "dann": message = "you guys, are a rat kids"; break;
                 case "eknimpie": message = "EKNIMPIE YOUR A RAXIST"; break;
-                case "flam": message = "Am Flam Flam Flam Flam Flam Flam"; break;
-                case "flame": goto case "flam";
-                case "flamevapour": goto case "flam";
+                case "flam":
+                case "flame":
+                case "flamevapour": message = "Am Flam Flam Flam Flam Flam Flam"; break;
                 case "flurp": message = "FLURP I TO SIGN UP AND NOT BE"; break;
                 case "george012": message = "henlo jorj"; break;
                 case "icce": goto case "blueice57";
                 case "+inf": message = "marbles will realize in +inf"; break;
-                case "jgeoroegeos": goto case "george012";
-                case "john": message = "Algodoo Marble for TROC!"; break;
-                case "john dubuc": goto case "john";
+                case "jgeoroegeos":
                 case "jorj": goto case "george012";
-                case "ken": message = "#kenismelmon"; break;
-                case "kenlimepie": goto case "ken";
-                case "keylimepie": goto case "ken";
+                case "ken":
+                case "kenlimepie":
+                case "keylimepie": message = "#kenismelmon"; break;
                 case "luka": message = "LUKA\nYOU BLUMT"; break;
                 case "marblebot": input = "myself"; goto case "myself";
                 case "myself": message = "who am I?"; break;
-                case "matheus": message = "marbles will realize in +inf"; break;
-                case "matheus fazzion": goto case "matheus";
-                case "meadow": message = "somebody toucha mei doe"; break;
-                case "mei doe": goto case "meadow";
+                case "matheus":
+                case "matheus fazzion": message = "marbles will realize in +inf"; break;
+                case "meadow":
+                case "mei doe": message = "somebody toucha mei doe"; break;
                 case "melmon": message = "Whyn Arey Yoou A Melmon"; break;
                 case "no u": message = "No Your"; break;
                 case "no your": message = "No You're"; break;
@@ -394,15 +386,9 @@ namespace MarbleBot.Modules
                 case "shotgun": message = "Vinh Shotgun All"; break;
                 case "you silly desk": message = "Now I\nCry"; break;
             }
-            // Dann Annoy Me >:((((
-            if (input.ToLower() == "dann" || input.ToLower() == "danny playz") {
-                int choice = Global.Rand.Next(0, 2);
-                if (choice == 1) message = "you guys, are a rat kids";
-                else message = "I don’t know who you are I don’t know what you want but if I don’t get my t-shirt tomorrow i will find you and I will rob you.";
-                rating = Global.Rand.Next(9, 11);
-            }
 
-            string emoji = rating switch {
+            string emoji = rating switch
+            {
                 -999 => ":gun: :dagger: :bomb:",
                 -1 => ":gun:",
                 0 => ":no_entry_sign:",
@@ -419,8 +405,10 @@ namespace MarbleBot.Modules
                 11 => ":heart:",
                 _ => ":thinking:",
             };
-            if (message == "") {
-                switch (rating) {
+            if (message == "")
+            {
+                switch (rating)
+                {
                     // If there isn't already a custom message, pick one depending on rating:
                     case 0: message = "Excuse me, kind user, please cease your current course of action immediately."; break;
                     case 1: message = "Immediate desistance required."; break;
@@ -437,12 +425,16 @@ namespace MarbleBot.Modules
                 }
             }
             if (rating == -2) await ReplyAsync($"**{Context.User.Username}**, I rATE {input} UNd3FINED10. {emoji}\n({message})");
-            else {
-                if (await Moderation.CheckSwearAsync(input)) {
-                    if (Context.IsPrivate) {
+            else
+            {
+                if (await Moderation.CheckSwearAsync(input))
+                {
+                    if (Context.IsPrivate)
+                    {
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                    } else await Log($"Profanity detected: {input}");
+                    }
+                    else await Log($"Profanity detected: {input}");
                 }
                 else await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
             }
@@ -453,15 +445,20 @@ namespace MarbleBot.Modules
         public async Task RepeatCommandAsync([Remainder] string repeat)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (repeat == "Am Melmon" && (Context.Guild.Id == THS || Context.Guild.Id == MT)) {
+            if (repeat == "Am Melmon" && (Context.Guild.Id == THS || Context.Guild.Id == MT))
+            {
                 await ReplyAsync("No U");
-            } else if (await Moderation.CheckSwearAsync(repeat)) {
-                if (Context.IsPrivate) {
+            }
+            else if (await Moderation.CheckSwearAsync(repeat))
+            {
+                if (Context.IsPrivate)
+                {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
                 else await Log($"Profanity detected: {repeat}");
-            } else await ReplyAsync(repeat);
+            }
+            else await ReplyAsync(repeat);
         }
 
         [Command("reverse")]
@@ -472,16 +469,21 @@ namespace MarbleBot.Modules
             // Another version of orangeify, but for CM (can secretly be used elsewhere)
             var reverse = new StringBuilder();
             int length = input.Length - 1;
-            while (length >= 0) {
+            while (length >= 0)
+            {
                 reverse.Append(input[length]);
                 length--;
             }
-            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(reverse.ToString()))) {
-                if (Context.IsPrivate) {
+            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(reverse.ToString())))
+            {
+                if (Context.IsPrivate)
+                {
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                } else await Log($"Profanity detected: {input}");
-            } else await ReplyAsync(reverse.ToString());
+                }
+                else await Log($"Profanity detected: {input}");
+            }
+            else await ReplyAsync(reverse.ToString());
         }
 
         [Command("vinhglish")]
@@ -495,9 +497,12 @@ namespace MarbleBot.Modules
             var invList = new string[100];
             var descList = new string[100];
             int a = 0;
-            if (word == "") {
-                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv")) {
-                    while (!stream.EndOfStream) {
+            if (word == "")
+            {
+                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv"))
+                {
+                    while (!stream.EndOfStream)
+                    {
                         string list = stream.ReadLine();
                         string[] vocab = list.Split(',');
                         wordList[a] = vocab[0];
@@ -507,28 +512,31 @@ namespace MarbleBot.Modules
                     }
                 }
                 randNo = Global.Rand.Next(1, a);
-            } else {
-                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv")) {
-                    while (!stream.EndOfStream) {
+            }
+            else
+            {
+                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv"))
+                {
+                    while (!stream.EndOfStream)
+                    {
                         string list = stream.ReadLine();
                         string[] vocab = list.Split(',');
                         wordList[a] = vocab[0];
                         invList[a] = vocab[1];
                         descList[a] = vocab[2];
-                        if (wordList[a].ToLower() == word.ToLower()) {
+                        if (wordList[a].ToLower() == word.ToLower())
+                        {
                             randNo = a;
                             stream.Close();
                             wordSet = true;
                             break;
                         }
-                        //JGeoroegeos
                         a++;
                     }
                     if (!wordSet) randNo = Global.Rand.Next(1, a);
                 }
             }
-            if (Context.IsPrivate || Context.Guild.Id != CM)
-                await ReplyAsync($"**__{wordList[randNo]}__**\nInventor: {invList[randNo]}\nDescription: {descList[randNo]}");
+            await ReplyAsync($"**__{wordList[randNo]}__**\nInventor: {invList[randNo]}\nDescription: {descList[randNo]}");
         }
     }
 }

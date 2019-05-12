@@ -60,13 +60,13 @@
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png",
     "Attacks": [
       {
-        "Name": "DonationBox",
+        "Name": "Donation Box",
         "Damage": 5,
         "Accuracy": 45,
         "StatusEffect": 0
       },
       {
-        "Name": "CryForHelp",
+        "Name": "Cry For Help",
         "Damage": 0,
         "Accuracy": 40,
         "StatusEffect": 1

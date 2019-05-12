@@ -14,6 +14,23 @@ namespace MarbleBot.Modules
     /// <summary> Utility commands. </summary>
     public class Utility : MarbleBotModule
     {
+        [Command("botinfo")]
+        [Alias("info")]
+        [Summary("Shows bot info.")]
+        public async Task BotInfoCommandAsync()
+            => await ReplyAsync(embed: new EmbedBuilder()
+                .AddField("Daily Timeout", $"{Global.DailyTimeout} hours", true)
+                .AddField("Ongoing Races", Global.RaceAlive.Count, true)
+                .AddField("Ongoing Scavenges", Global.ScavengeSessions.Count, true)
+                .AddField("Ongoing Sieges", Global.SiegeInfo.Count, true)
+                .AddField("Start Time (UTC)", Global.StartTime.ToString("yyyy-MM-dd hh:mm:ss"), true)
+                .AddField("Uptime", DateTime.UtcNow.Subtract(Global.StartTime).ToString(), true)
+                .WithAuthor(Context.Client.CurrentUser)
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator}")
+                .Build());
+
         [Command("help")]
         [Alias("cmds")]
         [Summary("Gives the user help.")]
@@ -23,10 +40,13 @@ namespace MarbleBot.Modules
             var builder = new EmbedBuilder()
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context));
-            switch (command.ToLower()) {
+            switch (command.ToLower())
+            {
                 case "":
-                    builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube")
-                        .WithDescription("*by Doc671#1965*\n\nUse mb/help followed by the name of a module or a command for more info, or mb/help full for the old help menu.")
+                    if (Context.Guild.CurrentUser.GuildPermissions.ManageMessages)
+                        builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
+                    else builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube");
+                    builder.WithDescription("*by Doc671#1965*\n\nUse `mb/help` followed by the name of a module or a command for more info, or `mb/help full` for the old help menu.")
                         .WithTitle("MarbleBot Help");
                     await ReplyAsync(embed: builder.Build());
                     break;
@@ -34,12 +54,15 @@ namespace MarbleBot.Modules
                     var allCmds = new StringBuilder();
                     var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => c.Module.Name.ToLower() == command.ToLower())
                         .OrderBy(c => c.Name);
-                    if (!Context.IsPrivate) {
+                    if (!Context.IsPrivate)
+                    {
                         if (Context.Guild.Id == CM) commands = commands.Where(c => c.Remarks != "Not CM");
                         else commands = commands.Where(c => c.Remarks != "CM Only");
-                    } else commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
+                    }
+                    else commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
                     if (GetUser(Context).Stage < 2) commands = commands.Where(c => c.Remarks != "Stage2");
-                    foreach (var cmd in commands) {
+                    foreach (var cmd in commands)
+                    {
                         var name = cmd.Name.IsEmpty() ? "help" : cmd.Name;
                         allCmds.AppendLine($"**{name}** - {cmd.Summary}");
                     }
@@ -67,22 +90,29 @@ namespace MarbleBot.Modules
                 case "siege":
                 case "utility":
                 case "youtube": goto case "economy";
+                case "moderation":
+                    if (Context.Guild.CurrentUser.GuildPermissions.ManageMessages) goto case "economy";
+                    else break;
                 case "yt":
                     command = "youtube";
                     goto case "economy";
-                case "full": 
+                case "full":
                     builder.AddField("MarbleBot Help", "*by Doc671#1965*\nUse mb/help followed by a command name for more info!")
                         .WithTimestamp(DateTime.UtcNow);
-                    if (Context.IsPrivate) {
+                    if (Context.IsPrivate)
+                    {
                         builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
                         .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
                         .AddField("Utility Commands", "help (gives command help)\nuptime (shows how long the bot has been running)")
                         .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
                         .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)")
                         .WithColor(Color.DarkerGrey);
-                    } else {
+                    }
+                    else
+                    {
                         builder.WithColor(GetColor(Context));
-                        switch (Context.Guild.Id) {
+                        switch (Context.Guild.Id)
+                        {
                             case CM:
                                 builder.AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)")
                                     .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
@@ -105,15 +135,19 @@ namespace MarbleBot.Modules
                     break;
                 default:
                     var hCommand = new HelpCommand();
-                    try {
+                    try
+                    {
                         var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower()).First();
                         hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
-                    } catch (NullReferenceException ex) {
+                    }
+                    catch (NullReferenceException ex)
+                    {
                         await Log(ex.ToString());
                     }
                     string THSOnly = "This command cannot be used in Community Marble!";
-                    switch (command) {
-                        // General
+                    switch (command)
+                    {
+                        // Fun
                         case "7ball": hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
                         case "bet": hCommand.Usage = "mb/bet [number of marbles]"; hCommand.Example = "mb/bet 30"; break;
                         case "buyhat": hCommand.Warning = THSOnly; break;
@@ -141,6 +175,12 @@ namespace MarbleBot.Modules
                         case "sell": hCommand.Usage = "mb/sell <item ID> <# of items>"; hCommand.Example = "mb/sell 1 1"; break;
                         case "use": hCommand.Usage = "mb/use <item ID>"; break;
 
+                        // Moderation
+                        case "addrole": hCommand.Usage = "mb/addrole <role name>"; break;
+                        case "clearchannel": hCommand.Usage = "mb/clearchannel <announcement/autoresponse/usable>"; break;
+                        case "removerole": hCommand.Usage = "mb/removerole <role name>"; break;
+                        case "setchannel": hCommand.Usage = "mb/setchannel <announcement/autoresponse/usable> <channel ID>"; break;
+
                         // Roles
                         case "give": hCommand.Usage = "mb/give <role>"; hCommand.Example = "mb/give Owner"; break;
                         case "role": hCommand.Usage = "mb/role <role>"; hCommand.Example = "mb/role Bots"; break;
@@ -153,12 +193,14 @@ namespace MarbleBot.Modules
                         case "searchvideo": hCommand.Usage = "mb/searchvideo <videoname>"; hCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
                     }
 
-                    if (!hCommand.Desc.IsEmpty()) {
+                    if (!hCommand.Desc.IsEmpty())
+                    {
                         builder.WithDescription(hCommand.Desc)
                             .AddField("Usage", $"`{hCommand.Usage}`")
                             .WithTitle($"MarbleBot Help: **{hCommand.Name[0].ToString().ToUpper() + string.Concat(hCommand.Name.Skip(1))}**");
 
-                        if (hCommand.Aliases.Length > 1) {
+                        if (hCommand.Aliases.Length > 1)
+                        {
                             var aliases = new StringBuilder();
                             foreach (var alias in hCommand.Aliases)
                                 aliases.AppendLine($"`mb/{alias}`");
@@ -169,10 +211,22 @@ namespace MarbleBot.Modules
                         if (!hCommand.Warning.IsEmpty()) builder.AddField("Warning", $":warning: {hCommand.Warning}");
 
                         await ReplyAsync(embed: builder.Build());
-                    } else await ReplyAsync("Could not find requested command!");
+                    }
+                    else await ReplyAsync("Could not find requested command!");
                     break;
             }
         }
+
+        [Command("invite")]
+        [Alias("invitelink")]
+        [Summary("Gives the bot's invite link.")]
+        public async Task InviteCommandAsync() => await ReplyAsync(new StringBuilder()
+                .AppendLine("Use this link to invite MarbleBot to your server: https://discordapp.com/oauth2/authorize?client_id=286228526234075136&scope=bot&permissions=1")
+                .Append("\nUse `mb/setchannel announcement <channel ID>` to set the channel where bot updates get posted, ")
+                .Append("`mb/setchannel autoresponse <channel ID>` to set the channel where autoresponses can be used and ")
+                .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used!")
+                .Append("If no usable channel is set, commands can be used anywhere.")
+                .ToString());
 
         [Command("serverinfo")]
         [Summary("Displays information about the current server.")]
@@ -180,7 +234,8 @@ namespace MarbleBot.Modules
         public async Task ServerInfoCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (!Context.IsPrivate) {
+            if (!Context.IsPrivate)
+            {
                 EmbedBuilder builder = new EmbedBuilder();
                 int botUsers = 0;
                 int onlineUsers = 0;
@@ -192,6 +247,7 @@ namespace MarbleBot.Modules
                 }
 
                 var owner = Context.Guild.GetUser(Context.Guild.OwnerId);
+                var mbServer = GetServer(Context);
 
                 builder.WithThumbnailUrl(Context.Guild.IconUrl)
                     .WithTitle(Context.Guild.Name)
@@ -201,177 +257,123 @@ namespace MarbleBot.Modules
                     .AddField("Voice Channels", Context.Guild.VoiceChannels.Count, true)
                     .AddField("Members", Context.Guild.Users.Count, true)
                     .AddField("Bots", botUsers, true)
-                    .AddField("Online", onlineUsers)
+                    .AddField("Online", onlineUsers, true)
                     .AddField("Roles", Context.Guild.Roles.Count, true)
+                    .AddField("Embed", mbServer.Color.ToString(), true)
                     .WithColor(GetColor(Context))
                     .WithTimestamp(DateTime.UtcNow)
                     .WithFooter(Context.Guild.Id.ToString());
+
+                if (mbServer.AnnouncementChannel != 0)
+                    builder.AddField("Announcement Channel", $"<#{mbServer.AnnouncementChannel}>", true);
+
+                if (mbServer.AutoresponseChannel != 0)
+                    builder.AddField("Autoresponse Channel", $"<#{mbServer.AutoresponseChannel}>", true);
+
+                if (mbServer.UsableChannels.Count != 0)
+                {
+                    var output = new StringBuilder();
+                    foreach (var channel in mbServer.UsableChannels)
+                        output.AppendLine($"<#{channel}>");
+                    builder.AddField("Usable Channels", output.ToString(), true);
+                }
+
                 await ReplyAsync(embed: builder.Build());
-            } else await ReplyAsync("This is a DM, not a server!");
+            }
+            else await ReplyAsync("This is a DM, not a server!");
         }
 
         [Command("staffcheck")]
         [Summary("Displays a list of all staff members and their statuses.")]
         [Remarks("Not DMs")]
+        [RequireContext(ContextType.Guild)]
         public async Task StaffCheckCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            if (!Context.IsPrivate) {
-                IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                if (Context.Guild.Id == CM) {
-                    IGuildUser Erikfassett = Context.Guild.GetUser(161258738429329408);
-                    IGuildUser JohnDubuc = Context.Guild.GetUser(161247044713840642);
-                    IGuildUser TAR = Context.Guild.GetUser(186652039126712320);
-                    IGuildUser Algorox = Context.Guild.GetUser(323680030724980736);
-                    IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
-                    IGuildUser[] users = { Doc671, Erikfassett, JohnDubuc, TAR, Algorox, FlameVapour };
-                    string[] nicks = new string[users.Length];
-                    string[] statuses = new string[users.Length];
-                    int h = 0;
-                    foreach (var user in users) {
-                        nicks[h] = user.Nickname;
-                        statuses[h] = user.Status.ToString();
-                        h++;
-                    }
-                    for (int i = 0; i < users.Length - 1; i++) {
-                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
-                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
-                    }
-                    var output = new StringBuilder();
-                    output.Append($"**__Admins:__** \n{nicks[0]} ({users[0].Username}#{users[0].Discriminator}): **{statuses[0]}**");
-                    output.Append($"**\n{nicks[1]} ({users[1].Username}#{users[1].Discriminator}): **{statuses[1]}**");
-                    output.Append($"**\n{nicks[2]} ({users[2].Username}#{users[2].Discriminator}): **{statuses[2]}**");
-                    output.Append($"**\n{nicks[3]} ({users[3].Username}#{users[3].Discriminator}): **{statuses[3]}**");
-                    output.Append($"\n\n**__Mods:__** \n{nicks[4]} ({users[4].Username}#{users[4].Discriminator}): **{statuses[4]}**");
-                    output.Append($"**\n{nicks[5]} ({users[5].Username}#{users[5].Discriminator}): **{statuses[5]}**");
-                    await ReplyAsync(output.ToString());
-                } else if (Context.Guild.Id == THS) {
-                    IGuildUser FlameVapour = Context.Guild.GetUser(193247613095641090);
-                    IGuildUser DannyPlayz = Context.Guild.GetUser(329532528031563777);
-                    IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
-                    IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
-                    IGuildUser[] users = { Doc671, FlameVapour, DannyPlayz, George012, Kenlimepie };
-                    string[] nicks = new string[users.Length];
-                    string[] statuses = new string[users.Length];
-                    int h = 0;
-                    foreach (var user in users) {
-                        nicks[h] = user.Nickname;
-                        statuses[h] = user.Status.ToString();
-                        h++;
-                    }
-                    for (int i = 0; i < users.Length - 1; i++) {
-                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
-                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
-                    }
-                    var output = new StringBuilder();
-                    output.Append($"**__Overlords:__** \n{nicks[0]} ({users[0].Username}#{users[0].Discriminator}): **{statuses[0]}**");
-                    output.Append($"**\n{nicks[1]} ({users[1].Username}#{users[1].Discriminator}): **{statuses[1]}**");
-                    output.Append($"\n\n**__Hat Stoar Employees:__** \n{nicks[2]} ({users[2].Username}#{users[2].Discriminator}): **{statuses[2]}**");
-                    output.Append($"**\n{nicks[3]} ({users[3].Username}#{users[3].Discriminator}): **{statuses[3]}**");
-                    output.Append($"**\n{nicks[4]} ({users[4].Username}#{users[4].Discriminator}): **{statuses[4]}**");
-                    await ReplyAsync(output.ToString());
-                } else if (Context.Guild.Id == MT) {
-                    IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
-                    IGuildUser[] users = { Doc671, George012 };
-                    string[] nicks = { users[0].Nickname, users[1].Nickname, };
-                    string[] statuses = { users[0].Status.ToString(), users[1].Status.ToString() };
-                    for (int i = 0; i < users.Length; i++) {
-                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
-                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
-                    }
-                    await ReplyAsync($"{nicks[0]} ({users[0].Username}#{users[0].Discriminator}): **{statuses[0]}**\n{nicks[1]} ({users[1].Username}#{users[1].Discriminator}): **{statuses[1]}**");
-                } else if (Context.Guild.Id == VFC) {
-                    IGuildUser Vinh = Context.Guild.GetUser(311360247740760064);
-                    IGuildUser George012 = Context.Guild.GetUser(232618363975630849);
-                    IGuildUser Kenlimepie = Context.Guild.GetUser(195529549855850496);
-                    IGuildUser Meadow = Context.Guild.GetUser(370463333763121152);
-                    IGuildUser Ayumi = Context.Guild.GetUser(189713815414374404);
-                    IGuildUser BlueIce57 = Context.Guild.GetUser(310960432909254667);
-                    IGuildUser Miles = Context.Guild.GetUser(170804546438692864);
-                    IGuildUser[] users = { Vinh, Kenlimepie, Doc671, George012, Meadow, Ayumi, BlueIce57, Miles };
-                    string[] nicks = new string[users.Length];
-                    string[] statuses = new string[users.Length];
-                    int h = 0;
-                    foreach (var user in users) {
-                        nicks[h] = user.Nickname;
-                        statuses[h] = user.Status.ToString();
-                        h++;
-                    }
-                    for (int i = 0; i < users.Length - 1; i++) {
-                        if (nicks[i].IsEmpty()) nicks[i] = users[i].Username;
-                        if (statuses[i] == "DoNotDisturb") statuses[i] = "Do Not Disturb";
-                    }
-                    var output = new StringBuilder();
-                    output.Append($"**__Owner:__** \n{nicks[0]} ){users[0].Username}#{users[0].Discriminator}): **{statuses[0]}");
-                    output.Append($"**\n\n**__Co-owners:__** \n{nicks[1]} ({users[1].Username}#{users[1].Discriminator}): **{statuses[1]}");
-                    output.Append($"**\n{nicks[2]} ({users[2].Username}#{users[2].Discriminator}): **{statuses[2]}");
-                    output.Append($"\n\n**__Admins:__** \n{nicks[3]} ({users[3].Username}#{users[3].Discriminator}): **{statuses[3]}");
-                    output.Append($"**\n{nicks[4]} ({users[4].Username}#{users[4].Discriminator}): **{statuses[4]}");
-                    output.Append($"\n\n**__Mods:__** \n{nicks[5]} ({users[5].Username}#{users[5].Discriminator}): **{statuses[5]}");
-                    output.Append($"**\n{nicks[6]} ({users[6].Username}#{users[6].Discriminator}): **{statuses[6]}");
-                    output.Append($"**\n{nicks[7]} ({users[7].Username}#{users[7].Discriminator}): **{statuses[7]}");
-                    await ReplyAsync(output.ToString());
+            var output = new StringBuilder();
+            foreach (var user in Context.Guild.Users)
+            {
+                if (user.GuildPermissions.ManageMessages)
+                {
+                    var status = user.Status switch
+                    {
+                        UserStatus.AFK => "Idle",
+                        UserStatus.DoNotDisturb => "Do Not Disturb",
+                        UserStatus.Idle => "Idle",
+                        UserStatus.Online => "Online",
+                        _ => "Offline"
+                    };
+                    if (user.Nickname.IsEmpty())
+                        output.AppendLine($"{user.Username}#{user.Discriminator}: **{status}**");
+                    else
+                        output.AppendLine($"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
                 }
-            } else await ReplyAsync("There are no staff members in a DM!");
+            }   
         }
 
         [Command("uptime")]
         [Summary("Displays how long the bot has been running for.")]
-        public async Task UptimeCommandAsync() {
-            var timeDiff = DateTime.UtcNow.Subtract(Global.StartTime);
-            await ReplyAsync($"The bot has been running for **{GetDateString(timeDiff)}**.");
-        }
+        public async Task UptimeCommandAsync()
+        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(Global.StartTime))}**.");
 
         [Command("userinfo")]
         [Summary("Displays information about a user.")]
         [Remarks("Not DMs")]
         public async Task UserInfoCommandAsync([Remainder] string username = "")
         {
-            if (!Context.IsPrivate) {
+            if (!Context.IsPrivate)
+            {
                 await Context.Channel.TriggerTypingAsync();
                 EmbedBuilder builder = new EmbedBuilder();
                 SocketGuildUser user = (SocketGuildUser)Context.User;
                 var userFound = true;
                 username = username.ToLower();
-                if (!username.IsEmpty()) {
-                    if (username[0] == '<') {
-                        try {
+                if (!username.IsEmpty())
+                {
+                    if (username[0] == '<')
+                    {
+                        try
+                        {
                             ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID);
                             user = Context.Guild.GetUser(ID);
-                        } catch (NullReferenceException ex) {
+                        }
+                        catch (NullReferenceException ex)
+                        {
                             await Log(ex.ToString());
                             await ReplyAsync("Invalid ID!");
                             userFound = false;
                         }
-                    } else {
-                        try {
-                            user = Context.Guild.Users.Where(u => u.Username.ToLower().Contains(username) 
+                    }
+                    else
+                    {
+                        try
+                        {
+                            user = Context.Guild.Users.Where(u => u.Username.ToLower().Contains(username)
                             || username.Contains(u.Username.ToLower())).FirstOrDefault();
-                        } catch (NullReferenceException ex) {
+                        }
+                        catch (NullReferenceException ex)
+                        {
                             await Log(ex.ToString());
                             await ReplyAsync("Could not find the requested user!");
                             userFound = false;
                         }
                     }
                 }
-                if (userFound) { 
-                    string status = "";
-                    switch (user.Status) {
-                        case UserStatus.Online: status = "Online"; break;
-                        case UserStatus.Idle: status = "Idle"; break;
-                        case UserStatus.DoNotDisturb: status = "Do Not Disturb"; break;
-                        case UserStatus.AFK: status = "Idle"; break;
-                        default: status = "Offline"; break;
-                    }
+                if (userFound)
+                {
+                    string status = user.Status switch
+                    {
+                        UserStatus.Online => "Online",
+                        UserStatus.Idle => "Idle",
+                        UserStatus.DoNotDisturb => "Do Not Disturb",
+                        UserStatus.AFK => "Idle",
+                        _ => "Offline"
+                    };
 
-                    string nickname;
-                    if (user.Nickname.IsEmpty()) nickname = "None";
-                    else nickname = user.Nickname;
-
+                    string nickname = user.Nickname.IsEmpty() ? "None" : user.Nickname;
                     var roles = new StringBuilder();
-                    foreach (var role in user.Roles) {
+                    foreach (var role in user.Roles)
                         roles.AppendLine(role.Name);
-                    }
 
                     builder.WithAuthor(user)
                         .AddField("Status", status, true)

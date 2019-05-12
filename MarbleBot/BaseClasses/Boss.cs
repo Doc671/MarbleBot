@@ -1,15 +1,14 @@
-using System.Collections.Generic;
-using System.Linq;
-
 namespace MarbleBot.BaseClasses
 {
     /// <summary> Represents a boss in a Marble Siege battle. </summary>
-    public class Boss {
+    public class Boss
+    {
         /// <summary> The name of the boss. </summary>
         public string Name { get; set; }
         private int _HP;
         /// <summary> The number of health points the boss currently has. </summary>
-        public int HP {
+        public int HP
+        {
             get { return _HP; }
             set { _HP = value > MaxHP ? MaxHP : value < 1 ? 0 : value; }
         }
@@ -41,7 +40,8 @@ namespace MarbleBot.BaseClasses
         /// <param name="imgUrl"> A URL to the boss' image. </param>
         /// <param name="atks"> The boss' attacks. </param>
         /// <param name="itemDrops"> The items that drop from the boss, the number of them and the chance each one has of dropping. </param>
-        public Boss(string name, int hp, Difficulty diff, byte stage, string imgUrl, Attack[] atks, BossDrops[] itemDrops) {
+        public Boss(string name, int hp, Difficulty diff, byte stage, string imgUrl, Attack[] atks, BossDrops[] itemDrops)
+        {
             Name = name;
             _HP = hp;
             MaxHP = hp;

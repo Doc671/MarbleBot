@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MarbleBot.BaseClasses;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +32,18 @@ namespace MarbleBot.Modules
                 }
                 default: break;
             }
+        }
+        
+        [Command("dailytimeout")]
+        [Alias("dt")]
+        [Summary("Changes daily timeout (in hours).")]
+        [RequireOwner]
+        public async Task DailyTimeoutCommandAsync(string rawHours)
+        {
+            if (ushort.TryParse(rawHours, out ushort hours)) {
+                Global.DailyTimeout = hours;
+                await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");
+            } else await ReplyAsync("Invalid number of hours!");
         }
 
         [Command("melmon")]
@@ -69,25 +82,12 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            ISocketMessageChannel chnl = Context.Client.GetGuild(CM).GetTextChannel(Global.BotChannels[1]);
-            var msg = await chnl.SendMessageAsync("", false, builder.Build());
-            if (major) await msg.PinAsync();
-
-            chnl = Context.Client.GetGuild(THS).GetTextChannel(Global.BotChannels[0]);
-            msg = await chnl.SendMessageAsync("", false, builder.Build());
-            if (major) await msg.PinAsync();
-
-            chnl = Context.Client.GetGuild(THSC).GetTextChannel(Global.BotChannels[2]);
-            msg = await chnl.SendMessageAsync("", false, builder.Build());
-            if (major) await msg.PinAsync();
-
-            chnl = Context.Client.GetGuild(VFC).GetTextChannel(Global.BotChannels[3]);
-            msg = await chnl.SendMessageAsync("", false, builder.Build());
-            if (major) await msg.PinAsync();
-
-            chnl = Context.Client.GetGuild(MT).GetTextChannel(Global.BotChannels[4]);
-            msg = await chnl.SendMessageAsync("", false, builder.Build());
-            if (major) await msg.PinAsync();
+            foreach (MBServer server in Global.Servers)
+            {
+                var channel = Context.Client.GetGuild(server.Id).GetTextChannel(server.AnnouncementChannel);
+                var msg = await channel.SendMessageAsync(embed: builder.Build());
+                if (major) await msg.PinAsync();
+            }
         }
 
         [Command("setgame")]
