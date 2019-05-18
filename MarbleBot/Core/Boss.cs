@@ -1,4 +1,4 @@
-namespace MarbleBot.BaseClasses
+namespace MarbleBot.Core
 {
     /// <summary> Represents a boss in a Marble Siege battle. </summary>
     public class Boss

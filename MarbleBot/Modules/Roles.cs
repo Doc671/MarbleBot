@@ -17,9 +17,9 @@ namespace MarbleBot.Modules
         public async Task GiveRoleCommandAsync([Remainder] string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (Context.Guild.Roles.Any(r => r.Name.ToLower() == roleName.ToLower()))
+            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
-                var role = Context.Guild.Roles.Where(r => r.Name.ToLower() == roleName.ToLower()).First();
+                var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
                 var server = GetServer(Context);
                 if (server.Roles.Any(r => r == role.Id))
                 {
@@ -38,9 +38,9 @@ namespace MarbleBot.Modules
         public async Task TakeRoleCommandAsync([Remainder] string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (Context.Guild.Roles.Any(r => r.Name.ToLower() == roleName.ToLower()))
+            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
-                var role = Context.Guild.Roles.Where(r => r.Name.ToLower() == roleName.ToLower()).First();
+                var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
                 var server = GetServer(Context);
                 if (server.Roles.Any(r => r == role.Id))
                 {
@@ -59,9 +59,9 @@ namespace MarbleBot.Modules
         public async Task RoleToggleCommandAsync([Remainder] string roleName)
         {
             await Context.Channel.TriggerTypingAsync();
-            if (Context.Guild.Roles.Any(r => r.Name.ToLower() == roleName.ToLower()))
+            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
-                var role = Context.Guild.Roles.Where(r => r.Name.ToLower() == roleName.ToLower()).First();
+                var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
                 var server = GetServer(Context);
                 if (server.Roles.Any(r => r == role.Id))
                 {

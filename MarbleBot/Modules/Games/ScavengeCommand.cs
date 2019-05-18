@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -33,8 +33,7 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
                     else
                     {
-                        Global.ScavengeInfo.Add(Context.User.Id, new Queue<Item>());
-                        Global.ScavengeSessions.Add(Task.Run(async () => { await ScavengeSessionAsync(Context, location); }));
+                        Global.ScavengeInfo.Add(Context.User.Id, new Scavenge(Context, location));
                         embed.WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)}**!")
                             .WithTitle("Item Scavenge Begin!");
                         await ReplyAsync(embed: embed.Build());
@@ -98,13 +97,13 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to grab!");
                     else
                     {
-                        if (Global.ScavengeInfo[Context.User.Id].Count > 0)
+                        if (Global.ScavengeInfo[Context.User.Id].Items.Count > 0)
                         {
-                            if (Global.ScavengeInfo[Context.User.Id].Peek().Name.Contains("Ore"))
+                            if (Global.ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
                                 await ReplyAsync($"**{Context.User.Username}**, you need to drill for ore!");
                             else
                             {
-                                var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
+                                var item = Global.ScavengeInfo[Context.User.Id].Items.Dequeue();
                                 if (user.Items != null)
                                 {
                                     if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -142,13 +141,13 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to drill!");
                     else
                     {
-                        if (Global.ScavengeInfo[Context.User.Id].Count > 0)
+                        if (Global.ScavengeInfo[Context.User.Id].Items.Count > 0)
                         {
-                            if (Global.ScavengeInfo[Context.User.Id].Peek().Name.Contains("Ore"))
+                            if (Global.ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
                             {
                                 if (user.Items.ContainsKey(81) || user.Items.ContainsKey(82))
                                 {
-                                    var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
+                                    var item = Global.ScavengeInfo[Context.User.Id].Items.Dequeue();
                                     if (user.Items != null)
                                     {
                                         if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -187,13 +186,13 @@ namespace MarbleBot.Modules
                     if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to sell!");
                     else
                     {
-                        if (Global.ScavengeInfo[Context.User.Id].Count > 0)
+                        if (Global.ScavengeInfo[Context.User.Id].Items.Count > 0)
                         {
-                            if (Global.ScavengeInfo[Context.User.Id].Peek().Name.Contains("Ore"))
+                            if (Global.ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
                                 await ReplyAsync($"**{Context.User.Username}**, you need to drill for ore!");
                             else
                             {
-                                var item = Global.ScavengeInfo[Context.User.Id].Dequeue();
+                                var item = Global.ScavengeInfo[Context.User.Id].Items.Dequeue();
                                 user.Balance += item.Price;
                                 user.NetWorth += item.Price;
                                 WriteUsers(obj, Context.User, user);
@@ -282,57 +281,6 @@ namespace MarbleBot.Modules
                     .WithTitle("Scavenge Location Info: Violet Volcanoes")
                     .Build());
                 else await ScavengeInfoAsync(ScavengeLocation.VioletVolcanoes);
-            }
-
-            public async Task ScavengeSessionAsync(SocketCommandContext context, ScavengeLocation location)
-            {
-                var startTime = DateTime.UtcNow;
-                var collectableItems = new List<Item>();
-                string json;
-                using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
-                var obj = JObject.Parse(json);
-                var items = obj.ToObject<Dictionary<string, Item>>();
-                foreach (var itemPair in items)
-                {
-                    if (itemPair.Value.ScavengeLocation == location)
-                    {
-                        var outputItem = itemPair.Value;
-                        outputItem.Id = int.Parse(itemPair.Key);
-                        collectableItems.Add(outputItem);
-                    }
-                }
-                do
-                {
-                    await Task.Delay(8000);
-                    if (Global.Rand.Next(0, 5) < 4)
-                    {
-                        var item = collectableItems[Global.Rand.Next(0, collectableItems.Count)];
-                        Global.ScavengeInfo[Context.User.Id].Enqueue(item);
-                        if (item.Name.Contains("Ore"))
-                            await ReplyAsync($"**{context.User.Username}**, you have found **{item.Name}** x**1**! Use `mb/scavenge drill` to mine it.");
-                        else
-                            await ReplyAsync($"**{context.User.Username}**, you have found **{item.Name}** x**1**! Use `mb/scavenge grab` to keep it or `mb/scavenge sell` to sell it.");
-                    }
-                } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 63));
-
-                string json2;
-                using (var users = new StreamReader("Data\\Users.json")) json2 = users.ReadToEnd();
-                var obj2 = JObject.Parse(json2);
-                var user = GetUser(Context, obj2);
-                user.LastScavenge = DateTime.UtcNow;
-                foreach (var item in Global.ScavengeInfo[context.User.Id])
-                {
-                    if (item.Name.Contains("Ore")) continue;
-                    if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
-                    else user.Items.Add(item.Id, 1);
-                }
-                WriteUsers(obj2, Context.User, user);
-
-                Global.ScavengeInfo.Remove(context.User.Id);
-                if (user.Stage > 1)
-                    await ReplyAsync("The scavenge session is over! Any remaining non-ore items have been added to your inventory!");
-                else
-                    await ReplyAsync("The scavenge session is over! Any remaining items have been added to your inventory!");
             }
 
             [Command("")]

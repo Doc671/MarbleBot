@@ -1,4 +1,4 @@
-namespace MarbleBot.BaseClasses
+namespace MarbleBot.Core
 {
     /// <summary> Represents a boss' attack during a Marble Siege. </summary>
     public readonly struct Attack

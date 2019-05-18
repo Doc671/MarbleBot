@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MarbleBot.BaseClasses
+namespace MarbleBot.Core
 {
     /// <summary> Represents an inventory item. </summary> 
     public struct Item
@@ -19,6 +19,8 @@ namespace MarbleBot.BaseClasses
         public byte Stage { get; set; }
         /// <summary> The location the item can be found in during a Scavenge game. </summary>
         public ScavengeLocation ScavengeLocation { get; set; }
+        /// <summary> The class of the weapon during a War game. </summary>
+        public WarClass WarClass { get; set; }
         /// <summary> The quantity produced of this item upon being crafted. </summary>
         public uint CraftingProduced { get; set; }
         /// <summary> The crafting recipe - a key value pair of item IDs and their necessary quantities. </summary>

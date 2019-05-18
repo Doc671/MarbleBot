@@ -1,7 +1,6 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -33,12 +32,11 @@ namespace MarbleBot
 
             int argPos = 0;
 
-            MBServer server;
+            var server = MBServer.Empty;
 
             if (!context.IsPrivate)
-                server = Global.Servers.Any(s => s.Id == context.Guild.Id) ?
+                server = Global.Servers.Value.Any(s => s.Id == context.Guild.Id) ?
                     MarbleBotModule.GetServer(context) : MBServer.Empty;
-            else server = MBServer.Empty;
 
             if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate || 
                 server.UsableChannels.Count == 0 || server.UsableChannels.Contains(context.Channel.Id))) {
@@ -55,7 +53,7 @@ namespace MarbleBot
             } else if (!context.IsPrivate && server.AutoresponseChannel == context.Channel.Id
                 && DateTime.UtcNow.Subtract(Global.ARLastUse).TotalSeconds > 2) {
                 foreach (var response in Global.Autoresponses) {
-                    if (context.Message.Content.ToLower() == response.Key) {
+                    if (string.Compare(context.Message.Content, response.Key, true) == 0) {
                         Global.ARLastUse = DateTime.UtcNow;
                         await context.Channel.SendMessageAsync(response.Value); break;
                     }

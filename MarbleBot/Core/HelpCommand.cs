@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace MarbleBot.BaseClasses
+namespace MarbleBot.Core
 {
     /// <summary> Stores info about a command. </summary>
     public struct HelpCommand
@@ -16,8 +16,6 @@ namespace MarbleBot.BaseClasses
         public string[] Aliases;
         /// <summary> An example of the command being used. </summary>
         public string Example;
-        /// <summary> A warning about the command. </summary>
-        public string Warning;
 
         /// <summary> Stores info about a command. </summary>
         /// <param name="name"> The command's name. </param>
@@ -25,20 +23,17 @@ namespace MarbleBot.BaseClasses
         /// <param name="usage"> The command's usage. </param>
         /// <param name="aliases"> The command's aliases. </param>
         /// <param name="example"> An example of the command being used. </param>
-        /// <param name="warning"> A warning about the command. </param>
         public HelpCommand(string name = "",
                            string desc = "",
                            string usage = "",
                            IEnumerable<string> aliases = null,
-                           string example = "",
-                           string warning = "")
+                           string example = "")
         {
             Name = name;
             Desc = desc;
             Usage = usage;
             Aliases = aliases == null ? new string[] { "" } : aliases.ToArray();
             Example = example;
-            Warning = warning;
         }
     }
 }

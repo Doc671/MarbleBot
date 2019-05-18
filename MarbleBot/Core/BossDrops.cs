@@ -1,4 +1,4 @@
-﻿namespace MarbleBot.BaseClasses
+﻿namespace MarbleBot.Core
 {
     /// <summary> Object containing information about an item a boss drops. </summary>
     public readonly struct BossDrops

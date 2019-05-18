@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
@@ -74,7 +74,7 @@ namespace MarbleBot.Modules
         [Summary("Releases update info to all bot channels.")]
         [RequireOwner]
         public async Task UpdateCommandAsync(string _major, [Remainder] string info) {
-            var major = _major == "major";
+            var major = string.Compare(_major, "major", true) == 0;
 
             var builder = new EmbedBuilder()
                 .WithColor(Color.Red)
@@ -82,7 +82,7 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            foreach (MBServer server in Global.Servers)
+            foreach (MBServer server in Global.Servers.Value)
             {
                 var channel = Context.Client.GetGuild(server.Id).GetTextChannel(server.AnnouncementChannel);
                 var msg = await channel.SendMessageAsync(embed: builder.Build());
@@ -105,6 +105,21 @@ namespace MarbleBot.Modules
                 case "donotdisturb": goto case "dnd";
                 case "invisible": await Context.Client.SetStatusAsync(UserStatus.Invisible); break;
             }
+        }
+
+        [Command("siegedict")]
+        [RequireOwner]
+        public async Task SiegeDictCommandAsync()
+        {
+            var output = new StringBuilder();
+            foreach (var siegePair in Global.SiegeInfo)
+                output.Append($"{siegePair.Key} - {siegePair.Value}");
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithDescription(output.ToString())
+                .WithTitle("`Global.SiegeInfo`")
+                .Build());
         }
     }
 }

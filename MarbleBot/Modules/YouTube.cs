@@ -79,18 +79,18 @@ namespace MarbleBot.Modules
                     var channel = new SearchResultSnippet();
                     foreach (var res in searchListResponse.Items)
                     {
-                        if (res.Id.Kind == "youtube#channel") channel = res.Snippet;
+                        if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0) channel = res.Snippet;
                     }
                     if (channel == null)
                     {
                         searchListRequest.Q = Context.User.Username;
                         foreach (var res in searchListResponse.Items)
-                            if (res.Id.Kind == "youtube#channel") channel = res.Snippet;
+                            if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0) channel = res.Snippet;
                     }
                     searchListRequest.Q = url;
                     searchListResponse = await searchListRequest.ExecuteAsync();
                     var video = searchListResponse.Items[0].Snippet;
-                    if (channel.Title == video.ChannelTitle)
+                    if (string.Compare(channel.Title, video.ChannelTitle, true) == 0)
                     {
                         if (DateTime.Now.Subtract((DateTime)video.PublishedAt).Days > 1)
                             await ReplyAsync("The video cannot be more than two days old!");
@@ -153,7 +153,7 @@ namespace MarbleBot.Modules
 
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (searchResult.Id.Kind == "youtube#channel" && !(await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
+                if (string.Compare(searchResult.Id.Kind, "youtube#channel", true) == 0 && !(await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
                 {
                     channels.Add($"{searchResult.Snippet.Title} (<https://www.youtube.com/channel/{searchResult.Id.ChannelId}>)");
                     found = true;
@@ -199,9 +199,9 @@ namespace MarbleBot.Modules
             bool found = false;
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (searchResult.Id.Kind == "youtube#video" && (await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
+                if (string.Compare(searchResult.Id.Kind, "youtube#video", true) == 0 && (await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
                     profaneCount++;
-                else if (searchResult.Id.Kind == "youtube#video")
+                else if (string.Compare(searchResult.Id.Kind, "youtube#video", true) == 0)
                 {
                     videos.Add($"{searchResult.Snippet.Title} (<https://youtu.be/{searchResult.Id.VideoId}>)");
                     found = true;

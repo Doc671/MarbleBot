@@ -1,4 +1,4 @@
-namespace MarbleBot.BaseClasses
+namespace MarbleBot.Core
 {
     public enum Difficulty
     {

@@ -157,11 +157,7 @@
     "Price": 3.00,
     "Description": "A bucket made of stainless steel.",
     "OnSale": true,
-    "ScavengeLocation": 0,
-    "CraftingProduced": 1,
-    "CraftingRecipe": {
-      "070": 3
-    }
+    "ScavengeLocation": 0
   },
   "019": {
     "Name": "Water Bucket",
@@ -839,5 +835,206 @@
       "070": 4
     },
     "CraftingStationRequired": 2
+  },
+  "086": {
+    "Name": "Gilded Dagger",
+    "Price": 110.00,
+    "Description": "A dagger covered lightly with gold.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 1,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "070": 3,
+      "075": 1
+    },
+    "CraftingStationRequired": 2
+  },
+  "087": {
+    "Name": "Pyrobit",
+    "Price": 1040.00,
+    "Description": "A sword forged from the ore of the Violet Volcanoes.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 1,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "020": 1,
+      "070": 3,
+      "073": 5,
+      "075": 2
+    },
+    "CraftingStationRequired": 2
+  },
+  "088": {
+    "Name": "Blizzare",
+    "Price": 830.00,
+    "Description": "An icy one-handed sword. Cold to the touch.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 1
+  },
+  "089": {
+    "Name": "Aquaria",
+    "Price": 680.00,
+    "Description": "A rounded sword of the oceans. Once belonged to a witch.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 1
+  },
+  "090": {
+    "Name": "Seaweed",
+    "Price": 0.12,
+    "Description": "A kilogram of seaweed. Contrary to popular belief, seaweed's composition is actually 42.9% sea, 57.1% weed.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
+  },
+  "091": {
+    "Name": "Makeshift Technology Altar",
+    "Price": 315.00,
+    "Description": "A makeshift altar made from not-very-advanced technology. It might be a good idea not to go on a Siege...",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "018": 4,
+      "041": 5,
+      "045": 15,
+      "046": 15,
+      "047": 15,
+      "049": 5,
+      "054": 5,
+      "055": 10
+    }
+  },
+  "092": {
+    "Name": "Mini-Marble",
+    "Price": 5.00,
+    "Description": "No, it's not a bullet, it's a marble!",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 10,
+    "CraftingRecipe": {
+      "070": 2
+    },
+    "CraftingStationRequired": 2
+  },
+  "093": {
+    "Name": "Flintlock Musket",
+    "Price": 34.00,
+    "Description": "A muzzle-loaded long gun that fires bullets.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 2,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "059": 4,
+      "067": 4,
+      "070": 3
+    },
+    "CraftingStationRequired": 2
+  },
+  "094": {
+    "Name": "Leaf's Breeze",
+    "Price": 27.30,
+    "Description": "A sword made from oak wood.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 1,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "041": 3,
+      "045": 4
+    }
+  },
+  "095": {
+    "Name": "The Hatchet",
+    "Price": 34.95,
+    "Description": "A striking tool of elm wood with a sharp stone blade on one side.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 1,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "041": 3,
+      "046": 1,
+      "048": 6,
+      "049": 1
+    }
+  },
+  "096": {
+    "Name": "Wooden Crossbow",
+    "Price": 33.49,
+    "Description": "A bow fixed across a support of ash wood with a groove to fire bolts.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 2,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "047": 5,
+      "049": 1
+    }
+  },
+  "097": {
+    "Name": "Golden Repeater",
+    "Price": 3700.00,
+    "Description": "A repeating crossbow consisting of a gold-alloy support with a groove to fire bolts.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "WarClass": 2,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "049": 1,
+      "069": 2,
+      "076": 3
+    },
+    "CraftingStationProduced": 2
+  },
+  "098": {
+    "Name": "Wooden Bolt",
+    "Price": 4.15,
+    "Description": "An arrow of ash wood used in a crossow.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 3,
+    "CraftingRecipe": {
+      "047": 1
+    }
+  },
+  "099": {
+    "Name": "Deletion",
+    "Price": 0.00,
+    "Description": "...",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+  },
+  "100": {
+    "Name": "Nickel Bolt",
+    "Price": 7.45,
+    "Description": "A nickel arrow used in a crossbow.",
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "CraftingProduced": 3,
+    "CraftingRecipe": {
+      "069": 1
+    }
+  },
+  "101": {
+    "Name": "Cursed Inferno Bolt",
+    "Price": 466.66,
+    "Description": "An infernite crossbow bolt. Imbued with mixed essence.",
+    "ScavengeLocation": 0,
+    "CraftingProduced": 5,
+    "CraftingRecipe": {
+      "074": 1,
+      "079": 1
+    }
   }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MarbleBot.BaseClasses
+namespace MarbleBot.Core
 {
     /// <summary> Represents a user when using money or item-based commands. </summary>
     public class MBUser

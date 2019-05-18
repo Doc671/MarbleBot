@@ -1,4 +1,4 @@
-﻿namespace MarbleBot.BaseClasses
+﻿namespace MarbleBot.Core
 {
     /// <summary> The status effects a marble can have during a Siege game. </summary>
     public enum MSE

@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using MarbleBot.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -107,7 +107,7 @@ namespace MarbleBot
 
         /// <summary> Returns a MBServer object with the ID of the current server. </summary>
         protected internal static MBServer GetServer(SocketCommandContext context)
-        => Global.Servers.Find(s => s.Id == context.Guild.Id);
+        => Global.Servers.Value.Find(s => s.Id == context.Guild.Id);
 
         /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser </summary>
         protected internal static MBUser GetUser(SocketCommandContext context)
@@ -225,7 +225,7 @@ namespace MarbleBot
             using (var servers = new JsonTextWriter(new StreamWriter("Data\\Servers.json")))
             {
                 var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                var dict = Global.Servers.ToDictionary(s => s.Id);
+                var dict = Global.Servers.Value.ToDictionary(s => s.Id);
                 serialiser.Serialize(servers, dict);
             }
         }

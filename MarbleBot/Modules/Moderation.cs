@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using MarbleBot.Extensions;
 using System.Collections.Generic;
 using System.Globalization;
@@ -19,15 +19,15 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task AddRoleCommandAsync([Remainder] string searchTerm)
         {
-            if (!Context.Guild.Roles.Any(r => r.Name.ToLower() == searchTerm.ToLower()))
+            if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0))
             {
                 await ReplyAsync("Could not find the role!");
                 return;
             }
-            var id = Context.Guild.Roles.Where(r => r.Name.ToLower() == searchTerm.ToLower()).First().Id;
+            var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
             var newServer = false;
             MBServer server;
-            if (Global.Servers.Any(s => s.Id == Context.Guild.Id))
+            if (Global.Servers.Value.Any(s => s.Id == Context.Guild.Id))
             {
                 server = GetServer(Context);
                 server.Roles.Add(id);
@@ -37,7 +37,7 @@ namespace MarbleBot.Modules
                 newServer = true;
                 server = new MBServer(Context.Guild.Id, 0, 0, "607D8B", new ulong[] { 0 }, new ulong[] { 0 });
             }
-            if (newServer) Global.Servers.Add(server);
+            if (newServer) Global.Servers.Value.Add(server);
             WriteServers();
             await ReplyAsync("Succesfully updated.");
         }
@@ -65,7 +65,7 @@ namespace MarbleBot.Modules
         {
             var server = MBServer.Empty;
             var newServer = false;
-            if (Global.Servers.Any(s => s.Id == Context.Guild.Id))
+            if (Global.Servers.Value.Any(s => s.Id == Context.Guild.Id))
                 server = GetServer(Context);
             else
             {
@@ -79,7 +79,7 @@ namespace MarbleBot.Modules
                 case "usable": server.UsableChannels = new List<ulong>(); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
             }
-            if (newServer) Global.Servers.Add(server);
+            if (newServer) Global.Servers.Value.Add(server);
             WriteServers();
             await ReplyAsync("Succesfully cleared.");
         }
@@ -163,13 +163,13 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task RemoveRoleCommandAsync([Remainder] string searchTerm)
         {
-            if (Global.Servers.GetServer(Context, out MBServer server))
+            if (Global.Servers.Value.GetServer(Context, out MBServer server))
             {
                 await ReplyAsync("Could not find the role!");
                 return;
             }
-            var id = Context.Guild.Roles.Where(r => r.Name.ToLower() == searchTerm.ToLower()).First().Id;
-            if (!Context.Guild.Roles.Any(r => r.Name.ToLower() == searchTerm.ToLower()) ||
+            var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
+            if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0) ||
                 !server.Roles.Contains(id))
             {
                 await ReplyAsync("Could not find the role!");
@@ -177,7 +177,7 @@ namespace MarbleBot.Modules
             }
             server.Roles.Remove(id);
             WriteServers();
-            await ReplyAsync("Succesfully updated.");
+            await ReplyAsync("Succesfully updated.");   
         }
 
         [Command("setchannel")]
@@ -192,7 +192,7 @@ namespace MarbleBot.Modules
                 return;
             }
             var newServer = false;
-            if (!Global.Servers.GetServer(Context, out MBServer server))
+            if (!Global.Servers.Value.GetServer(Context, out MBServer server))
             {
                 newServer = true;
                 server.Id = Context.Guild.Id;
@@ -204,7 +204,7 @@ namespace MarbleBot.Modules
                 case "usable": server.UsableChannels.Add(channel); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info."); return;
             }
-            if (newServer) Global.Servers.Add(server);
+            if (newServer) Global.Servers.Value.Add(server);
             WriteServers();
             await ReplyAsync("Successfully updated.");
         }
@@ -216,19 +216,19 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task SetColorCommandAsync(string input)
         {
-            if (!uint.TryParse(input, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uint _))
+            if (!uint.TryParse(input, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _))
             {
                 await ReplyAsync("Invalid hexadecimal colour string.");
                 return;
             }
             var newServer = false;
-            if (!Global.Servers.GetServer(Context, out MBServer server))
+            if (!Global.Servers.Value.GetServer(Context, out MBServer server))
             {
                 newServer = true;
                 server.Id = Context.Guild.Id;
             }
             server.Color = input;
-            if (newServer) Global.Servers.Add(server);
+            if (newServer) Global.Servers.Value.Add(server);
             WriteServers();
             await ReplyAsync("Successfully updated.");
         }

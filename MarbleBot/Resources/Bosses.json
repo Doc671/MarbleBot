@@ -207,7 +207,7 @@
         "StatusEffect": 0
       },
       {
-        "Name": "UnapprovedByOrange",
+        "Name": "Unapproved By Orange",
         "Damage": 3,
         "Accuracy": 55,
         "StatusEffect": 3
@@ -556,7 +556,7 @@
       {
         "Name": "Scythe Rush",
         "Damage": 100,
-        "Accuracy": 10,
+        "Accuracy": 15,
         "StatusEffect": 0
       },
       {
@@ -674,7 +674,7 @@
       {
         "Name": "Devil Scythe",
         "Damage": 100,
-        "Accuracy": 10,
+        "Accuracy": 15,
         "StatusEffect": 1
       },
       {

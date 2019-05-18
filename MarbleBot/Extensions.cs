@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +27,8 @@ namespace MarbleBot.Extensions
         }
 
         public static bool IsEmpty(this string str)
-            => str == "" || str == " " || str == null || str == string.Empty || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
+            => string.Compare(str, "", true) == 0 || string.Compare(str, " ", true) == 0 || str == null || str == string.Empty 
+            || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
 
         public static string Ordinal(this int no)
         {

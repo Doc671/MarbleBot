@@ -4,7 +4,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Docs.v1;
 using Google.Apis.Docs.v1.Data;
 using Google.Apis.Services;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -22,13 +22,15 @@ namespace MarbleBot
 
         public static DiscordSocketClient _client;
 
+#pragma warning disable IDE0052 // Remove unread private members
         private CommandHandler _handler;
+#pragma warning restore IDE0052 // Remove unread private members
 
         public async Task StartAsync()
         {
             Console.Title = "MarbleBot";
 
-            Global.StartTime = DateTime.UtcNow;
+            Global.StartTime = new Lazy<DateTime>(() => DateTime.UtcNow);
             _client = new DiscordSocketClient();
 
             string token = "";
@@ -53,7 +55,7 @@ namespace MarbleBot
                 {
                     var server2 = server.Value;
                     server2.Id = server.Key;
-                    Global.Servers.Add(server2);
+                    Global.Servers.Value.Add(server2);
                 }
             }
 
@@ -63,7 +65,7 @@ namespace MarbleBot
 
             await _client.SetGameAsync("Try mb/help!");
 
-            await Log($"MarbleBot by Doc671\nStarted running: {Global.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}\n", true);
+            await Log($"MarbleBot by Doc671\nStarted running: {Global.StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}\n", true);
 
             _handler = new CommandHandler(_client);
 
