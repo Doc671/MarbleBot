@@ -319,6 +319,24 @@
         "MinCount": 1,
         "MaxCount": 2,
         "Chance": 80
+      },
+      {
+        "ItemId": 94,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 25
+      },
+      {
+        "ItemId": 95,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 25
+      },
+      {
+        "ItemId": 102,
+        "MinCount": 1,
+        "MaxCount": 1,
+        "Chance": 75
       }
     ]
   },

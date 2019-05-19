@@ -338,6 +338,16 @@ namespace MarbleBot.Modules
                         .AddField("For Sale", item.OnSale ? "Yes" : "No", true)
                         .AddField("Scavenge Location", Enum.GetName(typeof(ScavengeLocation), item.ScavengeLocation));
 
+                    if (item.WarClass > 0) builder.AddField("War Class", Enum.GetName(typeof(WarClass), item.WarClass), true);
+                    if (item.Damage > 0) builder.AddField("War Damage", item.Damage, true);
+                    if (item.Ammo != null)
+                    {
+                        var output = new StringBuilder();
+                        foreach (var itemId in item.Ammo)
+                            output.AppendLine($"`[{itemId:000}]` {GetItem(itemId.ToString("000")).Name}");
+                        builder.AddField("Ammo", output.ToString());
+                    }
+
                     if (item.CraftingRecipe.Count > 0)
                     {
                         var output = new StringBuilder();
@@ -345,6 +355,7 @@ namespace MarbleBot.Modules
                             output.AppendLine($"`[{rawItem.Key}]` {GetItem(rawItem.Key).Name}: {rawItem.Value}");
                         builder.AddField($"Crafting Recipe (produces **{item.CraftingProduced}**)", output.ToString());
                     }
+
                     await ReplyAsync(embed: builder.Build());
                 }
             }

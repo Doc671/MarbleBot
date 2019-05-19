@@ -843,6 +843,7 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 8,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -858,6 +859,7 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 10,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -875,6 +877,7 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 9,
     "WarClass": 1
   },
   "089": {
@@ -884,6 +887,7 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 10,
     "WarClass": 1
   },
   "090": {
@@ -932,6 +936,8 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Ammo": [ 92 ],
+    "Damage": 11,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -947,6 +953,7 @@
     "Description": "A sword made from oak wood.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 5,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -960,6 +967,7 @@
     "Description": "A striking tool of elm wood with a sharp stone blade on one side.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 6,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -975,6 +983,8 @@
     "Description": "A bow fixed across a support of ash wood with a groove to fire bolts.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Ammo": [ 98, 100, 101 ],
+    "Damage": 8,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -986,8 +996,11 @@
     "Name": "Golden Repeater",
     "Price": 3700.00,
     "Description": "A repeating crossbow consisting of a gold-alloy support with a groove to fire bolts.",
+    "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Ammo": [98, 100, 101],
+    "Damage": 10,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1003,6 +1016,7 @@
     "Description": "An arrow of ash wood used in a crossow.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 1,
     "CraftingProduced": 3,
     "CraftingRecipe": {
       "047": 1
@@ -1019,22 +1033,37 @@
     "Name": "Nickel Bolt",
     "Price": 7.45,
     "Description": "A nickel arrow used in a crossbow.",
+    "Stage": "2",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 2,
     "CraftingProduced": 3,
     "CraftingRecipe": {
       "069": 1
-    }
+    },
+    "CraftingStationRequired": 2
   },
   "101": {
     "Name": "Cursed Inferno Bolt",
     "Price": 466.66,
     "Description": "An infernite crossbow bolt. Imbued with mixed essence.",
+    "Stage": 2,
+    "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 3,
     "CraftingProduced": 5,
     "CraftingRecipe": {
       "074": 1,
       "079": 1
-    }
+    },
+    "CraftingStationRequired": 2
+  },
+  "102": {
+    "Name": "EMP Blaster",
+    "Price": 340.00,
+    "Description": "Launches an electromagnetic pulse.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
   }
 }

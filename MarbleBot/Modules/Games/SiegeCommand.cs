@@ -89,7 +89,7 @@ namespace MarbleBot.Modules
                 {
                     while (!marbleList.EndOfStream)
                     {
-                        var line = await marbleList.ReadLineAsync();
+                        var line = (await marbleList.ReadLineAsync()).RemoveChar('\n');
                         if (!line.IsEmpty()) marbleCount++;
                         var sLine = line.Split(',');
                         var marble = new SiegeMarble()
@@ -400,9 +400,9 @@ namespace MarbleBot.Modules
                         if (marble.Length > 16)
                         {
                             var mSplit = marble.Split(',');
-                            var user = Context.Client.GetUser(ulong.Parse(mSplit[1].Trim('\n')));
-                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0].Trim('\n')}**");
-                            else marbles.AppendLine($"**{mSplit[0].Trim('\n')}** [{user.Username}#{user.Discriminator}]");
+                            var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
+                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0]}**");
+                            else marbles.AppendLine($"**{mSplit[0]}** [{user.Username}#{user.Discriminator}]");
                             cCount++;
                         }
                     }
@@ -495,8 +495,8 @@ namespace MarbleBot.Modules
                                 if (marble.Length > 16)
                                 {
                                     var mSplit = marble.Split(',');
-                                    var user = Context.Client.GetUser(ulong.Parse(mSplit[1].Trim('\n')));
-                                    marbles.AppendLine($"**{mSplit[0].Trim('\n')}** [{user.Username}#{user.Discriminator}]");
+                                    var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
+                                    marbles.AppendLine($"**{mSplit[0]}** [{user.Username}#{user.Discriminator}]");
                                 }
                             }
                         }

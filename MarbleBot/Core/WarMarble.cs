@@ -3,14 +3,15 @@
     /// <summary> Represents a marble during a war game. </summary>
     public class WarMarble : BaseMarble
     {
-        public WarClass Class { get; }
+        public int Team { get; set; }
+        public WarClass WarClass { get; }
         public Item Weapon { get; }
 
         public WarMarble(ulong id, int HP, string name, Item weapon, Item shield, int spikeId = 0)
         {
             Id = id;
             SetHP(HP);
-            Class = weapon.WarClass;
+            WarClass = weapon.WarClass;
             DamageIncrease = spikeId switch
             {
                 66 => (byte)40,

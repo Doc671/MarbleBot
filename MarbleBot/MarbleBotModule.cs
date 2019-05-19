@@ -69,15 +69,15 @@ namespace MarbleBot
                 if (obj[itemID.ToString("000")] != null)
                 {
                     item = obj[itemID.ToString("000")].ToObject<Item>();
-                    item.Id = itemID;
+                    item = new Item(item, itemID);
                     item.Description.Replace(';', ',');
-                    if (item.Stage == 0) item.Stage = 1;
-                    if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
+                    if (item.Stage == 0) item = new Item(item, stage: 1);
+                    if (item.CraftingRecipe == null) item = new Item(item, craftingRecipe: new Dictionary<string, int>());
                     return item;
                 }
                 else
                 {
-                    item.Id = -1;
+                    item = new Item(item, -1);
                     return item;
                 }
             }
@@ -90,17 +90,17 @@ namespace MarbleBot
                 foreach (var objItemPair in obj)
                 {
                     var objItem = objItemPair.Value.ToObject<Item>();
-                    objItem.Id = int.Parse(objItemPair.Key);
+                    objItem = new Item (objItem, int.Parse(objItemPair.Key));
                     if (objItem.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(objItem.Name.ToLower()))
                     {
                         item = objItem;
                         item.Description.Replace(';', ',');
-                        if (item.Stage == 0) item.Stage = 1;
-                        if (item.CraftingRecipe == null) item.CraftingRecipe = new Dictionary<string, int>();
+                        if (item.Stage == 0) item = new Item(item, stage: 1);
+                        if (item.CraftingRecipe == null) item = new Item(item, craftingRecipe: new Dictionary<string, int>());
                         return item;
                     }
                 }
-                item.Id = -2;
+                item = new Item(item, -2);
                 return item;
             }
         }

@@ -24,6 +24,8 @@ namespace MarbleBot.Core
         public uint RaceWins { get; set; }
         /// <summary> The number of times the user has won a Siege. </summary>
         public uint SiegeWins { get; set; }
+        /// <summary> The number of times the user has won a War. </summary>
+        public uint WarWins { get; set; }
         /// <summary> The last time the user has used mb/daily. </summary>
         public DateTime LastDaily { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         /// <summary> The last time the user has won a race. </summary>
@@ -32,7 +34,9 @@ namespace MarbleBot.Core
         public DateTime LastScavenge { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         /// <summary> The last time the user has won a Siege game. </summary>
         public DateTime LastSiegeWin { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
-        /// <summary> The items of the user - a key value pair storing item IDs against their quantities.. </summary>
+        /// <summary> The last time the user has won a Siege game. </summary>
+        public DateTime LastWarWin { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
+        /// <summary> The items of the user - a key value pair storing item IDs against their quantities. </summary>
         public SortedDictionary<int, int> Items { get; set; } = new SortedDictionary<int, int>();
 
         /// <summary> Converts the user into a string representation. </summary>

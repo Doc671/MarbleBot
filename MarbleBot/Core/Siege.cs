@@ -36,7 +36,7 @@ namespace MarbleBot.Core
             Boss.HP -= dmg;
             if (Boss.HP < 1)
                 await SiegeVictoryAsync(context);
-            if ((string.Compare(Boss.Name, "Destroyer", true) == 0) && Boss.HP <= Boss.MaxHP >> 1)
+            if ((string.Compare(Boss.Name, "Destroyer", true) == 0) && Boss.HP <= Boss.MaxHP / 2)
             {
                 AttackTime = 12000;
                 Boss.ImageUrl = "https://cdn.discordapp.com/attachments/296376584238137355/567456912430333962/DestroyerCorrupted.png";
@@ -307,7 +307,7 @@ namespace MarbleBot.Core
                     // Siege failure
                     if (Marbles.Sum(m => m.HP) < 1) break;
                 }
-            } while (Boss.HP > 0 || !timeout || Marbles.Sum(m => m.HP) > 0);
+            } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0);
             if (timeout || Marbles.Sum(m => m.HP) < 1)
             {
                 if (timeout) await context.Channel.SendMessageAsync("10 minute timeout reached! Siege aborted!");
@@ -338,10 +338,10 @@ namespace MarbleBot.Core
                 .WithCurrentTimestamp()
                 .WithTitle("Siege Victory!")
                 .WithDescription($"**{Boss.Name}** has been defeated!");
+            var obj = MarbleBotModule.GetUsersObj();
             for (int i = 0; i < Marbles.Count; i++)
             {
                 var marble = Marbles[i];
-                var obj = MarbleBotModule.GetUsersObj();
                 var user = MarbleBotModule.GetUser(context, obj, marble.Id);
                 var output = new StringBuilder();
                 if (user.Stage == 1 && string.Compare(Boss.Name, "Destroyer", true) == 0 && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149))
@@ -355,19 +355,13 @@ namespace MarbleBot.Core
                     output.AppendLine($"**You have entered Stage III!**");
                 }
                 int earnings = marble.DamageDealt + (marble.PowerUpHits * 50);
-                var dIdNothing = true;
                 if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6)
                 {
                     if (marble.DamageDealt > 0)
-                    {
                         output.AppendLine($"Damage dealt: {Global.UoM}**{marble.DamageDealt:n}**");
-                        dIdNothing = false;
-                    }
+                    else break;
                     if (marble.PowerUpHits > 0)
-                    {
                         output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PowerUpHits * 50:n}**");
-                        dIdNothing = false;
-                    }
                     if (marble.HP > 0)
                     {
                         earnings += 200;
@@ -379,7 +373,7 @@ namespace MarbleBot.Core
                         earnings *= 3;
                         output.AppendLine("Pendant bonus: x**3**");
                     }
-                    if (output.Length > 0 && !dIdNothing)
+                    if (output.Length > 0)
                     {
                         if (marble.HP > 0) user.LastSiegeWin = DateTime.UtcNow;
                         if (Boss.Drops.Length > 0) output.AppendLine("**Item Drops:**");
@@ -403,15 +397,14 @@ namespace MarbleBot.Core
                         output.AppendLine($"__**Total: {Global.UoM}{earnings:n}**__");
                         user.Balance += earnings;
                         user.NetWorth += earnings;
+                        builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
+                        obj.Remove(marble.Id.ToString());
+                        obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
                     }
                 }
-                if (output.Length > 1 && !dIdNothing)
-                    builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
-                obj.Remove(marble.Id.ToString());
-                obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
-                MarbleBotModule.WriteUsers(obj);
             }
             await context.Channel.SendMessageAsync(embed: builder.Build());
+            MarbleBotModule.WriteUsers(obj);
             Dispose(true);
         }
 

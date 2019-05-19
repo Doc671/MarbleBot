@@ -12,6 +12,8 @@ namespace MarbleBot.Core
     {
         /// <summary> The scavenge session. </summary>
         public Task Actions { get; set; }
+        /// <summary> The ID of the user performing the command. </summary>
+        public ulong Id { get; set; }
         /// <summary> The items currently available during the game. </summary>
         public Queue<Item> Items { get; set; } = new Queue<Item>();
         /// <summary> The location of the scavenge. </summary>
@@ -25,6 +27,7 @@ namespace MarbleBot.Core
         {
             if (_disposed) return;
             if (disposing) Actions.Dispose();
+            Global.ScavengeInfo.Remove(Id);
             Items = null;
             _disposed = true;
         }
@@ -32,6 +35,7 @@ namespace MarbleBot.Core
         public Scavenge(SocketCommandContext context, ScavengeLocation location)
         {
             Actions = Task.Run(async () => { await ScavengeSessionAsync(context); });
+            Id = context.User.Id;
             Location = location;
         }
 
@@ -49,7 +53,7 @@ namespace MarbleBot.Core
                 if (itemPair.Value.ScavengeLocation == Location)
                 {
                     var outputItem = itemPair.Value;
-                    outputItem.Id = int.Parse(itemPair.Key);
+                    outputItem = new Item(outputItem, int.Parse(itemPair.Key));
                     collectableItems.Add(outputItem);
                 }
             }

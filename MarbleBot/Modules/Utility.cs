@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using MarbleBot.BaseClasses;
+using MarbleBot.Core;
 using MarbleBot.Extensions;
 using System;
 using System.Collections.Generic;
@@ -21,10 +21,11 @@ namespace MarbleBot.Modules
             => await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Daily Timeout", $"{Global.DailyTimeout} hours", true)
                 .AddField("Ongoing Races", Global.RaceAlive.Count, true)
-                .AddField("Ongoing Scavenges", Global.ScavengeSessions.Count, true)
+                .AddField("Ongoing Scavenges", Global.ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", Global.SiegeInfo.Count, true)
-                .AddField("Start Time (UTC)", Global.StartTime.ToString("yyyy-MM-dd hh:mm:ss"), true)
-                .AddField("Uptime", DateTime.UtcNow.Subtract(Global.StartTime).ToString(), true)
+                .AddField("Ongoing Wars", Global.WarInfo.Count, true)
+                .AddField("Start Time (UTC)", Global.StartTime.Value.ToString("yyyy-MM-dd hh:mm:ss"), true)
+                .AddField("Uptime", DateTime.UtcNow.Subtract(Global.StartTime.Value).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -46,7 +47,7 @@ namespace MarbleBot.Modules
                     if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
                         builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
                     else builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube");
-                    builder.WithDescription("*by Doc671#1965*\n\nUse `mb/help` followed by the name of a module or a command for more info, or `mb/help full` for the old help menu.")
+                    builder.WithDescription("*by Doc671#1965*\n\nUse `mb/help` followed by the name of a module or a command for more info.")
                         .WithTitle("MarbleBot Help");
                     await ReplyAsync(embed: builder.Build());
                     break;
@@ -79,7 +80,9 @@ namespace MarbleBot.Modules
                         .AddField("Games commands", new StringBuilder()
                             .AppendLine("**race** - Participate in a marble race!")
                             .AppendLine("**scavenge** - Scavenge for items!")
-                            .AppendLine("**siege** - Participate in a Marble Siege!"))
+                            .AppendLine("**siege** - Participate in a Marble Siege!")
+                            .AppendLine("**war** - Participate in a Marble War!")
+                            .ToString())
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help")
                         .Build());
@@ -89,6 +92,7 @@ namespace MarbleBot.Modules
                 case "scavenge":
                 case "siege":
                 case "utility":
+                case "war":
                 case "youtube": goto case "economy";
                 case "moderation":
                     if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages) goto case "economy";
@@ -97,41 +101,16 @@ namespace MarbleBot.Modules
                     command = "youtube";
                     goto case "economy";
                 case "full":
-                    builder.AddField("MarbleBot Help", "*by Doc671#1965*\nUse mb/help followed by a command name for more info!")
-                        .WithTimestamp(DateTime.UtcNow);
-                    if (Context.IsPrivate)
-                    {
-                        builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                        .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
-                        .AddField("Utility Commands", "help (gives command help)\nuptime (shows how long the bot has been running)")
-                        .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                        .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)")
-                        .WithColor(Color.DarkerGrey);
-                    }
-                    else
-                    {
-                        builder.WithColor(GetColor(Context));
-                        switch (Context.Guild.Id)
-                        {
-                            case CM:
-                                builder.AddField("Fun Commands", "7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nchoose (chooses between options split with '|')\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nreverse (reverses text)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
-                                    .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
-                                    .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                                    .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                    .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)");
-                                break;
-                            default:
-                                builder.AddField("Fun Commands", "\n7ball (predicts an outcome)\nbest (picks a random user to call the best)\nbet (bets on a marble out of a chosen number)\nbuyhat (buys an Uglee Hat)\nchoose (chooses between options split with '|')\norange (gives a random statement in Orange Language)\norangeify (turns a message you say into Orange Language)\nrate (rates something out of 10)\nrandom (returns a random positive integer with defined bounds)\nrank (shows your level and total XP)\nrepeat (repeats a message you say)\nstaffcheck (checks the statuses of all staff members)\nvinhglish (shows the meaning and inventor of a Vinhglish word)")
-                                    .AddField("Economy Commands", "balance (returns how much money you or someone else has)\nbuy (buy an item)\ncraft (crafts an item from other items)\ndaily (gives daily money)\ninventory (view all items)\nitem (view item info)\npoupsoop (calculates price total)\nprofile (returns profile of you or someone else)\nrecipes (shows all crafting recipes)\nrichlist (shows 10 richest people)\nsell (sell an item)\nshop (view all items)\nuse (uses an item)")
-                                    .AddField("Utility Commands", "help (gives command help)\nserverinfo (displays information about the server)\nstaffcheck (checks the statuses of all staff members)\nuptime (shows how long the bot has been running)\nuserinfo (displays information about a user)")
-                                    .AddField("Role Commands", "give (gives a role)\ntake (takes a role)\nrolelist (lists all roles that can be given/taken)")
-                                    .AddField("YouTube Commands", "searchchannel (searches for a channel)\nsearchvideo (searches for a video)")
-                                    .AddField("Games", "\nrace (participate in a marble race)\nscavenge (search for items)\nsiege (participate in a Marble Siege)");
-                                break;
-                        }
-                    }
-                    await ReplyAsync(embed: builder.Build());
+                    var output = new StringBuilder();
+                    foreach (var cmd in Global.CommandService.Commands)
+                        output.Append($"`{cmd.Name}`");
+                    output.Append("\n\nThis has been deprecated.");
+                    await ReplyAsync(embed: new EmbedBuilder()
+                        .WithColor(GetColor(Context))
+                        .WithCurrentTimestamp()
+                        .WithDescription(output.ToString())
+                        .WithTitle("MarbleBot Help")
+                        .Build());
                     break;
                 default:
                     var hCommand = new HelpCommand();
@@ -144,21 +123,18 @@ namespace MarbleBot.Modules
                     {
                         await Log(ex.ToString());
                     }
-                    string THSOnly = "This command cannot be used in Community Marble!";
                     switch (command)
                     {
                         // Fun
                         case "7ball": hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
                         case "bet": hCommand.Usage = "mb/bet [number of marbles]"; hCommand.Example = "mb/bet 30"; break;
-                        case "buyhat": hCommand.Warning = THSOnly; break;
                         case "choose": hCommand.Usage = "mb/choose <choice1> | <choice2>"; hCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
-                        case "orange": hCommand.Warning = THSOnly; break;
-                        case "orangeify": hCommand.Usage = "mb/orangeify <text>"; hCommand.Example = "mb/orangeify Drink Poup Soop!"; hCommand.Warning = THSOnly; break;
+                        case "orangeify": hCommand.Usage = "mb/orangeify <text>"; hCommand.Example = "mb/orangeify Drink Poup Soop!"; break;
                         case "random": hCommand.Usage = "mb/random <number1> <number2>"; hCommand.Example = "mb/random 1 5"; break;
                         case "rate": hCommand.Usage = "mb/rate <text>"; hCommand.Example = "mb/rate Marbles"; break;
                         case "repeat": hCommand.Usage = "mb/repeat <text>"; hCommand.Example = "mb/repeat Hello!"; break;
                         case "reverse": hCommand.Usage = "mb/reverse <text>"; hCommand.Example = "mb/reverse Bowl"; break;
-                        case "vinhglish": hCommand.Usage = "mb/vinglish <optional word>"; hCommand.Example = "mb/vinhglish Am Will You"; hCommand.Warning = THSOnly; break;
+                        case "vinhglish": hCommand.Usage = "mb/vinglish <optional word>"; hCommand.Example = "mb/vinhglish Am Will You"; break;
 
                         // Utility
                         case "userinfo": hCommand.Desc = "Displays information about a user."; hCommand.Usage = "mb/userinfo <user>"; hCommand.Example = "mb/userinfo MarbleBot"; break;
@@ -188,7 +164,7 @@ namespace MarbleBot.Modules
                         case "take": hCommand.Usage = "mb/take <role>"; hCommand.Example = "mb/take Criminal"; break;
 
                         // YT
-                        case "cv": hCommand.Usage = "mb/cv <video link> <optional description>"; hCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; hCommand.Warning = "This command only works in DMs!"; break;
+                        case "cv": hCommand.Usage = "mb/cv <video link> <optional description>"; hCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; break;
                         case "searchchannel": hCommand.Usage = "mb/searchchannel <channelname>"; hCommand.Example = "mb/searchchannel carykh"; break;
                         case "searchvideo": hCommand.Usage = "mb/searchvideo <videoname>"; hCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
                     }
@@ -208,7 +184,6 @@ namespace MarbleBot.Modules
                         }
 
                         if (!hCommand.Example.IsEmpty()) builder.AddField("Example", $"`{hCommand.Example}`");
-                        if (!hCommand.Warning.IsEmpty()) builder.AddField("Warning", $":warning: {hCommand.Warning}");
 
                         await ReplyAsync(embed: builder.Build());
                     }
@@ -314,7 +289,7 @@ namespace MarbleBot.Modules
         [Command("uptime")]
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommandAsync()
-        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(Global.StartTime))}**.");
+        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(Global.StartTime.Value))}**.");
 
         [Command("userinfo")]
         [Summary("Displays information about a user.")]
