@@ -97,15 +97,24 @@ namespace MarbleBot.Modules
                             user.Items.Where(i => GetItem(i.Key.ToString("000")).Name.Contains("Spikes")).LastOrDefault().Key));
                     }
                 }
+                // Shuffles marble list
+                for (var i = 0; i < marbles.Count - 1; ++i)
+                {
+                    var r = Rand.Next(i, marbles.Count);
+                    var temp = marbles[i];
+                    marbles[i] = marbles[r];
+                    marbles[r] = temp;
+                }
                 var war = new War
                 {
                     Id = fileId
                 };
                 var t1Output = new StringBuilder();
                 var t2Output = new StringBuilder();
-                foreach (var marble in marbles)
+                for (int i = 0; i < marbles.Count; i++)
                 {
-                    if (Rand.Next(0, 2) > 0)
+                    WarMarble marble = marbles[i];
+                    if (i < (int)Math.Ceiling(marbles.Count / 2d))
                     {
                         war.Team1.Add(marble);
                         var user = Context.Client.GetUser(marble.Id);
@@ -158,18 +167,9 @@ namespace MarbleBot.Modules
                             1 => "095",
                             _ => "096"
                         }), GetItem("000"));
-                    if (war.Team1.Count > war.Team2.Count)
-                    {
-                        aiMarble.Team = 2;
-                        war.Team2.Add(aiMarble);
-                        t2Output.AppendLine("**MarbleBot** [MarbleBot#7194]");
-                    }
-                    else
-                    {
-                        aiMarble.Team = 1;
-                        war.Team1.Add(aiMarble);
-                        t1Output.AppendLine("**MarbleBot** [MarbleBot#7194]");
-                    }
+                    aiMarble.Team = 2;
+                    war.Team2.Add(aiMarble);
+                    t2Output.AppendLine("**MarbleBot** [MarbleBot#7194]");
                     war.SetAIMarble(aiMarble);
                 }
                 await ReplyAsync(embed: new EmbedBuilder()
@@ -200,6 +200,11 @@ namespace MarbleBot.Modules
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
+                if (currentMarble.HP < 0)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
+                    return;
+                }
                 var user = GetUser(Context);
                 var ammo = new Item();
                 if (currentMarble.WarClass == WarClass.Ranged)
@@ -232,6 +237,11 @@ namespace MarbleBot.Modules
                     {
                         if (Rand.Next(0, 10) < 9)
                         {
+                            if (enemy.HP < 0)
+                            {
+                                await ReplyAsync($"**{Context.User.Username}**, you cannot attack a dead marble!");
+                                return;
+                            }
                             var dmg = currentMarble.WarClass == WarClass.Ranged
                             ? (int)Math.Round(currentMarble.Weapon.Damage + ammo.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (0.5 + Rand.NextDouble())))
                             : (int)Math.Round(currentMarble.Weapon.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (0.5 + Rand.NextDouble())));
@@ -240,7 +250,7 @@ namespace MarbleBot.Modules
                             await ReplyAsync(embed: new EmbedBuilder()
                                 .WithColor(GetColor(Context))
                                 .WithCurrentTimestamp()
-                                .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!.")
+                                .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!")
                                 .WithTitle($"**{currentMarble.Name}** attacks!")
                                 .Build());
                             if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.WarEndAsync(Context);
@@ -251,7 +261,7 @@ namespace MarbleBot.Modules
                             .WithDescription($"**{currentMarble.Name}** tried to attack **{enemy.Name}** but missed!")
                             .WithTitle($"**{currentMarble.Name}** attacks!")
                             .Build());
-                        return;
+                        return; 
                     }
                 }
                 await ReplyAsync("Could not find the enemy!");
@@ -267,6 +277,11 @@ namespace MarbleBot.Modules
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
+                if (currentMarble.HP < 0)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
+                    return;
+                }
                 var user = GetUser(Context);
                 List<WarMarble> enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
                 for (int i = 0; i < enemyTeam.Count; i++)
@@ -274,13 +289,18 @@ namespace MarbleBot.Modules
                     WarMarble enemy = enemyTeam[i];
                     if (string.Compare(enemy.Name, target, true) == 0)
                     {
+                        if (enemy.HP < 0)
+                        {
+                            await ReplyAsync($"**{Context.User.Username}**, you cannot attack a dead marble!");
+                            return;
+                        }
                         var dmg = (int)Math.Round(3 * (1 + currentMarble.DamageIncrease / 50d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (1 + 0.5 * Rand.NextDouble())));
                         enemy.HP -= dmg;
                         currentMarble.DamageDealt += dmg;
                         await ReplyAsync(embed: new EmbedBuilder()
                             .WithColor(GetColor(Context))
                             .WithCurrentTimestamp()
-                            .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!.")
+                            .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}**!")
                             .WithTitle($"**{currentMarble.Name}** attacks!")
                             .Build());
                         if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.WarEndAsync(Context);
