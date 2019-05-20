@@ -10,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.Global;
+
 namespace MarbleBot.Modules
 {
     /// <summary> YouTube API-related commands. </summary>
@@ -24,7 +26,7 @@ namespace MarbleBot.Modules
 
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = Global.YTKey,
+                ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
             });
 
@@ -69,7 +71,7 @@ namespace MarbleBot.Modules
                 {
                     var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
-                        ApiKey = Global.YTKey,
+                        ApiKey = YTKey,
                         ApplicationName = GetType().ToString()
                     });
                     var searchListRequest = youtubeService.Search.List("snippet");
@@ -132,7 +134,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = Global.YTKey,
+                ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
             });
 
@@ -179,7 +181,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = Global.YTKey,
+                ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
             });
 

@@ -8,10 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.0.1" />
-    <PackageReference Include="Google.Apis.Docs.v1" Version="1.39.0.1576" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.39.0.1572" />
+    <PackageReference Include="Discord.Net" Version="2.1.0" />
+    <PackageReference Include="Google.Apis.Docs.v1" Version="1.40.0.1594" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.40.0.1593" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Octokit" Version="0.32.0" />
   </ItemGroup>
 
   <ItemGroup>

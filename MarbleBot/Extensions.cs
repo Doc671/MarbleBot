@@ -1,5 +1,4 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using MarbleBot.Core;
 using System;
 using System.Collections.Generic;
@@ -49,8 +48,11 @@ namespace MarbleBot.Extensions
         {
             var chr = str.ToCharArray();
             var output = new StringBuilder();
-            foreach (var c in chr)
+            for (int i = 0; i < chr.Length; i++)
+            {
+                char c = chr[i];
                 if (c != charToRemove) output.Append(c);
+            }
             return output.ToString();
         }
 

@@ -12,7 +12,7 @@
     "Description": "A hole-y drink of Qefpedun origin that contains Poup, acid, lava, rotten flesh and 13 different lethal diseases. Approved by Orange.",
     "OnSale": true,
     "ScavengeLocation": 0,
-    "CraftingProduced": 1,
+    "CraftingProduced": 0,
     "CraftingRecipe": {
       "020": 1,
       "021": 1,
@@ -918,14 +918,15 @@
   },
   "092": {
     "Name": "Mini-Marble",
-    "Price": 5.00,
+    "Price": 7.00,
     "Description": "No, it's not a bullet, it's a marble!",
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
     "CraftingProduced": 10,
+    "Damage": 3,
     "CraftingRecipe": {
-      "070": 2
+      "070": 3
     },
     "CraftingStationRequired": 2
   },
@@ -937,7 +938,7 @@
     "OnSale": false,
     "ScavengeLocation": 0,
     "Ammo": [ 92 ],
-    "Damage": 11,
+    "Damage": 10,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -964,7 +965,7 @@
   "095": {
     "Name": "The Hatchet",
     "Price": 34.95,
-    "Description": "A striking tool of elm wood with a sharp stone blade on one side.",
+    "Description": "A striking tool of ash wood with a sharp stone blade on one side.",
     "OnSale": false,
     "ScavengeLocation": 0,
     "Damage": 6,
@@ -980,11 +981,11 @@
   "096": {
     "Name": "Wooden Crossbow",
     "Price": 33.49,
-    "Description": "A bow fixed across a support of ash wood with a groove to fire bolts.",
+    "Description": "A bow fixed across a support of elm wood with a groove to fire bolts.",
     "OnSale": false,
     "ScavengeLocation": 0,
     "Ammo": [ 98, 100, 101 ],
-    "Damage": 8,
+    "Damage": 4,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1000,7 +1001,7 @@
     "OnSale": false,
     "ScavengeLocation": 0,
     "Ammo": [98, 100, 101],
-    "Damage": 10,
+    "Damage": 8,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1013,7 +1014,7 @@
   "098": {
     "Name": "Wooden Bolt",
     "Price": 4.15,
-    "Description": "An arrow of ash wood used in a crossow.",
+    "Description": "An arrow of elm wood used in a crossbow.",
     "OnSale": false,
     "ScavengeLocation": 0,
     "Damage": 1,
@@ -1027,7 +1028,7 @@
     "Price": 0.00,
     "Description": "...",
     "OnSale": false,
-    "ScavengeLocation": 0,
+    "ScavengeLocation": 0
   },
   "100": {
     "Name": "Nickel Bolt",
@@ -1053,7 +1054,7 @@
     "Damage": 3,
     "CraftingProduced": 5,
     "CraftingRecipe": {
-      "074": 1,
+      "073": 1,
       "079": 1
     },
     "CraftingStationRequired": 2

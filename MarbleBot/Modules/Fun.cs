@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.Global;
+
 namespace MarbleBot.Modules
 {
     /// <summary> Fun non-game commands. </summary>
@@ -20,7 +22,7 @@ namespace MarbleBot.Modules
 #pragma warning restore IDE0060 // Remove unused parameter
         {
             await Context.Channel.TriggerTypingAsync();
-            string outcome = Global.Rand.Next(0, 13) switch
+            string outcome = Rand.Next(0, 13) switch
             {
                 0 => "no.",
                 1 => "looking negative.",
@@ -93,7 +95,7 @@ namespace MarbleBot.Modules
                 msg = new StringBuilder().Append("Well done. Your next goal is to gather for items at Canary Beach and Tree Wurld.")
                     .Append("Use `mb/scavenge help` if you are unsure of how to proceed.")
                     .ToString();
-            else msg = new StringBuilder().Append($"Welcome! Your first task is to gain {Global.UoM}1000! If you need help ")
+            else msg = new StringBuilder().Append($"Welcome! Your first task is to gain {UoM}1000! If you need help ")
                     .Append("earning money, try using `mb/daily`, `mb/race` or `mb/siege`.")
                     .ToString();
             await ReplyAsync(embed: new EmbedBuilder()
@@ -116,7 +118,7 @@ namespace MarbleBot.Modules
                 SocketGuildUser[] users = Context.Guild.Users.ToArray();
                 for (int i = 0; i < Context.Guild.MemberCount - 1; i++)
                     names[i] = users[i].Username;
-                await ReplyAsync($"**{names[Global.Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
+                await ReplyAsync($"**{names[Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
             }
         }
 
@@ -140,7 +142,7 @@ namespace MarbleBot.Modules
                     a++;
                 }
             }
-            int choice = Global.Rand.Next(0, noOfMarbles);
+            int choice = Rand.Next(0, noOfMarbles);
             int d = choice / 10;
             int c = choice - (d * 10);
             await ReplyAsync($"**{Context.User.Username}**, I bet that **{marbles[d - 1, c - 1]}** will win!");
@@ -155,8 +157,8 @@ namespace MarbleBot.Modules
             if (Context.Guild.Id != CM)
             {
                 await Context.Channel.TriggerTypingAsync();
-                var price = Global.Rand.Next(0, int.MaxValue);
-                var hatNo = Global.Rand.Next(0, 69042);
+                var price = Rand.Next(0, int.MaxValue);
+                var hatNo = Rand.Next(0, 69042);
                 await ReplyAsync($"That'll be **{price}** units of money please. Thank you for buying Uglee Hat #**{hatNo}**!");
             }
         }
@@ -167,7 +169,7 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             string[] choices = input.Split('|');
-            int choice = Global.Rand.Next(0, choices.Length);
+            int choice = Rand.Next(0, choices.Length);
             if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(choices[choice])))
             {
                 if (Context.IsPrivate)
@@ -186,7 +188,7 @@ namespace MarbleBot.Modules
         public async Task OrangeCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            int choice = Global.Rand.Next(1, 6);
+            int choice = Rand.Next(1, 6);
             await ReplyAsync(choice switch
             {
                 1 => "!olleH",
@@ -235,7 +237,7 @@ namespace MarbleBot.Modules
             {
                 try
                 {
-                    int randNumber = Global.Rand.Next(end, start);
+                    int randNumber = Rand.Next(end, start);
                     await ReplyAsync(randNumber.ToString());
                 }
                 catch (FormatException)
@@ -248,7 +250,7 @@ namespace MarbleBot.Modules
             {
                 try
                 {
-                    int randNumber = Global.Rand.Next(start, end);
+                    int randNumber = Rand.Next(start, end);
                     await ReplyAsync(randNumber.ToString());
                 }
                 catch (FormatException)
@@ -265,8 +267,8 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             EmbedBuilder builder = new EmbedBuilder();
-            byte level = Convert.ToByte(Global.Rand.Next(0, 25));
-            int xp = level * 100 * Global.Rand.Next(1, 5);
+            byte level = Convert.ToByte(Rand.Next(0, 25));
+            int xp = level * 100 * Rand.Next(1, 5);
 
             var msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
             byte ranks = 0;
@@ -348,7 +350,7 @@ namespace MarbleBot.Modules
                 case "the hat stoar": rating = 10; message = "!raotS taH ehT owt oG"; break;
                 case "vinh": rating = 10; message = "Henlo Cooooooooool Vinh"; break;
                 case "yad egnaro": goto case "orange day";
-                default: rating = Global.Rand.Next(0, 11); break;
+                default: rating = Rand.Next(0, 11); break;
             }
             switch (input.ToLower())
             {
@@ -508,7 +510,7 @@ namespace MarbleBot.Modules
                         a++;
                     }
                 }
-                randNo = Global.Rand.Next(1, a);
+                randNo = Rand.Next(1, a);
             }
             else
             {
@@ -530,7 +532,7 @@ namespace MarbleBot.Modules
                         }
                         a++;
                     }
-                    if (!wordSet) randNo = Global.Rand.Next(1, a);
+                    if (!wordSet) randNo = Rand.Next(1, a);
                 }
             }
             await ReplyAsync($"**__{wordList[randNo]}__**\nInventor: {invList[randNo]}\nDescription: {descList[randNo]}");

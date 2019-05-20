@@ -3,11 +3,14 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Core;
 using MarbleBot.Extensions;
+using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using static MarbleBot.Global;
 
 namespace MarbleBot.Modules
 {
@@ -19,13 +22,13 @@ namespace MarbleBot.Modules
         [Summary("Shows bot info.")]
         public async Task BotInfoCommandAsync()
             => await ReplyAsync(embed: new EmbedBuilder()
-                .AddField("Daily Timeout", $"{Global.DailyTimeout} hours", true)
-                .AddField("Ongoing Races", Global.RaceAlive.Count, true)
-                .AddField("Ongoing Scavenges", Global.ScavengeInfo.Count, true)
-                .AddField("Ongoing Sieges", Global.SiegeInfo.Count, true)
-                .AddField("Ongoing Wars", Global.WarInfo.Count, true)
-                .AddField("Start Time (UTC)", Global.StartTime.Value.ToString("yyyy-MM-dd hh:mm:ss"), true)
-                .AddField("Uptime", DateTime.UtcNow.Subtract(Global.StartTime.Value).ToString(), true)
+                .AddField("Daily Timeout", $"{DailyTimeout} hours", true)
+                .AddField("Ongoing Races", RaceAlive.Count, true)
+                .AddField("Ongoing Scavenges", ScavengeInfo.Count, true)
+                .AddField("Ongoing Sieges", SiegeInfo.Count, true)
+                .AddField("Ongoing Wars", WarInfo.Count, true)
+                .AddField("Start Time (UTC)", StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss"), true)
+                .AddField("Uptime", DateTime.UtcNow.Subtract(StartTime.Value).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -53,8 +56,8 @@ namespace MarbleBot.Modules
                     break;
                 case "economy":
                     var allCmds = new StringBuilder();
-                    var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => c.Module.Name.ToLower() == command.ToLower())
-                        .OrderBy(c => c.Name);
+                    var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => string.Compare(c.Module.Name, command, true) == 0
+                    && !c.Preconditions.Any(c => c is RequireOwnerAttribute)).OrderBy(c => c.Name);
                     if (!Context.IsPrivate)
                     {
                         if (Context.Guild.Id == CM) commands = commands.Where(c => c.Remarks != "Not CM");
@@ -68,7 +71,7 @@ namespace MarbleBot.Modules
                         allCmds.AppendLine($"**{name}** - {cmd.Summary}");
                     }
                     builder.AddField(
-                            $"{System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Global.CommandService.Modules.Where(m => m.Name.ToLower() == command.ToLower()).First().Name)} Commands",
+                            $"{System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Global.CommandService.Modules.Where(m => string.Compare(m.Name, command) == 0).First().Name)} Commands",
                             allCmds.ToString())
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help");
@@ -103,7 +106,10 @@ namespace MarbleBot.Modules
                 case "full":
                     var output = new StringBuilder();
                     foreach (var cmd in Global.CommandService.Commands)
-                        output.Append($"`{cmd.Name}`");
+                    {
+                        if (string.Compare(cmd.Module.Name, "Sneak", true) != 0 && (GetUser(Context).Stage < 2 && string.Compare(cmd.Remarks, "Stage2", true) != 0))
+                            output.Append($"`{cmd.Name}` ");
+                    }
                     output.Append("\n\nThis has been deprecated.");
                     await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
@@ -142,7 +148,8 @@ namespace MarbleBot.Modules
                         // Economy
                         case "balance": hCommand.Usage = "mb/balance <optional user>"; break;
                         case "buy": hCommand.Usage = "mb/buy <item ID> <# of items>"; hCommand.Example = "mb/buy 1 1"; break;
-                        case "craft": hCommand.Usage = "mb/craft <item ID>"; hCommand.Example = "mb/craft 014"; break;
+                        case "craft": hCommand.Usage = "mb/craft <item ID> <# of items>"; hCommand.Example = "mb/craft 014 2"; break;
+                        case "dismantle": hCommand.Usage = "mb/dismantle <item ID> <# of items>"; hCommand.Example = "mb/decraft 045 10"; break;
                         case "inventory": hCommand.Usage = "mb/inventory <optional user>"; break;
                         case "item": hCommand.Usage = "mb/item <item ID>"; break;
                         case "poupsoop": hCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; hCommand.Example = "mb/poupsoop 3 | 1"; break;
@@ -202,6 +209,25 @@ namespace MarbleBot.Modules
                 .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used! ")
                 .Append("If no usable channel is set, commands can be used anywhere.")
                 .ToString());
+
+        [Command("issue")]
+        [Summary("Posts an issue.")]
+        public async Task IssueCommandAsync(string title, string description)
+        {
+            var client = new GitHubClient(new ProductHeaderValue("MarbleBot"));
+            var newIssue = new NewIssue(title)
+            {
+                Body = description
+            };
+            var issue = await client.Issue.Create("owner", "name", newIssue);
+            await ReplyAsync(embed: new EmbedBuilder()
+                .AddField(issue.Title, issue.Body)
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithDescription($"Posted issue #{issue.Number} in {issue.Repository}")
+                .WithTitle("Issue posted")
+                .Build());
+        }
 
         [Command("serverinfo")]
         [Summary("Displays information about the current server.")]
@@ -289,7 +315,7 @@ namespace MarbleBot.Modules
         [Command("uptime")]
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommandAsync()
-        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(Global.StartTime.Value))}**.");
+        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(StartTime.Value))}**.");
 
         [Command("userinfo")]
         [Summary("Displays information about a user.")]

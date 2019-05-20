@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.Global;
+
 namespace MarbleBot.Modules
 {
     public partial class Games
@@ -90,18 +92,18 @@ namespace MarbleBot.Modules
                         }
                         marbleList.Close();
                     }
-                    Global.RaceAlive.Add(fileId, marbleCount);
+                    RaceAlive.Add(fileId, marbleCount);
 
                     // Race start
                     builder.WithTitle("The race has started!");
                     var msg = await ReplyAsync(embed: builder.Build());
                     await Task.Delay(1500);
-                    byte alive = Context.IsPrivate ? Global.RaceAlive[Context.User.Id] : Global.RaceAlive[Context.Guild.Id];
+                    byte alive = Context.IsPrivate ? RaceAlive[Context.User.Id] : RaceAlive[Context.Guild.Id];
                     byte id = alive;
                     while (alive > 1)
                     {
                         int eliminated = 0;
-                        do eliminated = Global.Rand.Next(0, id);
+                        do eliminated = Rand.Next(0, id);
                         while (string.Compare(marbles[eliminated].Item1, "///out", true) == 0);
                         var deathmsg = "";
                         var msgs = new List<string>();
@@ -114,7 +116,7 @@ namespace MarbleBot.Modules
                                 msgs.Add(await msgFile.ReadLineAsync());
                             }
                         }
-                        int choice = Global.Rand.Next(0, msgCount - 1);
+                        int choice = Rand.Next(0, msgCount - 1);
                         deathmsg = msgs[choice];
                         var mName = marbles[eliminated].Item1.ToLower();
                         builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathmsg} and is now out of the competition!");
@@ -138,8 +140,8 @@ namespace MarbleBot.Modules
                     }
 
                     // Race finish
-                    if (Context.IsPrivate) Global.RaceAlive.Remove(Context.User.Id);
-                    else Global.RaceAlive.Remove(Context.Guild.Id);
+                    if (Context.IsPrivate) RaceAlive.Remove(Context.User.Id);
+                    else RaceAlive.Remove(Context.Guild.Id);
                     var winnerID = 0ul;
                     for (int i = 0; i < marbles.Count; i++)
                     {
@@ -174,7 +176,7 @@ namespace MarbleBot.Modules
                             obj.Remove(winnerID.ToString());
                             obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(user)));
                             WriteUsers(obj);
-                            await ReplyAsync($"**{user.Name}** won {Global.UoM}**{gift:n}** for winning the race!");
+                            await ReplyAsync($"**{user.Name}** won {UoM}**{gift:n}** for winning the race!");
                         }
                     }
                     using (var marbleList = new StreamWriter($"Data\\{fileId}race.csv", false))
@@ -267,7 +269,7 @@ namespace MarbleBot.Modules
                             winList.Add((winner.Key, winner.Value));
                         winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
                         builder.WithTitle("Race Leaderboard: Winners")
-                            .WithDescription(Global.Leaderboard(winList, no));
+                            .WithDescription(Leaderboard(winList, no));
                         await ReplyAsync(embed: builder.Build());
                     }
                     else
@@ -287,7 +289,7 @@ namespace MarbleBot.Modules
                             winList.Add((winner.Key, winner.Value));
                         winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
                         builder.WithTitle("Race Leaderboard: Most Used")
-                            .WithDescription(Global.Leaderboard(winList, no));
+                            .WithDescription(Leaderboard(winList, no));
                         await ReplyAsync(embed: builder.Build());
                     }
                 }

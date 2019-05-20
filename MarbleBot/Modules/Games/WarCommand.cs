@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.Global;
+
 namespace MarbleBot.Modules
 {
     public partial class Games
@@ -39,7 +41,7 @@ namespace MarbleBot.Modules
                     await ReplyAsync($"**{Context.User.Username}**, your entry exceeds the 100 character limit.");
                     return;
                 }
-                else if (Global.WarInfo.ContainsKey(fileId))
+                else if (WarInfo.ContainsKey(fileId))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
                     return;
@@ -90,18 +92,20 @@ namespace MarbleBot.Modules
                         var line = (await marbleList.ReadLineAsync()).RemoveChar('\n').Split(',');
                         var userId = ulong.Parse(line[1]);
                         var user = GetUser(Context, userId);
-                        marbles.Add(new WarMarble(userId, 50, line[0], GetItem(line[2]),
+                        marbles.Add(new WarMarble(userId, 35, line[0], GetItem(line[2]),
                             user.Items.ContainsKey(63) && user.Items[63] > 1 ? GetItem("063") : GetItem("000"),
                             user.Items.Where(i => GetItem(i.Key.ToString("000")).Name.Contains("Spikes")).LastOrDefault().Key));
                     }
                 }
-                var war = new War();
-                war.Id = fileId;
+                var war = new War
+                {
+                    Id = fileId
+                };
                 var t1Output = new StringBuilder();
                 var t2Output = new StringBuilder();
                 foreach (var marble in marbles)
                 {
-                    if (Global.Rand.Next(0, 2) > 0)
+                    if (Rand.Next(0, 2) > 0)
                     {
                         war.Team1.Add(marble);
                         var user = Context.Client.GetUser(marble.Id);
@@ -116,21 +120,20 @@ namespace MarbleBot.Modules
                         t2Output.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
                     }
                 }
+                var nameList = new List<string>();
                 using (var teamNames = new StreamReader("Resources\\WarTeamNames.txt"))
                 {
-                    var nameArray = teamNames.ReadToEnd().Split('\n');
-                    war.Team1Name = nameArray[Global.Rand.Next(0, nameArray.Length)];
-                    do
-                    {
-                        war.Team2Name = nameArray[Global.Rand.Next(0, nameArray.Length)].Trim('\n');
-                    }
-                    while (string.Compare(war.Team1Name, war.Team2Name, false) == 0);
+                    while (!teamNames.EndOfStream)
+                        nameList.Add(await teamNames.ReadLineAsync());
                 }
+                war.Team1Name = nameList[Rand.Next(0, nameList.Count)];
+                do war.Team2Name = nameList[Rand.Next(0, nameList.Count)];
+                while (string.Compare(war.Team1Name, war.Team2Name, false) == 0);
                 if (war.AllMarbles.Count() % 2 > 0)
                 {
                     WarMarble aiMarble;
                     if (Math.Round(war.AllMarbles.Sum(m => GetUser(Context, m.Id).Stage) / (double)war.AllMarbles.Count()) == 2)
-                        aiMarble = new WarMarble(Global.BotId, 50, "MarbleBot", GetItem(Global.Rand.Next(0, 9) switch
+                        aiMarble = new WarMarble(BotId, 35, "MarbleBot", GetItem(Rand.Next(0, 9) switch
                         {
                             0 => "086",
                             1 => "087",
@@ -141,15 +144,16 @@ namespace MarbleBot.Modules
                             6 => "095",
                             7 => "096",
                             _ => "097"
-                        }), GetItem("063"), Global.Rand.Next(0, 4) switch
+                        }), GetItem("063"), Rand.Next(0, 4) switch
                         {
                             0 => 66,
                             1 => 71,
                             2 => 74,
                             _ => 80
                         });
-                    else aiMarble = new WarMarble(Global.BotId, 50, "MarbleBot", 
-                        GetItem(Global.Rand.Next(0, 2) switch {
+                    else aiMarble = new WarMarble(BotId, 35, "MarbleBot",
+                        GetItem(Rand.Next(0, 2) switch
+                        {
                             0 => "094",
                             1 => "095",
                             _ => "096"
@@ -175,7 +179,7 @@ namespace MarbleBot.Modules
                     .AddField($"Team {war.Team1Name}", t1Output.ToString())
                     .AddField($"Team {war.Team2Name}", t2Output.ToString())
                     .Build());
-                Global.WarInfo.Add(fileId, war);
+                WarInfo.Add(fileId, war);
                 war.Actions = Task.Run(async () => { await war.WarActions(Context); });
             }
 
@@ -183,7 +187,7 @@ namespace MarbleBot.Modules
             [RequireOwner]
             public async Task WarStopCommandAsync()
             {
-                Global.WarInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Dispose();
+                WarInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Dispose();
                 await ReplyAsync("War successfully stopped.");
             }
 
@@ -194,7 +198,7 @@ namespace MarbleBot.Modules
             {
                 await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                var war = Global.WarInfo[fileId];
+                var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
                 var user = GetUser(Context);
                 var ammo = new Item();
@@ -226,33 +230,42 @@ namespace MarbleBot.Modules
                     WarMarble enemy = enemyTeam[i];
                     if (string.Compare(enemy.Name, target, true) == 0)
                     {
-                        var dmg = currentMarble.WarClass == WarClass.Ranged 
-                            ? (int)Math.Round(currentMarble.Weapon.Damage + ammo.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(user.Items.ContainsKey(63))))
-                            : (int)Math.Round(currentMarble.Weapon.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(user.Items.ContainsKey(63))));
-                        enemy.HP -= dmg;
-                        currentMarble.DamageDealt += dmg;
-                        await ReplyAsync(embed: new EmbedBuilder()
+                        if (Rand.Next(0, 10) < 9)
+                        {
+                            var dmg = currentMarble.WarClass == WarClass.Ranged
+                            ? (int)Math.Round(currentMarble.Weapon.Damage + ammo.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (0.5 + Rand.NextDouble())))
+                            : (int)Math.Round(currentMarble.Weapon.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (0.5 + Rand.NextDouble())));
+                            enemy.HP -= dmg;
+                            currentMarble.DamageDealt += dmg;
+                            await ReplyAsync(embed: new EmbedBuilder()
+                                .WithColor(GetColor(Context))
+                                .WithCurrentTimestamp()
+                                .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!.")
+                                .WithTitle($"**{currentMarble.Name}** attacks!")
+                                .Build());
+                            if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.WarEndAsync(Context);
+                        }
+                        else await Context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                             .WithColor(GetColor(Context))
                             .WithCurrentTimestamp()
-                            .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!.")
+                            .WithDescription($"**{currentMarble.Name}** tried to attack **{enemy.Name}** but missed!")
                             .WithTitle($"**{currentMarble.Name}** attacks!")
                             .Build());
-                        if (war.Team1.Sum(m => m.HP) > 0 || war.Team2.Sum(m => m.HP) > 0) await war.WarEndAsync(Context);
                         return;
                     }
                 }
                 await ReplyAsync("Could not find the enemy!");
             }
 
-            [Command("bonk")]
-            [Alias("bash", "charge")]
-            [Summary("Attacks a member of the opposing team with the equipped weapon.")]
+            [Command("bash")]
+            [Alias("bonk", "charge")]
+            [Summary("Attacks a member of the opposing team without a weapon.")]
             [RequireSlowmode]
             public async Task WarBonkCommandAsync([Remainder] string target)
             {
                 await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                var war = Global.WarInfo[fileId];
+                var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
                 var user = GetUser(Context);
                 List<WarMarble> enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
@@ -261,7 +274,7 @@ namespace MarbleBot.Modules
                     WarMarble enemy = enemyTeam[i];
                     if (string.Compare(enemy.Name, target, true) == 0)
                     {
-                        var dmg = (int)Math.Round(3 * (1 + currentMarble.DamageIncrease / 50d) * (1 - 0.2 * Convert.ToDouble(user.Items.ContainsKey(63))));
+                        var dmg = (int)Math.Round(3 * (1 + currentMarble.DamageIncrease / 50d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (1 + 0.5 * Rand.NextDouble())));
                         enemy.HP -= dmg;
                         currentMarble.DamageDealt += dmg;
                         await ReplyAsync(embed: new EmbedBuilder()
@@ -270,7 +283,7 @@ namespace MarbleBot.Modules
                             .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!.")
                             .WithTitle($"**{currentMarble.Name}** attacks!")
                             .Build());
-                        if (war.Team1.Sum(m => m.HP) > 0 || war.Team2.Sum(m => m.HP) > 0) await war.WarEndAsync(Context);
+                        if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.WarEndAsync(Context);
                         return;
                     }
                 }
@@ -296,7 +309,7 @@ namespace MarbleBot.Modules
                             var mSplit = marble.Split(',');
                             var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
                             var weapon = GetItem(int.Parse(mSplit[2]).ToString("000"));
-                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0]} (Weapon: **{weapon}**)**");
+                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0]}** (Weapon: **{weapon}**)");
                             else marbles.AppendLine($"**{mSplit[0]}** (Weapon: **{weapon}**) [{user.Username}#{user.Discriminator}]");
                             cCount++;
                         }
@@ -322,12 +335,13 @@ namespace MarbleBot.Modules
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
                     .WithTitle("War Info");
-                if (Global.WarInfo.ContainsKey(fileId))
+                if (WarInfo.ContainsKey(fileId))
                 {
                     var t1Output = new StringBuilder();
                     var t2Output = new StringBuilder();
-                    var war = Global.WarInfo[fileId];
-                    foreach (var marble in war.Team1) {
+                    var war = WarInfo[fileId];
+                    foreach (var marble in war.Team1)
+                    {
                         var user = Context.Client.GetUser(marble.Id);
                         t1Output.AppendLine($"{marble.Name} (HP: **{marble.HP}**/{marble.MaxHP}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
                     }
@@ -367,23 +381,98 @@ namespace MarbleBot.Modules
                 await ReplyAsync(embed: builder.Build());
             }
 
+            [Command("leaderboard")]
+            [Alias("leaderboard mostused")]
+            [Summary("Shows a leaderboard of most used marbles in Sieges.")]
+            public async Task SiegeLeaderboardCommandAsync(string rawNo = "1")
+            {
+                if (int.TryParse(rawNo, out int no))
+                {
+                    var winners = new SortedDictionary<string, int>();
+                    using (var win = new StreamReader("Data\\WarMostUsed.txt"))
+                    {
+                        while (!win.EndOfStream)
+                        {
+                            var racerInfo = await win.ReadLineAsync();
+                            if (winners.ContainsKey(racerInfo)) winners[racerInfo]++;
+                            else winners.Add(racerInfo, 1);
+                        }
+                    }
+                    var winList = new List<(string, int)>();
+                    foreach (var winner in winners)
+                        winList.Add((winner.Key, winner.Value));
+                    winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                    await ReplyAsync(embed: new EmbedBuilder()
+                        .WithColor(GetColor(Context))
+                        .WithCurrentTimestamp()
+                        .WithDescription(Leaderboard(winList, no))
+                        .WithTitle("War Leaderboard: Most Used")
+                        .Build());
+                }
+                else await ReplyAsync("This is not a valid number! Format: `mb/war leaderboard <optional number>`");
+            }
+
+            [Command("remove")]
+            [Summary("Removes a contestant from the contestant list.")]
+            [RequireSlowmode]
+            public async Task SiegeRemoveCommandAsync([Remainder] string marbleToRemove)
+            {
+                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+                // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
+                byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0;
+                var wholeFile = new StringBuilder();
+                using (var marbleList = new StreamReader($"Data\\{fileId}war.csv"))
+                {
+                    while (!marbleList.EndOfStream)
+                    {
+                        var line = await marbleList.ReadLineAsync();
+                        if (string.Compare(line.Split(',')[0], marbleToRemove, true) == 0)
+                        {
+                            if (ulong.Parse(line.Split(',')[1]) == Context.User.Id)
+                                state = 2;
+                            else
+                            {
+                                wholeFile.AppendLine(line);
+                                if (!(state == 2)) state = 1;
+                            }
+                        }
+                        else wholeFile.AppendLine(line);
+                    }
+                }
+                switch (state)
+                {
+                    case 0: await ReplyAsync("Could not find the requested marble!"); break;
+                    case 1: await ReplyAsync("This is not your marble!"); break;
+                    case 2:
+                        using (var marbleList = new StreamWriter($"Data\\{fileId}war.csv", false))
+                        {
+                            await marbleList.WriteAsync(wholeFile.ToString());
+                            await ReplyAsync($"Removed contestant **{marbleToRemove}**!");
+                        }
+                        break;
+                    case 3: goto case 2;
+                }
+            }
+
             [Command("")]
             [Alias("help")]
             [Priority(-1)]
-            [Summary("Race help.")]
+            [Summary("War help.")]
             public async Task WarHelpCommandAsync([Remainder] string _ = "")
                 => await ReplyAsync(embed: new EmbedBuilder()
                     .AddField("How to play",
                         new StringBuilder()
                             .AppendLine("Use `mb/war signup <weapon ID> <marble name>` to sign up as a marble!")
-                            .AppendLine("When everyone's done, use `mb/war start`! The War begins automatically if 20 people have signed up.")
-                            .Append("\nWhen the war begins, use `mb/attack <marble name>` to attack an enemy with your weapon")
-                            .AppendLine(" and `mb/bash <marble name>` to attack without. Spikes are twice as effective with `mb/bash`.")
-                            .AppendLine("\nYou can earn Units of Money if you win! (6 hour cooldown)")
+                            .AppendLine("When everyone's done, use `mb/war start`! The war begins automatically if 20 people have signed up.")
+                            .Append("\nWhen the war begins, use `mb/war attack <marble name>` to attack an enemy with your weapon")
+                            .AppendLine(" and `mb/war bash <marble name>` to attack without. Spikes are twice as effective with `mb/war bash`.")
+                            .Append("\nEveryone is split into two teams. If there is an odd number of contestants, an AI marble joins")
+                            .AppendLine(" the team that has fewer members!")
                             .ToString())
                     .AddField("Valid weapons", new StringBuilder()
                         .AppendLine("Any item that displays a 'War Class' when you use `mb/item` on it is valid.")
-                        .AppendLine("Remember that ranged weapons need ammo to work!")
+                        .Append("\nMelee and ranged weapons both have 90% accuracy but ranged weapons require")
+                        .Append(" ammo to work. Bashing is 100% accurate but only has a base damage of 3.")
                         .ToString())
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()

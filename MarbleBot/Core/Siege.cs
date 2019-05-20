@@ -36,7 +36,7 @@ namespace MarbleBot.Core
             Boss.HP -= dmg;
             if (Boss.HP < 1)
                 await SiegeVictoryAsync(context);
-            if ((string.Compare(Boss.Name, "Destroyer", true) == 0) && Boss.HP <= Boss.MaxHP / 2)
+            if ((string.Compare(Boss.Name, "Destroyer", true) == 0) && Boss.HP <= Boss.MaxHP >> 1)
             {
                 AttackTime = 12000;
                 Boss.ImageUrl = "https://cdn.discordapp.com/attachments/296376584238137355/567456912430333962/DestroyerCorrupted.png";
@@ -51,7 +51,10 @@ namespace MarbleBot.Core
             Active = false;
             if (_disposed) return;
             if (disposing)
+            {
+                Actions.Wait();
                 Actions.Dispose();
+            }
             Boss.ResetHP();
             Marbles = null;
             using (var marbleList = new StreamWriter($"Data\\{Id}siege.csv", false))

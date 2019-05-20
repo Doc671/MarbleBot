@@ -8,6 +8,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.Global;
+
 namespace MarbleBot.Modules
 {
     public partial class Games
@@ -30,10 +32,10 @@ namespace MarbleBot.Modules
                 }
                 else
                 {
-                    if (Global.ScavengeInfo.ContainsKey(Context.User.Id)) await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
+                    if (ScavengeInfo.ContainsKey(Context.User.Id)) await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
                     else
                     {
-                        Global.ScavengeInfo.Add(Context.User.Id, new Scavenge(Context, location));
+                        ScavengeInfo.Add(Context.User.Id, new Scavenge(Context, location));
                         embed.WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)}**!")
                             .WithTitle("Item Scavenge Begin!");
                         await ReplyAsync(embed: embed.Build());
@@ -92,18 +94,18 @@ namespace MarbleBot.Modules
                 var obj = GetUsersObj();
                 var user = GetUser(Context, obj);
 
-                if (Global.ScavengeInfo.ContainsKey(Context.User.Id))
+                if (ScavengeInfo.ContainsKey(Context.User.Id))
                 {
-                    if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to grab!");
+                    if (ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to grab!");
                     else
                     {
-                        if (Global.ScavengeInfo[Context.User.Id].Items.Count > 0)
+                        if (ScavengeInfo[Context.User.Id].Items.Count > 0)
                         {
-                            if (Global.ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
+                            if (ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
                                 await ReplyAsync($"**{Context.User.Username}**, you need to drill for ore!");
                             else
                             {
-                                var item = Global.ScavengeInfo[Context.User.Id].Items.Dequeue();
+                                var item = ScavengeInfo[Context.User.Id].Items.Dequeue();
                                 if (user.Items != null)
                                 {
                                     if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -136,18 +138,18 @@ namespace MarbleBot.Modules
                 var obj = GetUsersObj();
                 var user = GetUser(Context, obj);
 
-                if (Global.ScavengeInfo.ContainsKey(Context.User.Id))
+                if (ScavengeInfo.ContainsKey(Context.User.Id))
                 {
-                    if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to drill!");
+                    if (ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to drill!");
                     else
                     {
-                        if (Global.ScavengeInfo[Context.User.Id].Items.Count > 0)
+                        if (ScavengeInfo[Context.User.Id].Items.Count > 0)
                         {
-                            if (Global.ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
+                            if (ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
                             {
                                 if (user.Items.ContainsKey(81) || user.Items.ContainsKey(82))
                                 {
-                                    var item = Global.ScavengeInfo[Context.User.Id].Items.Dequeue();
+                                    var item = ScavengeInfo[Context.User.Id].Items.Dequeue();
                                     if (user.Items != null)
                                     {
                                         if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -181,22 +183,22 @@ namespace MarbleBot.Modules
                 var obj = GetUsersObj();
                 var user = GetUser(Context, obj);
 
-                if (Global.ScavengeInfo.ContainsKey(Context.User.Id))
+                if (ScavengeInfo.ContainsKey(Context.User.Id))
                 {
-                    if (Global.ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to sell!");
+                    if (ScavengeInfo[Context.User.Id] == null) await ReplyAsync($"**{Context.User.Username}**, there is no item to sell!");
                     else
                     {
-                        if (Global.ScavengeInfo[Context.User.Id].Items.Count > 0)
+                        if (ScavengeInfo[Context.User.Id].Items.Count > 0)
                         {
-                            if (Global.ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
+                            if (ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
                                 await ReplyAsync($"**{Context.User.Username}**, you need to drill for ore!");
                             else
                             {
-                                var item = Global.ScavengeInfo[Context.User.Id].Items.Dequeue();
+                                var item = ScavengeInfo[Context.User.Id].Items.Dequeue();
                                 user.Balance += item.Price;
                                 user.NetWorth += item.Price;
                                 WriteUsers(obj, Context.User, user);
-                                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {Global.UoM}**{item.Price:n}**!");
+                                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n}**!");
                             }
                         }
                         else await ReplyAsync($"**{Context.User.Username}**, there is nothing to sell!");

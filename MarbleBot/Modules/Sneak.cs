@@ -8,6 +8,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.Global;
+
 namespace MarbleBot.Modules
 {
     /// <summary> Owner-only commands. >:) </summary>
@@ -18,13 +20,13 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task AutoresponseCommandAsync(string option) {
             switch (option) {
-                case "time": await ReplyAsync($"Last Use: {Global.ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
+                case "time": await ReplyAsync($"Last Use: {ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
                 case "update": {
-                    Global.Autoresponses = new Dictionary<string, string>();
+                    Autoresponses = new Dictionary<string, string>();
                     using (var arFile = new StreamReader("Resources\\Autoresponses.txt")) {
                         while (!arFile.EndOfStream) {
                             var arPair = arFile.ReadLine().Split(';');
-                            Global.Autoresponses.Add(arPair[0], arPair[1]);
+                            Autoresponses.Add(arPair[0], arPair[1]);
                         }
                     }
                     await ReplyAsync("Dictionary update complete!");
@@ -41,7 +43,7 @@ namespace MarbleBot.Modules
         public async Task DailyTimeoutCommandAsync(string rawHours)
         {
             if (ushort.TryParse(rawHours, out ushort hours)) {
-                Global.DailyTimeout = hours;
+                DailyTimeout = hours;
                 await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");
             } else await ReplyAsync("Invalid number of hours!");
         }
@@ -82,11 +84,14 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            foreach (MBServer server in Global.Servers.Value)
+            foreach (MBServer server in Servers.Value)
             {
-                var channel = Context.Client.GetGuild(server.Id).GetTextChannel(server.AnnouncementChannel);
-                var msg = await channel.SendMessageAsync(embed: builder.Build());
-                if (major) await msg.PinAsync();
+                if (server.AnnouncementChannel != 0)
+                {
+                    var channel = Context.Client.GetGuild(server.Id).GetTextChannel(server.AnnouncementChannel);
+                    var msg = await channel.SendMessageAsync(embed: builder.Build());
+                    if (major) await msg.PinAsync();
+                }
             }
         }
 
@@ -112,13 +117,13 @@ namespace MarbleBot.Modules
         public async Task SiegeDictCommandAsync()
         {
             var output = new StringBuilder();
-            foreach (var siegePair in Global.SiegeInfo)
+            foreach (var siegePair in SiegeInfo)
                 output.Append($"{siegePair.Key} - {siegePair.Value}");
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
-                .WithTitle("`Global.SiegeInfo`")
+                .WithTitle("`SiegeInfo`")
                 .Build());
         }
     }
