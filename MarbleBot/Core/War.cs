@@ -31,17 +31,17 @@ namespace MarbleBot.Core
         private void Dispose(bool disposing)
         {
             if (_disposed) return;
+            _disposed = true;
+            Global.WarInfo.Remove(Id);
+            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}war.csv", false))
+                marbleList.Write("");
+            Team1 = null;
+            Team2 = null;
             if (disposing)
             {
                 Actions.Wait();
                 Actions.Dispose();
             }
-            Global.WarInfo.Remove(Id);
-            using (var marbleList = new StreamWriter($"Data\\{Id}war.csv", false))
-                marbleList.Write("");
-            Team1 = null;
-            Team2 = null;
-            _disposed = true;
         }
 
         public void SetAIMarble(WarMarble aiMarble)
@@ -71,6 +71,7 @@ namespace MarbleBot.Core
                         var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
                         randMarble.HP -= dmg;
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                            .AddField("Remaining HP", $"**{randMarble.HP}**/{randMarble.MaxHP}")
                             .WithColor(MarbleBotModule.GetColor(context))
                             .WithCurrentTimestamp()
                             .WithDescription($"**{_aiMarble.Name}** dealt **{dmg}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
@@ -126,14 +127,14 @@ namespace MarbleBot.Core
                     if (marble.DamageDealt > 0)
                     {
                         earnings = marble.DamageDealt * 5;
-                        output.AppendLine($"Damage dealt (x5): {Global.UoM}**{earnings:n}**");
+                        output.AppendLine($"Damage dealt (x5): {Global.UoM}**{earnings:n2}**");
                         user.WarWins++;
                     }
                     else break;
                     if (marble.HP > 0)
                     {
                         earnings += 200;
-                        output.AppendLine($"Alive bonus: {Global.UoM}**{200:n}**");
+                        output.AppendLine($"Alive bonus: {Global.UoM}**{200:n2}**");
                     }
                     if (user.Items.ContainsKey(83))
                     {
@@ -145,7 +146,7 @@ namespace MarbleBot.Core
                         user.LastWarWin = DateTime.UtcNow;
                         user.Balance += earnings;
                         user.NetWorth += earnings;
-                        output.AppendLine($"__**Total: {Global.UoM}{earnings:n}**__");
+                        output.AppendLine($"__**Total: {Global.UoM}{earnings:n2}**__");
                         builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
                         obj.Remove(marble.Id.ToString());
                         obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));

@@ -198,7 +198,7 @@ namespace MarbleBot.Modules
                                 user.Balance += item.Price;
                                 user.NetWorth += item.Price;
                                 WriteUsers(obj, Context.User, user);
-                                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n}**!");
+                                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n2}**!");
                             }
                         }
                         else await ReplyAsync($"**{Context.User.Username}**, there is nothing to sell!");
@@ -227,7 +227,7 @@ namespace MarbleBot.Modules
                 await Context.Channel.TriggerTypingAsync();
                 var output = new StringBuilder();
                 string json;
-                using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+                using (var users = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = users.ReadToEnd();
                 var obj = JObject.Parse(json);
                 var items = obj.ToObject<Dictionary<string, Item>>();
                 foreach (var itemPair in items)

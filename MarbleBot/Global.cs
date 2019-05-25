@@ -44,6 +44,7 @@ namespace MarbleBot
                 else if (displayedPlace > maxValue) break;
                 dataIndex++;
             }
+            if (output.Length > 2048) return string.Concat(output.ToString().Take(2048));
             return output.ToString();
         }
 

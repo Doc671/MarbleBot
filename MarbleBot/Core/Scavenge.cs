@@ -26,14 +26,14 @@ namespace MarbleBot.Core
         private void Dispose(bool disposing)
         {
             if (_disposed) return;
+            _disposed = true;
+            Global.ScavengeInfo.Remove(Id);
+            Items = null;
             if (disposing)
             {
                 Actions.Wait();
                 Actions.Dispose();
             }
-            Global.ScavengeInfo.Remove(Id);
-            Items = null;
-            _disposed = true;
         }
 
         public Scavenge(SocketCommandContext context, ScavengeLocation location)
@@ -49,7 +49,7 @@ namespace MarbleBot.Core
             var startTime = DateTime.UtcNow;
             var collectableItems = new List<Item>();
             string json;
-            using (var users = new StreamReader("Resources\\Items.json")) json = users.ReadToEnd();
+            using (var users = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = users.ReadToEnd();
             var obj = JObject.Parse(json);
             var items = obj.ToObject<Dictionary<string, Item>>();
             foreach (var itemPair in items)
@@ -76,7 +76,7 @@ namespace MarbleBot.Core
             } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 63));
 
             string json2;
-            using (var users = new StreamReader("Data\\Users.json")) json2 = users.ReadToEnd();
+            using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json2 = users.ReadToEnd();
             var obj2 = JObject.Parse(json2);
             var user = MarbleBotModule.GetUser(context, obj2);
             user.LastScavenge = DateTime.UtcNow;

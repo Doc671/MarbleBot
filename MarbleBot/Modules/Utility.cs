@@ -57,13 +57,13 @@ namespace MarbleBot.Modules
                 case "economy":
                     var allCmds = new StringBuilder();
                     var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => string.Compare(c.Module.Name, command, true) == 0
-                    && !c.Preconditions.Any(c => c is RequireOwnerAttribute)).OrderBy(c => c.Name);
-                    if (!Context.IsPrivate)
+                        && !c.Preconditions.Any(c => c is RequireOwnerAttribute)).OrderBy(c => c.Name);
+                    if (Context.IsPrivate) commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
+                    else
                     {
                         if (Context.Guild.Id == CM) commands = commands.Where(c => c.Remarks != "Not CM");
                         else commands = commands.Where(c => c.Remarks != "CM Only");
                     }
-                    else commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
                     if (GetUser(Context).Stage < 2) commands = commands.Where(c => c.Remarks != "Stage2");
                     foreach (var cmd in commands)
                     {
@@ -107,7 +107,8 @@ namespace MarbleBot.Modules
                     var output = new StringBuilder();
                     foreach (var cmd in Global.CommandService.Commands)
                     {
-                        if (string.Compare(cmd.Module.Name, "Sneak", true) != 0 && (GetUser(Context).Stage < 2 && string.Compare(cmd.Remarks, "Stage2", true) != 0))
+                        var user = GetUser(Context);
+                        if (string.Compare(cmd.Module.Name, "Sneak", true) != 0 && (GetUser(Context).Stage > 2 || (GetUser(Context).Stage < 2 && string.Compare(cmd.Remarks, "Stage2", true) != 0)))
                             output.Append($"`{cmd.Name}` ");
                     }
                     output.Append("\n\nThis has been deprecated.");

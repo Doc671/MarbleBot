@@ -64,7 +64,7 @@ namespace MarbleBot
             if (int.TryParse(searchTerm, out int itemID))
             {
                 string json;
-                using (var userFile = new StreamReader("Resources\\Items.json")) json = userFile.ReadToEnd();
+                using (var userFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = userFile.ReadToEnd();
                 var obj = JObject.Parse(json);
                 if (obj[itemID.ToString("000")] != null)
                 {
@@ -85,7 +85,7 @@ namespace MarbleBot
             {
                 var newSearchTerm = searchTerm.ToLower().RemoveChar(' ');
                 string json;
-                using (var userFile = new StreamReader("Resources\\Items.json")) json = userFile.ReadToEnd();
+                using (var userFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = userFile.ReadToEnd();
                 var obj = JObject.Parse(json);
                 foreach (var objItemPair in obj)
                 {
@@ -202,7 +202,7 @@ namespace MarbleBot
         protected internal static JObject GetUsersObj()
         {
             string json;
-            using (var users = new StreamReader("Data\\Users.json")) json = users.ReadToEnd();
+            using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
             return JObject.Parse(json);
         }
 
@@ -222,7 +222,7 @@ namespace MarbleBot
         /// <summary> Writes servers to the appropriate file. </summary>
         protected internal static void WriteServers()
         {
-            using (var servers = new JsonTextWriter(new StreamWriter("Data\\Servers.json")))
+            using (var servers = new JsonTextWriter(new StreamWriter("Servers.json")))
             {
                 var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
                 var dict = Global.Servers.Value.ToDictionary(s => s.Id);
@@ -233,7 +233,7 @@ namespace MarbleBot
         /// <summary> Writes users to the appropriate JSON file/ </summary>
         protected internal static void WriteUsers(JObject obj)
         {
-            using (var users = new JsonTextWriter(new StreamWriter("Data\\Users.json")))
+            using (var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json")))
             {
                 var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
                 serialiser.Serialize(users, obj);
@@ -246,7 +246,7 @@ namespace MarbleBot
             mbUser.Discriminator = socketUser.Discriminator;
             obj.Remove(socketUser.Id.ToString());
             obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
-            using (var users = new JsonTextWriter(new StreamWriter("Data\\Users.json")))
+            using (var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json")))
             {
                 var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
                 serialiser.Serialize(users, obj);

@@ -50,23 +50,23 @@ namespace MarbleBot.Core
         {
             Active = false;
             if (_disposed) return;
+            _disposed = true;
+            Boss.ResetHP();
+            Marbles = null;
+            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
+                marbleList.Write("");
+            Global.SiegeInfo.Remove(Id);
             if (disposing)
             {
                 Actions.Wait();
                 Actions.Dispose();
             }
-            Boss.ResetHP();
-            Marbles = null;
-            using (var marbleList = new StreamWriter($"Data\\{Id}siege.csv", false))
-                marbleList.Write("");
-            Global.SiegeInfo.Remove(Id);
-            _disposed = true;
         }
 
         public static Boss GetBoss(string searchTerm)
         {
             string json;
-            using (var bosses = new StreamReader("Resources\\Bosses.json")) json = bosses.ReadToEnd();
+            using (var bosses = new StreamReader($"Resources{Path.DirectorySeparatorChar}Bosses.json")) json = bosses.ReadToEnd();
             var obj = new Dictionary<string, JObject>(JObject.Parse(json).ToObject<IDictionary<string, JObject>>(), 
                 StringComparer.InvariantCultureIgnoreCase);
             var boss = Boss.Empty;
@@ -81,6 +81,7 @@ namespace MarbleBot.Core
                                      int ammoRequired = 1, int accuracyDivisor = 1)
         {
             var item = MarbleBotModule.GetItem(itemId.ToString("000"));
+            var ammo = MarbleBotModule.GetItem(ammoId.ToString("000"));
             var marble = Marbles.Find(m => m.Id == context.User.Id);
 
             if (marble.HP == 0)
@@ -113,6 +114,8 @@ namespace MarbleBot.Core
 
             if (Global.Rand.Next(0, 100) < marble.ItemAccuracy / accuracyDivisor)
             {
+                damage = (int)Math.Round(damage * DamageMultiplier);
+                if (ammoId != 0) damage += ammo.Damage;
                 await DealDamageAsync(context, damage);
                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                     .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
@@ -123,7 +126,7 @@ namespace MarbleBot.Core
                     .Build());
                 marble.DamageDealt += damage;
                 marble.ItemAccuracy -= 30;
-                if (ammoId != 0) UpdateUser(MarbleBotModule.GetItem(ammoId.ToString("000")), ammoRequired);
+                if (ammoId != 0) UpdateUser(ammo, -ammoRequired);
                 if (consumable) UpdateUser(item, 1);
                 if (item.Id == 10) marble.QefpedunCharmUsed = true;
             }
@@ -361,14 +364,14 @@ namespace MarbleBot.Core
                 if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6)
                 {
                     if (marble.DamageDealt > 0)
-                        output.AppendLine($"Damage dealt: {Global.UoM}**{marble.DamageDealt:n}**");
+                        output.AppendLine($"Damage dealt: {Global.UoM}**{marble.DamageDealt:n2}**");
                     else break;
                     if (marble.PowerUpHits > 0)
-                        output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PowerUpHits * 50:n}**");
+                        output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PowerUpHits * 50:n2}**");
                     if (marble.HP > 0)
                     {
                         earnings += 200;
-                        output.AppendLine($"Alive bonus: {Global.UoM}**{200:n}**");
+                        output.AppendLine($"Alive bonus: {Global.UoM}**{200:n2}**");
                         user.SiegeWins++;
                     }
                     if (user.Items.ContainsKey(83))
@@ -397,7 +400,7 @@ namespace MarbleBot.Core
                             }
                         }
                         if (drops == 0) output.AppendLine("None");
-                        output.AppendLine($"__**Total: {Global.UoM}{earnings:n}**__");
+                        output.AppendLine($"__**Total: {Global.UoM}{earnings:n2}**__");
                         user.Balance += earnings;
                         user.NetWorth += earnings;
                         builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());

@@ -23,7 +23,7 @@ namespace MarbleBot.Modules
                 case "time": await ReplyAsync($"Last Use: {ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
                 case "update": {
                     Autoresponses = new Dictionary<string, string>();
-                    using (var arFile = new StreamReader("Resources\\Autoresponses.txt")) {
+                    using (var arFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt")) {
                         while (!arFile.EndOfStream) {
                             var arPair = arFile.ReadLine().Split(';');
                             Autoresponses.Add(arPair[0], arPair[1]);
@@ -46,6 +46,19 @@ namespace MarbleBot.Modules
                 DailyTimeout = hours;
                 await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");
             } else await ReplyAsync("Invalid number of hours!");
+        }
+
+        [Command("disposeall")]
+        [RequireOwner]
+        public async Task DisposeAllAsync()
+        {
+            foreach (var pair in ScavengeInfo)
+                pair.Value.Dispose();
+            foreach (var pair in SiegeInfo)
+                pair.Value.Dispose();
+            foreach (var pair in WarInfo)
+                pair.Value.Dispose();
+            await ReplyAsync("All separate tasks successfully disposed.");
         }
 
         [Command("melmon")]

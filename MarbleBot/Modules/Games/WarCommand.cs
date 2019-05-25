@@ -2,6 +2,7 @@
 using Discord.Commands;
 using MarbleBot.Core;
 using MarbleBot.Extensions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,8 +48,8 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                if (!File.Exists($"Data\\{fileId}war.csv")) File.Create($"Data\\{fileId}war.csv").Close();
-                using (var marbleList = new StreamReader($"Data\\{fileId}war.csv"))
+                if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}war.csv")) File.Create($"Data{Path.DirectorySeparatorChar}{fileId}war.csv").Close();
+                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
                 {
                     if ((await marbleList.ReadToEndAsync()).Contains(Context.User.Id.ToString()))
                     {
@@ -61,12 +62,12 @@ namespace MarbleBot.Modules
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
                     .AddField("Marble War: Signed up!", $"**{Context.User.Username}** has successfully signed up as **{marbleName}** with the weapon **{item.Name}**!");
-                using (var fighters = new StreamWriter("Data\\WarMostUsed.txt", true))
+                using (var fighters = new StreamWriter("WarMostUsed.txt", true))
                     await fighters.WriteLineAsync(marbleName);
-                using (var marbleList = new StreamWriter($"Data\\{fileId}war.csv", true))
+                using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}war.csv", true))
                     await marbleList.WriteLineAsync($"{marbleName},{Context.User.Id},{item.Id:000}");
                 int alive;
-                using (var marbleList = new StreamReader($"Data\\{fileId}war.csv"))
+                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
                     alive = (await marbleList.ReadToEndAsync()).Split('\n').Length;
                 await ReplyAsync(embed: builder.Build());
                 if (alive > 20)
@@ -85,7 +86,7 @@ namespace MarbleBot.Modules
                 await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var marbles = new List<WarMarble>();
-                using (var marbleList = new StreamReader($"Data\\{fileId}war.csv"))
+                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
                 {
                     while (!marbleList.EndOfStream)
                     {
@@ -130,7 +131,7 @@ namespace MarbleBot.Modules
                     }
                 }
                 var nameList = new List<string>();
-                using (var teamNames = new StreamReader("Resources\\WarTeamNames.txt"))
+                using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
                 {
                     while (!teamNames.EndOfStream)
                         nameList.Add(await teamNames.ReadLineAsync());
@@ -175,6 +176,7 @@ namespace MarbleBot.Modules
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
+                    .WithDescription("Use `mb/war attack <marble name>` to attack with your weapon and `mb/war bash <marble name>` to attack without.")
                     .WithTitle("Let the battle commence!")
                     .AddField($"Team {war.Team1Name}", t1Output.ToString())
                     .AddField($"Team {war.Team2Name}", t2Output.ToString())
@@ -212,7 +214,7 @@ namespace MarbleBot.Modules
                     var ammoId = 0;
                     for (int i = currentMarble.Weapon.Ammo.Length - 1; i >= 0; i--)
                     {
-                        if (user.Items[currentMarble.Weapon.Ammo[i]] > 0)
+                        if (user.Items.ContainsKey(currentMarble.Weapon.Ammo[i]) && user.Items[currentMarble.Weapon.Ammo[i]] > 0)
                         {
                             ammoId = currentMarble.Weapon.Ammo[i];
                             break;
@@ -248,6 +250,7 @@ namespace MarbleBot.Modules
                             enemy.HP -= dmg;
                             currentMarble.DamageDealt += dmg;
                             await ReplyAsync(embed: new EmbedBuilder()
+                                .AddField("Remaining HP", $"**{enemy.HP}**/{enemy.MaxHP}")
                                 .WithColor(GetColor(Context))
                                 .WithCurrentTimestamp()
                                 .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!")
@@ -298,6 +301,7 @@ namespace MarbleBot.Modules
                         enemy.HP -= dmg;
                         currentMarble.DamageDealt += dmg;
                         await ReplyAsync(embed: new EmbedBuilder()
+                            .AddField("Remaining HP", $"**{enemy.HP}**/{enemy.MaxHP}")
                             .WithColor(GetColor(Context))
                             .WithCurrentTimestamp()
                             .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}**!")
@@ -319,7 +323,7 @@ namespace MarbleBot.Modules
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var marbles = new StringBuilder();
                 byte cCount = 0;
-                using (var marbleList = new StreamReader($"Data\\{fileId}war.csv"))
+                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
                 {
                     var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
                     foreach (var marble in allMarbles)
@@ -329,8 +333,8 @@ namespace MarbleBot.Modules
                             var mSplit = marble.Split(',');
                             var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
                             var weapon = GetItem(int.Parse(mSplit[2]).ToString("000"));
-                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0]}** (Weapon: **{weapon}**)");
-                            else marbles.AppendLine($"**{mSplit[0]}** (Weapon: **{weapon}**) [{user.Username}#{user.Discriminator}]");
+                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0]}** (Weapon: {weapon})");
+                            else marbles.AppendLine($"**{mSplit[0]}** (Weapon: {weapon}) [{user.Username}#{user.Discriminator}]");
                             cCount++;
                         }
                     }
@@ -376,7 +380,7 @@ namespace MarbleBot.Modules
                 else
                 {
                     var marbles = new StringBuilder();
-                    using (var marbleList = new StreamReader($"Data\\{fileId}War.csv"))
+                    using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
                     {
                         var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
                         if (allMarbles.Length > 1)
@@ -409,7 +413,7 @@ namespace MarbleBot.Modules
                 if (int.TryParse(rawNo, out int no))
                 {
                     var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader("Data\\WarMostUsed.txt"))
+                    using (var win = new StreamReader("WarMostUsed.txt"))
                     {
                         while (!win.EndOfStream)
                         {
@@ -441,7 +445,7 @@ namespace MarbleBot.Modules
                 // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
                 byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0;
                 var wholeFile = new StringBuilder();
-                using (var marbleList = new StreamReader($"Data\\{fileId}war.csv"))
+                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
                 {
                     while (!marbleList.EndOfStream)
                     {
@@ -464,7 +468,7 @@ namespace MarbleBot.Modules
                     case 0: await ReplyAsync("Could not find the requested marble!"); break;
                     case 1: await ReplyAsync("This is not your marble!"); break;
                     case 2:
-                        using (var marbleList = new StreamWriter($"Data\\{fileId}war.csv", false))
+                        using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}war.csv", false))
                         {
                             await marbleList.WriteAsync(wholeFile.ToString());
                             await ReplyAsync($"Removed contestant **{marbleToRemove}**!");
@@ -472,6 +476,30 @@ namespace MarbleBot.Modules
                         break;
                     case 3: goto case 2;
                 }
+            }
+
+            [Command("valid")]
+            [Alias("validweapons")]
+            [Summary("Shows all valid weapons to use in War battles.")]
+            public async Task WarValidWeaponsCommandAsync()
+            {
+                string json;
+                using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = itemFile.ReadToEnd();
+                var obj = JObject.Parse(json);
+                var items = obj.ToObject<Dictionary<string, Item>>();
+                var output = new StringBuilder();
+                foreach (var itemPair in items)
+                {
+                    var item = new Item(itemPair.Value, int.Parse(itemPair.Key));
+                    if (item.WarClass != 0 && item.Stage <= GetUser(Context).Stage)
+                        output.AppendLine($"{item} ({Enum.GetName(typeof(WarClass), item.WarClass)})");
+                }
+                await ReplyAsync(embed: new EmbedBuilder()
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithDescription(output.ToString())
+                    .WithTitle("Marble War: Valid Weapons")
+                    .Build());
             }
 
             [Command("")]
@@ -490,7 +518,7 @@ namespace MarbleBot.Modules
                             .AppendLine(" the team that has fewer members!")
                             .ToString())
                     .AddField("Valid weapons", new StringBuilder()
-                        .AppendLine("Any item that displays a 'War Class' when you use `mb/item` on it is valid.")
+                        .AppendLine("Any item that displays a 'War Class' when you use `mb/item` on it is valid. See `mb/war valid` for more.")
                         .Append("\nMelee and ranged weapons both have 90% accuracy but ranged weapons require")
                         .Append(" ammo to work. Bashing is 100% accurate but only has a base damage of 3.")
                         .ToString())

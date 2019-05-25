@@ -34,10 +34,10 @@ namespace MarbleBot
             _client = new DiscordSocketClient();
 
             string token = "";
-            using (var stream = new StreamReader("Keys\\MBT.txt")) token = stream.ReadLine();
-            using (var stream = new StreamReader("Keys\\MBK.txt")) Global.YTKey = stream.ReadLine();
+            using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBT.txt")) token = stream.ReadLine();
+            using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBK.txt")) Global.YTKey = stream.ReadLine();
 
-            using (var arFile = new StreamReader("Resources\\Autoresponses.txt"))
+            using (var arFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
             {
                 while (!arFile.EndOfStream)
                 {
@@ -46,10 +46,10 @@ namespace MarbleBot
                 }
             }
 
-            using (var srvrFile = new StreamReader("Data\\Servers.json"))
+            using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
             {
                 string json;
-                using (var users = new StreamReader("Data\\Servers.json")) json = await users.ReadToEndAsync();
+                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json")) json = await users.ReadToEndAsync();
                 var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MBServer>>(json);
                 foreach (var server in allServers)
                 {
@@ -80,7 +80,7 @@ namespace MarbleBot
 
             UserCredential credential;
 
-            using (var stream = new FileStream("Keys\\client_id.json", FileMode.Open, FileAccess.Read))
+            using (var stream = new FileStream($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
             {
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,

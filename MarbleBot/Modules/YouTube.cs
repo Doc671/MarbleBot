@@ -54,7 +54,7 @@ namespace MarbleBot.Modules
             {
                 var validUser = false;
                 var channelLink = "";
-                using (var CVID = new StreamReader("Resources\\CVID.csv"))
+                using (var CVID = new StreamReader($"Resources{Path.DirectorySeparatorChar}CVID.csv"))
                 {
                     while (!CVID.EndOfStream)
                     {

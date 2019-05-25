@@ -52,51 +52,62 @@ namespace MarbleBot.Modules
             string msg;
             if (user.Items.ContainsKey(78))
                 msg = new StringBuilder().Append("Combine the terror-inducing essence of the bosses you have just ")
-                    .Append("defeated with another similar, yet different liquid. Be careful with the product.")
+                    .AppendLine("defeated with another similar, yet different liquid. Be careful with the product.")
+                    .Append("\n**TO ADVANCE:** Craft the **Essence of Corruption** (ID `079`).")
                     .ToString();
             else if (user.Items.ContainsKey(66) || user.Items.ContainsKey(71) || user.Items.ContainsKey(74) || user.Items.ContainsKey(80))
                 msg = new StringBuilder().Append("Your equipment will prove very useful in the upcoming battles.")
-                    .Append("Seek the Chest of sentience and the Scary Face to test your newfound power.")
+                    .AppendLine("Seek the Chest of sentience and the Scary Face to test your newfound power.")
+                    .Append("\n**TO ADVANCE:** Obtain the **Raw Essence of Horror** (ID `078`) from Chest or Scary Face.")
                     .ToString();
             else if (user.Items.ContainsKey(81))
                 msg = new StringBuilder().Append("There is a way to increase the offensive capabilities of a marble.")
-                    .Append("Form a covering of spikes, made of iron, steel or even infernite.")
+                    .AppendLine("Form a covering of spikes, made of iron, steel or even infernite.")
+                    .Append("\n**TO ADVANCE:** Craft **Iron Spikes** (ID `066`), **Steel Spikes** (ID `071`) or **Infernite Spikes** (ID `074`).")
                     .ToString();
             else if (user.Items.ContainsKey(63))
                 msg = new StringBuilder().Append("The world now contains a plethora of treasures for you to gather.")
-                    .Append("Craft the drill of chromium to allow you to extract the ore of the Violet Volcanoes.")
+                    .AppendLine("Craft the drill of chromium to allow you to extract the ore of the Violet Volcanoes.")
+                    .Append("\n**TO ADVANCE:** Craft the **Chromium Drill** (ID `081`).")
                     .ToString();
             else if (user.Items.ContainsKey(62))
                 msg = new StringBuilder().Append("Before you can successfully take on the new terrors roaming the land, ")
-                    .Append("you must first improve your equipment. Use Destroyer's plating to craft your own shield.")
+                    .AppendLine("you must first improve your equipment. Use Destroyer's plating to craft your own shield.")
+                    .Append("\n**TO ADVANCE:** Craft the **Coating of Destruction** (ID `063`).")
                     .ToString();
             else if (user.Stage == 2)
                 msg = new StringBuilder().Append("The cyborg's defeat has both given you new options and caught the attention of ")
-                    .Append("even more powerful foes. Head to its remains and gather the resources to upgrade your workstation.")
+                    .AppendLine("even more powerful foes. Head to its remains and gather the resources to upgrade your workstation.")
+                    .Append("\n**TO ADVANCE:** Craft the **Crafting Station Mk.II** (ID `062`).")
                     .ToString();
             else if (user.Items.ContainsKey(53) && user.Items.ContainsKey(57))
                 msg = new StringBuilder().Append("You have done very well, and have forged the best with the resources available ")
                     .AppendLine("to you. There is more to this world, however. Gather your allies and seek the cyborg Destroyer.")
-                    .AppendLine("\nDestiny awaits. This mechanical abomination must be put to an end.")
+                    .Append("\n**TO ADVANCE:** Defeat Destroyer. Item `091` may provide assistance.")
                     .ToString();
             else if (user.Items.ContainsKey(53))
                 msg = new StringBuilder().Append("The Trebuchet Array is a potent weapon, albeit rather inaccurate. To assist ")
-                    .Append("in your battles, create the Rocket Boots, which shall help you evade their menacing attacks.")
+                    .AppendLine("in your battles, create the Rocket Boots, which shall help you evade their menacing attacks.")
+                    .Append("\n**TO ADVANCE:** Craft the **Rocket Boots** (ID `057`).")
                     .ToString();
             else if (user.Items.ContainsKey(17))
                 msg = new StringBuilder().Append("With your workstation, forge the Trebuchet Array from the different woods found ")
-                    .Append("in the forest. You will have to create three separate trebuchets first, then combine them.")
+                    .AppendLine("in the forest. You will have to create three separate trebuchets first, then combine them.")
+                    .Append("\n**TO ADVANCE:** Craft the **Trebuchet Array** (ID `053`).")
                     .ToString();
             else if (user.LastScavenge.DayOfYear != 1 || user.LastScavenge.Year != 2019)
                 msg = new StringBuilder().Append("The items you have gathered are likely unable to be used in their current form. ")
                     .AppendLine("You must find a way to obtain a Crafting Station.")
+                    .Append("\n**TO ADVANCE:** Obtain the **Crafting Station Mk.I** (ID `017`) via dailies.")
                     .ToString();
             else if (user.NetWorth > 1000)
-                msg = new StringBuilder().Append("Well done. Your next goal is to gather for items at Canary Beach and Tree Wurld.")
-                    .Append("Use `mb/scavenge help` if you are unsure of how to proceed.")
+                msg = new StringBuilder().Append("Well done. Your next goal is to gather for items at Canary Beach and Tree Wurld. ")
+                    .AppendLine("Use `mb/scavenge help` if you are unsure of how to proceed.")
+                    .Append("\n**TO ADVANCE:** Successfully complete a Scavenge.")
                     .ToString();
             else msg = new StringBuilder().Append($"Welcome! Your first task is to gain {UoM}1000! If you need help ")
-                    .Append("earning money, try using `mb/daily`, `mb/race` or `mb/siege`.")
+                    .AppendLine("earning money, try using `mb/daily`, `mb/race` or `mb/siege`.")
+                    .Append($"\n**TO ADVANCE:** Obtain {UoM}1000.")
                     .ToString();
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -131,7 +142,7 @@ namespace MarbleBot.Modules
             if (noOfMarbles > 100) await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
             else if (noOfMarbles < 1) await ReplyAsync("The number you gave is too small.");
             string[,] marbles = new string[10, 10];
-            using (StreamReader stream = new StreamReader("Resources\\Marbles.csv"))
+            using (StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Marbles.csv"))
             {
                 int a = 0;
                 while (!stream.EndOfStream)
@@ -188,8 +199,7 @@ namespace MarbleBot.Modules
         public async Task OrangeCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            int choice = Rand.Next(1, 6);
-            await ReplyAsync(choice switch
+            await base.ReplyAsync((Rand.Next(1, 6)) switch
             {
                 1 => "!olleH",
                 2 => "!raotS taH ehT owt oG",
@@ -498,7 +508,7 @@ namespace MarbleBot.Modules
             int a = 0;
             if (word == "")
             {
-                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv"))
+                using (StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
                 {
                     while (!stream.EndOfStream)
                     {
@@ -514,7 +524,7 @@ namespace MarbleBot.Modules
             }
             else
             {
-                using (StreamReader stream = new StreamReader("Resources\\Vinhglish.csv"))
+                using (StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
                 {
                     while (!stream.EndOfStream)
                     {
