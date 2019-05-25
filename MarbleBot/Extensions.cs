@@ -31,9 +31,6 @@ namespace MarbleBot.Extensions
 
         public static string Ordinal(this int no)
         {
-            var ns = no.ToString();
-            if (ns.Length > 2) ns.Substring(^3);
-            no = int.Parse(ns);
             if (no > 20) no %= 10;
             return no switch
             {

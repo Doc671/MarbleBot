@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -145,11 +146,11 @@ namespace MarbleBot.Modules
                     {
                         if (ScavengeInfo[Context.User.Id].Items.Count > 0)
                         {
-                            if (ScavengeInfo[Context.User.Id].Items.Peek().Name.Contains("Ore"))
+                            if (ScavengeInfo[Context.User.Id].Items.Any(i => i.Name.Contains("Ore")))
                             {
                                 if (user.Items.ContainsKey(81) || user.Items.ContainsKey(82))
                                 {
-                                    var item = ScavengeInfo[Context.User.Id].Items.Dequeue();
+                                    var item = ScavengeInfo[Context.User.Id].Items.Where(i => i.Name.Contains("Ore")).First();
                                     if (user.Items != null)
                                     {
                                         if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;

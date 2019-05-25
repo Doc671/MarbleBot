@@ -448,6 +448,7 @@ namespace MarbleBot.Modules
                 .AddField("Net Worth", $"{UoM}{user.NetWorth:n2}", true)
                 .AddField("Daily Streak", user.DailyStreak, true)
                 .AddField("Siege Mentions", user.SiegePing, true)
+                .AddField("War Mentions", user.WarPing, true)
                 .AddField("Race Wins", user.RaceWins, true)
                 .AddField("Siege Wins", user.SiegeWins, true)
                 .AddField("War Wins", user.WarWins, true)
@@ -469,6 +470,13 @@ namespace MarbleBot.Modules
                   .AddField("Shield", shield, true)
                   .AddField("Spikes", spikes, true);
             }
+            var weaponOutput = new StringBuilder();
+            foreach (var itemPair in user.Items) {
+                var item = GetItem(itemPair.Key.ToString("000"));
+                if (item.WarClass == 0) continue;
+                weaponOutput.AppendLine(item.ToString());
+            }
+            if (weaponOutput.Length > 0) builder.AddField("Weapons", weaponOutput.ToString());
             await ReplyAsync(embed: builder.Build());
         }
 

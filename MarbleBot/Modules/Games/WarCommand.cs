@@ -202,7 +202,7 @@ namespace MarbleBot.Modules
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
-                if (currentMarble.HP < 0)
+                if (currentMarble.HP < 1)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
                     return;
@@ -280,7 +280,7 @@ namespace MarbleBot.Modules
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
-                if (currentMarble.HP < 0)
+                if (currentMarble.HP < 1)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
                     return;
@@ -434,6 +434,29 @@ namespace MarbleBot.Modules
                         .Build());
                 }
                 else await ReplyAsync("This is not a valid number! Format: `mb/war leaderboard <optional number>`");
+            }
+
+            [Command("ping")]
+            [Summary("Toggles whether you are pinged when a war that you are in starts.")]
+            public async Task WarPingCommandAsync(string option = "")
+            {
+                var obj = GetUsersObj();
+                var user = GetUser(Context, obj);
+                switch (option)
+                {
+                    case "enable":
+                    case "true":
+                    case "on": user.WarPing = true; break;
+                    case "disable":
+                    case "false":
+                    case "off": user.WarPing = false; break;
+                    default: user.WarPing = !user.WarPing; break;
+                }
+                obj.Remove(Context.User.Id.ToString());
+                obj.Add(new JProperty(Context.User.Id.ToString(), JObject.FromObject(user)));
+                WriteUsers(obj);
+                if (user.WarPing) await ReplyAsync($"**{Context.User.Username}**, you will now be pinged when a war that you are in starts.\n(type `mb/war ping` to turn off)");
+                else await ReplyAsync($"**{Context.User.Username}**, you will no longer be pinged when a war that you are in starts.\n(type `mb/war ping` to turn on)");
             }
 
             [Command("remove")]

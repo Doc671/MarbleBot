@@ -1,5 +1,7 @@
 # ignore Visual Studio solution settings
 .vs
+.vscode
+MarbleBot/.vscode
 
 # ignore NuGet packages
 packages

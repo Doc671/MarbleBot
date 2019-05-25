@@ -206,18 +206,18 @@ namespace MarbleBot
             return JObject.Parse(json);
         }
 
+        /// <summary> Logs to the console and the online logs. </summary>
         protected internal static async Task Log(string log) => await Program.Log(log);
 
-        protected internal static string StageTooHighString()
-        {
-            return (Global.Rand.Next(0, 4)) switch
+        /// <summary> Returns a string that indicates the user's Stage is too low. </summary>
+        protected internal static string StageTooHighString() 
+        => (Global.Rand.Next(0, 4)) switch
             {
                 0 => "*Your inexperience blinds you...*",
                 1 => "*Your vision is blurry...*",
                 2 => "*Screams echo in your head...*",
                 _=> "*Your mind is wracked with pain...*",
             };
-        }
 
         /// <summary> Writes servers to the appropriate file. </summary>
         protected internal static void WriteServers()

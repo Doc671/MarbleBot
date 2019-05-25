@@ -101,7 +101,7 @@ namespace MarbleBot.Core
             var builder = new EmbedBuilder()
                 .WithColor(MarbleBotModule.GetColor(context))
                 .WithCurrentTimestamp()
-                .WithTitle($"Team {(t1Total > t2Total ? Team1Name : Team2Name)} has defeated Team {(t1Total > t2Total ? Team2Name : Team2Name)}!");
+                .WithTitle($"Team {(t1Total > t2Total ? Team1Name : Team2Name)} has defeated Team {(t1Total > t2Total ? Team2Name : Team1Name)}!");
             var t1Output = new StringBuilder();
             var t2Output = new StringBuilder();
             foreach (var marble in Team1)

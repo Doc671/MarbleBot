@@ -20,6 +20,8 @@ namespace MarbleBot.Core
         public uint DailyStreak { get; set; }
         /// <summary> Whether or not the user is pinged at the beginning of a Siege game. </summary>
         public bool SiegePing { get; set; }
+        /// <summary> Whether or not the user is pinged at the beginning of a War game. </summary>
+        public bool WarPing { get; set; }
         /// <summary> The number of times the user has won a race. </summary>
         public uint RaceWins { get; set; }
         /// <summary> The number of times the user has won a Siege. </summary>

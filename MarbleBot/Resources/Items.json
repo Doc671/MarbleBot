@@ -123,6 +123,7 @@
     "Description": "An explosive plastic bottle that can be used as a weapon. Consumable.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 5,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "012": 1,
@@ -642,8 +643,9 @@
     "ScavengeLocation": 0,
     "CraftingProduced": 4,
     "CraftingRecipe": {
-      "061": 4,
+      "061": 3,
       "065": 3,
+      "067": 2,
       "069": 1
     }
   },
@@ -813,6 +815,7 @@
     "Description": "An large explosive plastic bottle that can be used as a weapon. Consumable. Requires a weapon to be launched.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 5,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "012": 3,
@@ -828,6 +831,8 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Damage": 15,
+    "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "059": 1,
