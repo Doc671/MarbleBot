@@ -23,7 +23,7 @@ namespace MarbleBot.Modules
         {
             [Command("signup")]
             [Alias("join")]
-            [Summary("Sign up to the marble war!")]
+            [Summary("Sign up to the Marble War!")]
             [RequireSlowmode]
             public async Task WarSignupCommandAsync(string itemId, [Remainder] string marbleName = "")
             {
@@ -32,6 +32,13 @@ namespace MarbleBot.Modules
                 if (item.WarClass == 0)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, this item cannot be used as a weapon!");
+                    return;
+                }
+
+                var user = GetUser(Context);
+                if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] < 1) 
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");
                     return;
                 }
 
@@ -112,6 +119,7 @@ namespace MarbleBot.Modules
                 };
                 var t1Output = new StringBuilder();
                 var t2Output = new StringBuilder();
+                var pings = new StringBuilder();
                 for (int i = 0; i < marbles.Count; i++)
                 {
                     WarMarble marble = marbles[i];
@@ -121,6 +129,7 @@ namespace MarbleBot.Modules
                         var user = Context.Client.GetUser(marble.Id);
                         marble.Team = 1;
                         t1Output.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
+                        if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
                     }
                     else
                     {
@@ -128,6 +137,7 @@ namespace MarbleBot.Modules
                         var user = Context.Client.GetUser(marble.Id);
                         marble.Team = 2;
                         t2Output.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
+                        if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
                     }
                 }
                 var nameList = new List<string>();
@@ -181,6 +191,7 @@ namespace MarbleBot.Modules
                     .AddField($"Team {war.Team1Name}", t1Output.ToString())
                     .AddField($"Team {war.Team2Name}", t2Output.ToString())
                     .Build());
+                if (pings.Length != 0) await ReplyAsync(pings.ToString());
                 WarInfo.Add(fileId, war);
                 war.Actions = Task.Run(async () => { await war.WarActions(Context); });
             }
@@ -314,9 +325,26 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Could not find the enemy!");
             }
 
+            [Command("checkearn")]
+            [Summary("Shows whether you can earn money from wars and if not, when.")]
+            public async Task WarCheckearnCommandAsync()
+            {
+                var user = GetUser(Context);
+                var nextDaily = DateTime.UtcNow.Subtract(user.LastWarWin);
+                var output = nextDaily.TotalHours < 6 ?
+                    $"You can earn money from wars in **{GetDateString(user.LastWarWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
+                    : "You can earn money from wars now!";
+                await ReplyAsync(embed: new EmbedBuilder()
+                    .WithAuthor(Context.User)
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithDescription(output)
+                    .Build());
+            }
+
             [Command("contestants")]
             [Alias("marbles", "participants")]
-            [Summary("Shows a list of all the contestants in the War.")]
+            [Summary("Shows a list of all the contestants in the war.")]
             [RequireSlowmode]
             public async Task WarContestantsCommandAsync()
             {
@@ -350,7 +378,7 @@ namespace MarbleBot.Modules
             }
 
             [Command("info")]
-            [Summary("Shows information about the War.")]
+            [Summary("Shows information about the war.")]
             [RequireSlowmode]
             public async Task WarInfoCommandAsync()
             {
@@ -407,7 +435,7 @@ namespace MarbleBot.Modules
 
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
-            [Summary("Shows a leaderboard of most used marbles in Sieges.")]
+            [Summary("Shows a leaderboard of most used marbles in wars.")]
             public async Task SiegeLeaderboardCommandAsync(string rawNo = "1")
             {
                 if (int.TryParse(rawNo, out int no))
@@ -503,7 +531,7 @@ namespace MarbleBot.Modules
 
             [Command("valid")]
             [Alias("validweapons")]
-            [Summary("Shows all valid weapons to use in War battles.")]
+            [Summary("Shows all valid weapons to use in war battles.")]
             public async Task WarValidWeaponsCommandAsync()
             {
                 string json;

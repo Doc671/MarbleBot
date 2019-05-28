@@ -142,7 +142,7 @@ namespace MarbleBot.Modules
         public static async Task<bool> CheckSwearAsync(string msg)
         {
             string swears;
-            using (var FS = new StreamReader("Keys\\ListOfBand.txt")) swears = await FS.ReadLineAsync();
+            using (var FS = new StreamReader($"Keys{Path.DirectorySeparatorChar}ListOfBand.txt")) swears = await FS.ReadLineAsync();
             string[] swearList = swears.Split(',');
             var swearPresent = false;
             foreach (var swear in swearList)

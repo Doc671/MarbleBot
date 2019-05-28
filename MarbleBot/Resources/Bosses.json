@@ -62,13 +62,13 @@
       {
         "Name": "Donation Box",
         "Damage": 5,
-        "Accuracy": 45,
+        "Accuracy": 55,
         "StatusEffect": 0
       },
       {
         "Name": "Cry For Help",
         "Damage": 0,
-        "Accuracy": 40,
+        "Accuracy": 25,
         "StatusEffect": 1
       },
       {
@@ -80,7 +80,7 @@
       {
         "Name": "Decay",
         "Damage": 2,
-        "Accuracy": 50,
+        "Accuracy": 40,
         "StatusEffect": 4
       }
     ],
@@ -428,7 +428,7 @@
         "Name": "Leg",
         "Damage": 14,
         "Accuracy": 40,
-        "StatusEffect": 1
+        "StatusEffect": 0
       },
       {
         "Name": "Lock and Key",
@@ -693,7 +693,7 @@
         "Name": "Devil Scythe",
         "Damage": 100,
         "Accuracy": 15,
-        "StatusEffect": 1
+        "StatusEffect": 0
       },
       {
         "Name": "Terror",

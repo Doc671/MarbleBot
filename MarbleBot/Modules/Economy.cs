@@ -532,7 +532,8 @@ namespace MarbleBot.Modules
         public async Task RichListCommandAsync(string rawNo = "1")
         {
             await Context.Channel.TriggerTypingAsync();
-            if (!int.TryParse(rawNo, out int no)) await ReplyAsync("This is not a valid integer!");
+            if (!int.TryParse(rawNo, out int no)) await ReplyAsync($"**{Context.User.Username}**, this is not a valid integer!");
+            else if (no < 1) await ReplyAsync($"**{Context.User.Username}**, the leaderboard value must be at least one!"); 
             else
             {
                 string json;
@@ -541,29 +542,30 @@ namespace MarbleBot.Modules
                 var users = new List<(string, MBUser)>();
                 foreach (var user in rawUsers) users.Add((user.Key, user.Value));
                 var richList = (from user in users orderby user.Item2.NetWorth descending select user.Item2).ToList();
-                int i = 1, j = 1, yourPos = 0, minValue = (no - 1) * 10 + 1, maxValue = no * 10;
+                int displayedPlace = 1, index = 1, yourPos = 0, minValue = (no - 1) * 10 + 1, maxValue = no * 10;
                 var output = new StringBuilder();
                 foreach (var user in richList)
                 {
-                    if (i < maxValue + 1 && i >= minValue)
+                    if (displayedPlace < maxValue + 1 && displayedPlace >= minValue)
                     {
-                        output.Append($"**{i}{i.Ordinal()}:** {user.Name}#{user.Discriminator} - {UoM}**{user.NetWorth:n2}**\n");
-                        if (j < richList.Count) if (richList[j].NetWorth != user.NetWorth) i++;
-                        if (string.Compare(user.Name, Context.User.Username, true) == 0 && string.Compare(user.Discriminator, Context.User.Discriminator, 
-                            true) == 0) yourPos = i - 1;
+                        output.Append($"**{displayedPlace}{displayedPlace.Ordinal()}:** {user.Name}#{user.Discriminator} - {UoM}**{user.NetWorth:n2}**\n");
+                        if (index < richList.Count) if (richList[index].NetWorth != user.NetWorth) 
+                            displayedPlace++;
+                        if (string.Compare(user.Name, Context.User.Username, false) == 0 && string.Compare(user.Discriminator, Context.User.Discriminator) == 0) 
+                            yourPos = displayedPlace - 1;
                     }
                     else
                     {
                         if (yourPos != 0) break;
-                        else if (string.Compare(user.Name, Context.User.Username, true) == 0 && string.Compare(user.Discriminator, Context.User.Discriminator,
-                            true) == 0 && i >= minValue)
+                        else if (string.Compare(user.Name, Context.User.Username, false) == 0 && string.Compare(user.Discriminator, Context.User.Discriminator) 
+                            == 0 && displayedPlace >= minValue)
                         {
-                            yourPos = i - 1;
+                            yourPos = displayedPlace - 1;
                             break;
                         }
                     }
-                    if (i < maxValue + 1 && !(i >= minValue)) i++;
-                    j++;
+                    if ((displayedPlace < maxValue + 1 && !(displayedPlace >= minValue)) || displayedPlace >= maxValue) displayedPlace++;
+                    index++;
                 }
                 var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))

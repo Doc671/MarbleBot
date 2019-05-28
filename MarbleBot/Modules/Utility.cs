@@ -57,7 +57,7 @@ namespace MarbleBot.Modules
                 case "economy":
                     var allCmds = new StringBuilder();
                     var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => string.Compare(c.Module.Name, command, true) == 0
-                        && !c.Preconditions.Any(c => c is RequireOwnerAttribute)).OrderBy(c => c.Name);
+                        && !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
                     if (Context.IsPrivate) commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
                     else
                     {
@@ -71,7 +71,7 @@ namespace MarbleBot.Modules
                         allCmds.AppendLine($"**{name}** - {cmd.Summary}");
                     }
                     builder.AddField(
-                            $"{System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Global.CommandService.Modules.Where(m => string.Compare(m.Name, command) == 0).First().Name)} Commands",
+                            $"{System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command)} Commands",
                             allCmds.ToString())
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help");
@@ -121,15 +121,8 @@ namespace MarbleBot.Modules
                     break;
                 default:
                     var hCommand = new HelpCommand();
-                    try
-                    {
-                        var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower()).First();
-                        hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
-                    }
-                    catch (NullReferenceException ex)
-                    {
-                        await Log(ex.ToString());
-                    }
+                    var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower()).First();
+                    hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
                     switch (command)
                     {
                         // Fun
