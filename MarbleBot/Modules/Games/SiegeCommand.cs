@@ -26,49 +26,7 @@ namespace MarbleBot.Modules
             [Summary("Sign up to the Marble Siege!")]
             [RequireSlowmode]
             public async Task SiegeSignupCommandAsync([Remainder] string marbleName = "")
-            {
-                await Context.Channel.TriggerTypingAsync();
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                EmbedBuilder builder = new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp();
-
-                if (marbleName.IsEmpty() || marbleName.Contains("@")) marbleName = Context.User.Username;
-                else if (marbleName.Length > 100)
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, your entry exceeds the 100 character limit.");
-                    return;
-                }
-                else if (SiegeInfo.ContainsKey(fileId) && SiegeInfo[fileId].Active)
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
-                    return;
-                }
-                if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv")) File.Create($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv").Close();
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
-                {
-                    if ((await marbleList.ReadToEndAsync()).Contains(Context.User.Id.ToString()))
-                    {
-                        await ReplyAsync("You've already joined!");
-                        return;
-                    }
-                }
-                marbleName = marbleName.Replace("\n", " ").Replace(",", ";");
-                builder.AddField("Marble Siege: Signed up!", $"**{Context.User.Username}** has successfully signed up as **{marbleName}**!");
-                using (var siegers = new StreamWriter("SiegeMostUsed.txt", true))
-                    await siegers.WriteLineAsync(marbleName);
-                using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv", true))
-                    await marbleList.WriteLineAsync($"{marbleName},{Context.User.Id}");
-                int alive;
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
-                    alive = (await marbleList.ReadToEndAsync()).Split('\n').Length;
-                await ReplyAsync(embed: builder.Build());
-                if (alive > 20)
-                {
-                    await ReplyAsync("The limit of 20 contestants has been reached!");
-                    await SiegeStartCommandAsync();
-                }
-            }
+            => await Signup(Context, GameType.Siege, marbleName, 20, async () => { await SiegeStartCommandAsync(); });
 
             [Command("start")]
             [Alias("begin")]
@@ -369,12 +327,10 @@ namespace MarbleBot.Modules
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 if (Context.User.Id == 224267581370925056 || Context.IsPrivate)
                 {
-                    using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv", false))
-                    {
-                        await marbleList.WriteAsync("");
-                        await ReplyAsync("Contestant list successfully cleared!");
-                        marbleList.Close();
-                    }
+                    using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv", false);
+                    await marbleList.WriteAsync("");
+                    await ReplyAsync("Contestant list successfully cleared!");
+                    marbleList.Close();
                 }
             }
 
@@ -528,7 +484,7 @@ namespace MarbleBot.Modules
                 if (int.TryParse(rawNo, out int no))
                 {
                     var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader("SiegeMostUsed.txt"))
+                    using (var win = new StreamReader($"Data{Path.DirectorySeparatorChar}SiegeMostUsed.txt"))
                     {
                         while (!win.EndOfStream)
                         {

@@ -13,18 +13,7 @@ namespace MarbleBot.Extensions
     {
         public static bool ContainsServer(this IEnumerable<MBServer> serverList, SocketCommandContext context)
             => serverList.Any(s => s.Id == context.Guild.Id);
-
-        public static bool GetServer(this IEnumerable<MBServer> serverList, SocketCommandContext context, out MBServer server)
-        {
-            if (serverList.Any(s => s.Id == context.Guild.Id))
-            {
-                server = serverList.Where(s => s.Id == context.Guild.Id).First();
-                return true;
-            }
-            server = MBServer.Empty;
-            return false;
-        }
-
+            
         public static bool IsEmpty(this string str)
             => string.Compare(str, "", true) == 0 || string.Compare(str, " ", true) == 0 || str == null || str == string.Empty 
             || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);

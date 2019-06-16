@@ -109,7 +109,7 @@ namespace MarbleBot
         protected internal static MBServer GetServer(SocketCommandContext context)
         => Global.Servers.Value.Find(s => s.Id == context.Guild.Id);
 
-        /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser </summary>
+        /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser. </summary>
         protected internal static MBUser GetUser(SocketCommandContext context)
         {
             var obj = GetUsersObj();
@@ -130,6 +130,7 @@ namespace MarbleBot
             return user;
         }
 
+        /// <summary> Returns an instance of a MBUser with the given ID. </summary>
         protected internal static MBUser GetUser(SocketCommandContext context, ulong Id)
         {
             var obj = GetUsersObj();
@@ -150,6 +151,7 @@ namespace MarbleBot
             return user;
         }
 
+        /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser in the given JObject. </summary>
         protected internal static MBUser GetUser(SocketCommandContext context, JObject obj)
         {
             MBUser user;
@@ -169,6 +171,7 @@ namespace MarbleBot
             return user;
         }
 
+        /// <summary> Returns an instance of a MBUser with the given ID in the given JObject. </summary>
         protected internal static MBUser GetUser(SocketCommandContext context, JObject obj, ulong id)
         {
             MBUser user;
@@ -199,6 +202,7 @@ namespace MarbleBot
             return user;
         }
 
+         /// <summary> Returns a JObject containing all the users. </summary>
         protected internal static JObject GetUsersObj()
         {
             string json;
@@ -222,22 +226,18 @@ namespace MarbleBot
         /// <summary> Writes servers to the appropriate file. </summary>
         protected internal static void WriteServers()
         {
-            using (var servers = new JsonTextWriter(new StreamWriter("Servers.json")))
-            {
-                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                var dict = Global.Servers.Value.ToDictionary(s => s.Id);
-                serialiser.Serialize(servers, dict);
-            }
+            using var servers = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Servers.json"));
+            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            var dict = Global.Servers.Value.ToDictionary(s => s.Id);
+            serialiser.Serialize(servers, dict);
         }
 
         /// <summary> Writes users to the appropriate JSON file/ </summary>
         protected internal static void WriteUsers(JObject obj)
         {
-            using (var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json")))
-            {
-                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                serialiser.Serialize(users, obj);
-            }
+            using var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
+            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            serialiser.Serialize(users, obj);
         }
 
         protected internal static void WriteUsers(JObject obj, SocketUser socketUser, MBUser mbUser)
@@ -246,11 +246,9 @@ namespace MarbleBot
             mbUser.Discriminator = socketUser.Discriminator;
             obj.Remove(socketUser.Id.ToString());
             obj.Add(new JProperty(socketUser.Id.ToString(), JObject.FromObject(mbUser)));
-            using (var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json")))
-            {
-                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                serialiser.Serialize(users, obj);
-            }
+            using var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
+            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            serialiser.Serialize(users, obj);
         }
     }
 }

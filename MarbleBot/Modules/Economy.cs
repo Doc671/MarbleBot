@@ -278,7 +278,15 @@ namespace MarbleBot.Modules
         {
             var user = new MBUser();
             var id = Context.User.Id;
-            if (searchTerm.IsEmpty()) user = GetUser(Context);
+            if (searchTerm.IsEmpty()) 
+            {
+                user = GetUser(Context);
+                if (user.Items == null)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, you don't have any items!");
+                    return;
+                } 
+            }
             else
             {
                 string json;
@@ -286,7 +294,17 @@ namespace MarbleBot.Modules
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
-                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).Last();
+                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
+                if (foundUser.Value == null) 
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, the requested user could not be found.");
+                    return;
+                } 
+                else if (foundUser.Value.Items == null)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, the user **{foundUser.Value.Name}** does not have any items!");
+                    return;
+                } 
                 id = ulong.Parse(foundUser.Key);
                 user = foundUser.Value;
             }
@@ -372,7 +390,7 @@ namespace MarbleBot.Modules
             => await ReplyAsync("https://docs.google.com/spreadsheets/d/1tKT8nFH4Aa1VkH_UeieoOkN_iBAfueZLqLOdHsVTJ1I/edit#gid=0");
 
         [Command("poupsoop")]
-        [Alias("poupsoopcalc, poupcalc")]
+        [Alias("poupsoopcalc", "poupcalc")]
         [Summary("Calculates the total price of Poup Soop.")]
         public async Task PoupSoopCalcCommandAsync([Remainder] string msg)
         {
@@ -389,19 +407,17 @@ namespace MarbleBot.Modules
                 var no = splitMsg[i].ToDecimal();
                 var subtot = (no * poupSoopPrices[i]);
                 totalCost += subtot;
-                var type = "";
-                switch (i)
-                {
-                    case 0: type = "Regular"; break;
-                    case 1: type = "Limited"; break;
-                    case 2: type = "Frozen"; break;
-                    case 3: type = "Orange"; break;
-                    case 4: type = "Electric"; break;
-                    case 5: type = "Burning"; break;
-                    case 6: type = "Rotten"; break;
-                    case 7: type = "Ulteymut"; break;
-                    case 8: type = "Variety Pack"; break;
-                }
+                var type = i switch {
+                    0 => "Regular",
+                    1 => "Limited",
+                    2 => "Frozen",
+                    3 => "Orange",
+                    4 => "Electric",
+                    5 => "Burning",
+                    6 => "Rotten",
+                    7 => "Ulteymut",
+                    _ => "Variety Pack"
+                };
                 builder.AddField($"{type} x{no}", $"Cost: {UoM}{subtot:n2}");
             }
             builder.AddField("Total Cost", $"{UoM}{totalCost:n2}");
@@ -424,7 +440,12 @@ namespace MarbleBot.Modules
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
-                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).Last();
+                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
+                if (foundUser.Value == null) 
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, the requested user could not be found.");
+                    return;
+                } 
                 id = ulong.Parse(foundUser.Key);
                 user = foundUser.Value;
             }
@@ -564,7 +585,7 @@ namespace MarbleBot.Modules
                             break;
                         }
                     }
-                    if ((displayedPlace < maxValue + 1 && !(displayedPlace >= minValue)) || displayedPlace >= maxValue) displayedPlace++;
+                    if ((displayedPlace < maxValue + 1 && !(displayedPlace >= minValue)) || displayedPlace > maxValue) displayedPlace++;
                     index++;
                 }
                 var builder = new EmbedBuilder()
@@ -629,28 +650,6 @@ namespace MarbleBot.Modules
                 .WithDescription(output.ToString())
                 .WithTitle("All items for sale");
             await ReplyAsync(embed: builder.Build());
-        }
-
-        [Command("srs")]
-        [Summary("Call the streak revival service!")]
-        public async Task SRSCommandAsync()
-        {
-            var user = GetUser(Context);
-            IUser doc671 = Context.Client.GetUser(224267581370925056);
-            var lastDaily = user.LastDaily.ToString("yyyy-MM-dd HH:mm:ss");
-            if (user.LastDaily.Year == 2019 && user.LastDaily.DayOfYear == 1) lastDaily = "N/A";
-            await doc671.SendMessageAsync(embed: new EmbedBuilder()
-                .WithAuthor(Context.User)
-                .WithCurrentTimestamp()
-                .WithColor(GetColor(Context))
-                .WithFooter(Context.User.Id.ToString())
-                .AddField("Balance", $"{UoM}{user.Balance:n2}", true)
-                .AddField("Net Worth", $"{UoM}{user.NetWorth:n2}", true)
-                .AddField("Daily Streak", user.DailyStreak, true)
-                .AddField("Last Daily", lastDaily, true)
-                .Build());
-            var msg = doc671.Status == UserStatus.Offline ? " You might not get a reply soon, though..." : "";
-            await ReplyAsync($"The streak revival service has been called!{msg}");
         }
 
         [Command("use")]

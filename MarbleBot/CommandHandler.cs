@@ -32,11 +32,17 @@ namespace MarbleBot
 
             int argPos = 0;
 
-            var server = MBServer.Empty;
+            var server = new MBServer(0);
 
-            if (!context.IsPrivate)
-                server = Global.Servers.Value.Any(s => s.Id == context.Guild.Id) ?
-                    MarbleBotModule.GetServer(context) : MBServer.Empty;
+            if (!context.IsPrivate) 
+            {
+                if (Global.Servers.Value.Any(sr => sr.Id == context.Guild.Id))
+                    server =  MarbleBotModule.GetServer(context);
+                else {
+                    server = new MBServer(context.Guild.Id);
+                    Global.Servers.Value.Add(server);
+                }
+            }
 
             if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate || 
                 server.UsableChannels.Count == 0 || server.UsableChannels.Contains(context.Channel.Id))) {
@@ -45,7 +51,8 @@ namespace MarbleBot
                 if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
                     await Program.Log($"{result.Error.Value}: {result.ErrorReason}");
 
-                switch (result.Error) {
+                switch (result.Error) 
+                {
                     case CommandError.BadArgCount: await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command."); break;
                     case CommandError.UnmetPrecondition: await context.Channel.SendMessageAsync("Insufficient permissions."); break;
                 }

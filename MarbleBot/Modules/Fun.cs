@@ -190,7 +190,7 @@ namespace MarbleBot.Modules
                 }
                 else await Log($"Profanity detected: {input}");
             }
-            else await ReplyAsync($"**{Context.User.Username} **, I choose **{choices[choice].Trim()}**!");
+            else await ReplyAsync($"**{Context.User.Username}**, I choose **{choices[choice].Trim()}**!");
         }
 
         [Command("orange")]
@@ -425,7 +425,7 @@ namespace MarbleBot.Modules
                     case 0: message = "Excuse me, kind user, please cease your current course of action immediately."; break;
                     case 1: message = "Immediate desistance required."; break;
                     case 2: message = "I don't like it..."; break;
-                    case 3: message = "angery"; break;
+                    case 3: message = ">:("; break;
                     case 4: message = "ehhh..."; break;
                     case 5: message = "not bad... but not good either"; break;
                     case 6: message = "slightly above average... I guess..."; break;
@@ -524,26 +524,24 @@ namespace MarbleBot.Modules
             }
             else
             {
-                using (StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
+                using StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv");
+                while (!stream.EndOfStream)
                 {
-                    while (!stream.EndOfStream)
+                    string list = stream.ReadLine();
+                    string[] vocab = list.Split(',');
+                    wordList[a] = vocab[0];
+                    invList[a] = vocab[1];
+                    descList[a] = vocab[2];
+                    if (wordList[a].ToLower() == word.ToLower())
                     {
-                        string list = stream.ReadLine();
-                        string[] vocab = list.Split(',');
-                        wordList[a] = vocab[0];
-                        invList[a] = vocab[1];
-                        descList[a] = vocab[2];
-                        if (wordList[a].ToLower() == word.ToLower())
-                        {
-                            randNo = a;
-                            stream.Close();
-                            wordSet = true;
-                            break;
-                        }
-                        a++;
+                        randNo = a;
+                        stream.Close();
+                        wordSet = true;
+                        break;
                     }
-                    if (!wordSet) randNo = Rand.Next(1, a);
+                    a++;
                 }
+                if (!wordSet) randNo = Rand.Next(1, a);
             }
             await ReplyAsync($"**__{wordList[randNo]}__**\nInventor: {invList[randNo]}\nDescription: {descList[randNo]}");
         }

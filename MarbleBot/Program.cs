@@ -49,7 +49,8 @@ namespace MarbleBot
             using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
             {
                 string json;
-                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json")) json = await users.ReadToEndAsync();
+                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
+                    json = await users.ReadToEndAsync();
                 var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MBServer>>(json);
                 foreach (var server in allServers)
                 {

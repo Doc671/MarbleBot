@@ -5,10 +5,16 @@ Algodoo
 Deskland
 Vertigo
 Deletion
-Infernite
 MarbleBot
 Frigidium
 Neptune
 Melmons
 Scavenger
 Trebuchet
+Alternator
+Plinko
+Pree
+Cee
+Three
+Siege
+Juggernaut

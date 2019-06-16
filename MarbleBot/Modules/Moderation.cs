@@ -25,19 +25,8 @@ namespace MarbleBot.Modules
                 return;
             }
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
-            var newServer = false;
-            MBServer server;
-            if (Global.Servers.Value.Any(s => s.Id == Context.Guild.Id))
-            {
-                server = GetServer(Context);
-                server.Roles.Add(id);
-            }
-            else
-            {
-                newServer = true;
-                server = new MBServer(Context.Guild.Id, 0, 0, "607D8B", new ulong[] { 0 }, new ulong[] { 0 });
-            }
-            if (newServer) Global.Servers.Value.Add(server);
+            var server = GetServer(Context);
+            server.Roles.Add(id);
             WriteServers();
             await ReplyAsync("Succesfully updated.");
         }
@@ -63,15 +52,7 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task ClearChannelCommandAsync(string option)
         {
-            var server = MBServer.Empty;
-            var newServer = false;
-            if (Global.Servers.Value.Any(s => s.Id == Context.Guild.Id))
-                server = GetServer(Context);
-            else
-            {
-                newServer = true;
-                server.Id = Context.Guild.Id;
-            }
+            var server = GetServer(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
                 case "announcement": server.AnnouncementChannel = 0; break;
@@ -79,7 +60,6 @@ namespace MarbleBot.Modules
                 case "usable": server.UsableChannels = new List<ulong>(); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
             }
-            if (newServer) Global.Servers.Value.Add(server);
             WriteServers();
             await ReplyAsync("Succesfully cleared.");
         }
@@ -163,11 +143,7 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task RemoveRoleCommandAsync([Remainder] string searchTerm)
         {
-            if (Global.Servers.Value.GetServer(Context, out MBServer server))
-            {
-                await ReplyAsync("Could not find the role!");
-                return;
-            }
+            var server = GetServer(Context);
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
             if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0) ||
                 !server.Roles.Contains(id))
@@ -191,12 +167,7 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Invalid channel!");
                 return;
             }
-            var newServer = false;
-            if (!Global.Servers.Value.GetServer(Context, out MBServer server))
-            {
-                newServer = true;
-                server.Id = Context.Guild.Id;
-            }
+            var server = GetServer(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
                 case "announcement": server.AnnouncementChannel = channel; break;
@@ -204,7 +175,6 @@ namespace MarbleBot.Modules
                 case "usable": server.UsableChannels.Add(channel); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info."); return;
             }
-            if (newServer) Global.Servers.Value.Add(server);
             WriteServers();
             await ReplyAsync("Successfully updated.");
         }
@@ -221,14 +191,8 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Invalid hexadecimal colour string.");
                 return;
             }
-            var newServer = false;
-            if (!Global.Servers.Value.GetServer(Context, out MBServer server))
-            {
-                newServer = true;
-                server.Id = Context.Guild.Id;
-            }
+            var server = GetServer(Context);
             server.Color = input;
-            if (newServer) Global.Servers.Value.Add(server);
             WriteServers();
             await ReplyAsync("Successfully updated.");
         }

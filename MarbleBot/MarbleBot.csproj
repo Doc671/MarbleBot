@@ -9,11 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="2.1.0" />
-    <PackageReference Include="Google.Apis.Docs.v1" Version="1.40.0.1594" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.40.0.1593" />
+    <PackageReference Include="Discord.Net" Version="2.1.1" />
+    <PackageReference Include="Google.Apis.Docs.v1" Version="1.40.2.1615" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.40.2.1593" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Octokit" Version="0.32.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +32,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\RaceDeathMessages.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\RaceSpecialMessages.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Vinhglish.csv">

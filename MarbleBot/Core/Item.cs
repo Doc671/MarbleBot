@@ -54,14 +54,14 @@ namespace MarbleBot.Core
             CraftingStationRequired = craftingStationRequired;
         }
 
-        public Item(Item baseItem, int id = 0, byte stage = 1, Dictionary<string, int> craftingRecipe = null)
+        public Item(Item baseItem, int id = 0, bool onSale = false, byte stage = 1, Dictionary<string, int> craftingRecipe = null)
         {
             Id = id == 0 ? baseItem.Id : id;
             Name = baseItem.Name;
             Price = baseItem.Price;
             Description = baseItem.Description;
-            OnSale = baseItem.OnSale;
-            Stage = stage == 1 ? baseItem.Stage : stage;
+            OnSale = onSale == baseItem.OnSale ? onSale : baseItem.OnSale;
+            Stage = stage == 1 && baseItem.Stage != 0 ? baseItem.Stage : stage;
             Ammo = baseItem.Ammo;
             Damage = baseItem.Damage;
             ScavengeLocation = baseItem.ScavengeLocation;

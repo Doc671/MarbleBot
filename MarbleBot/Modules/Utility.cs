@@ -3,7 +3,6 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Core;
 using MarbleBot.Extensions;
-using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +26,7 @@ namespace MarbleBot.Modules
                 .AddField("Ongoing Scavenges", ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", SiegeInfo.Count, true)
                 .AddField("Ongoing Wars", WarInfo.Count, true)
+                .AddField("Servers", Global.Servers.Value.Count, true)
                 .AddField("Start Time (UTC)", StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss"), true)
                 .AddField("Uptime", DateTime.UtcNow.Subtract(StartTime.Value).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
@@ -73,7 +73,6 @@ namespace MarbleBot.Modules
                     builder.AddField(
                             $"{System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command)} Commands",
                             allCmds.ToString())
-                        .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help");
                     await ReplyAsync(embed: builder.Build());
                     break;
@@ -128,7 +127,7 @@ namespace MarbleBot.Modules
                         // Fun
                         case "7ball": hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
                         case "bet": hCommand.Usage = "mb/bet [number of marbles]"; hCommand.Example = "mb/bet 30"; break;
-                        case "choose": hCommand.Usage = "mb/choose <choice1> | <choice2>"; hCommand.Example = "Example: `mb/choose Red | Yellow | Green | Blue"; break;
+                        case "choose": hCommand.Usage = "mb/choose <choice1> | <choice2>"; hCommand.Example = "mb/choose Red | Yellow | Green | Blue"; break;
                         case "orangeify": hCommand.Usage = "mb/orangeify <text>"; hCommand.Example = "mb/orangeify Drink Poup Soop!"; break;
                         case "random": hCommand.Usage = "mb/random <number1> <number2>"; hCommand.Example = "mb/random 1 5"; break;
                         case "rate": hCommand.Usage = "mb/rate <text>"; hCommand.Example = "mb/rate Marbles"; break;
@@ -203,25 +202,6 @@ namespace MarbleBot.Modules
                 .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used! ")
                 .Append("If no usable channel is set, commands can be used anywhere.")
                 .ToString());
-
-        [Command("issue")]
-        [Summary("Posts an issue.")]
-        public async Task IssueCommandAsync(string title, string description)
-        {
-            var client = new GitHubClient(new ProductHeaderValue("MarbleBot"));
-            var newIssue = new NewIssue(title)
-            {
-                Body = description
-            };
-            var issue = await client.Issue.Create("owner", "name", newIssue);
-            await ReplyAsync(embed: new EmbedBuilder()
-                .AddField(issue.Title, issue.Body)
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
-                .WithDescription($"Posted issue #{issue.Number} in {issue.Repository}")
-                .WithTitle("Issue posted")
-                .Build());
-        }
 
         [Command("serverinfo")]
         [Summary("Displays information about the current server.")]

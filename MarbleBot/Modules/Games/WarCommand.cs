@@ -26,63 +26,7 @@ namespace MarbleBot.Modules
             [Summary("Sign up to the Marble War!")]
             [RequireSlowmode]
             public async Task WarSignupCommandAsync(string itemId, [Remainder] string marbleName = "")
-            {
-                await Context.Channel.TriggerTypingAsync();
-                var item = GetItem(itemId);
-                if (item.WarClass == 0)
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, this item cannot be used as a weapon!");
-                    return;
-                }
-
-                var user = GetUser(Context);
-                if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] < 1) 
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");
-                    return;
-                }
-
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                if (marbleName.IsEmpty() || marbleName.Contains("@")) marbleName = Context.User.Username;
-                else if (marbleName.Length > 100)
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, your entry exceeds the 100 character limit.");
-                    return;
-                }
-                else if (WarInfo.ContainsKey(fileId))
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
-                    return;
-                }
-
-                if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}war.csv")) File.Create($"Data{Path.DirectorySeparatorChar}{fileId}war.csv").Close();
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
-                {
-                    if ((await marbleList.ReadToEndAsync()).Contains(Context.User.Id.ToString()))
-                    {
-                        await ReplyAsync("You've already joined!");
-                        return;
-                    }
-                }
-                marbleName = marbleName.Replace("\n", " ").Replace(",", ";");
-                var builder = new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .AddField("Marble War: Signed up!", $"**{Context.User.Username}** has successfully signed up as **{marbleName}** with the weapon **{item.Name}**!");
-                using (var fighters = new StreamWriter("WarMostUsed.txt", true))
-                    await fighters.WriteLineAsync(marbleName);
-                using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}war.csv", true))
-                    await marbleList.WriteLineAsync($"{marbleName},{Context.User.Id},{item.Id:000}");
-                int alive;
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
-                    alive = (await marbleList.ReadToEndAsync()).Split('\n').Length;
-                await ReplyAsync(embed: builder.Build());
-                if (alive > 20)
-                {
-                    await ReplyAsync("The limit of 20 fighters has been reached!");
-                    await WarStartCommandAsync();
-                }
-            }
+            => await Signup(Context, GameType.War, marbleName, 20, async () => { await WarStartCommandAsync(); }, itemId);
 
             [Command("start")]
             [Alias("commence")]
@@ -436,12 +380,12 @@ namespace MarbleBot.Modules
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
             [Summary("Shows a leaderboard of most used marbles in wars.")]
-            public async Task SiegeLeaderboardCommandAsync(string rawNo = "1")
+            public async Task WarLeaderboardCommandAsync(string rawNo = "1")
             {
                 if (int.TryParse(rawNo, out int no))
                 {
                     var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader("WarMostUsed.txt"))
+                    using (var win = new StreamReader($"Data{Path.DirectorySeparatorChar}WarMostUsed.txt"))
                     {
                         while (!win.EndOfStream)
                         {
@@ -490,7 +434,7 @@ namespace MarbleBot.Modules
             [Command("remove")]
             [Summary("Removes a contestant from the contestant list.")]
             [RequireSlowmode]
-            public async Task SiegeRemoveCommandAsync([Remainder] string marbleToRemove)
+            public async Task WarRemoveCommandAsync([Remainder] string marbleToRemove)
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden

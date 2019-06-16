@@ -37,7 +37,7 @@
     "Name": "Limited Edition Poup Soop",
     "Price": 552387946.00,
     "Description": "A special edition of Poup Soop that contains extra Poup, extra acid, extra lava, rotten-er flesh, 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "003": {
@@ -58,7 +58,7 @@
     "Name": "Electric Edition Poup Soop",
     "Price": 221548933670.00,
     "Description": "A special edition of Poup Soop with 20% more lava, 20% more acid and electricity generators inside the barrel. Very good conductor of electricity. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "006": {
@@ -1071,5 +1071,33 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0
+  },
+  "103": {
+    "Name": "Toxicut",
+    "Price": 910.00,
+    "Description": "A steel sword imbued with acid and poison.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0,
+    "Damage": 12,
+    "CraftingProduced": 1,
+    "CraftingRecipe": {
+      "023": 1,
+      "024": 1,
+      "025": 1,
+      "026": 1,
+      "027": 1,
+      "028": 1,
+      "029": 1,
+      "030": 1,
+      "031": 1,
+      "032": 1,
+      "033": 1,
+      "034": 1,
+      "035": 1,
+      "036": 2,
+      "061": 3,
+      "070": 5
+    }
   }
 }

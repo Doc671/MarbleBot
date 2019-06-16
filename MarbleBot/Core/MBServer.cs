@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MarbleBot.Core
@@ -19,7 +20,17 @@ namespace MarbleBot.Core
         /// <summary> The channels where commands can be used. If empty, commands can be used anywhere in the server. </summary>
         public List<ulong> UsableChannels { get; set; }
 
-        public static readonly MBServer Empty = new MBServer(0, 0, 0, "607D8B", new ulong[0], new ulong[0]);
+        /// <summary> Represents a server. </summary>
+        /// <param name="id"> The ID of the server. </param>
+        public MBServer(ulong id)
+        {
+            Id = id;
+            AnnouncementChannel = 0;
+            AutoresponseChannel = 0;
+            Color = "607D8B";
+            Roles = new List<ulong>(new ulong[0]);
+            UsableChannels = new List<ulong>(new ulong[0]);
+        }
 
         /// <summary> Represents a server. </summary>
         /// <param name="id"> The ID of the server. </param>
@@ -28,6 +39,7 @@ namespace MarbleBot.Core
         /// <param name="color"> The colour used in embeds. </param>
         /// <param name="roles"> The role list roles of the server. </param>
         /// <param name="usableChannels"> The channels where commands can be used. If empty, commands can be used anywhere in the server. </param>
+        [JsonConstructor]
         public MBServer(ulong id, ulong announcementChannel, ulong autoresponseChannel, string color, IEnumerable<ulong> roles, IEnumerable<ulong> usableChannels)
         {
             Id = id;
