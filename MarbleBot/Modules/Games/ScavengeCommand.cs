@@ -18,6 +18,8 @@ namespace MarbleBot.Modules
         [Summary("Scavenge for items!")]
         public class ScavengeCommand : MarbleBotModule
         {
+            private const GameType Type = GameType.Race;
+
             public async Task ScavengeStartAsync(MBUser user, ScavengeLocation location)
             {
                 await Context.Channel.TriggerTypingAsync();
@@ -221,6 +223,12 @@ namespace MarbleBot.Modules
                     .WithTitle("Scavenge Locations")
                     .Build());
             }
+
+            [Command("next")]
+            [Alias("checkearn")]
+            [Summary("Shows whether you can scavenge and if not, when you will be able to.")]
+            public async Task ScavengeCheckearnAsync()
+            => await CheckearnAsync(Context, Type);
 
             public async Task ScavengeInfoAsync(ScavengeLocation location)
             {

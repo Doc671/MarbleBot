@@ -21,12 +21,14 @@ namespace MarbleBot.Modules
         [Remarks("Requires a channel in which slowmode is enabled.")]
         public class WarCommand : MarbleBotModule
         {
+            private const GameType Type = GameType.War;
+
             [Command("signup")]
             [Alias("join")]
             [Summary("Sign up to the Marble War!")]
             [RequireSlowmode]
             public async Task WarSignupCommandAsync(string itemId, [Remainder] string marbleName = "")
-            => await Signup(Context, GameType.War, marbleName, 20, async () => { await WarStartCommandAsync(); }, itemId);
+            => await SignupAsync(Context, Type, marbleName, 20, async () => { await WarStartCommandAsync(); }, itemId);
 
             [Command("start")]
             [Alias("commence")]
@@ -219,7 +221,7 @@ namespace MarbleBot.Modules
                             .WithDescription($"**{currentMarble.Name}** tried to attack **{enemy.Name}** but missed!")
                             .WithTitle($"**{currentMarble.Name}** attacks!")
                             .Build());
-                        return; 
+                        return;
                     }
                 }
                 await ReplyAsync("Could not find the enemy!");
@@ -272,54 +274,19 @@ namespace MarbleBot.Modules
             [Command("checkearn")]
             [Summary("Shows whether you can earn money from wars and if not, when.")]
             public async Task WarCheckearnCommandAsync()
-            {
-                var user = GetUser(Context);
-                var nextDaily = DateTime.UtcNow.Subtract(user.LastWarWin);
-                var output = nextDaily.TotalHours < 6 ?
-                    $"You can earn money from wars in **{GetDateString(user.LastWarWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
-                    : "You can earn money from wars now!";
-                await ReplyAsync(embed: new EmbedBuilder()
-                    .WithAuthor(Context.User)
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithDescription(output)
-                    .Build());
-            }
+            => await CheckearnAsync(Context, Type);
+
+            [Command("clear")]
+            [Summary("Clears the list of contestants.")]
+            public async Task WarClearCommandAsync()
+            => await ClearAsync(Context, Type);
 
             [Command("contestants")]
             [Alias("marbles", "participants")]
             [Summary("Shows a list of all the contestants in the war.")]
             [RequireSlowmode]
             public async Task WarContestantsCommandAsync()
-            {
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                var marbles = new StringBuilder();
-                byte cCount = 0;
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
-                {
-                    var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                    foreach (var marble in allMarbles)
-                    {
-                        if (marble.Length > 16)
-                        {
-                            var mSplit = marble.Split(',');
-                            var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
-                            var weapon = GetItem(int.Parse(mSplit[2]).ToString("000"));
-                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0]}** (Weapon: {weapon})");
-                            else marbles.AppendLine($"**{mSplit[0]}** (Weapon: {weapon}) [{user.Username}#{user.Discriminator}]");
-                            cCount++;
-                        }
-                    }
-                }
-                if (marbles.ToString().IsEmpty()) await ReplyAsync("It looks like there aren't any contestants...");
-                else await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("Contestants", marbles.ToString())
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithFooter("Contestant count: " + cCount)
-                    .WithTitle("Marble War: Contestants")
-                    .Build());
-            }
+            => await ContestantsAsync(Context, Type);
 
             [Command("info")]
             [Summary("Shows information about the war.")]
@@ -435,43 +402,7 @@ namespace MarbleBot.Modules
             [Summary("Removes a contestant from the contestant list.")]
             [RequireSlowmode]
             public async Task WarRemoveCommandAsync([Remainder] string marbleToRemove)
-            {
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
-                byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0;
-                var wholeFile = new StringBuilder();
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
-                {
-                    while (!marbleList.EndOfStream)
-                    {
-                        var line = await marbleList.ReadLineAsync();
-                        if (string.Compare(line.Split(',')[0], marbleToRemove, true) == 0)
-                        {
-                            if (ulong.Parse(line.Split(',')[1]) == Context.User.Id)
-                                state = 2;
-                            else
-                            {
-                                wholeFile.AppendLine(line);
-                                if (!(state == 2)) state = 1;
-                            }
-                        }
-                        else wholeFile.AppendLine(line);
-                    }
-                }
-                switch (state)
-                {
-                    case 0: await ReplyAsync("Could not find the requested marble!"); break;
-                    case 1: await ReplyAsync("This is not your marble!"); break;
-                    case 2:
-                        using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}war.csv", false))
-                        {
-                            await marbleList.WriteAsync(wholeFile.ToString());
-                            await ReplyAsync($"Removed contestant **{marbleToRemove}**!");
-                        }
-                        break;
-                    case 3: goto case 2;
-                }
-            }
+            => await RemoveAsync(Context, Type, marbleToRemove);
 
             [Command("valid")]
             [Alias("validweapons")]

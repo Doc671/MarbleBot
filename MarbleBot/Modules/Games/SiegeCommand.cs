@@ -21,12 +21,14 @@ namespace MarbleBot.Modules
         [Remarks("Requires a channel in which slowmode is enabled.")]
         public class SiegeCommand : MarbleBotModule
         {
+            private const GameType Type = GameType.Siege;
+
             [Command("signup")]
             [Alias("join")]
             [Summary("Sign up to the Marble Siege!")]
             [RequireSlowmode]
             public async Task SiegeSignupCommandAsync([Remainder] string marbleName = "")
-            => await Signup(Context, GameType.Siege, marbleName, 20, async () => { await SiegeStartCommandAsync(); });
+            => await SignupAsync(Context, Type, marbleName, 20, async () => { await SiegeStartCommandAsync(); });
 
             [Command("start")]
             [Alias("begin")]
@@ -169,6 +171,7 @@ namespace MarbleBot.Modules
                 if (marble.HP < 1)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
+                    return;
                 }
 
                 if (marble.StatusEffect == MSE.Stun) {
@@ -320,36 +323,15 @@ namespace MarbleBot.Modules
                 else await ReplyAsync("You failed to grab the power-up!");
             }
 
-            [Command("clear")]
-            [Summary("Clears the list of contestants.")]
-            public async Task SiegeClearCommandAsync()
-            {
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                if (Context.User.Id == 224267581370925056 || Context.IsPrivate)
-                {
-                    using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv", false);
-                    await marbleList.WriteAsync("");
-                    await ReplyAsync("Contestant list successfully cleared!");
-                    marbleList.Close();
-                }
-            }
-
             [Command("checkearn")]
             [Summary("Shows whether you can earn money from Sieges and if not, when.")]
             public async Task SiegeCheckearnCommandAsync()
-            {
-                var user = GetUser(Context);
-                var nextDaily = DateTime.UtcNow.Subtract(user.LastSiegeWin);
-                var output = nextDaily.TotalHours < 6 ?
-                    $"You can earn money from Sieges in **{GetDateString(user.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
-                    : "You can earn money from Sieges now!";
-                await ReplyAsync(embed: new EmbedBuilder()
-                    .WithAuthor(Context.User)
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithDescription(output)
-                    .Build());
-            }
+            => await CheckearnAsync(Context, Type);
+
+            [Command("clear")]
+            [Summary("Clears the list of contestants.")]
+            public async Task SiegeClearCommandAsync()
+            => await ClearAsync(Context, Type);
 
             [Command("contestants")]
             [Alias("marbles", "participants")]
@@ -389,43 +371,7 @@ namespace MarbleBot.Modules
             [Summary("Removes a contestant from the contestant list.")]
             [RequireSlowmode]
             public async Task SiegeRemoveCommandAsync([Remainder] string marbleToRemove)
-            {
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
-                byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0;
-                var wholeFile = new StringBuilder();
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
-                {
-                    while (!marbleList.EndOfStream)
-                    {
-                        var line = await marbleList.ReadLineAsync();
-                        if (string.Compare(line.Split(',')[0], marbleToRemove, true) == 0)
-                        {
-                            if (ulong.Parse(line.Split(',')[1]) == Context.User.Id)
-                                state = 2;
-                            else
-                            {
-                                wholeFile.AppendLine(line);
-                                if (!(state == 2)) state = 1;
-                            }
-                        }
-                        else wholeFile.AppendLine(line);
-                    }
-                }
-                switch (state)
-                {
-                    case 0: await ReplyAsync("Could not find the requested marble!"); break;
-                    case 1: await ReplyAsync("This is not your marble!"); break;
-                    case 2:
-                        using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv", false))
-                        {
-                            await marbleList.WriteAsync(wholeFile.ToString());
-                            await ReplyAsync($"Removed contestant **{marbleToRemove}**!");
-                        }
-                        break;
-                    case 3: goto case 2;
-                }
-            }
+            => await RemoveAsync(Context, Type, marbleToRemove);
 
             [Command("info")]
             [Summary("Shows information about the Siege.")]

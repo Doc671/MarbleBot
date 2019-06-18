@@ -21,11 +21,13 @@ namespace MarbleBot.Modules
         [Summary("Participate in a marble race!")]
         public class RaceCommand : MarbleBotModule
         {
+            private const GameType Type = GameType.Race;
+
             [Command("signup")]
             [Alias("join")]
             [Summary("Sign up to the marble race!")]
             public async Task RaceSignupCommandAsync([Remainder] string marbleName = "")
-            => await Signup(Context, GameType.Race, marbleName, 10, async () => { await RaceStartCommandAsync(); });
+            => await SignupAsync(Context, Type, marbleName, 10, async () => { await RaceStartCommandAsync(); });
 
             [Command("start")]
             [Alias("begin")]
@@ -147,64 +149,20 @@ namespace MarbleBot.Modules
 #pragma warning disable IDE0063 // Use simple 'using' statement
                     using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}race.csv", false))
 #pragma warning restore IDE0063 // Use simple 'using' statement
-                    {
                         await marbleList.WriteAsync("");
-                        marbleList.Close();
-                    }
                 }
             }
 
             [Command("clear")]
             [Summary("Clears the list of racers.")]
             public async Task RaceClearCommandAsync()
-            {
-                await Context.Channel.TriggerTypingAsync();
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                if (Context.User.Id == 224267581370925056 || Context.IsPrivate)
-                {
-                    using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}race.csv", false);
-                    await marbleList.WriteAsync("");
-                    await ReplyAsync("Contestant list successfully cleared!");
-                    marbleList.Close();
-                }
-            }
+            => await ClearAsync(Context, Type);
 
             [Command("contestants")]
             [Alias("marbles", "participants")]
             [Summary("Shows a list of all the contestants in the race.")]
             public async Task RaceContestantsCommandAsync()
-            {
-                await Context.Channel.TriggerTypingAsync();
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                var builder = new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp();
-                var marbles = new StringBuilder();
-                byte count = 0;
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}race.csv"))
-                {
-                    var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                    foreach (var marble in allMarbles)
-                    {
-                        if (marble.Length > 16)
-                        {
-                            var mSplit = marble.Split(',');
-                            var user = Context.Client.GetUser(ulong.Parse(mSplit[1].Trim('\n')));
-                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0].Trim('\n')}**");
-                            else marbles.AppendLine($"**{mSplit[0].Trim('\n')}** [{user.Username}#{user.Discriminator}]");
-                            count++;
-                        }
-                    }
-                }
-                if (marbles.ToString().IsEmpty()) await ReplyAsync("It looks like there aren't any contestants...");
-                else
-                {
-                    builder.AddField("Contestants", marbles.ToString());
-                    builder.WithFooter("Contestant count: " + count)
-                        .WithTitle("Marble Race: Contestants");
-                    await ReplyAsync(embed: builder.Build());
-                }
-            }
+            => await ContestantsAsync(Context, Type);
 
             [Command("leaderboard")]
             [Summary("Shows a leaderboard of most used marbles or winning marbles.")]
@@ -263,61 +221,13 @@ namespace MarbleBot.Modules
 
             [Command("checkearn")]
             [Summary("Shows whether you can earn money from racing and if not, when.")]
-            public async Task RaceCheckearnTaskAsync()
-            {
-                await Context.Channel.TriggerTypingAsync();
-                var user = GetUser(Context);
-                var nextDaily = DateTime.UtcNow.Subtract(user.LastRaceWin);
-                var output = nextDaily.TotalHours < 6 ?
-                    $"You can earn money from racing in **{GetDateString(user.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
-                    : "You can earn money from racing now!";
-                await ReplyAsync(embed: new EmbedBuilder()
-                    .WithAuthor(Context.User)
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithDescription(output)
-                    .Build());
-            }
+            public async Task RaceCheckearnCommandAsync()
+            => await CheckearnAsync(Context, Type);
 
             [Command("remove")]
             [Summary("Removes a contestant from the contestant list.")]
             public async Task RaceRemoveCommandAsync([Remainder] string marbleToRemove)
-            {
-                await Context.Channel.TriggerTypingAsync();
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                byte state = Context.User.Id == 224267581370925056 ? (byte)3 : (byte)0;
-                var wholeFile = new StringBuilder();
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}race.csv"))
-                {
-                    while (!marbleList.EndOfStream)
-                    {
-                        var line = await marbleList.ReadLineAsync();
-                        if (string.Compare(line.Split(',')[0], marbleToRemove, true) == 0)
-                        {
-                            if (ulong.Parse(line.Split(',')[1]) == Context.User.Id) state = 2;
-                            else
-                            {
-                                wholeFile.AppendLine(line);
-                                if (!(state == 2)) state = 1;
-                            }
-                        }
-                        else wholeFile.AppendLine(line);
-                    }
-                }
-                switch (state)
-                {
-                    case 0: await ReplyAsync("Could not find the requested racer!"); break;
-                    case 1: await ReplyAsync("This is not your marble!"); break;
-                    case 2:
-                        using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}race.csv", false))
-                        {
-                            await marbleList.WriteAsync(wholeFile.ToString());
-                            await ReplyAsync($"Removed contestant **{marbleToRemove}**!");
-                        }
-                        break;
-                    case 3: goto case 2;
-                }
-            }
+            => await RemoveAsync(Context, Type, marbleToRemove);
 
             [Command("")]
             [Alias("help")]
