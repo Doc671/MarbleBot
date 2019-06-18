@@ -338,34 +338,7 @@ namespace MarbleBot.Modules
             [Summary("Shows a list of all the contestants in the Siege.")]
             [RequireSlowmode]
             public async Task SiegeContestantsCommandAsync()
-            {
-                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                var marbles = new StringBuilder();
-                byte cCount = 0;
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
-                {
-                    var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                    foreach (var marble in allMarbles)
-                    {
-                        if (marble.Length > 16)
-                        {
-                            var mSplit = marble.Split(',');
-                            var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
-                            if (Context.IsPrivate) marbles.AppendLine($"**{mSplit[0]}**");
-                            else marbles.AppendLine($"**{mSplit[0]}** [{user.Username}#{user.Discriminator}]");
-                            cCount++;
-                        }
-                    }
-                }
-                if (marbles.ToString().IsEmpty()) await ReplyAsync("It looks like there aren't any contestants...");
-                else await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("Contestants", marbles.ToString())
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithFooter("Contestant count: " + cCount)
-                    .WithTitle("Marble Siege: Contestants")
-                    .Build());
-            }
+            => await ContestantsAsync(Context, Type);
 
             [Command("remove")]
             [Summary("Removes a contestant from the contestant list.")]

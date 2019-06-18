@@ -153,6 +153,11 @@ namespace MarbleBot.Modules
                 }
             }
 
+            [Command("checkearn")]
+            [Summary("Shows whether you can earn money from racing and if not, when.")]
+            public async Task RaceCheckearnCommandAsync()
+            => await CheckearnAsync(Context, Type);
+
             [Command("clear")]
             [Summary("Clears the list of racers.")]
             public async Task RaceClearCommandAsync()
@@ -218,11 +223,6 @@ namespace MarbleBot.Modules
                 }
                 else await ReplyAsync("This is not a valid number! Format: `mb/race leaderboard <winners/mostused> <optional number>`");
             }
-
-            [Command("checkearn")]
-            [Summary("Shows whether you can earn money from racing and if not, when.")]
-            public async Task RaceCheckearnCommandAsync()
-            => await CheckearnAsync(Context, Type);
 
             [Command("remove")]
             [Summary("Removes a contestant from the contestant list.")]

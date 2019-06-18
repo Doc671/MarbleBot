@@ -15,9 +15,16 @@ namespace MarbleBot.Modules
     /// <summary> Game commands. </summary>
     public partial class Games
     {
+        /// <summary> Gets the string representation of the game. </summary>
+        /// <param name="gameType"> The type of game. </param>
+        /// <param name="capitalised"> Whether or not the name being returned is capitalised. </param>
+        /// <returns> The string representation of the game. </returns>
         private static string GameName(GameType gameType, bool capitalised = true)
         => capitalised ? Enum.GetName(typeof(GameType), gameType) : Enum.GetName(typeof(GameType), gameType).ToLower();
 
+        /// <summary> Sends a message showing whether a user can earn from a game. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="gameType"> The type of game. </param>
         public static async Task CheckearnAsync(SocketCommandContext context, GameType gameType)
         {
             await context.Channel.TriggerTypingAsync();
@@ -41,6 +48,9 @@ namespace MarbleBot.Modules
                 .Build());
         }
 
+        /// <summary> Clears the contestant list. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="gameType"> The type of game. </param>
         public static async Task ClearAsync(SocketCommandContext context, GameType gameType)
         {
             await context.Channel.TriggerTypingAsync();
@@ -51,8 +61,12 @@ namespace MarbleBot.Modules
                 await marbleList.WriteAsync("");
                 await context.Channel.SendMessageAsync("Contestant list successfully cleared!");
             }
+            else await context.Channel.SendMessageAsync($"**{context.User.Username}**, you cannot do this!");
         }
 
+        /// <summary> Returns a message showing the contestants currently signed up to the game. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="gameType"> The type of game. </param>
         public static async Task ContestantsAsync(SocketCommandContext context, GameType gameType)
         {
             await context.Channel.TriggerTypingAsync();
@@ -88,6 +102,10 @@ namespace MarbleBot.Modules
             }
         }
 
+        /// <summary> Removes a contestant from the contestant list of a game. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="gameType"> The type of game. </param>
+        /// <param name="marbleToRemove"> The name of the marble to remove. </param>
         public static async Task RemoveAsync(SocketCommandContext context, GameType gameType, string marbleToRemove)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
@@ -127,6 +145,13 @@ namespace MarbleBot.Modules
             }
         }
 
+        /// <summary> Removes a contestant from the contestant list of a game. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="gameType"> The type of game. </param>
+        /// <param name="marbleName"> The name of the contestant signing up. </param>
+        /// <param name="marbleLimit"> The maximum number of marbles that can be signed up. </param>
+        /// <param name="startCommand"> The command to execute if the marble limit has been met. </param>
+        /// <param name="itemId"> (War only) The ID of the weapon the marble is joining with. </param>
         public static async Task SignupAsync(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
             Func<Task> startCommand, string itemId = "")
         {
