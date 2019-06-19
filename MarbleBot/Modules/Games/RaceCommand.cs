@@ -63,7 +63,7 @@ namespace MarbleBot.Modules
                         }
                         marbleList.Close();
                     }
-                    RaceAlive.Add(fileId, marbleCount);
+                    RaceAlive.GetOrAdd(fileId, marbleCount);
 
                     // Race start
                     builder.WithTitle("The race has started!");
@@ -107,8 +107,8 @@ namespace MarbleBot.Modules
                     }
 
                     // Race finish
-                    if (Context.IsPrivate) RaceAlive.Remove(Context.User.Id);
-                    else RaceAlive.Remove(Context.Guild.Id);
+                    if (Context.IsPrivate) RaceAlive.TryRemove(Context.User.Id, out _);
+                    else RaceAlive.TryRemove(Context.Guild.Id, out _);
                     var winnerID = 0ul;
                     for (int i = 0; i < marbles.Count; i++)
                     {
@@ -126,7 +126,7 @@ namespace MarbleBot.Modules
                     }
 
                     // Reward winner
-                    var obj = GetUsersObj();
+                    var obj = GetUsersObject();
                     var user = GetUser(Context, obj, winnerID);
                     if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
                     {

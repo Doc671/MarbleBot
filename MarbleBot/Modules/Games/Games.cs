@@ -3,7 +3,9 @@ using Discord.Commands;
 using MarbleBot.Core;
 using MarbleBot.Extensions;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +27,7 @@ namespace MarbleBot.Modules
         /// <summary> Sends a message showing whether a user can earn from a game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        public static async Task CheckearnAsync(SocketCommandContext context, GameType gameType)
+        internal static async Task CheckearnAsync(SocketCommandContext context, GameType gameType)
         {
             await context.Channel.TriggerTypingAsync();
             var user = GetUser(context);
@@ -51,7 +53,7 @@ namespace MarbleBot.Modules
         /// <summary> Clears the contestant list. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        public static async Task ClearAsync(SocketCommandContext context, GameType gameType)
+        internal static async Task ClearAsync(SocketCommandContext context, GameType gameType)
         {
             await context.Channel.TriggerTypingAsync();
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
@@ -67,7 +69,7 @@ namespace MarbleBot.Modules
         /// <summary> Returns a message showing the contestants currently signed up to the game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        public static async Task ContestantsAsync(SocketCommandContext context, GameType gameType)
+        internal static async Task ContestantsAsync(SocketCommandContext context, GameType gameType)
         {
             await context.Channel.TriggerTypingAsync();
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
@@ -102,11 +104,37 @@ namespace MarbleBot.Modules
             }
         }
 
+        /// <summary> Shows leaderboards for mb/race and mb/siege. </summary>
+        /// <param name="orderedData"> The data to be made into a leaderboard. </param>
+        /// <param name="no"> The part of the leaderboard that will be displayed. </param>
+        /// <returns> A string ready to be output. </returns>
+        internal static string Leaderboard(IEnumerable<(string, int)> orderedData, int no)
+        {
+            // This displays in groups of ten (i.e. if no is 1, first 10 displayed;
+            // no = 2, next 10, etc.
+            int displayedPlace = 1, dataIndex = 1, minValue = (no - 1) * 10 + 1, maxValue = no * 10;
+            var output = new StringBuilder();
+            foreach (var item in orderedData)
+            {
+                if (displayedPlace < maxValue + 1 && displayedPlace >= minValue)
+                { // i.e. if item is within range
+                    output.AppendLine($"{displayedPlace}{displayedPlace.Ordinal()}: {item.Item1} {item.Item2}");
+                    if (dataIndex < orderedData.Count() && !(orderedData.ElementAt(dataIndex).Item2 == item.Item2))
+                        displayedPlace++;
+                }
+                if (displayedPlace < maxValue + 1 && !(displayedPlace >= minValue)) displayedPlace++;
+                else if (displayedPlace > maxValue) break;
+                dataIndex++;
+            }
+            if (output.Length > 2048) return string.Concat(output.ToString().Take(2048));
+            return output.ToString();
+        }
+
         /// <summary> Removes a contestant from the contestant list of a game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
         /// <param name="marbleToRemove"> The name of the marble to remove. </param>
-        public static async Task RemoveAsync(SocketCommandContext context, GameType gameType, string marbleToRemove)
+        internal static async Task RemoveAsync(SocketCommandContext context, GameType gameType, string marbleToRemove)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
@@ -152,7 +180,7 @@ namespace MarbleBot.Modules
         /// <param name="marbleLimit"> The maximum number of marbles that can be signed up. </param>
         /// <param name="startCommand"> The command to execute if the marble limit has been met. </param>
         /// <param name="itemId"> (War only) The ID of the weapon the marble is joining with. </param>
-        public static async Task SignupAsync(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
+        internal static async Task SignupAsync(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
             Func<Task> startCommand, string itemId = "")
         {
             await context.Channel.TriggerTypingAsync();

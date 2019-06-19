@@ -62,7 +62,7 @@ namespace MarbleBot.Modules
                 else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else if (item.OnSale)
                 {
-                    var obj = GetUsersObj();
+                    var obj = GetUsersObject();
                     var user = GetUser(Context, obj);
                     if (user.Balance >= item.Price * noOfItems)
                     {
@@ -93,7 +93,7 @@ namespace MarbleBot.Modules
         public async Task CraftCommandAsync(string searchTerm, string rawNo = "1")
         {
             await Context.Channel.TriggerTypingAsync();
-            var obj = GetUsersObj();
+            var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (user.Items.ContainsKey(17) || user.Items.ContainsKey(62))
             {
@@ -152,10 +152,7 @@ namespace MarbleBot.Modules
             await Context.Channel.TriggerTypingAsync();
             var user = GetUser(Context);
             var output = new StringBuilder();
-            string json;
-            using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = itemFile.ReadToEnd();
-            var obj = JObject.Parse(json);
-            var items = obj.ToObject<Dictionary<string, Item>>();
+            var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
             foreach (var itemPair in items)
             {
                 if (itemPair.Value.CraftingProduced != 0)
@@ -187,7 +184,7 @@ namespace MarbleBot.Modules
         public async Task DailyCommandAsync()
         {
             await Context.Channel.TriggerTypingAsync();
-            var obj = GetUsersObj();
+            var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 24)
             {
@@ -225,7 +222,7 @@ namespace MarbleBot.Modules
         public async Task DecraftCommandAsync(string searchTerm, string rawNo = "1")
         {
             await Context.Channel.TriggerTypingAsync();
-            var obj = GetUsersObj();
+            var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (user.Items.ContainsKey(17) || user.Items.ContainsKey(62))
             {
@@ -508,10 +505,7 @@ namespace MarbleBot.Modules
             var embed = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp();
-            string json;
-            using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = itemFile.ReadToEnd();
-            var obj = JObject.Parse(json);
-            var items = obj.ToObject<Dictionary<string, Item>>();
+            var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
             if (int.TryParse(rawIndex, out int index))
             {
                 var minValue = index * 20 - 20;
@@ -613,7 +607,7 @@ namespace MarbleBot.Modules
                 else if (item.Price == -1) await ReplyAsync("This item cannot be sold!");
                 else
                 {
-                    var obj = GetUsersObj();
+                    var obj = GetUsersObject();
                     var user = GetUser(Context, obj);
                     if (user.Items.ContainsKey(item.Id) && user.Items[item.Id] >= noOfItems)
                     {
@@ -658,7 +652,7 @@ namespace MarbleBot.Modules
         public async Task UseCommandAsync([Remainder] string searchTerm)
         {
             var item = GetItem(searchTerm);
-            var obj = GetUsersObj();
+            var obj = GetUsersObject();
             var user = GetUser(Context, obj);
 
             void UpdateUser(Item itm, int noOfItems)
@@ -944,7 +938,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (!SiegeInfo.ContainsKey(fileId))
                             {
-                                SiegeInfo.Add(fileId, new Siege(Context, new SiegeMarble[0])
+                                SiegeInfo.GetOrAdd(fileId, new Siege(Context, new SiegeMarble[0])
                                 {
                                     Active = false,
                                     Boss = Siege.GetBoss("Destroyer")

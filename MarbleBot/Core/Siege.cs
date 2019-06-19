@@ -55,7 +55,7 @@ namespace MarbleBot.Core
             Marbles = null;
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
                 marbleList.Write("");
-            Global.SiegeInfo.Remove(Id);
+            Global.SiegeInfo.TryRemove(Id, out _);
             if (disposing)
             {
                 Actions.Wait();
@@ -112,7 +112,7 @@ namespace MarbleBot.Core
                 return;
             }
 
-            if (Global.Rand.Next(0, 100) < marble.ItemAccuracy / accuracyDivisor)
+            if (item.WarClass != WarClass.None)
             {
                 damage = (int)Math.Round(damage * DamageMultiplier);
                 if (ammoId != 0) damage += ammo.Damage;
@@ -125,8 +125,21 @@ namespace MarbleBot.Core
                     .WithTitle(item.Name)
                     .Build());
                 marble.DamageDealt += damage;
-                marble.ItemAccuracy -= 30;
                 if (ammoId != 0) UpdateUser(ammo, -ammoRequired);
+            }
+            else if (Global.Rand.Next(0, 100) < marble.ItemAccuracy / accuracyDivisor)
+            {
+                damage = (int)Math.Round(damage * DamageMultiplier);
+                await DealDamageAsync(context, damage);
+                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
+                    .WithColor(MarbleBotModule.GetColor(context))
+                    .WithCurrentTimestamp()
+                    .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
+                    .WithTitle(item.Name)
+                    .Build());
+                marble.DamageDealt += damage;
+                marble.ItemAccuracy -= 30;
                 if (consumable) UpdateUser(item, 1);
                 if (item.Id == 10) marble.QefpedunCharmUsed = true;
             }
@@ -166,7 +179,7 @@ namespace MarbleBot.Core
                     if (!VictoryCalled) await SiegeVictoryAsync(context);
                     break;
                 }
-                else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
+                else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 20)
                 {
                     timeout = true;
                     break;
@@ -316,7 +329,7 @@ namespace MarbleBot.Core
             } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0);
             if (timeout || Marbles.Sum(m => m.HP) < 1)
             {
-                if (timeout) await context.Channel.SendMessageAsync("10 minute timeout reached! Siege aborted!");
+                if (timeout) await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
                 else
                 {
                     var marbles = new StringBuilder();
@@ -344,7 +357,7 @@ namespace MarbleBot.Core
                 .WithCurrentTimestamp()
                 .WithTitle("Siege Victory!")
                 .WithDescription($"**{Boss.Name}** has been defeated!");
-            var obj = MarbleBotModule.GetUsersObj();
+            var obj = MarbleBotModule.GetUsersObject();
             for (int i = 0; i < Marbles.Count; i++)
             {
                 var marble = Marbles[i];

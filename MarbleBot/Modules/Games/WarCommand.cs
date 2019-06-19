@@ -138,7 +138,7 @@ namespace MarbleBot.Modules
                     .AddField($"Team {war.Team2Name}", t2Output.ToString())
                     .Build());
                 if (pings.Length != 0) await ReplyAsync(pings.ToString());
-                WarInfo.Add(fileId, war);
+                WarInfo.GetOrAdd(fileId, war);
                 war.Actions = Task.Run(async () => { await war.WarActions(Context); });
             }
 
@@ -379,7 +379,7 @@ namespace MarbleBot.Modules
             [Summary("Toggles whether you are pinged when a war that you are in starts.")]
             public async Task WarPingCommandAsync(string option = "")
             {
-                var obj = GetUsersObj();
+                var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
                 switch (option)
                 {
@@ -409,10 +409,7 @@ namespace MarbleBot.Modules
             [Summary("Shows all valid weapons to use in war battles.")]
             public async Task WarValidWeaponsCommandAsync()
             {
-                string json;
-                using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = itemFile.ReadToEnd();
-                var obj = JObject.Parse(json);
-                var items = obj.ToObject<Dictionary<string, Item>>();
+                var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
                 var output = new StringBuilder();
                 foreach (var itemPair in items)
                 {

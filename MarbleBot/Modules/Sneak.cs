@@ -123,9 +123,7 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task SeezunCommandAsync(string seezun)
         {
-            string json;
-            using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = itemFile.ReadToEnd();
-            var obj = JObject.Parse(json);
+            var obj = GetItemsObject();
             var items = obj.ToObject<Dictionary<string, Item>>();
             switch (seezun)
             {

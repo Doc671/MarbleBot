@@ -37,7 +37,7 @@ namespace MarbleBot.Modules
                     if (ScavengeInfo.ContainsKey(Context.User.Id)) await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
                     else
                     {
-                        ScavengeInfo.Add(Context.User.Id, new Scavenge(Context, location));
+                        ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(Context, location));
                         embed.WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)}**!")
                             .WithTitle("Item Scavenge Begin!");
                         await ReplyAsync(embed: embed.Build());
@@ -93,7 +93,7 @@ namespace MarbleBot.Modules
             public async Task ScavengeGrabCommandAsync()
             {
                 await Context.Channel.TriggerTypingAsync();
-                var obj = GetUsersObj();
+                var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
 
                 if (ScavengeInfo.ContainsKey(Context.User.Id))
@@ -137,7 +137,7 @@ namespace MarbleBot.Modules
             public async Task ScavengeDrillCommandAsync()
             {
                 await Context.Channel.TriggerTypingAsync();
-                var obj = GetUsersObj();
+                var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
 
                 if (ScavengeInfo.ContainsKey(Context.User.Id))
@@ -182,7 +182,7 @@ namespace MarbleBot.Modules
             public async Task ScavengeSellCommandAsync()
             {
                 await Context.Channel.TriggerTypingAsync();
-                var obj = GetUsersObj();
+                var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
 
                 if (ScavengeInfo.ContainsKey(Context.User.Id))

@@ -67,7 +67,7 @@ namespace MarbleBot.Modules
                         else if (user.Items.ContainsKey(66)) marble.DamageIncrease = 40;
                         if (SiegeInfo.ContainsKey(fileId) && !SiegeInfo[fileId].Marbles.Contains(marble))
                             SiegeInfo[fileId].Marbles.Add(marble);
-                        else SiegeInfo.Add(fileId, new Siege(Context, new SiegeMarble[] { marble }));
+                        else SiegeInfo.GetOrAdd(fileId, new Siege(Context, new SiegeMarble[] { marble }));
                     }
                 }
                 if (marbleCount == 0) await ReplyAsync("It doesn't look like anyone has signed up!");
@@ -625,7 +625,7 @@ namespace MarbleBot.Modules
             [Summary("Toggles whether you are pinged when a Siege that you are in starts.")]
             public async Task SiegePingCommandAsync(string option = "")
             {
-                var obj = GetUsersObj();
+                var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
                 switch (option)
                 {

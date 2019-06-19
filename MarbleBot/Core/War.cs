@@ -32,7 +32,7 @@ namespace MarbleBot.Core
         {
             if (_disposed) return;
             _disposed = true;
-            Global.WarInfo.Remove(Id);
+            Global.WarInfo.TryRemove(Id, out _);
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}war.csv", false))
                 marbleList.Write("");
             Team1 = null;
@@ -116,7 +116,7 @@ namespace MarbleBot.Core
             }
             builder.AddField($"Team {Team1Name} Final Stats", t1Output.ToString())
                 .AddField($"Team {Team2Name} Final Stats", t2Output.ToString());
-            var obj = MarbleBotModule.GetUsersObj();
+            var obj = MarbleBotModule.GetUsersObject();
             foreach (var marble in winningTeam)
             {
                 var user = MarbleBotModule.GetUser(context, obj, marble.Id);

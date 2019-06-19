@@ -63,9 +63,7 @@ namespace MarbleBot
             var item = new Item();
             if (int.TryParse(searchTerm, out int itemID))
             {
-                string json;
-                using (var userFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = userFile.ReadToEnd();
-                var obj = JObject.Parse(json);
+                var obj = GetItemsObject();
                 if (obj[itemID.ToString("000")] != null)
                 {
                     item = obj[itemID.ToString("000")].ToObject<Item>();
@@ -105,6 +103,15 @@ namespace MarbleBot
             }
         }
 
+        /// <summary> Returns a JObject containing all the items. </summary>
+        protected internal static JObject GetItemsObject()
+        {
+            string json;
+            using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json"))
+                json = itemFile.ReadToEnd();
+            return JObject.Parse(json);
+        }
+
         /// <summary> Returns a MBServer object with the ID of the current server. </summary>
         protected internal static MBServer GetServer(SocketCommandContext context)
         => Global.Servers.Value.Find(s => s.Id == context.Guild.Id);
@@ -112,7 +119,7 @@ namespace MarbleBot
         /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser. </summary>
         protected internal static MBUser GetUser(SocketCommandContext context)
         {
-            var obj = GetUsersObj();
+            var obj = GetUsersObject();
             MBUser user;
             if (obj.ContainsKey(context.User.Id.ToString()))
             {
@@ -133,7 +140,7 @@ namespace MarbleBot
         /// <summary> Returns an instance of a MBUser with the given ID. </summary>
         protected internal static MBUser GetUser(SocketCommandContext context, ulong Id)
         {
-            var obj = GetUsersObj();
+            var obj = GetUsersObject();
             MBUser user;
             if (obj.ContainsKey(Id.ToString()))
             {
@@ -203,7 +210,7 @@ namespace MarbleBot
         }
 
          /// <summary> Returns a JObject containing all the users. </summary>
-        protected internal static JObject GetUsersObj()
+        protected internal static JObject GetUsersObject()
         {
             string json;
             using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
