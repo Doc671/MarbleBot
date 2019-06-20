@@ -1,8 +1,12 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MarbleBot.Core;
 using MarbleBot.Extensions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -331,72 +335,20 @@ namespace MarbleBot.Modules
         public async Task RateCommandAsync([Remainder] string input)
         {
             await Context.Channel.TriggerTypingAsync();
+            var lowerInput = input.ToLower();
             string message = "";
-            int rating;
-            switch (input.ToLower())
+            int rating = Rand.Next(0, 11);
+
+            string json;
+            using (var specialMessages = new StreamReader($"Resources{Path.DirectorySeparatorChar}RateSpecialMessages.json"))
+                json = specialMessages.ReadToEnd();
+            var messageDict = JsonConvert.DeserializeObject<Dictionary<string, RateInfo>>(json);
+
+            if (messageDict.ContainsKey(lowerInput))
             {
-                // These inputs have custom ratings and messages:
-                case "256 mg": rating = -2; message = "I Am In Confusial Why"; break;
-                case "ddsc": rating = 0; break;
-                case "desk":
-                case "desk176":
-                case "desks": rating = 11; message = "what did you expect?"; break;
-                case "dGFibGU=": rating = -999; message = "do not mention that unholy creature near me"; break;
-                case "dGFibGVz": rating = -999; message = "do not mention those unholy creatures near me"; break;
-                case "doc671": rating = -1; message = "terrible at everything"; break;
-                case "dockque the rockque": rating = -1; message = "AM NOT ROCKQUE YOU MELMON"; break;
-                case "egnaro": rating = 10; message = "!egnarO"; break;
-                case "erango": rating = 0; message = "stoP noW"; break;
-                case "marblebot's creator":
-                case "my creator": input = "Doc671"; goto case "doc671";
-                case "orange": goto case "egnaro";
-                case "orange day": rating = 10; message = "!yaD egnarO"; break;
-                case "poos puop": rating = 10; message = "!pooS puoP knirD"; break;
-                case "poup soop": goto case "poos puop";
-                case "rockque":
-                case "rockques": rating = -1; message = "I Hate Rocks"; break;
-                case "table": rating = -999; message = "do not mention that unholy creature near me"; input = "dGFibGU="; break;
-                case "tables": rating = -999; message = "do not mention those unholy creatures near me"; input = "dGFibGVz"; break;
-                case "the hat stoar": rating = 10; message = "!raotS taH ehT owt oG"; break;
-                case "vinh": rating = 10; message = "Henlo Cooooooooool Vinh"; break;
-                case "yad egnaro": goto case "orange day";
-                default: rating = Rand.Next(0, 11); break;
-            }
-            switch (input.ToLower())
-            {
-                // These have custom messages but no preset ratings:
-                case "blueice57": message = "icccce"; break;
-                case "confusial": message = "I Am In Confusial Why"; break;
-                case "dann": message = "you guys, are a rat kids"; break;
-                case "eknimpie": message = "EKNIMPIE YOUR A RAXIST"; break;
-                case "flam":
-                case "flame":
-                case "flamevapour": message = "Am Flam Flam Flam Flam Flam Flam"; break;
-                case "flurp": message = "FLURP I TO SIGN UP AND NOT BE"; break;
-                case "george012": message = "henlo jorj"; break;
-                case "icce": goto case "blueice57";
-                case "+inf": message = "marbles will realize in +inf"; break;
-                case "jgeoroegeos":
-                case "jorj": goto case "george012";
-                case "ken":
-                case "kenlimepie":
-                case "keylimepie": message = "#kenismelmon"; break;
-                case "luka": message = "LUKA\nYOU BLUMT"; break;
-                case "marblebot": input = "myself"; goto case "myself";
-                case "myself": message = "who am I?"; break;
-                case "matheus":
-                case "matheus fazzion": message = "marbles will realize in +inf"; break;
-                case "meadow":
-                case "mei doe": message = "somebody toucha mei doe"; break;
-                case "melmon": message = "Whyn Arey Yoou A Melmon"; break;
-                case "no u": message = "No Your"; break;
-                case "no your": message = "No You're"; break;
-                case "no you're": message = "N'Yuroe"; break;
-                case "oh so muches": message = "Is To Much"; break;
-                case "rackquette": message = "WHACC"; break;
-                case "sand dollar": message = "XXX"; break;
-                case "shotgun": message = "Vinh Shotgun All"; break;
-                case "you silly desk": message = "Now I\nCry"; break;
+                if (messageDict[lowerInput].Input != null) input = messageDict[lowerInput].Input;
+                message = messageDict[lowerInput].Message;
+                if (messageDict[lowerInput].Rating != -3) rating = messageDict[lowerInput].Rating;
             }
 
             string emoji = rating switch
@@ -415,8 +367,10 @@ namespace MarbleBot.Modules
                 9 => ":white_check_mark:",
                 10 => ":rofl:",
                 11 => ":heart:",
+                69 => ":deletion:",
                 _ => ":thinking:",
             };
+
             if (message == "")
             {
                 switch (rating)
@@ -436,6 +390,7 @@ namespace MarbleBot.Modules
                     default: message = "Uhhhhhhhh\nNot"; break;
                 }
             }
+
             if (rating == -2) await ReplyAsync($"**{Context.User.Username}**, I rATE {input} UNd3FINED10. {emoji}\n({message})");
             else
             {
