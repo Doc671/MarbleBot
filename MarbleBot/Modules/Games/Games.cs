@@ -191,7 +191,7 @@ namespace MarbleBot.Modules
             {
                 if (gameType == GameType.Siege)
                 {
-                    if (SiegeInfo.ContainsKey(fileId))
+                    if (SiegeInfo.ContainsKey(fileId) && SiegeInfo[fileId].Active)
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, a battle is currently ongoing!");
                         return;
@@ -211,7 +211,7 @@ namespace MarbleBot.Modules
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, you don't have this item!");
                         return;
                     }
-                    if (SiegeInfo.ContainsKey(fileId))
+                    if (WarInfo.ContainsKey(fileId))
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, a battle is currently ongoing!");
                         return;

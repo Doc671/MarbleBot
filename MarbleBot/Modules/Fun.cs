@@ -367,7 +367,7 @@ namespace MarbleBot.Modules
                 9 => ":white_check_mark:",
                 10 => ":rofl:",
                 11 => ":heart:",
-                69 => ":deletion:",
+                69 => "<:deletion:296013805782040576>",
                 _ => ":thinking:",
             };
 
