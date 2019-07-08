@@ -6,9 +6,9 @@ namespace MarbleBot.Core
         /// <summary> The name of the attack. </summary>
         public string Name { get; }
         /// <summary> The amount of damage dealt by the attack. </summary>
-        public byte Damage { get; }
+        public int Damage { get; }
         /// <summary> The chance the attack will hit each marble out of 100. </summary>
-        public byte Accuracy { get; }
+        public int Accuracy { get; }
         /// <summary> The status effect the attack inflicts. </summary>
         public MSE StatusEffect { get; }
 
@@ -20,7 +20,7 @@ namespace MarbleBot.Core
         /// <param name="damage"> The amount of damage dealt by the attack. </param>
         /// <param name="accuracy"> The chance the attack will hit each marble out of 100. </param>
         /// <param name="statusEffect"> The status effect the attack inflicts. </param>
-        public Attack(string name, byte damage, byte accuracy, MSE statusEffect)
+        public Attack(string name, int damage, int accuracy, MSE statusEffect)
         {
             Name = name;
             Damage = damage;

@@ -453,8 +453,8 @@
       {
         "ItemId": 75,
         "MinCount": 1,
-        "MaxCount": 1,
-        "Chance": 40
+        "MaxCount": 3,
+        "Chance": 55
       },
       {
         "ItemId": 78,

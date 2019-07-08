@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using MarbleBot.Core;
 using MarbleBot.Extensions;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -281,11 +280,11 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             EmbedBuilder builder = new EmbedBuilder();
-            byte level = Convert.ToByte(Rand.Next(0, 25));
+            int level = Rand.Next(0, 25);
             int xp = level * 100 * Rand.Next(1, 5);
 
             var msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
-            byte ranks = 0;
+            int ranks = 0;
 
             foreach (IMessage msg in msgs)
             {
@@ -347,7 +346,7 @@ namespace MarbleBot.Modules
             if (messageDict.ContainsKey(lowerInput))
             {
                 if (messageDict[lowerInput].Input != null) input = messageDict[lowerInput].Input;
-                message = messageDict[lowerInput].Message;
+                if (messageDict[lowerInput].Message != null) message = messageDict[lowerInput].Message;
                 if (messageDict[lowerInput].Rating != -3) rating = messageDict[lowerInput].Rating;
             }
 
@@ -371,7 +370,7 @@ namespace MarbleBot.Modules
                 _ => ":thinking:",
             };
 
-            if (message == "")
+            if (message.Length == 0)
             {
                 switch (rating)
                 {

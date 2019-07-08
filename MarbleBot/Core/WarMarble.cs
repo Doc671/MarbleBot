@@ -14,11 +14,11 @@
             WarClass = weapon.WarClass;
             DamageIncrease = spikeId switch
             {
-                66 => (byte)40,
-                71 => (byte)60,
-                74 => (byte)95,
-                80 => (byte)110,
-                _ => (byte)0
+                66 => 40,
+                71 => 60,
+                74 => 95,
+                80 => 110,
+                _ => 0
             };
             Name = name;
             Shield = shield;

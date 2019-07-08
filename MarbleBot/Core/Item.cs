@@ -17,11 +17,11 @@ namespace MarbleBot.Core
         /// <summary> Whether the item is available to buy in the shop or not. </summary>
         public bool OnSale { get; }
         /// <summary> The Stage at which the item can be obtained. </summary>
-        public byte Stage { get; }
+        public int Stage { get; }
         /// <summary> The ID of the ammo used by the ranged weapon. </summary>
         public int[] Ammo { get; }
         /// <summary> The damage dealt by the weapon during a War game. </summary>
-        public byte Damage { get; }
+        public int Damage { get; }
         /// <summary> The location the item can be found in during a Scavenge game. </summary>
         public ScavengeLocation ScavengeLocation { get; }
         /// <summary> The class of the weapon during a War game. </summary>
@@ -31,13 +31,13 @@ namespace MarbleBot.Core
         /// <summary> The crafting recipe - a key value pair of item IDs and their necessary quantities. </summary>
         public Dictionary<string, int> CraftingRecipe { get; }
         /// <summary> Which crafting station is required to craft the item. </summary>
-        public byte CraftingStationRequired { get; }
+        public int CraftingStationRequired { get; }
 
         [JsonConstructor]
         public Item(int id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
-            byte stage = 1, int[] ammo = null, byte damage = 0, ScavengeLocation scavengeLocation = ScavengeLocation.None,
+            int stage = 1, int[] ammo = null, int damage = 0, ScavengeLocation scavengeLocation = ScavengeLocation.None,
             WarClass warClass = WarClass.None, uint craftingProduced = 0u, Dictionary<string, int> craftingRecipe = null,
-            byte craftingStationRequired = 0)
+            int craftingStationRequired = 0)
         {
             Id = id;
             Name = name;
@@ -54,7 +54,7 @@ namespace MarbleBot.Core
             CraftingStationRequired = craftingStationRequired;
         }
 
-        public Item(Item baseItem, int id = 0, bool onSale = false, byte stage = 1, Dictionary<string, int> craftingRecipe = null)
+        public Item(Item baseItem, int id = 0, bool onSale = false, int stage = 1, Dictionary<string, int> craftingRecipe = null)
         {
             Id = id == 0 ? baseItem.Id : id;
             Name = baseItem.Name;

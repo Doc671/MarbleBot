@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MarbleBot.Core
 {
@@ -25,7 +23,7 @@ namespace MarbleBot.Core
         /// <summary> The marble's shield. </summary>
         public Item Shield { get; set; }
         /// <summary> The marble's damage increase multiplier. </summary>
-        public byte DamageIncrease { get; set; }
+        public int DamageIncrease { get; set; }
 
 
         /// <summary> Deals damage to a marble. </summary>

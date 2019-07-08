@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.MarbleBotModule;
+
 namespace MarbleBot.Core
 {
     /// <summary> Represents a siege game. </summary>
@@ -26,7 +28,7 @@ namespace MarbleBot.Core
         public ulong Id { get; }
         public DateTime LastMorale { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public List<SiegeMarble> Marbles { get; set; } = new List<SiegeMarble>();
-        public byte Morales { get; set; }
+        public int Morales { get; set; }
         public string PowerUp { get; set; } = "";
         public string PUImageUrl { get; set; } = "";
         public bool VictoryCalled { get; set; }
@@ -67,7 +69,7 @@ namespace MarbleBot.Core
         {
             string json;
             using (var bosses = new StreamReader($"Resources{Path.DirectorySeparatorChar}Bosses.json")) json = bosses.ReadToEnd();
-            var obj = new Dictionary<string, JObject>(JObject.Parse(json).ToObject<IDictionary<string, JObject>>(), 
+            var obj = new Dictionary<string, JObject>(JObject.Parse(json).ToObject<IDictionary<string, JObject>>(),
                 StringComparer.InvariantCultureIgnoreCase);
             var boss = Boss.Empty;
             if (searchTerm.Contains(' ') || (string.Compare(searchTerm[0].ToString(), searchTerm[0].ToString(), true) == 0))
@@ -80,8 +82,8 @@ namespace MarbleBot.Core
                                      int damage, bool consumable = false, int ammoId = 0,
                                      int ammoRequired = 1, int accuracyDivisor = 1)
         {
-            var item = MarbleBotModule.GetItem(itemId.ToString("000"));
-            var ammo = MarbleBotModule.GetItem(ammoId.ToString("000"));
+            var item = GetItem(itemId.ToString("000"));
+            var ammo = GetItem(ammoId.ToString("000"));
             var marble = Marbles.Find(m => m.Id == context.User.Id);
 
             if (marble.HP == 0)
@@ -90,14 +92,14 @@ namespace MarbleBot.Core
                 return;
             }
 
-            var user = MarbleBotModule.GetUser(context);
+            var user = GetUser(context);
 
             // Removes items from the user (consumable offensive items or ammo)
             void UpdateUser(Item itm, int noOfItems)
             {
                 user.Items[itm.Id] -= noOfItems;
                 user.NetWorth -= itm.Price * noOfItems;
-                MarbleBotModule.WriteUsers(obj, context.User, user);
+                WriteUsers(obj, context.User, user);
             }
 
             if (item.Id == 10 && marble.QefpedunCharmUsed)
@@ -119,7 +121,7 @@ namespace MarbleBot.Core
                 await DealDamageAsync(context, damage);
                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                     .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
-                    .WithColor(MarbleBotModule.GetColor(context))
+                    .WithColor(GetColor(context))
                     .WithCurrentTimestamp()
                     .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
                     .WithTitle(item.Name)
@@ -127,13 +129,13 @@ namespace MarbleBot.Core
                 marble.DamageDealt += damage;
                 if (ammoId != 0) UpdateUser(ammo, -ammoRequired);
             }
-            else if (Global.Rand.Next(0, 100) < marble.ItemAccuracy / accuracyDivisor)
+            else if (Global.Rand.Next(0, 100) < (float)marble.ItemAccuracy / accuracyDivisor)
             {
                 damage = (int)Math.Round(damage * DamageMultiplier);
                 await DealDamageAsync(context, damage);
                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                     .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
-                    .WithColor(MarbleBotModule.GetColor(context))
+                    .WithColor(GetColor(context))
                     .WithCurrentTimestamp()
                     .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
                     .WithTitle(item.Name)
@@ -144,7 +146,7 @@ namespace MarbleBot.Core
                 if (item.Id == 10) marble.QefpedunCharmUsed = true;
             }
             else await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(MarbleBotModule.GetColor(context))
+                                    .WithColor(GetColor(context))
                                     .WithCurrentTimestamp()
                                     .WithDescription($"**{marble.Name}** used their **{item.Name}**! It missed!")
                                     .WithTitle(item.Name)
@@ -189,7 +191,7 @@ namespace MarbleBot.Core
                     // Attack marbles
                     var atk = Boss.Attacks[Global.Rand.Next(0, Boss.Attacks.Length)];
                     var builder = new EmbedBuilder()
-                        .WithColor(MarbleBotModule.GetColor(context))
+                        .WithColor(GetColor(context))
                         .WithCurrentTimestamp()
                         .WithDescription($"**{Boss.Name}** used **{atk.Name}**!")
                         .WithThumbnailUrl(Boss.ImageUrl)
@@ -281,7 +283,7 @@ namespace MarbleBot.Core
                             case 0:
                                 SetPowerUp("Morale Boost");
                                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(MarbleBotModule.GetColor(context))
+                                    .WithColor(GetColor(context))
                                     .WithCurrentTimestamp()
                                     .WithDescription("A **Morale Boost** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                     .WithThumbnailUrl(PUImageUrl)
@@ -291,7 +293,7 @@ namespace MarbleBot.Core
                             case 1:
                                 SetPowerUp("Clone");
                                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(MarbleBotModule.GetColor(context))
+                                    .WithColor(GetColor(context))
                                     .WithCurrentTimestamp()
                                     .WithDescription("A **Clone** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                     .WithThumbnailUrl(PUImageUrl)
@@ -300,7 +302,7 @@ namespace MarbleBot.Core
                             case 2:
                                 SetPowerUp("Summon");
                                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(MarbleBotModule.GetColor(context))
+                                    .WithColor(GetColor(context))
                                     .WithCurrentTimestamp()
                                     .WithDescription("A **Summon** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                     .WithThumbnailUrl(PUImageUrl)
@@ -312,7 +314,7 @@ namespace MarbleBot.Core
                                 {
                                     SetPowerUp("Cure");
                                     await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(MarbleBotModule.GetColor(context))
+                                    .WithColor(GetColor(context))
                                     .WithCurrentTimestamp()
                                     .WithDescription("A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
                                     .WithThumbnailUrl(PUImageUrl)
@@ -327,7 +329,7 @@ namespace MarbleBot.Core
                     if (Marbles.Sum(m => m.HP) < 1) break;
                 }
             } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0);
-            if (timeout || Marbles.Sum(m => m.HP) < 1)
+            if (Boss.HP > 0)
             {
                 if (timeout) await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
                 else
@@ -336,7 +338,7 @@ namespace MarbleBot.Core
                     foreach (var marble in Marbles)
                         marbles.AppendLine(marble.ToString(context, false));
                     await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                        .WithColor(MarbleBotModule.GetColor(context))
+                        .WithColor(GetColor(context))
                         .WithCurrentTimestamp()
                         .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal HP: **{Boss.HP}**/{Boss.MaxHP}")
                         .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
@@ -353,15 +355,15 @@ namespace MarbleBot.Core
             if (VictoryCalled) return;
             VictoryCalled = true;
             var builder = new EmbedBuilder()
-                .WithColor(MarbleBotModule.GetColor(context))
+                .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
                 .WithTitle("Siege Victory!")
                 .WithDescription($"**{Boss.Name}** has been defeated!");
-            var obj = MarbleBotModule.GetUsersObject();
+            var obj = GetUsersObject();
             for (int i = 0; i < Marbles.Count; i++)
             {
                 var marble = Marbles[i];
-                var user = MarbleBotModule.GetUser(context, obj, marble.Id);
+                var user = GetUser(context, obj, marble.Id);
                 var output = new StringBuilder();
                 if (user.Stage == 1 && string.Compare(Boss.Name, "Destroyer", true) == 0 && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149))
                 {
@@ -396,7 +398,7 @@ namespace MarbleBot.Core
                     {
                         if (marble.HP > 0) user.LastSiegeWin = DateTime.UtcNow;
                         if (Boss.Drops.Length > 0) output.AppendLine("**Item Drops:**");
-                        byte drops = 0;
+                        int drops = 0;
                         foreach (var itemDrops in Boss.Drops)
                         {
                             if (Global.Rand.Next(0, 100) < itemDrops.Chance)
@@ -406,7 +408,7 @@ namespace MarbleBot.Core
                                 else amount = (ushort)Global.Rand.Next(itemDrops.MinCount, itemDrops.MaxCount + 1);
                                 if (user.Items.ContainsKey(itemDrops.ItemId)) user.Items[itemDrops.ItemId] += amount;
                                 else user.Items.Add(itemDrops.ItemId, amount);
-                                var item = MarbleBotModule.GetItem(itemDrops.ItemId.ToString("000"));
+                                var item = GetItem(itemDrops.ItemId.ToString("000"));
                                 user.NetWorth += item.Price * amount;
                                 drops++;
                                 output.AppendLine($"`[{itemDrops.ItemId.ToString("000")}]` {item.Name} x{amount}");
@@ -423,7 +425,7 @@ namespace MarbleBot.Core
                 }
             }
             await context.Channel.SendMessageAsync(embed: builder.Build());
-            MarbleBotModule.WriteUsers(obj);
+            WriteUsers(obj);
             Dispose(true);
         }
 

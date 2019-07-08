@@ -23,7 +23,7 @@ namespace MarbleBot.Core
         /// <summary> A URL to the boss' image. </summary>
         public string ImageUrl { get; set; }
         /// <summary> The Stage the boss appears at. </summary>
-        public byte Stage { get; set; }
+        public int Stage { get; set; }
 
         /// <summary> An empty instance of a boss. </summary>
         public static Boss Empty = new Boss("", 0, Difficulty.None, 1, "",
@@ -40,7 +40,7 @@ namespace MarbleBot.Core
         /// <param name="imgUrl"> A URL to the boss' image. </param>
         /// <param name="atks"> The boss' attacks. </param>
         /// <param name="itemDrops"> The items that drop from the boss, the number of them and the chance each one has of dropping. </param>
-        public Boss(string name, int hp, Difficulty diff, byte stage, string imgUrl, Attack[] atks, BossDrops[] itemDrops)
+        public Boss(string name, int hp, Difficulty diff, int stage, string imgUrl, Attack[] atks, BossDrops[] itemDrops)
         {
             Name = name;
             _HP = hp;

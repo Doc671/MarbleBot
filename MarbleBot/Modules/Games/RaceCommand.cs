@@ -39,7 +39,7 @@ namespace MarbleBot.Modules
                 var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp();
-                byte marbleCount = 0;
+                int marbleCount = 0;
                 using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}race.csv"))
                 {
                     while (!marbleList.EndOfStream)
@@ -69,8 +69,8 @@ namespace MarbleBot.Modules
                     builder.WithTitle("The race has started!");
                     var msg = await ReplyAsync(embed: builder.Build());
                     await Task.Delay(1500);
-                    byte alive = Context.IsPrivate ? RaceAlive[Context.User.Id] : RaceAlive[Context.Guild.Id];
-                    byte id = alive;
+                    int alive = Context.IsPrivate ? RaceAlive[Context.User.Id] : RaceAlive[Context.Guild.Id];
+                    int id = alive;
                     while (alive > 1)
                     {
                         int eliminated = 0;
@@ -78,7 +78,7 @@ namespace MarbleBot.Modules
                         while (string.Compare(marbles[eliminated].Item1, "///out", true) == 0);
                         var deathmsg = "";
                         var msgs = new List<string>();
-                        byte msgCount = 0;
+                        int msgCount = 0;
                         using (var msgFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceDeathMessages.txt"))
                         {
                             while (!msgFile.EndOfStream)

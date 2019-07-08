@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using static MarbleBot.MarbleBotModule;
+
 namespace MarbleBot.Core
 {
     /// <summary> Represents a game of war. </summary>
@@ -23,8 +25,8 @@ namespace MarbleBot.Core
 
         private WarMarble _aiMarble;
         private bool _aiMarblePresent = false;
-        private bool _endCalled = false;
         private bool _disposed = false;
+        private bool _endCalled = false;
 
         public void Dispose() => Dispose(true);
 
@@ -72,14 +74,14 @@ namespace MarbleBot.Core
                         randMarble.HP -= dmg;
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                             .AddField("Remaining HP", $"**{randMarble.HP}**/{randMarble.MaxHP}")
-                            .WithColor(MarbleBotModule.GetColor(context))
+                            .WithColor(GetColor(context))
                             .WithCurrentTimestamp()
                             .WithDescription($"**{_aiMarble.Name}** dealt **{dmg}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
                             .WithTitle($"**{_aiMarble.Name}** attacks!")
                             .Build());
                     }
                     else await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                          .WithColor(MarbleBotModule.GetColor(context))
+                          .WithColor(GetColor(context))
                           .WithCurrentTimestamp()
                           .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
                           .WithTitle($"**{_aiMarble.Name}** attacks!")
@@ -99,7 +101,7 @@ namespace MarbleBot.Core
             var t2Total = Team2.Sum(m => m.HP);
             var winningTeam = t1Total > t2Total ? Team1 : Team2;
             var builder = new EmbedBuilder()
-                .WithColor(MarbleBotModule.GetColor(context))
+                .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
                 .WithTitle($"Team {(t1Total > t2Total ? Team1Name : Team2Name)} has defeated Team {(t1Total > t2Total ? Team2Name : Team1Name)}!");
             var t1Output = new StringBuilder();
@@ -116,10 +118,10 @@ namespace MarbleBot.Core
             }
             builder.AddField($"Team {Team1Name} Final Stats", t1Output.ToString())
                 .AddField($"Team {Team2Name} Final Stats", t2Output.ToString());
-            var obj = MarbleBotModule.GetUsersObject();
+            var obj = GetUsersObject();
             foreach (var marble in winningTeam)
             {
-                var user = MarbleBotModule.GetUser(context, obj, marble.Id);
+                var user = GetUser(context, obj, marble.Id);
                 if (DateTime.UtcNow.Subtract(user.LastWarWin).TotalHours > 6)
                 {
                     var output = new StringBuilder();
@@ -154,7 +156,7 @@ namespace MarbleBot.Core
                 }
             }
             await context.Channel.SendMessageAsync(embed: builder.Build());
-            MarbleBotModule.WriteUsers(obj);
+            WriteUsers(obj);
             Dispose(true);
         }
 

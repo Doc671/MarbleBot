@@ -9,13 +9,13 @@ namespace MarbleBot.Core
         /// <summary> The number of times the marble has activated a power-up. </summary>
         public int PowerUpHits { get; set; }
         /// <summary> The marble's chance of dodging an attack. </summary>
-        public byte Evade { get; set; }
-        private byte _itemAccuracy = 100;
+        public int Evade { get; set; }
+        private int _itemAccuracy = 100;
         /// <summary> The marble's chance of an offensive item dealing damage. </summary>
-        public byte ItemAccuracy
+        public int ItemAccuracy
         {
             get => _itemAccuracy;
-            set => _itemAccuracy = value < 0 ? (byte)0 : value; 
+            set => _itemAccuracy = value < 0 ? 0 : value; 
         }
         /// <summary> Whether or not the Rocket Boots have been used. </summary>
         public bool BootsUsed { get; set; }

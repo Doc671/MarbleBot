@@ -73,12 +73,18 @@ namespace MarbleBot.Modules
         {
             await context.Channel.TriggerTypingAsync();
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
+            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
+            if (!File.Exists(marbleListDirectory))
+            {
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "server")}! No-one is signed up!");
+                return;
+            }
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp();
             var marbles = new StringBuilder();
-            byte count = 0;
-            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv"))
+            int count = 0;
+            using (var marbleList = new StreamReader(marbleListDirectory))
             {
                 var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
                 foreach (var marble in allMarbles)
@@ -94,7 +100,7 @@ namespace MarbleBot.Modules
                 }
             }
             if (marbles.ToString().IsEmpty())
-                await context.Channel.SendMessageAsync("It looks like there aren't any contestants...");
+                await context.Channel.SendMessageAsync("No-one is signed up!");
             else
             {
                 builder.AddField("Contestants", marbles.ToString());
@@ -137,10 +143,16 @@ namespace MarbleBot.Modules
         internal static async Task RemoveAsync(SocketCommandContext context, GameType gameType, string marbleToRemove)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
+            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
+            if (!File.Exists(marbleListDirectory))
+            {
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "server")}! There are no marbles signed up to remove!");
+                return;
+            }
             // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
-            byte state = context.User.Id == 224267581370925056 ? (byte)3 : (byte)0;
+            int state = context.User.Id == 224267581370925056 ? 3 : 0;
             var wholeFile = new StringBuilder();
-            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv"))
+            using (var marbleList = new StreamReader(marbleListDirectory))
             {
                 while (!marbleList.EndOfStream)
                 {
@@ -160,14 +172,14 @@ namespace MarbleBot.Modules
             }
             switch (state)
             {
-                case 0: await context.Channel.SendMessageAsync("Could not find the requested marble!"); break;
-                case 1: await context.Channel.SendMessageAsync("This is not your marble!"); break;
+                case 0: await context.Channel.SendMessageAsync($"**{context.User.Username}**, could not find the requested marble!"); break;
+                case 1: await context.Channel.SendMessageAsync($"**{context.User.Username}**, this is not your marble!"); break;
                 case 2:
                 case 3:
-                    using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv", false))
+                    using (var marbleList = new StreamWriter(marbleListDirectory, false))
                     {
                         await marbleList.WriteAsync(wholeFile.ToString());
-                        await context.Channel.SendMessageAsync($"Removed contestant **{marbleToRemove}**!");
+                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, removed contestant **{marbleToRemove}**!");
                     }
                     break;
             }
@@ -186,6 +198,7 @@ namespace MarbleBot.Modules
             await context.Channel.TriggerTypingAsync();
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
+            if (!File.Exists(marbleListDirectory)) File.Create(marbleListDirectory).Close();
 
             if (gameType == GameType.Siege || gameType == GameType.War)
             {
@@ -239,7 +252,7 @@ namespace MarbleBot.Modules
                 .AddField($"Marble {GameName(gameType)}: Signed up!", $"**{context.User.Username}** has successfully signed up as **{marbleName}**!");
             using (var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
                 await racers.WriteLineAsync(marbleName);
-            if (!File.Exists(marbleListDirectory)) File.Create(marbleListDirectory).Close();
+
             using (var marbleList = new StreamWriter(marbleListDirectory, true))
             {
                 if (gameType == GameType.War) await marbleList.WriteLineAsync($"{marbleName},{context.User.Id},{itemId}");

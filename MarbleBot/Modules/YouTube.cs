@@ -138,7 +138,7 @@ namespace MarbleBot.Modules
                 ApplicationName = GetType().ToString()
             });
 
-            byte profaneCount = 0;
+            int profaneCount = 0;
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
@@ -185,7 +185,7 @@ namespace MarbleBot.Modules
                 ApplicationName = GetType().ToString()
             });
 
-            byte profaneCount = 0;
+            int profaneCount = 0;
 
             var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;

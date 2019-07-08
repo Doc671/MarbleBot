@@ -1,11 +1,8 @@
 ﻿using Discord.Commands;
 using MarbleBot.Core;
-using MarbleBot.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace MarbleBot
 {
@@ -24,7 +21,7 @@ namespace MarbleBot
         internal static string YTKey { get; set; } = "";
 
         // Games
-        internal static ConcurrentDictionary<ulong, byte> RaceAlive { get; set; } = new ConcurrentDictionary<ulong, byte>();
+        internal static ConcurrentDictionary<ulong, int> RaceAlive { get; set; } = new ConcurrentDictionary<ulong, int>();
         internal static ConcurrentDictionary<ulong, Scavenge> ScavengeInfo { get; set; } = new ConcurrentDictionary<ulong, Scavenge>();
         internal static ConcurrentDictionary<ulong, Siege> SiegeInfo { get; set; } = new ConcurrentDictionary<ulong, Siege>();
         internal static ConcurrentDictionary<ulong, War> WarInfo { get; set; } = new ConcurrentDictionary<ulong, War>();

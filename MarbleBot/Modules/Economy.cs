@@ -97,7 +97,7 @@ namespace MarbleBot.Modules
             var user = GetUser(Context, obj);
             if (user.Items.ContainsKey(17) || user.Items.ContainsKey(62))
             {
-                if (!byte.TryParse(rawNo, out byte noOfItems)) searchTerm += rawNo;
+                if (!int.TryParse(rawNo, out int noOfItems)) searchTerm += rawNo;
                 var requestedItem = GetItem(searchTerm);
                 if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(62))
                     await ReplyAsync($":warning: | **{Context.User.Username}**, your current Crafting Station cannot craft this item!");
@@ -226,7 +226,7 @@ namespace MarbleBot.Modules
             var user = GetUser(Context, obj);
             if (user.Items.ContainsKey(17) || user.Items.ContainsKey(62))
             {
-                if (!byte.TryParse(rawNo, out byte noOfItems)) searchTerm += rawNo;
+                if (!int.TryParse(rawNo, out int noOfItems)) searchTerm += rawNo;
                 var requestedItem = GetItem(searchTerm);
                 if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(62))
                 {

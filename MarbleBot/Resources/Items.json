@@ -1032,6 +1032,7 @@
     "Name": "Deletion",
     "Price": 0.00,
     "Description": "...",
+    "Stage": 5,
     "OnSale": false,
     "ScavengeLocation": 0
   },
@@ -1039,7 +1040,7 @@
     "Name": "Nickel Bolt",
     "Price": 7.45,
     "Description": "A nickel arrow used in a crossbow.",
-    "Stage": "2",
+    "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
     "Damage": 2,

@@ -20,7 +20,7 @@ namespace MarbleBot
         private static void Main()
         => new Program().StartAsync().GetAwaiter().GetResult();
 
-        public static DiscordSocketClient _client;
+        private static DiscordSocketClient _client;
 
 #pragma warning disable IDE0052 // Remove unread private members
         private CommandHandler _handler;
@@ -75,6 +75,7 @@ namespace MarbleBot
         }
 
         public static async Task Log(string log, bool noDate = false)
+        => await Task.Run(async () =>
         {
             var logString = noDate ? log : $"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {log}";
             Console.WriteLine(logString);
@@ -115,6 +116,6 @@ namespace MarbleBot
 
             var body = new BatchUpdateDocumentRequest() { Requests = requests };
             await service.Documents.BatchUpdate(body, documentId).ExecuteAsync();
-        }
+        });
     }
 }

@@ -15,7 +15,7 @@ namespace MarbleBot.Core
         /// <summary> The net worth of the user. </summary>
         public decimal NetWorth { get; set; }
         /// <summary> The Stage of the user, representing how far they are through the game. </summary>
-        public byte Stage { get; set; } = 1;
+        public int Stage { get; set; } = 1;
         /// <summary> The number of times mb/daily was used successfully in a row. </summary>
         public uint DailyStreak { get; set; }
         /// <summary> Whether or not the user is pinged at the beginning of a Siege game. </summary>

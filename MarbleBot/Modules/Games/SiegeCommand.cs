@@ -45,7 +45,7 @@ namespace MarbleBot.Modules
                     return;
                 }
                 // Get marbles
-                byte marbleCount = 0;
+                int marbleCount = 0;
                 using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
                 {
                     while (!marbleList.EndOfStream)
@@ -80,7 +80,7 @@ namespace MarbleBot.Modules
                         currentSiege.Boss = Siege.GetBoss(over.Split(' ')[1].RemoveChar(' '));
                     else if (string.Compare(currentSiege.Boss.Name, "", true) == 0)
                     {
-                        byte stageTotal = 0;
+                        int stageTotal = 0;
                         foreach (var marble in currentSiege.Marbles)
                         {
                             var user = GetUser(Context, marble.Id);
@@ -174,9 +174,11 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                if (marble.StatusEffect == MSE.Stun) {
+                if (marble.StatusEffect == MSE.Stun)
+                {
                     if (DateTime.UtcNow.Subtract(marble.LastStun).TotalSeconds > 15) marble.StatusEffect = MSE.None;
-                    else {
+                    else
+                    {
                         await ReplyAsync($"**{Context.User.Username}**, you are stunned and cannot attack!");
                         return;
                     }
@@ -227,7 +229,8 @@ namespace MarbleBot.Modules
                     .WithDescription($"**{marble.Name}** dealt **{dmg}** damage to **{SiegeInfo[fileId].Boss.Name}**!")
                     .AddField("Boss HP", $"**{SiegeInfo[fileId].Boss.HP}**/{SiegeInfo[fileId].Boss.MaxHP}");
                 await ReplyAsync(embed: builder.Build());
-                if (clone) {
+                if (clone)
+                {
                     if (marble.Name.Last() != 's') await ReplyAsync($"{marble.Name}'s clones disappeared!");
                     else await ReplyAsync($"{marble.Name}' clones disappeared!");
                 }
@@ -259,13 +262,15 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                if (currentSiege.PowerUp.IsEmpty()) {
+                if (currentSiege.PowerUp.IsEmpty())
+                {
                     await ReplyAsync("There is no power-up to grab!");
                     return;
                 }
 
                 var marble = currentSiege.Marbles.Find(m => m.Id == Context.User.Id);
-                if (marble.HP < 1) {
+                if (marble.HP < 1)
+                {
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer grab power-ups!");
                     return;
                 }
