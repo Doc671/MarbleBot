@@ -18,7 +18,6 @@ namespace MarbleBot.Core
     {
         public Task Actions { get; set; }
         public bool Active { get; set; } = true;
-        public int AttackTime { get; set; } = 15000;
         public Boss Boss { get; set; } = Boss.Empty;
         public double DamageMultiplier => (1.0 + (Marbles.Aggregate(0, (totalDeaths, m) =>
                                                         {
@@ -36,13 +35,7 @@ namespace MarbleBot.Core
         public async Task DealDamageAsync(SocketCommandContext context, int dmg)
         {
             Boss.HP -= dmg;
-            if (Boss.HP < 1)
-                await SiegeVictoryAsync(context);
-            if ((string.Compare(Boss.Name, "Destroyer", true) == 0) && Boss.HP <= Boss.MaxHP >> 1)
-            {
-                AttackTime = 12000;
-                Boss.ImageUrl = "https://cdn.discordapp.com/attachments/296376584238137355/567456912430333962/DestroyerCorrupted.png";
-            }
+            if (Boss.HP < 1) await SiegeVictoryAsync(context);
         }
 
         private bool _disposed = false;
@@ -50,8 +43,8 @@ namespace MarbleBot.Core
 
         private void Dispose(bool disposing)
         {
-            Active = false;
             if (_disposed) return;
+            Active = false;
             _disposed = true;
             Boss.ResetHP();
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
@@ -79,8 +72,14 @@ namespace MarbleBot.Core
 
         public async Task ItemAttack(SocketCommandContext context, JObject obj, int itemId,
                                      int damage, bool consumable = false, int ammoId = 0,
-                                     int ammoRequired = 1, int accuracyDivisor = 1)
+                                     int ammoRequired = 1)
         {
+            if (_disposed)
+            {
+                await context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
+                return;
+            }
+
             var item = GetItem(itemId.ToString("000"));
             var ammo = GetItem(ammoId.ToString("000"));
             var marble = Marbles.Find(m => m.Id == context.User.Id);
@@ -128,7 +127,7 @@ namespace MarbleBot.Core
                 marble.DamageDealt += damage;
                 if (ammoId != 0) UpdateUser(ammo, -ammoRequired);
             }
-            else if (Global.Rand.Next(0, 100) < (float)marble.ItemAccuracy / accuracyDivisor)
+            else if (Global.Rand.Next(0, 100) < marble.ItemAccuracy)
             {
                 damage = (int)Math.Round(damage * DamageMultiplier);
                 await DealDamageAsync(context, damage);
@@ -174,8 +173,9 @@ namespace MarbleBot.Core
             var timeout = false;
             do
             {
-                await Task.Delay(AttackTime);
-                if (Boss.HP < 1)
+                await Task.Delay(15000);
+                if (_disposed) return;
+                else if (Boss.HP < 1)
                 {
                     if (!VictoryCalled) await SiegeVictoryAsync(context);
                     break;
@@ -327,8 +327,8 @@ namespace MarbleBot.Core
                     // Siege failure
                     if (Marbles.Sum(m => m.HP) < 1) break;
                 }
-            } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0);
-            if (Boss.HP > 0)
+            } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0 && !_disposed);
+            if (Boss.HP > 0 && !_disposed)
             {
                 if (timeout) await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
                 else

@@ -400,6 +400,38 @@ namespace MarbleBot.Modules
                 await ReplyAsync(embed: builder.Build());
             }
 
+            [Command("marbleinfo")]
+            [Summary("Displays information about the current marble.")]
+            [Alias("minfo")]
+            public async Task MarbleInfoCommandAsync(string searchTerm = null)
+            {
+                SiegeMarble currentMarble;
+                try
+                {
+                    currentMarble = searchTerm == null ? SiegeInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Marbles.Find(m => m.Id == Context.User.Id)
+                        : SiegeInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Marbles.Find(m => string.Compare(m.Name, searchTerm, true) == 0);
+                }
+                catch (ArgumentNullException)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, could not find the requested marble!");
+                    return;
+                }
+                await ReplyAsync(embed: new EmbedBuilder()
+                    .AddField("HP", $"**{currentMarble.HP}**/{currentMarble.MaxHP}", true)
+                    .AddField("Status Effect", Enum.GetName(typeof(MSE), currentMarble.StatusEffect), true)
+                    .AddField("Shield", currentMarble.Shield.Name, true)
+                    .AddField("Damage Increase", $"{currentMarble.DamageIncrease}%", true)
+                    .AddField("Item Accuracy", $"{currentMarble.ItemAccuracy}%", true)
+                    .AddField("Damage Dealt", currentMarble.DamageDealt, true)
+                    .AddField("Power-up Hits", currentMarble.PowerUpHits, true)
+                    .AddField("Rocket Boots Used?", currentMarble.BootsUsed, true)
+                    .AddField("Qefpedun Charm Used?", currentMarble.QefpedunCharmUsed, true)
+                    .WithCurrentTimestamp()
+                    .WithColor(GetColor(Context))
+                    .WithTitle(currentMarble.Name)
+                    .Build());
+            }
+
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
             [Summary("Shows a leaderboard of most used marbles in Sieges.")]

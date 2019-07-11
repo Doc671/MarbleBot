@@ -57,7 +57,8 @@ namespace MarbleBot.Core
             do
             {
                 await Task.Delay(7000);
-                if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
+                if (_disposed) return;
+                else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
                 {
                     timeout = true;
                     break;
@@ -86,7 +87,7 @@ namespace MarbleBot.Core
                           .Build());
                 }
             }
-            while (!timeout && Team1.Sum(m => m.HP) > 0 && Team2.Sum(m => m.HP) > 0);
+            while (!timeout && Team1.Sum(m => m.HP) > 0 && Team2.Sum(m => m.HP) > 0 && !_disposed);
             if (!timeout) await WarEndAsync(context);
             else Dispose(true);
         }

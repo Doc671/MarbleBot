@@ -850,8 +850,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (SiegeInfo.ContainsKey(fileId))
                                 await SiegeInfo[fileId].ItemAttack(Context, obj, item.Id,
-                                    (int)Math.Round(75 + 12.5 * (int)SiegeInfo[fileId].Boss.Difficulty), ammoId: 48,
-                                    accuracyDivisor: 2);
+                                    (int)Math.Round(75 + 12.5 * (int)SiegeInfo[fileId].Boss.Difficulty), ammoId: 48);
                             else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
@@ -872,7 +871,7 @@ namespace MarbleBot.Modules
                                     var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                     for (int i = 0; i < 3; i++)
                                     {
-                                        if (Rand.Next(0, 100) < userMarble.ItemAccuracy >> 1)
+                                        if (Rand.Next(0, 100) < userMarble.ItemAccuracy)
                                         {
                                             var dmg = 110 + 9 * (int)SiegeInfo[fileId].Boss.Difficulty;
                                             await SiegeInfo[fileId].DealDamageAsync(Context, dmg);
