@@ -255,7 +255,7 @@ namespace MarbleBot.Modules
                             user.NetWorth += item.Price * noOfItems;
                         }
                         user.Items[requestedItem.Id] -= noCrafted;
-                        user.NetWorth -= requestedItem.Price * noOfItems;
+                        user.NetWorth -= requestedItem.Price * noCrafted;
                         embed.AddField("Gained items", output.ToString())
                             .AddField("Net Worth", $"Old: {UoM}**{currentNetWorth:n2}**\nNew: {UoM}**{user.NetWorth:n2}**");
                         WriteUsers(obj, Context.User, user);

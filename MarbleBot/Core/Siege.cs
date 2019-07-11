@@ -54,7 +54,6 @@ namespace MarbleBot.Core
             if (_disposed) return;
             _disposed = true;
             Boss.ResetHP();
-            Marbles = null;
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
                 marbleList.Write("");
             Global.SiegeInfo.TryRemove(Id, out _);

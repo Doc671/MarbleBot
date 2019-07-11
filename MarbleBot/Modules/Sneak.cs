@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -93,6 +94,29 @@ namespace MarbleBot.Modules
                     await chnl.SendMessageAsync(msg);
                     break;
             }
+        }
+
+        [Command("fixbalance")]
+        [Summary("Fixes the balance of each user.")]
+        [Alias("fixbal")]
+        [RequireOwner]
+        public async Task FixBalanceCommandAsync()
+        {
+            var itemsObj = GetItemsObject();
+            var usersDict = GetUsersObject().ToObject<Dictionary<string, MBUser>>();
+            var newUsersDict = new Dictionary<string, MBUser>();
+            foreach (var userPair in usersDict)
+            {
+                var user = userPair.Value;
+                user.Balance = user.NetWorth - (user.Items == null ? 0 : user.Items.Aggregate(0m, (total, itemPair) =>
+                {
+                    total += itemsObj[itemPair.Key.ToString("000")].ToObject<Item>().Price * itemPair.Value;
+                    return total;
+                }));
+                newUsersDict.Add(userPair.Key, user);
+            }
+            WriteUsers(JObject.FromObject(newUsersDict));
+            await ReplyAsync("Success.");
         }
 
         [Command("update")]

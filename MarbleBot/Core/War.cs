@@ -37,8 +37,6 @@ namespace MarbleBot.Core
             Global.WarInfo.TryRemove(Id, out _);
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}war.csv", false))
                 marbleList.Write("");
-            Team1 = null;
-            Team2 = null;
             if (disposing)
             {
                 Actions.Wait();

@@ -28,7 +28,6 @@ namespace MarbleBot.Core
             if (_disposed) return;
             _disposed = true;
             Global.ScavengeInfo.TryRemove(Id, out _);
-            Items = null;
             if (disposing)
             {
                 Actions.Wait();
