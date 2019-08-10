@@ -1081,6 +1081,7 @@
     "OnSale": false,
     "ScavengeLocation": 0,
     "Damage": 12,
+    "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "023": 1,
