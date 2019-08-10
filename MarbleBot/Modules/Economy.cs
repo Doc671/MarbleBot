@@ -288,6 +288,7 @@ namespace MarbleBot.Modules
                 string part = searchTermParts[i];
                 if (!int.TryParse(part, out page))
                     name.Append($"{part}{(i == searchTermParts.Length - 2 ? "" : " ")}");
+                    page = page == 0 ? 1 : page;
             }
             if (page < 1)
             {
