@@ -285,9 +285,14 @@ namespace MarbleBot.Modules
             var name = new StringBuilder();
             for (int i = 0; i < searchTermParts.Length; i++)
             {
-                string part = (string)searchTermParts[i];
+                string part = searchTermParts[i];
                 if (!int.TryParse(part, out page))
                     name.Append($"{part}{(i == searchTermParts.Length - 2 ? "" : " ")}");
+            }
+            if (page < 1)
+            {
+                await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
+                return;
             }
             var searchTerm = name.ToString();
             if (searchTerm.IsEmpty())
@@ -566,7 +571,7 @@ namespace MarbleBot.Modules
         {
             await Context.Channel.TriggerTypingAsync();
             if (!int.TryParse(rawPage, out int page)) await ReplyAsync($"**{Context.User.Username}**, this is not a valid integer!");
-            else if (page < 1) await ReplyAsync($"**{Context.User.Username}**, the leaderboard value must be at least one!");
+            else if (page < 1) await ReplyAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
             else
             {
                 string json;
