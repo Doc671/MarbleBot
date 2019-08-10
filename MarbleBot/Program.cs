@@ -26,6 +26,14 @@ namespace MarbleBot
         private CommandHandler _handler;
 #pragma warning restore IDE0052 // Remove unread private members
 
+        private static UserCredential _credential;
+
+        private static DocsService _service;
+
+        private static DocumentsResource.GetRequest _request;
+
+        private const string _documentId = "1HlzCpdMG7Wn5cAGDCLb_k9NqMk6jsZG9P1Q-VwCrp9E";
+
         public async Task StartAsync()
         {
             Console.Title = "MarbleBot";
@@ -36,15 +44,6 @@ namespace MarbleBot
             string token = "";
             using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBT.txt")) token = stream.ReadLine();
             using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBK.txt")) Global.YTKey = stream.ReadLine();
-
-            using (var arFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
-            {
-                while (!arFile.EndOfStream)
-                {
-                    var arPair = (await arFile.ReadLineAsync()).Split(';');
-                    Global.Autoresponses.Add(arPair[0], arPair[1]);
-                }
-            }
 
             using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
             {
@@ -59,6 +58,23 @@ namespace MarbleBot
                     Global.Servers.Value.Add(server2);
                 }
             }
+
+            using (var stream = new FileStream($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
+            {
+                _credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    new string[] { DocsService.Scope.Documents },
+                    "user",
+                    CancellationToken.None);
+            }
+
+            _service = new DocsService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = _credential,
+                ApplicationName = "MarbleBot",
+            });
+
+            _request = _service.Documents.Get(_documentId);
 
             await _client.LoginAsync(TokenType.Bot, token);
 
@@ -80,28 +96,8 @@ namespace MarbleBot
             var logString = noDate ? log : $"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {log}";
             Console.WriteLine(logString);
 
-            UserCredential credential;
-
-            using (var stream = new FileStream($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
-            {
-                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    new string[] { DocsService.Scope.Documents },
-                    "user",
-                    CancellationToken.None);
-            }
-
-            var service = new DocsService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = "MarbleBot",
-            });
-
-            string documentId = "1HlzCpdMG7Wn5cAGDCLb_k9NqMk6jsZG9P1Q-VwCrp9E";
-
             // Get the end of the document
-            DocumentsResource.GetRequest request = service.Documents.Get(documentId);
-            Document doc = await request.ExecuteAsync();
+            Document doc = await _request.ExecuteAsync();
             var index = doc.Body.Content.Last().EndIndex - 1;
 
             // Write to the document
@@ -115,7 +111,7 @@ namespace MarbleBot
             };
 
             var body = new BatchUpdateDocumentRequest() { Requests = requests };
-            await service.Documents.BatchUpdate(body, documentId).ExecuteAsync();
+            await _service.Documents.BatchUpdate(body, _documentId).ExecuteAsync();
         });
     }
 }

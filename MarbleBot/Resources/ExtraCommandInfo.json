@@ -1,0 +1,122 @@
+{
+  "7ball": {
+    "Usage": "mb/7ball <condition>",
+    "Example": "mb/7ball Will I break?"
+  },
+  "addrole": {
+    "Usage": "mb/addrole <role name>"
+  },
+  "balance": {
+    "Usage": "mb/balance <optional user>"
+  },
+  "bet": {
+    "Usage": "mb/bet <number of marbles>",
+    "Example": "mb/bet 30"
+  },
+  "buy": {
+    "Usage": "mb/buy <item ID> <# of items>",
+    "Example": "mb/craft 001 1"
+  },
+  "channelinfo": {
+    "Usage": "mb/channelinfo <channel name>",
+    "Example": "mb/channelinfo Jack Spero"
+  },
+  "choose": {
+    "Usage": "mb/choose <choice1> | <choice2>",
+    "Example": "mb/choose Red | Yellow | Green | Blue"
+  },
+  "clearchannel": {
+    "Usage": "mb/clearchannel <announcement/autoresponse/usable>"
+  },
+  "craft": {
+    "Usage": "mb/craft <item ID> <number of items>",
+    "Example": "mb/craft 014 2"
+  },
+  "cv": {
+    "Usage": "mb/cv <video link> <optional description>",
+    "Example": "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"
+  },
+  "dismantle": {
+    "Usage": "mb/dismantle <item ID> <# of items>",
+    "Example": "mb/dismantle 045 10"
+  },
+  "give": {
+    "Usage": "mb/give <role>",
+    "Example": "mb/give Owner"
+  },
+  "inventory": {
+    "Usage": "mb/inventory <optional user> <optional page>",
+    "Example": "mb/inventory Doc671 2"
+  },
+  "item": {
+    "Usage": "mb/item <item ID>"
+  },
+  "orangeify": {
+    "Usage": "mb/orangeify <text>",
+    "Example": "mb/orangeify Drink Poup Soop!"
+  },
+  "poupsoop": {
+    "Usage": "mb/poupsoop <# Regular> | <optional # Limited> | <optional # Frozen> | <optional # Orange> | <optional # Electric> | <optional # Burning> | optional <# Rotten> | <optional # Ulteymut> | <optional # Variety Pack>",
+    "Example": "mb/poupsoop 3 | 1"
+  },
+  "profile": {
+    "Usage": "mb/profile <optional user>"
+  },
+  "random": {
+    "Usage": "mb/random <number1> <number2>",
+    "Example": "mb/random 1 5"
+  },
+  "rate": {
+    "Usage": "mb/rate <text>",
+    "Example": "mb/rate Marbles"
+  },
+  "recipes": {
+    "Usage": "mb/recipes <optional page number>",
+    "Example": "mb/recipes 2"
+  },
+  "removerole": {
+    "Usage": "mb/removerole <role name>"
+  },
+  "repeat": {
+    "Usage": "mb/repeat <text>",
+    "Example": "mb/repeat Hello!"
+  },
+  "reverse": {
+    "Usage": "mb/reverse <text>",
+    "Example": "mb/reverse Bowl"
+  },
+  "role": {
+    "Usage": "mb/role <role>",
+    "Example": "mb/role Bots"
+  },
+  "searchchannel": {
+    "Usage": "mb/searchchannel <channel name>",
+    "Example": "mb/searchchannel carykh"
+  },
+  "searchvideo": {
+    "Usage": "mb/searchvideo <video name>",
+    "Example": "mb/searchvideo The Amazing Marble Race"
+  },
+  "sell": {
+    "Usage": "mb/sell <item ID> <# of items>",
+    "Example": "mb/sell 000 2"
+  },
+  "setchannel": {
+    "Usage": "mb/setchannel <announcement/autoresponse/usable> <channel ID>"
+  },
+  "take": {
+    "Usage": "mb/take <role>",
+    "Example": "mb/take Criminal"
+  },
+  "use": {
+    "Usage": "mb/use <item ID>"
+  },
+  "userinfo": {
+    "Usage": "mb/userinfo <user>",
+    "Example": "mb/userinfo MarbleBot"
+  },
+  "vinhglish": {
+    "Usage": "mb/vinhglish <optional word>",
+    "Example": "mb/vinhglish Am Will You"
+  }
+}

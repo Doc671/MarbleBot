@@ -28,8 +28,25 @@ namespace MarbleBot.Core
         public DateTime LastMorale { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         public List<SiegeMarble> Marbles { get; set; } = new List<SiegeMarble>();
         public int Morales { get; set; }
-        public string PowerUp { get; set; } = "";
-        public string PUImageUrl { get; set; } = "";
+        private PowerUp powerUp;
+        public PowerUp PowerUp {
+            get => powerUp;
+            set
+            {
+                powerUp = value;
+                PUImageUrl = value switch
+                {
+                    PowerUp.Clone => "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
+                    PowerUp.Cure => "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
+                    PowerUp.Heal => "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
+                    PowerUp.MoraleBoost => "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
+                    PowerUp.Overclock => "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
+                    PowerUp.Summon => "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
+                    _ => ""
+                };
+            }
+        }
+        public string PUImageUrl { get; private set; } = "";
         public bool VictoryCalled { get; set; }
 
         public async Task DealDamageAsync(SocketCommandContext context, int dmg)
@@ -151,21 +168,6 @@ namespace MarbleBot.Core
                                     .Build());
         }
 
-        public void SetPowerUp(string PU)
-        {
-            PowerUp = PU;
-            PUImageUrl = PU switch
-            {
-                "Clone" => "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
-                "Cure" => "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
-                "Heal" => "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
-                "Morale Boost" => "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
-                "Overclock" => "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
-                "Summon" => "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
-                _ => ""
-            };
-        }
-
         // Separate task dealing with time-based boss responses
         public async Task SiegeBossActionsAsync(SocketCommandContext context)
         {
@@ -190,10 +192,10 @@ namespace MarbleBot.Core
                     // Attack marbles
                     var atk = Boss.Attacks[Global.Rand.Next(0, Boss.Attacks.Length)];
                     var builder = new EmbedBuilder()
+                        .WithAuthor(Boss.Name, Boss.ImageUrl)
                         .WithColor(GetColor(context))
                         .WithCurrentTimestamp()
                         .WithDescription($"**{Boss.Name}** used **{atk.Name}**!")
-                        .WithThumbnailUrl(Boss.ImageUrl)
                         .WithTitle($"WARNING: {atk.Name.ToUpper()} INBOUND!");
                     var hits = 0;
                     foreach (var marble in Marbles)
@@ -211,23 +213,23 @@ namespace MarbleBot.Core
                                 }
                                 else
                                 {
-                                    switch (atk.StatusEffect == marble.StatusEffect ? MSE.None : atk.StatusEffect)
+                                    switch (atk.StatusEffect == marble.StatusEffect ? StatusEffect.None : atk.StatusEffect)
                                     {
-                                        case MSE.Chill:
-                                            marble.StatusEffect = MSE.Chill;
+                                        case StatusEffect.Chill:
+                                            marble.StatusEffect = StatusEffect.Chill;
                                             builder.AddField($"**{marble.Name}** has been chilled! All attacks will deal half damage unless cured!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Chill**");
                                             break;
-                                        case MSE.Doom:
-                                            marble.StatusEffect = MSE.Doom;
+                                        case StatusEffect.Doom:
+                                            marble.StatusEffect = StatusEffect.Doom;
                                             builder.AddField($"**{marble.Name}** has been doomed and will die in ~45 seconds if not cured!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Doom**");
                                             marble.DoomStart = DateTime.UtcNow;
                                             break;
-                                        case MSE.Poison:
-                                            marble.StatusEffect = MSE.Poison;
+                                        case StatusEffect.Poison:
+                                            marble.StatusEffect = StatusEffect.Poison;
                                             builder.AddField($"**{marble.Name}** has been poisoned and will lose HP every ~15 seconds until cured/at 1 HP!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Poison**");
                                             break;
-                                        case MSE.Stun:
-                                            marble.StatusEffect = MSE.Stun;
+                                        case StatusEffect.Stun:
+                                            marble.StatusEffect = StatusEffect.Stun;
                                             builder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Stun**");
                                             marble.LastStun = DateTime.UtcNow;
                                             break;
@@ -239,14 +241,14 @@ namespace MarbleBot.Core
                             // Perform status effects
                             switch (marble.StatusEffect)
                             {
-                                case MSE.Doom:
+                                case StatusEffect.Doom:
                                     if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45)
                                     {
                                         marble.HP = 0;
                                         builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{DamageMultiplier}**");
                                     }
                                     break;
-                                case MSE.Poison:
+                                case StatusEffect.Poison:
                                     if (DateTime.UtcNow.Subtract(marble.LastPoisonTick).TotalSeconds > 15)
                                     {
                                         if (marble.HP < 1) break;
@@ -255,7 +257,7 @@ namespace MarbleBot.Core
                                         if (marble.HP < 2)
                                         {
                                             marble.HP = 1;
-                                            marble.StatusEffect = MSE.None;
+                                            marble.StatusEffect = StatusEffect.None;
                                         }
                                         builder.AddField($"**{marble.Name}** has taken Poison damage!", $"HP: **{marble.HP}**/{marble.MaxHP}");
                                     }
@@ -265,67 +267,47 @@ namespace MarbleBot.Core
                         }
                     }
                     if (hits < 1) builder.AddField("Missed!", "No-one got hurt!");
-                    await context.Channel.SendMessageAsync(embed: builder.Build());
 
                     // Wear off Morale Boost
                     if (DateTime.UtcNow.Subtract(LastMorale).TotalSeconds > 20 && Morales > 0)
                     {
                         Morales--;
-                        await context.Channel.SendMessageAsync($"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
+                        builder.AddField("Morale Boost has worn off!", 
+                            $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
                     }
 
                     // Cause new power-up to appear
-                    if (string.Compare(PowerUp, "", true) == 0)
+                    if (PowerUp == PowerUp.None)
                     {
-                        switch (Global.Rand.Next(0, Boss.Attacks.Length))
+                        switch (Global.Rand.Next(0, 8))
                         {
-                            case 0:
-                                SetPowerUp("Morale Boost");
-                                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(GetColor(context))
-                                    .WithCurrentTimestamp()
-                                    .WithDescription("A **Morale Boost** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(PUImageUrl)
-                                    .WithTitle("Power-up spawned!")
-                                    .Build());
-                                break;
                             case 1:
-                                SetPowerUp("Clone");
-                                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(GetColor(context))
-                                    .WithCurrentTimestamp()
-                                    .WithDescription("A **Clone** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(PUImageUrl)
-                                    .WithTitle("Power-up spawned!").Build());
+                                PowerUp = PowerUp.Clone;
+                                builder.AddField("Power-up spawned!", "A **Clone** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                    .WithThumbnailUrl(PUImageUrl);
                                 break;
                             case 2:
-                                SetPowerUp("Summon");
-                                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(GetColor(context))
-                                    .WithCurrentTimestamp()
-                                    .WithDescription("A **Summon** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(PUImageUrl)
-                                    .WithTitle("Power-up spawned!")
-                                    .Build());
-                                break;
-                            case 3:
-                                if (Marbles.Any(m => m.StatusEffect != MSE.None))
+                                if (Marbles.Any(m => m.StatusEffect != StatusEffect.None))
                                 {
-                                    SetPowerUp("Cure");
-                                    await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(GetColor(context))
-                                    .WithCurrentTimestamp()
-                                    .WithDescription("A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(PUImageUrl)
-                                    .WithTitle("Power-up spawned!")
-                                    .Build());
+                                    PowerUp = PowerUp.Cure;
+                                    builder.AddField("Power-up spawned!", "A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                        .WithThumbnailUrl(PUImageUrl);
                                 }
+                                break;
+                            case 4:
+                                PowerUp = PowerUp.MoraleBoost;
+                                builder.AddField("Power-up spawned!", "A **Morale Boost** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                    .WithThumbnailUrl(PUImageUrl);
+                                break;
+                            case 6:
+                                PowerUp = PowerUp.Summon;
+                                builder.AddField("Power-up spawned!", "A **Summon** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                    .WithThumbnailUrl(PUImageUrl);
                                 break;
                         }
                     }
 
-                    // Siege failure
-                    if (Marbles.Sum(m => m.HP) < 1) break;
+                    await context.Channel.SendMessageAsync(embed: builder.Build());
                 }
             } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0 && !_disposed);
             if (Boss.HP > 0 && !_disposed)
@@ -337,6 +319,7 @@ namespace MarbleBot.Core
                     foreach (var marble in Marbles)
                         marbles.AppendLine(marble.ToString(context, false));
                     await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        .WithAuthor(Boss.Name, Boss.ImageUrl)
                         .WithColor(GetColor(context))
                         .WithCurrentTimestamp()
                         .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal HP: **{Boss.HP}**/{Boss.MaxHP}")
@@ -429,6 +412,13 @@ namespace MarbleBot.Core
         }
 
         public override string ToString() => $"{Boss.Name}: {Marbles.Count}";
+
+        public static string PowerUpString(PowerUp powerUp)
+        => powerUp switch {
+            PowerUp.None => "",
+            PowerUp.MoraleBoost => "Morale Boost",
+            _ => Enum.GetName(typeof(PowerUp), powerUp)
+        };
 
         public Siege(SocketCommandContext context, SiegeMarble[] marbles)
         {

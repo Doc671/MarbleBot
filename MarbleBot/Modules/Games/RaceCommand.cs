@@ -63,35 +63,31 @@ namespace MarbleBot.Modules
                         }
                         marbleList.Close();
                     }
-                    RaceAlive.GetOrAdd(fileId, marbleCount);
+
+                    // Get the death messages
+                    var messages = new List<string>();
+                    using (var messageFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceDeathMessages.txt"))
+                    {
+                        while (!messageFile.EndOfStream)
+                            messages.Add(await messageFile.ReadLineAsync());
+                    }
 
                     // Race start
                     builder.WithTitle("The race has started!");
                     var msg = await ReplyAsync(embed: builder.Build());
                     await Task.Delay(1500);
-                    int alive = Context.IsPrivate ? RaceAlive[Context.User.Id] : RaceAlive[Context.Guild.Id];
-                    int id = alive;
-                    while (alive > 1)
+
+                    for (int alive = marbleCount; alive > 1; alive--)
                     {
                         int eliminated = 0;
-                        do eliminated = Rand.Next(0, id);
+                        do eliminated = Rand.Next(0, marbleCount);
                         while (string.Compare(marbles[eliminated].Item1, "///out", true) == 0);
-                        var deathmsg = "";
-                        var msgs = new List<string>();
-                        int msgCount = 0;
-                        using (var msgFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceDeathMessages.txt"))
-                        {
-                            while (!msgFile.EndOfStream)
-                            {
-                                msgCount++;
-                                msgs.Add(await msgFile.ReadLineAsync());
-                            }
-                        }
-                        int choice = Rand.Next(0, msgCount - 1);
-                        deathmsg = msgs[choice];
-                        var mName = marbles[eliminated].Item1.ToLower();
-                        builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathmsg} and is now out of the competition!");
-                        if (alive == id && id > 1)
+                        string deathMessage;
+                        deathMessage = messages[Rand.Next(0, messages.Count - 1)];
+                        builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathMessage} and is now out of the competition!");
+
+                        // A special message may be displayed depending on the name of last place
+                        if (alive == marbleCount && marbleCount > 1)
                         {
                             string json;
                             using (var messageList = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceSpecialMessages.json"))
@@ -100,39 +96,31 @@ namespace MarbleBot.Modules
                             var marbleName = marbles[eliminated].Item1.ToLower().RemoveChar(' ');
                             if (messageDict.ContainsKey(marbleName)) builder.WithDescription($"*{messageDict[marbleName]}*");
                         }
+
                         marbles[eliminated] = ("///out", marbles[eliminated].Item2);
-                        alive--;
                         await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                         await Task.Delay(1500);
                     }
 
                     // Race finish
-                    if (Context.IsPrivate) RaceAlive.TryRemove(Context.User.Id, out _);
-                    else RaceAlive.TryRemove(Context.Guild.Id, out _);
-                    var winnerID = 0ul;
-                    for (int i = 0; i < marbles.Count; i++)
+                    var winningMarble = marbles.Find(m => string.Compare(m.Item1, "///out") != 0);
+                    builder.AddField($"**{winningMarble.Item1}** wins!", winningMarble.Item1 + " is the winner!");
+                    if (marbleCount > 1)
                     {
-                        (string, ulong) marble = marbles[i];
-                        if (marble.Item1 != "///out")
-                        {
-                            winnerID = marble.Item2;
-                            builder.AddField($"**{marble.Item1}** wins!", marble.Item1 + " is the winner!");
-                            if (id > 1)
-                                using (var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}RaceWinners.txt", true)) await racers.WriteLineAsync(marble.Item1);
-                            await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
-                            await ReplyAsync($"**{marble.Item1}** won the race!");
-                            break;
-                        }
+                        using var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}RaceWinners.txt", true);
+                        await racers.WriteLineAsync(winningMarble.Item1);
                     }
+                    await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
+                    await ReplyAsync($"**{winningMarble.Item1}** won the race!");
 
                     // Reward winner
                     var obj = GetUsersObject();
-                    var user = GetUser(Context, obj, winnerID);
+                    var user = GetUser(Context, obj, winningMarble.Item2);
                     if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
                     {
                         var noOfSameUser = 0;
-                        foreach (var marble in marbles) if (marble.Item2 == winnerID) noOfSameUser++;
-                        var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(id) / noOfSameUser) - 1) * 100, 2));
+                        foreach (var marble in marbles) if (marble.Item2 == winningMarble.Item2) noOfSameUser++;
+                        var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(marbleCount) / noOfSameUser) - 1) * 100, 2));
                         if (gift > 0)
                         {
                             if (user.Items.ContainsKey(83)) gift *= 3;
@@ -140,15 +128,13 @@ namespace MarbleBot.Modules
                             user.NetWorth += gift;
                             user.LastRaceWin = DateTime.UtcNow;
                             user.RaceWins++;
-                            obj.Remove(winnerID.ToString());
-                            obj.Add(new JProperty(winnerID.ToString(), JObject.FromObject(user)));
+                            obj.Remove(winningMarble.Item2.ToString());
+                            obj.Add(new JProperty(winningMarble.Item2.ToString(), JObject.FromObject(user)));
                             WriteUsers(obj);
                             await ReplyAsync($"**{user.Name}** won {UoM}**{gift:n2}** for winning the race!");
                         }
                     }
-#pragma warning disable IDE0063 // Use simple 'using' statement
                     using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}race.csv", false))
-#pragma warning restore IDE0063 // Use simple 'using' statement
                         await marbleList.WriteAsync("");
                 }
             }
@@ -171,10 +157,10 @@ namespace MarbleBot.Modules
 
             [Command("leaderboard")]
             [Summary("Shows a leaderboard of most used marbles or winning marbles.")]
-            public async Task RaceLeaderboardCommandAsync(string option, string rawNo = "1")
+            public async Task RaceLeaderboardCommandAsync(string option, string rawPage = "1")
             {
                 await Context.Channel.TriggerTypingAsync();
-                if (int.TryParse(rawNo, out int no))
+                if (int.TryParse(rawPage, out int page))
                 {
                     ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                     var builder = new EmbedBuilder()
@@ -197,7 +183,7 @@ namespace MarbleBot.Modules
                             winList.Add((winner.Key, winner.Value));
                         winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
                         builder.WithTitle("Race Leaderboard: Winners")
-                            .WithDescription(Leaderboard(winList, no));
+                            .WithDescription(Leaderboard(winList, page));
                         await ReplyAsync(embed: builder.Build());
                     }
                     else
@@ -217,7 +203,7 @@ namespace MarbleBot.Modules
                             winList.Add((winner.Key, winner.Value));
                         winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
                         builder.WithTitle("Race Leaderboard: Most Used")
-                            .WithDescription(Leaderboard(winList, no));
+                            .WithDescription(Leaderboard(winList, page));
                         await ReplyAsync(embed: builder.Build());
                     }
                 }

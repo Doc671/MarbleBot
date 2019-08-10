@@ -1,7 +1,7 @@
 ﻿namespace MarbleBot.Core
 {
     /// <summary> The status effects a marble can have during a Siege game. </summary>
-    public enum MSE
+    public enum StatusEffect
     {
         /// <summary> The marble is not affected by any status ailment. </summary>
         None,

@@ -24,7 +24,7 @@ namespace MarbleBot.Core
         /// <summary> Whether or not the Qefpedun Charm has been used. </summary>
         public bool QefpedunCharmUsed { get; set; }
         /// <summary> The marble's status ailment. </summary>
-        public MSE StatusEffect { get; set; }
+        public StatusEffect StatusEffect { get; set; }
         /// <summary> The time at which the marble had been doomed. </summary>
         public DateTime DoomStart { get; set; }
         /// <summary> The last time the marble was damaged by poison. </summary>

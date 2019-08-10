@@ -1,8 +1,4 @@
-﻿using Discord.Commands;
-using MarbleBot.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Text;
 using System.Threading;
 
@@ -10,10 +6,7 @@ namespace MarbleBot.Extensions
 {
     /// <summary> Extension methods </summary>
     public static class Extensions
-    {
-        public static bool ContainsServer(this IEnumerable<MBServer> serverList, SocketCommandContext context)
-            => serverList.Any(s => s.Id == context.Guild.Id);
-            
+    {       
         public static bool IsEmpty(this string str)
             => string.Compare(str, "", true) == 0 || string.Compare(str, " ", true) == 0 || str == null || str == string.Empty 
             || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);

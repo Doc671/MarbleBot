@@ -11,8 +11,7 @@ namespace MarbleBot
     {
         internal const ulong BotId = 286228526234075136;
         internal const string UoM = "<:unitofmoney:372385317581488128>";
-        internal static DateTime ARLastUse { get; set; }
-        internal static Dictionary<string, string> Autoresponses { get; set; } = new Dictionary<string, string>();
+        internal static DateTime AutoresponseLastUse { get; set; }
         internal static CommandService CommandService { get; set; }
         internal static ushort DailyTimeout  { get; set; } = 48;
         internal static Random Rand { get; } = new Random();
@@ -21,7 +20,6 @@ namespace MarbleBot
         internal static string YTKey { get; set; } = "";
 
         // Games
-        internal static ConcurrentDictionary<ulong, int> RaceAlive { get; set; } = new ConcurrentDictionary<ulong, int>();
         internal static ConcurrentDictionary<ulong, Scavenge> ScavengeInfo { get; set; } = new ConcurrentDictionary<ulong, Scavenge>();
         internal static ConcurrentDictionary<ulong, Siege> SiegeInfo { get; set; } = new ConcurrentDictionary<ulong, Siege>();
         internal static ConcurrentDictionary<ulong, War> WarInfo { get; set; } = new ConcurrentDictionary<ulong, War>();

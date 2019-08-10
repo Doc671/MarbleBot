@@ -116,21 +116,28 @@ namespace MarbleBot.Modules
         /// <returns> A string ready to be output. </returns>
         internal static string Leaderboard(IEnumerable<(string, int)> orderedData, int no)
         {
-            // This displays in groups of ten (i.e. if no is 1, first 10 displayed;
-            // no = 2, next 10, etc.
-            int displayedPlace = 1, dataIndex = 1, minValue = (no - 1) * 10 + 1, maxValue = no * 10;
-            var output = new StringBuilder();
+            // Key is the displayed place on the leaderboard; value item 1 is the item; value item 2 is its data
+            // i.e. (1, "Red", 83) would be displayed as "1st: Red 83"
+            var dataList = new List<(int, string, int)>();
+            int displayedPlace = 0, lastValue = 0;
             foreach (var item in orderedData)
             {
-                if (displayedPlace < maxValue + 1 && displayedPlace >= minValue)
-                { // i.e. if item is within range
-                    output.AppendLine($"{displayedPlace}{displayedPlace.Ordinal()}: {item.Item1} {item.Item2}");
-                    if (dataIndex < orderedData.Count() && !(orderedData.ElementAt(dataIndex).Item2 == item.Item2))
-                        displayedPlace++;
-                }
-                if (displayedPlace < maxValue + 1 && !(displayedPlace >= minValue)) displayedPlace++;
-                else if (displayedPlace > maxValue) break;
-                dataIndex++;
+                if (item.Item2 != lastValue)
+                    displayedPlace++;
+                dataList.Add((displayedPlace, item.Item1, item.Item2));
+                lastValue = item.Item2;
+            }
+            if (no > dataList.Last().Item1 / 10)
+                return $"There are no entries in page **{no}**!";
+            // This displays in groups of ten (i.e. if no is 1, first 10 displayed;
+            // no = 2, next 10, etc.
+            int minValue = (no - 1) * 10 + 1, maxValue = no * 10;
+            var output = new StringBuilder();
+            foreach (var itemPair in dataList)
+            {
+                if (itemPair.Item1 > maxValue) break;
+                if (itemPair.Item1 < maxValue + 1 && itemPair.Item1 >= minValue)
+                    output.AppendLine($"{itemPair.Item1 }{itemPair.Item1.Ordinal()}: {itemPair.Item2} {itemPair.Item3}");
             }
             if (output.Length > 2048) return string.Concat(output.ToString().Take(2048));
             return output.ToString();

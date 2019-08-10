@@ -18,31 +18,6 @@ namespace MarbleBot.Modules
     /// <summary> Owner-only commands. >:) </summary>
     public class Sneak : MarbleBotModule
     {
-        [Command("autoresponse")]
-        [Summary("Things to do with autoresponses.")]
-        [RequireOwner]
-        public async Task AutoresponseCommandAsync(string option)
-        {
-            switch (option)
-            {
-                case "time": await ReplyAsync($"Last Use: {ARLastUse.ToString()}\nCurrent Time: {DateTime.UtcNow.ToString()}"); break;
-                case "update":
-                    {
-                        Autoresponses = new Dictionary<string, string>();
-                        using (var arFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
-                        {
-                            while (!arFile.EndOfStream)
-                            {
-                                var arPair = arFile.ReadLine().Split(';');
-                                Autoresponses.Add(arPair[0], arPair[1]);
-                            }
-                        }
-                        await ReplyAsync("Dictionary update complete!");
-                        break;
-                    }
-                default: break;
-            }
-        }
 
         [Command("dailytimeout")]
         [Alias("dt")]

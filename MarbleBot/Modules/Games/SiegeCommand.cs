@@ -100,6 +100,15 @@ namespace MarbleBot.Modules
                     foreach (var marble in currentSiege.Marbles)
                         marble.SetHP(hp);
 
+                    var marbles = new StringBuilder();
+                    var pings = new StringBuilder();
+                    foreach (var marble in currentSiege.Marbles)
+                    {
+                        var user = Context.Client.GetUser(marble.Id);
+                        marbles.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
+                        if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
+                    }
+
                     // Siege Start
                     var cdown = await ReplyAsync("**3**");
                     await Task.Delay(1000);
@@ -109,14 +118,6 @@ namespace MarbleBot.Modules
                     await Task.Delay(1000);
                     await cdown.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
                     currentSiege.Actions = Task.Run(async () => { await currentSiege.SiegeBossActionsAsync(Context); });
-                    var marbles = new StringBuilder();
-                    var pings = new StringBuilder();
-                    foreach (var marble in currentSiege.Marbles)
-                    {
-                        var user = Context.Client.GetUser(marble.Id);
-                        marbles.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
-                        if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
-                    }
                     await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
@@ -174,9 +175,9 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                if (marble.StatusEffect == MSE.Stun)
+                if (marble.StatusEffect == StatusEffect.Stun)
                 {
-                    if (DateTime.UtcNow.Subtract(marble.LastStun).TotalSeconds > 15) marble.StatusEffect = MSE.None;
+                    if (DateTime.UtcNow.Subtract(marble.LastStun).TotalSeconds > 15) marble.StatusEffect = StatusEffect.None;
                     else
                     {
                         await ReplyAsync($"**{Context.User.Username}**, you are stunned and cannot attack!");
@@ -213,7 +214,7 @@ namespace MarbleBot.Modules
                     title = "CRITICAL attack!";
                     url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
                 }
-                dmg = (int)Math.Round(dmg * SiegeInfo[fileId].DamageMultiplier * (marble.StatusEffect == MSE.Chill ? 0.5 : 1.0) * (marble.DamageIncrease / 100.0 + 1));
+                dmg = (int)Math.Round(dmg * SiegeInfo[fileId].DamageMultiplier * (marble.StatusEffect == StatusEffect.Chill ? 0.5 : 1.0) * (marble.DamageIncrease / 100.0 + 1));
                 var clone = false;
                 if (marble.Cloned)
                 {
@@ -262,7 +263,7 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                if (currentSiege.PowerUp.IsEmpty())
+                if (currentSiege.PowerUp == PowerUp.None)
                 {
                     await ReplyAsync("There is no power-up to grab!");
                     return;
@@ -280,22 +281,30 @@ namespace MarbleBot.Modules
                     marble.PowerUpHits++;
                     switch (currentSiege.PowerUp)
                     {
-                        case "Morale Boost":
-                            currentSiege.Morales++;
-                            builder.WithTitle("POWER-UP ACTIVATED!")
-                                .WithDescription($"**{marble.Name}** activated **Morale Boost**! Damage multiplier increased to **{currentSiege.DamageMultiplier}**!");
-                            await ReplyAsync(embed: builder.Build());
-                            currentSiege.SetPowerUp("");
-                            currentSiege.LastMorale = DateTime.UtcNow;
-                            break;
-                        case "Clone":
+                        case PowerUp.Clone:
                             marble.Cloned = true;
                             builder.WithTitle("POWER-UP ACTIVATED!")
                                 .WithDescription($"**{marble.Name}** activated **Clone**! Five clones of {marble.Name} appeared!");
                             await ReplyAsync(embed: builder.Build());
-                            currentSiege.SetPowerUp("");
+                            currentSiege.PowerUp = PowerUp.None;
                             break;
-                        case "Summon":
+                        case PowerUp.Cure:
+                            var mse = Enum.GetName(typeof(StatusEffect), marble.StatusEffect);
+                            builder.WithTitle("Cured!")
+                                .WithDescription($"**{marble.Name}** has been cured of **{mse}**!");
+                            marble.StatusEffect = StatusEffect.None;
+                            await ReplyAsync(embed: builder.Build());
+                            currentSiege.PowerUp = PowerUp.None;
+                            break;
+                        case PowerUp.MoraleBoost:
+                            currentSiege.Morales++;
+                            builder.WithTitle("POWER-UP ACTIVATED!")
+                                .WithDescription($"**{marble.Name}** activated **Morale Boost**! Damage multiplier increased to **{currentSiege.DamageMultiplier}**!");
+                            await ReplyAsync(embed: builder.Build());
+                            currentSiege.PowerUp = PowerUp.None;
+                            currentSiege.LastMorale = DateTime.UtcNow;
+                            break;
+                        case PowerUp.Summon:
                             var choice = Rand.Next(0, 2);
                             string ally;
                             string url;
@@ -313,15 +322,7 @@ namespace MarbleBot.Modules
                                 .AddField("Boss HP", $"**{currentSiege.Boss.HP}**/{currentSiege.Boss.MaxHP}")
                                 .WithDescription($"**{marble.Name}** activated **Summon**! **{ally}** came into the arena and dealt **{dmg}** damage to the boss!");
                             await ReplyAsync(embed: builder.Build());
-                            currentSiege.SetPowerUp("");
-                            break;
-                        case "Cure":
-                            var mse = Enum.GetName(typeof(MSE), marble.StatusEffect);
-                            builder.WithTitle("Cured!")
-                                .WithDescription($"**{marble.Name}** has been cured of **{mse}**!");
-                            marble.StatusEffect = MSE.None;
-                            await ReplyAsync(embed: builder.Build());
-                            currentSiege.SetPowerUp("");
+                            currentSiege.PowerUp = PowerUp.None;
                             break;
                     }
                 }
@@ -367,12 +368,11 @@ namespace MarbleBot.Modules
                     var siege = SiegeInfo[fileId];
                     foreach (var marble in siege.Marbles)
                         marbles.AppendLine(marble.ToString(Context));
-                    var PU = siege.PowerUp.IsEmpty() ? "None" : siege.PowerUp;
                     builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHP: **{siege.Boss.HP}**/{siege.Boss.MaxHP}\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**");
                     if (marbles.Length > 1024) builder.AddField($"Marbles: **{siege.Marbles.Count}**", string.Concat(marbles.ToString().Take(1024)))
                         .AddField("Marbles (cont.)", string.Concat(marbles.ToString().Skip(1024)));
                     else builder.AddField($"Marbles: **{siege.Marbles.Count}**", marbles.ToString());
-                    builder.WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{PU}**")
+                    builder.WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{Siege.PowerUpString(siege.PowerUp)}**")
                          .WithThumbnailUrl(siege.Boss.ImageUrl);
                 }
                 else
@@ -418,7 +418,7 @@ namespace MarbleBot.Modules
                 }
                 await ReplyAsync(embed: new EmbedBuilder()
                     .AddField("HP", $"**{currentMarble.HP}**/{currentMarble.MaxHP}", true)
-                    .AddField("Status Effect", Enum.GetName(typeof(MSE), currentMarble.StatusEffect), true)
+                    .AddField("Status Effect", Enum.GetName(typeof(StatusEffect), currentMarble.StatusEffect), true)
                     .AddField("Shield", currentMarble.Shield.Name, true)
                     .AddField("Damage Increase", $"{currentMarble.DamageIncrease}%", true)
                     .AddField("Item Accuracy", $"{currentMarble.ItemAccuracy}%", true)
@@ -435,9 +435,9 @@ namespace MarbleBot.Modules
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
             [Summary("Shows a leaderboard of most used marbles in Sieges.")]
-            public async Task SiegeLeaderboardCommandAsync(string rawNo = "1")
+            public async Task SiegeLeaderboardCommandAsync(string rawPage = "1")
             {
-                if (int.TryParse(rawNo, out int no))
+                if (int.TryParse(rawPage, out int page))
                 {
                     var winners = new SortedDictionary<string, int>();
                     using (var win = new StreamReader($"Data{Path.DirectorySeparatorChar}SiegeMostUsed.txt"))
@@ -456,7 +456,7 @@ namespace MarbleBot.Modules
                     await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
-                        .WithDescription(Leaderboard(winList, no))
+                        .WithDescription(Leaderboard(winList, page))
                         .WithTitle("Siege Leaderboard: Most Used")
                         .Build());
                 }
@@ -525,7 +525,7 @@ namespace MarbleBot.Modules
                     {
                         var attacks = new StringBuilder();
                         foreach (var attack in boss.Attacks)
-                            attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(MSE), attack.StatusEffect)}>");
+                            attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(StatusEffect), attack.StatusEffect)}>");
                         var drops = new StringBuilder();
                         foreach (var drop in boss.Drops)
                         {

@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using MarbleBot.Core;
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -58,11 +59,18 @@ namespace MarbleBot
                 }
 
             } else if (!context.IsPrivate && server.AutoresponseChannel == context.Channel.Id
-                && DateTime.UtcNow.Subtract(Global.ARLastUse).TotalSeconds > 2) {
-                foreach (var response in Global.Autoresponses) {
-                    if (string.Compare(context.Message.Content, response.Key, true) == 0) {
-                        Global.ARLastUse = DateTime.UtcNow;
-                        await context.Channel.SendMessageAsync(response.Value); break;
+                && DateTime.UtcNow.Subtract(Global.AutoresponseLastUse).TotalSeconds > 2) {
+                var autoresponses = new System.Collections.Generic.List<string>();
+                using (var autoresponseFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
+                {
+                    while (!autoresponseFile.EndOfStream)
+                        autoresponses.Add(autoresponseFile.ReadLine());
+                }
+                foreach (var response in autoresponses) {
+                    var responseArray = response.Split(';');
+                    if (string.Compare(context.Message.Content, responseArray[0], true) == 0) {
+                        Global.AutoresponseLastUse = DateTime.UtcNow;
+                        await context.Channel.SendMessageAsync(responseArray[1]); break;
                     }
                 }
             }

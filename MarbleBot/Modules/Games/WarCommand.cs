@@ -347,9 +347,9 @@ namespace MarbleBot.Modules
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
             [Summary("Shows a leaderboard of most used marbles in wars.")]
-            public async Task WarLeaderboardCommandAsync(string rawNo = "1")
+            public async Task WarLeaderboardCommandAsync(string rawPage = "1")
             {
-                if (int.TryParse(rawNo, out int no))
+                if (int.TryParse(rawPage, out int page))
                 {
                     var winners = new SortedDictionary<string, int>();
                     using (var win = new StreamReader($"Data{Path.DirectorySeparatorChar}WarMostUsed.txt"))
@@ -368,7 +368,7 @@ namespace MarbleBot.Modules
                     await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
-                        .WithDescription(Leaderboard(winList, no))
+                        .WithDescription(Leaderboard(winList, page))
                         .WithTitle("War Leaderboard: Most Used")
                         .Build());
                 }

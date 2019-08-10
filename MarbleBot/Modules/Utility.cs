@@ -3,8 +3,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Core;
 using MarbleBot.Extensions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +24,6 @@ namespace MarbleBot.Modules
         public async Task BotInfoCommandAsync()
             => await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Daily Timeout", $"{DailyTimeout} hours", true)
-                .AddField("Ongoing Races", RaceAlive.Count, true)
                 .AddField("Ongoing Scavenges", ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", SiegeInfo.Count, true)
                 .AddField("Ongoing Wars", WarInfo.Count, true)
@@ -120,53 +121,17 @@ namespace MarbleBot.Modules
                     break;
                 default:
                     var hCommand = new HelpCommand();
-                    var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower()).First();
+                    var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower() || c.Aliases.Any(alias => alias == command)).First();
                     hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
-                    switch (command)
+
+                    string json;
+                    using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}ExtraCommandInfo.json"))
+                        json = itemFile.ReadToEnd();
+                    var commandDict = JObject.Parse(json).ToObject<Dictionary<string, Dictionary<string, string>>>();
+                    if (commandDict.ContainsKey(hCommand.Name) || hCommand.Aliases.Any(alias => commandDict.ContainsKey(alias)))
                     {
-                        // Fun
-                        case "7ball": hCommand.Usage = "mb/7ball <condition>"; hCommand.Example = "mb/7ball Will I break?"; break;
-                        case "bet": hCommand.Usage = "mb/bet [number of marbles]"; hCommand.Example = "mb/bet 30"; break;
-                        case "choose": hCommand.Usage = "mb/choose <choice1> | <choice2>"; hCommand.Example = "mb/choose Red | Yellow | Green | Blue"; break;
-                        case "orangeify": hCommand.Usage = "mb/orangeify <text>"; hCommand.Example = "mb/orangeify Drink Poup Soop!"; break;
-                        case "random": hCommand.Usage = "mb/random <number1> <number2>"; hCommand.Example = "mb/random 1 5"; break;
-                        case "rate": hCommand.Usage = "mb/rate <text>"; hCommand.Example = "mb/rate Marbles"; break;
-                        case "repeat": hCommand.Usage = "mb/repeat <text>"; hCommand.Example = "mb/repeat Hello!"; break;
-                        case "reverse": hCommand.Usage = "mb/reverse <text>"; hCommand.Example = "mb/reverse Bowl"; break;
-                        case "vinhglish": hCommand.Usage = "mb/vinglish <optional word>"; hCommand.Example = "mb/vinhglish Am Will You"; break;
-
-                        // Utility
-                        case "userinfo": hCommand.Desc = "Displays information about a user."; hCommand.Usage = "mb/userinfo <user>"; hCommand.Example = "mb/userinfo MarbleBot"; break;
-
-                        // Economy
-                        case "balance": hCommand.Usage = "mb/balance <optional user>"; break;
-                        case "buy": hCommand.Usage = "mb/buy <item ID> <# of items>"; hCommand.Example = "mb/buy 1 1"; break;
-                        case "craft": hCommand.Usage = "mb/craft <item ID> <# of items>"; hCommand.Example = "mb/craft 014 2"; break;
-                        case "dismantle": hCommand.Usage = "mb/dismantle <item ID> <# of items>"; hCommand.Example = "mb/decraft 045 10"; break;
-                        case "inventory": hCommand.Usage = "mb/inventory <optional user>"; break;
-                        case "item": hCommand.Usage = "mb/item <item ID>"; break;
-                        case "poupsoop": hCommand.Usage = "mb/poupsoop <# Regular> | <# Limited> | <# Frozen> | <# Orange> | <# Electric> | <# Burning> | <# Rotten> | <# Ulteymut> | <# Variety Pack>"; hCommand.Example = "mb/poupsoop 3 | 1"; break;
-                        case "profile": hCommand.Usage = "mb/profile <optional user>"; break;
-                        case "recipes": hCommand.Usage = "mb/recipes <optional group number>"; hCommand.Example = "mb/recipes 2"; break;
-                        case "sell": hCommand.Usage = "mb/sell <item ID> <# of items>"; hCommand.Example = "mb/sell 1 1"; break;
-                        case "use": hCommand.Usage = "mb/use <item ID>"; break;
-
-                        // Moderation
-                        case "addrole": hCommand.Usage = "mb/addrole <role name>"; break;
-                        case "clearchannel": hCommand.Usage = "mb/clearchannel <announcement/autoresponse/usable>"; break;
-                        case "removerole": hCommand.Usage = "mb/removerole <role name>"; break;
-                        case "setchannel": hCommand.Usage = "mb/setchannel <announcement/autoresponse/usable> <channel ID>"; break;
-
-                        // Roles
-                        case "give": hCommand.Usage = "mb/give <role>"; hCommand.Example = "mb/give Owner"; break;
-                        case "role": hCommand.Usage = "mb/role <role>"; hCommand.Example = "mb/role Bots"; break;
-                        case "rolelist": hCommand.Usage = "mb/rolelist"; break;
-                        case "take": hCommand.Usage = "mb/take <role>"; hCommand.Example = "mb/take Criminal"; break;
-
-                        // YT
-                        case "cv": hCommand.Usage = "mb/cv <video link> <optional description>"; hCommand.Example = "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"; break;
-                        case "searchchannel": hCommand.Usage = "mb/searchchannel <channelname>"; hCommand.Example = "mb/searchchannel carykh"; break;
-                        case "searchvideo": hCommand.Usage = "mb/searchvideo <videoname>"; hCommand.Example = "mb/searchvideo The Amazing Marble Race"; break;
+                        hCommand.Example = commandDict[hCommand.Name]["Example"];
+                        hCommand.Usage = commandDict[hCommand.Name]["Usage"];
                     }
 
                     if (!hCommand.Desc.IsEmpty())
