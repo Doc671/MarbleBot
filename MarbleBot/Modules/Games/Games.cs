@@ -79,35 +79,36 @@ namespace MarbleBot.Modules
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "server")}! No-one is signed up!");
                 return;
             }
-            var builder = new EmbedBuilder()
-                .WithColor(GetColor(context))
-                .WithCurrentTimestamp();
+
             var marbles = new StringBuilder();
             int count = 0;
             using (var marbleList = new StreamReader(marbleListDirectory))
             {
                 var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                foreach (var marble in allMarbles)
+                for (count = 0; count < allMarbles.Length - 1; count++)
                 {
+                    string marble = allMarbles[count];
                     if (marble.Length > 16)
                     {
-                        var mSplit = marble.Split(',');
-                        var user = context.Client.GetUser(ulong.Parse(mSplit[1].Trim('\n')));
-                        if (context.IsPrivate) marbles.AppendLine($"**{mSplit[0].Trim('\n')}**");
-                        else marbles.AppendLine($"**{mSplit[0].Trim('\n')}** [{user.Username}#{user.Discriminator}]");
-                        count++;
+                        var marbleInfo = marble.Split(',');
+                        var user = context.Client.GetUser(ulong.Parse(marbleInfo[1]));
+                        if (context.IsPrivate) marbles.AppendLine($"**{marbleInfo[0]}**");
+                        else marbles.AppendLine($"**{marbleInfo[0]}** [{user.Username}#{user.Discriminator}]");
                     }
                 }
             }
-            if (marbles.ToString().IsEmpty())
+
+            var output = marbles.ToString();
+            if (output.IsEmpty())
                 await context.Channel.SendMessageAsync("No-one is signed up!");
             else
-            {
-                builder.AddField("Contestants", marbles.ToString());
-                builder.WithFooter("Contestant count: " + count)
-                    .WithTitle($"Marble {GameName(gameType)}: Contestants");
-                await context.Channel.SendMessageAsync(embed: builder.Build());
-            }
+                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    .WithColor(GetColor(context))
+                    .WithCurrentTimestamp()
+                    .WithFooter($"Contestant count: {count}")
+                    .WithTitle($"Marble {GameName(gameType)}: Contestants")
+                    .AddField("Contestants", output)
+                    .Build());
         }
 
         /// <summary> Shows leaderboards for mb/race and mb/siege. </summary>
@@ -137,7 +138,7 @@ namespace MarbleBot.Modules
             {
                 if (itemPair.Item1 > maxValue) break;
                 if (itemPair.Item1 < maxValue + 1 && itemPair.Item1 >= minValue)
-                    output.AppendLine($"{itemPair.Item1 }{itemPair.Item1.Ordinal()}: {itemPair.Item2} {itemPair.Item3}");
+                    output.AppendLine($"{itemPair.Item1}{itemPair.Item1.Ordinal()}: {itemPair.Item2} {itemPair.Item3}");
             }
             if (output.Length > 2048) return string.Concat(output.ToString().Take(2048));
             return output.ToString();

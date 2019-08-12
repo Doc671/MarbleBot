@@ -250,7 +250,7 @@ namespace MarbleBot.Modules
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp();
 
-                if (!SiegeInfo.ContainsKey(fileId) && !SiegeInfo[fileId].Active)
+                if (!SiegeInfo.ContainsKey(fileId) || !SiegeInfo[fileId].Active)
                 {
                     await ReplyAsync("There is no currently ongoing Siege!");
                     return;

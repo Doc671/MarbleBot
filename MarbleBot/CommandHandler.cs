@@ -48,14 +48,16 @@ namespace MarbleBot
             if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate || 
                 server.UsableChannels.Count == 0 || server.UsableChannels.Contains(context.Channel.Id))) {
                 var result = await _service.ExecuteAsync(context, argPos, null);
-                
-                if (!result.IsSuccess && result.Error != CommandError.UnknownCommand)
-                    await Program.Log($"{result.Error.Value}: {result.ErrorReason}");
 
-                switch (result.Error) 
+                if (!result.IsSuccess)
                 {
-                    case CommandError.BadArgCount: await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command."); break;
-                    case CommandError.UnmetPrecondition: await context.Channel.SendMessageAsync("Insufficient permissions."); break;
+                    switch (result.Error)
+                    {
+                        case CommandError.BadArgCount: await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command."); break;
+                        case CommandError.UnknownCommand: break;
+                        case CommandError.UnmetPrecondition: await context.Channel.SendMessageAsync("Insufficient permissions."); break;
+                        default: await Program.Log($"{result.Error.Value}: {result.ErrorReason}"); break;
+                    }
                 }
 
             } else if (!context.IsPrivate && server.AutoresponseChannel == context.Channel.Id
