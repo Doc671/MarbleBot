@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MarbleBot.Core
 {
     /// <summary> Represents a user when using money or item-based commands. </summary>
-    public class MBUser
+    public class MarbleBotUser
     {
         /// <summary> The name of the user. </summary>
         public string Name { get; set; } = "";

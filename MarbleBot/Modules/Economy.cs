@@ -23,15 +23,14 @@ namespace MarbleBot.Modules
         [Summary("Returns how much money you or someone else has.")]
         public async Task BalanceCommandAsync([Remainder] string searchTerm = "")
         {
-            await Context.Channel.TriggerTypingAsync();
-            var user = new MBUser();
+            var user = new MarbleBotUser();
             var id = Context.User.Id;
             if (searchTerm.IsEmpty()) user = GetUser(Context);
             else
             {
                 string json;
                 using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
                 || searchTerm.ToLower().Contains(usr.Value.Discriminator)).Last();
@@ -53,7 +52,6 @@ namespace MarbleBot.Modules
         [Summary("Buys items.")]
         public async Task BuyCommandAsync(string rawID, string rawNo = "1")
         {
-            await Context.Channel.TriggerTypingAsync();
             if (int.TryParse(rawNo, out int noOfItems) && noOfItems > 0)
             {
                 var item = GetItem(rawID);
@@ -92,7 +90,6 @@ namespace MarbleBot.Modules
         [Summary("Crafts an item out of other items.")]
         public async Task CraftCommandAsync(string searchTerm, string rawNo = "1")
         {
-            await Context.Channel.TriggerTypingAsync();
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (user.Items.ContainsKey(17) || user.Items.ContainsKey(62))
@@ -149,7 +146,6 @@ namespace MarbleBot.Modules
         [Summary("Returns a list of all items that can be crafted with the user's inventory.")]
         public async Task CraftableCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             var user = GetUser(Context);
             var output = new StringBuilder();
             var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
@@ -183,7 +179,6 @@ namespace MarbleBot.Modules
         [Summary("Gives daily Units of Money (200 to the power of (your streak / 100 - 1)).")]
         public async Task DailyCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (DateTime.UtcNow.Subtract(user.LastDaily).TotalHours > 24)
@@ -221,7 +216,6 @@ namespace MarbleBot.Modules
         [Summary("Turns a crafted item back into its ingredients.")]
         public async Task DecraftCommandAsync(string searchTerm, string rawNo = "1")
         {
-            await Context.Channel.TriggerTypingAsync();
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (user.Items.ContainsKey(17) || user.Items.ContainsKey(62))
@@ -233,11 +227,13 @@ namespace MarbleBot.Modules
                     await ReplyAsync($"**{Context.User.Username}**, you cannot dismantle this item!");
                     return;
                 }
+
                 if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(62))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, your Crafting Station is not advanced enough to dismantle this item!");
                     return;
                 }
+
                 if (requestedItem.CraftingRecipe.Count > 0)
                 {
                     if (user.Items.ContainsKey(requestedItem.Id) && user.Items[requestedItem.Id] >= noOfItems)
@@ -278,23 +274,27 @@ namespace MarbleBot.Modules
         [Summary("Shows all the items a user has.")]
         public async Task InventoryCommandAsync([Remainder] string rawSearchTerm = "")
         {
-            var user = new MBUser();
+            var user = new MarbleBotUser();
             var id = Context.User.Id;
             var searchTermParts = rawSearchTerm.Split(' ');
             int page = 1;
             var name = new StringBuilder();
+
             for (int i = 0; i < searchTermParts.Length; i++)
             {
                 string part = searchTermParts[i];
                 if (!int.TryParse(part, out page))
                     name.Append($"{part}{(i == searchTermParts.Length - 2 ? "" : " ")}");
-                    page = page == 0 ? 1 : page;
             }
+
+            page = page == 0 ? 1 : page;
+
             if (page < 1)
             {
                 await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
                 return;
             }
+
             var searchTerm = name.ToString();
             if (searchTerm.IsEmpty())
             {
@@ -309,7 +309,7 @@ namespace MarbleBot.Modules
             {
                 string json;
                 using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
                 || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
@@ -352,7 +352,6 @@ namespace MarbleBot.Modules
         [Summary("Returns information about an item.")]
         public async Task ItemCommandAsync([Remainder] string searchTerm)
         {
-            await Context.Channel.TriggerTypingAsync();
             var item = GetItem(searchTerm);
             if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
             else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
@@ -413,7 +412,6 @@ namespace MarbleBot.Modules
         [Summary("Calculates the total price of Poup Soop.")]
         public async Task PoupSoopCalcCommandAsync([Remainder] string msg)
         {
-            await Context.Channel.TriggerTypingAsync();
             var splitMsg = msg.Split('|');
             var totalCost = 0m;
             var builder = new EmbedBuilder()
@@ -449,15 +447,14 @@ namespace MarbleBot.Modules
         [Summary("Returns the profile of you or someone else.")]
         public async Task ProfileCommandAsync([Remainder] string searchTerm = "")
         {
-            await Context.Channel.TriggerTypingAsync();
-            var user = new MBUser();
+            var user = new MarbleBotUser();
             var id = Context.User.Id;
             if (searchTerm.IsEmpty()) user = GetUser(Context);
             else
             {
                 string json;
                 using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
                 || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
@@ -570,16 +567,15 @@ namespace MarbleBot.Modules
         [Summary("Shows the ten richest people globally by Net Worth.")]
         public async Task RichListCommandAsync(string rawPage = "1")
         {
-            await Context.Channel.TriggerTypingAsync();
             if (!int.TryParse(rawPage, out int page)) await ReplyAsync($"**{Context.User.Username}**, this is not a valid integer!");
             else if (page < 1) await ReplyAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
             else
             {
                 string json;
                 using (var userFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = userFile.ReadToEnd();
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MBUser>>(json);
+                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
                 var richList = from user in rawUsers orderby user.Value.NetWorth descending select user.Value;
-                var dataList = new List<(int, MBUser)>();
+                var dataList = new List<(int, MarbleBotUser)>();
                 int displayedPlace = 0;
                 decimal lastValue = 0m;
                 foreach (var user in richList)
@@ -619,7 +615,6 @@ namespace MarbleBot.Modules
         [Summary("Sells items.")]
         public async Task SellCommandAsync(string rawID, string rawNo = "1")
         {
-            await Context.Channel.TriggerTypingAsync();
             if (int.TryParse(rawNo, out int noOfItems) && noOfItems > 0)
             {
                 var item = GetItem(rawID);
@@ -648,7 +643,6 @@ namespace MarbleBot.Modules
         [Summary("Shows all items available for sale, their IDs and their prices.")]
         public async Task ShopCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             var output = new StringBuilder();
             string json;
             using (var userFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = userFile.ReadToEnd();

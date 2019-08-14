@@ -2,7 +2,6 @@
 using Discord.WebSocket;
 using MarbleBot.Core;
 using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -33,20 +32,24 @@ namespace MarbleBot
 
             int argPos = 0;
 
-            var server = new MBServer(0);
+            var server = new MarbleBotServer(0);
 
-            if (!context.IsPrivate) 
+            if (!context.IsPrivate)
             {
                 if (Global.Servers.Value.Any(sr => sr.Id == context.Guild.Id))
-                    server =  MarbleBotModule.GetServer(context);
-                else {
-                    server = new MBServer(context.Guild.Id);
+                    server = MarbleBotModule.GetServer(context);
+                else
+                {
+                    server = new MarbleBotServer(context.Guild.Id);
                     Global.Servers.Value.Add(server);
                 }
             }
 
-            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate || 
-                server.UsableChannels.Count == 0 || server.UsableChannels.Contains(context.Channel.Id))) {
+            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate ||
+                server.UsableChannels.Count == 0 || server.UsableChannels.Contains(context.Channel.Id)))
+            {
+
+                await context.Channel.TriggerTypingAsync();
                 var result = await _service.ExecuteAsync(context, argPos, null);
 
                 if (!result.IsSuccess)
@@ -60,19 +63,17 @@ namespace MarbleBot
                     }
                 }
 
-            } else if (!context.IsPrivate && server.AutoresponseChannel == context.Channel.Id
-                && DateTime.UtcNow.Subtract(Global.AutoresponseLastUse).TotalSeconds > 2) {
-                var autoresponses = new System.Collections.Generic.List<string>();
-                using (var autoresponseFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
+            }
+            else if (!context.IsPrivate && server.AutoresponseChannel == context.Channel.Id
+              && DateTime.UtcNow.Subtract(Global.AutoresponseLastUse).TotalSeconds > 2)
+            {
+                foreach (var response in Global.Autoresponses)
                 {
-                    while (!autoresponseFile.EndOfStream)
-                        autoresponses.Add(autoresponseFile.ReadLine());
-                }
-                foreach (var response in autoresponses) {
-                    var responseArray = response.Split(';');
-                    if (string.Compare(context.Message.Content, responseArray[0], true) == 0) {
+                    if (string.Compare(context.Message.Content, response.Key, true) == 0)
+                    {
                         Global.AutoresponseLastUse = DateTime.UtcNow;
-                        await context.Channel.SendMessageAsync(responseArray[1]); break;
+                        await context.Channel.SendMessageAsync(response.Value);
+                        break;
                     }
                 }
             }

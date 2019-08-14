@@ -36,7 +36,6 @@ namespace MarbleBot.Modules
             [RequireSlowmode]
             public async Task SiegeStartCommandAsync([Remainder] string over = "")
             {
-                await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
 
                 if (SiegeInfo.ContainsKey(fileId) && SiegeInfo[fileId].Active)
@@ -150,7 +149,6 @@ namespace MarbleBot.Modules
             [RequireSlowmode]
             public async Task SiegeAttackCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -244,7 +242,6 @@ namespace MarbleBot.Modules
             [RequireSlowmode]
             public async Task SiegeGrabCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))

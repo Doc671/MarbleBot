@@ -24,7 +24,6 @@ namespace MarbleBot.Modules
         public async Task SevenBallCommandAsync([Remainder] string input)
 #pragma warning restore IDE0060 // Remove unused parameter
         {
-            await Context.Channel.TriggerTypingAsync();
             string outcome = Rand.Next(0, 13) switch
             {
                 0 => "no.",
@@ -50,7 +49,6 @@ namespace MarbleBot.Modules
         [Summary("Gives advice on progression.")]
         public async Task AdviceCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             var user = GetUser(Context);
             string msg;
             if (user.Items.ContainsKey(78))
@@ -125,7 +123,6 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task BestCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             if (Context.Guild.MemberCount > 1)
             {
                 string[] names = new string[Context.Guild.MemberCount];
@@ -140,7 +137,6 @@ namespace MarbleBot.Modules
         [Summary("Bets on a marble.")]
         public async Task BetCommandAsync(string no)
         {
-            await Context.Channel.TriggerTypingAsync();
             int noOfMarbles = int.Parse(no);
             if (noOfMarbles > 100) await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
             else if (noOfMarbles < 1) await ReplyAsync("The number you gave is too small.");
@@ -167,10 +163,8 @@ namespace MarbleBot.Modules
         [Remarks("Not CM")]
         public async Task BuyHatCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             if (Context.Guild.Id != CM)
             {
-                await Context.Channel.TriggerTypingAsync();
                 var price = Rand.Next(0, int.MaxValue);
                 var hatNo = Rand.Next(0, 69042);
                 await ReplyAsync($"That'll be **{price}** units of money please. Thank you for buying Uglee Hat #**{hatNo}**!");
@@ -181,7 +175,6 @@ namespace MarbleBot.Modules
         [Summary("Chooses between several provided choices.")]
         public async Task ChooseCommandAsync([Remainder] string input)
         {
-            await Context.Channel.TriggerTypingAsync();
             string[] choices = input.Split('|');
             int choice = Rand.Next(0, choices.Length);
             if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(choices[choice])))
@@ -201,7 +194,6 @@ namespace MarbleBot.Modules
         [Remarks("Not CM")]
         public async Task OrangeCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             await base.ReplyAsync((Rand.Next(1, 6)) switch
             {
                 1 => "!olleH",
@@ -218,7 +210,6 @@ namespace MarbleBot.Modules
         [Remarks("Not CM")]
         public async Task OrangeifyCommandAsync([Remainder] string input)
         {
-            await Context.Channel.TriggerTypingAsync();
             var orangeified = new StringBuilder();
             int length = input.Length - 1;
             while (length >= 0)
@@ -242,7 +233,6 @@ namespace MarbleBot.Modules
         [Summary("Returns a random number with user-defined bounds.")]
         public async Task RandomCommandAsync(string rStart, string rEnd)
         {
-            await Context.Channel.TriggerTypingAsync();
             var start = rStart.ToInt();
             var end = rEnd.ToInt();
             if (start < 0 || end < 0) await ReplyAsync("Only use positive numbers!");
@@ -278,7 +268,6 @@ namespace MarbleBot.Modules
         [Summary("Returns a randomised level and XP count.")]
         public async Task RankCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             EmbedBuilder builder = new EmbedBuilder();
             int level = Rand.Next(0, 25);
             int xp = level * 100 * Rand.Next(1, 5);
@@ -333,7 +322,6 @@ namespace MarbleBot.Modules
         [Summary("Rates something out of 10.")]
         public async Task RateCommandAsync([Remainder] string input)
         {
-            await Context.Channel.TriggerTypingAsync();
             var lowerInput = input.ToLower();
             string message = "";
             int rating = Rand.Next(0, 11);
@@ -372,22 +360,22 @@ namespace MarbleBot.Modules
 
             if (message.Length == 0)
             {
-                switch (rating)
+                message = rating switch
                 {
                     // If there isn't already a custom message, pick one depending on rating:
-                    case 0: message = "Excuse me, kind user, please cease your current course of action immediately."; break;
-                    case 1: message = "Immediate desistance required."; break;
-                    case 2: message = "I don't like it..."; break;
-                    case 3: message = ">:("; break;
-                    case 4: message = "ehhh..."; break;
-                    case 5: message = "not bad... but not good either"; break;
-                    case 6: message = "slightly above average... I guess..."; break;
-                    case 7: message = "pretty cool, don't you think?"; break;
-                    case 8: message = "yes"; break;
-                    case 9: message = "approaching perfection"; break;
-                    case 10: message = "PERFECT!!"; break;
-                    default: message = "Uhhhhhhhh\nNot"; break;
-                }
+                    0 => "Excuse me, kind user, please cease your current course of action immediately.",
+                    1 => "Immediate desistance required.",
+                    2 => "I don't like it...",
+                    3 => ">:(",
+                    4 => "ehhh...",
+                    5 => "not bad... but not good either",
+                    6 => "slightly above average... I guess...",
+                    7 => "pretty cool, don't you think?",
+                    8 => "yes",
+                    9 => "approaching perfection",
+                    10 => "PERFECT!!",
+                    _ => "Uhhhhhhhh\nNot",
+                };
             }
 
             if (rating == -2) await ReplyAsync($"**{Context.User.Username}**, I rATE {input} UNd3FINED10. {emoji}\n({message})");
@@ -410,7 +398,6 @@ namespace MarbleBot.Modules
         [Summary("Repeats the given message.")]
         public async Task RepeatCommandAsync([Remainder] string repeat)
         {
-            await Context.Channel.TriggerTypingAsync();
             if (repeat == "Am Melmon") await ReplyAsync("No U");
             else if (await Moderation.CheckSwearAsync(repeat))
             {
@@ -428,7 +415,6 @@ namespace MarbleBot.Modules
         [Summary("Returns the user input reversed.")]
         public async Task ReverseCommandAsync([Remainder] string input)
         {
-            await Context.Channel.TriggerTypingAsync();
             // Another version of orangeify, but for CM (can secretly be used elsewhere)
             var reverse = new StringBuilder();
             int length = input.Length - 1;

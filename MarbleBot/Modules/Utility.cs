@@ -27,9 +27,9 @@ namespace MarbleBot.Modules
                 .AddField("Ongoing Scavenges", ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", SiegeInfo.Count, true)
                 .AddField("Ongoing Wars", WarInfo.Count, true)
-                .AddField("Servers", Global.Servers.Value.Count, true)
-                .AddField("Start Time (UTC)", StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss"), true)
-                .AddField("Uptime", DateTime.UtcNow.Subtract(StartTime.Value).ToString(), true)
+                .AddField("Servers", Servers.Value.Count, true)
+                .AddField("Start Time (UTC)", StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
+                .AddField("Uptime", DateTime.UtcNow.Subtract(StartTime).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -41,7 +41,6 @@ namespace MarbleBot.Modules
         [Summary("Gives the user help.")]
         public async Task HelpCommandAsync([Remainder] string command = "")
         {
-            await Context.Channel.TriggerTypingAsync();
             var builder = new EmbedBuilder()
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context));
@@ -173,7 +172,6 @@ namespace MarbleBot.Modules
         [Remarks("Not DMs")]
         public async Task ServerInfoCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             if (!Context.IsPrivate)
             {
                 EmbedBuilder builder = new EmbedBuilder();
@@ -229,7 +227,6 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task StaffCheckCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             var output = new StringBuilder();
             foreach (var user in Context.Guild.Users)
             {
@@ -248,7 +245,8 @@ namespace MarbleBot.Modules
                     else
                         output.AppendLine($"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
                 }
-            }   
+            }
+            await ReplyAsync(output.ToString());
         }
 
         [Command("uptime")]
@@ -263,7 +261,6 @@ namespace MarbleBot.Modules
         {
             if (!Context.IsPrivate)
             {
-                await Context.Channel.TriggerTypingAsync();
                 EmbedBuilder builder = new EmbedBuilder();
                 SocketGuildUser user = (SocketGuildUser)Context.User;
                 var userFound = true;

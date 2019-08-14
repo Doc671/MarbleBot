@@ -22,7 +22,7 @@ namespace MarbleBot.Core
         /// <summary> The location of the scavenge. </summary>
         public ScavengeLocation Location { get; set; }
         /// <summary> The ores currently available during the game. </summary>
-        public Queue<Item> OreItems { get; set; } = new Queue<Item>();
+        public Queue<Item> Ores { get; set; } = new Queue<Item>();
         /// <summary> The original message sent to modify. </summary>
 
         private bool _disposed = false;
@@ -75,7 +75,7 @@ namespace MarbleBot.Core
                 {
                     var item = collectableItems[Global.Rand.Next(0, collectableItems.Count)];
                     if (item.Name.Contains("Ore"))
-                        OreItems.Enqueue(item);
+                        Ores.Enqueue(item);
                     else
                         Items.Enqueue(item);
                     await UpdateEmbedAsync();
@@ -112,7 +112,7 @@ namespace MarbleBot.Core
 
             first = false;
             var oreOutput = new StringBuilder();
-            foreach (var ore in OreItems)
+            foreach (var ore in Ores)
             {
                 oreOutput.AppendLine(first || gameEnded ? ore.Name : $"**{ore.Name}**");
                 first = true;
@@ -123,10 +123,10 @@ namespace MarbleBot.Core
                 fields.Add(new EmbedFieldBuilder()
                     .WithName("Items")
                     .WithValue($"{itemOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"));
-            if (OreItems.Count > 0)
+            if (Ores.Count > 0)
                 fields.Add(new EmbedFieldBuilder()
-                    .WithName("Ore Items")
-                    .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded item to your inventory. A drill is required to drill ores.")}"));
+                    .WithName("Ores")
+                    .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}"));
 
             var embed = _originalMessage.Embeds.First();
             await _originalMessage.ModifyAsync(m => m.Embed = new EmbedBuilder()
@@ -134,10 +134,10 @@ namespace MarbleBot.Core
                 Color = embed.Color,
                 Description = gameEnded ? stage == 1 ? "The scavenge session is over! Any remaining items have been added to your inventory!" 
                     : "The scavenge session is over! Any remaining non-ore items have been added to your inventory!" 
-                    : embed.Description,
+                    : "Scavenge session ongoing.",
                 Fields = fields,
                 Timestamp = embed.Timestamp,
-                Title = embed.Title
+                Title = $"Item Scavenge: {Enum.GetName(typeof(ScavengeLocation), Location)}"
             }.Build());
         }
 

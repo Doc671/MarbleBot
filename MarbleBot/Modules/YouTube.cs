@@ -21,16 +21,19 @@ namespace MarbleBot.Modules
         [Summary("Returns information about a channel.")]
         public async Task ChannelInfoCommandAsync([Remainder] string searchTerm)
         {
-            await Context.Channel.TriggerTypingAsync();
-            //Channel display;
+            // Channel display;
 
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            SearchResource.ListRequest searchListRequest;
+
+            using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
-            });
+            }))
+            {
+                searchListRequest = youtubeService.Search.List("snippet");
+            }
 
-            var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
             var searchListResult = (await searchListRequest.ExecuteAsync()).Items.First();
@@ -69,26 +72,33 @@ namespace MarbleBot.Modules
                 }
                 if (validUser)
                 {
-                    var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                    SearchResource.ListRequest searchListRequest;
+                    using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
                         ApiKey = YTKey,
                         ApplicationName = GetType().ToString()
-                    });
-                    var searchListRequest = youtubeService.Search.List("snippet");
+                    }))
+                    {
+                        searchListRequest = youtubeService.Search.List("snippet");
+                    }
+
                     searchListRequest.Q = channelLink;
                     searchListRequest.MaxResults = 10;
                     var searchListResponse = await searchListRequest.ExecuteAsync();
                     var channel = new SearchResultSnippet();
+
                     foreach (var res in searchListResponse.Items)
                     {
                         if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0) channel = res.Snippet;
                     }
+
                     if (channel == null)
                     {
                         searchListRequest.Q = Context.User.Username;
                         foreach (var res in searchListResponse.Items)
                             if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0) channel = res.Snippet;
                     }
+
                     searchListRequest.Q = url;
                     searchListResponse = await searchListRequest.ExecuteAsync();
                     var video = searchListResponse.Items[0].Snippet;
@@ -104,6 +114,7 @@ namespace MarbleBot.Modules
                                 var CV = (IMessageChannel)Context.Client.GetGuild(CM).GetChannel(442474624417005589);
                                 var msgs = await CV.GetMessagesAsync(100).FlattenAsync();
                                 var already = false;
+
                                 foreach (var msg in msgs)
                                 {
                                     if (msg.Content.Contains(url))
@@ -112,6 +123,7 @@ namespace MarbleBot.Modules
                                         break;
                                     }
                                 }
+
                                 if (already) await ReplyAsync("This video has already been posted!");
                                 else await CV.SendMessageAsync($"{desc}\n{url}");
                             }
@@ -131,18 +143,21 @@ namespace MarbleBot.Modules
         [Summary("Displays a list of channels that match the search criteria.")]
         public async Task SearchChannelCommandAsync([Remainder] string searchTerm)
         {
-            await Context.Channel.TriggerTypingAsync();
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            SearchResource.ListRequest searchListRequest;
+
+            using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
-            });
+            }))
+            {
+                searchListRequest = youtubeService.Search.List("snippet");
+            }
 
-            int profaneCount = 0;
-
-            var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
+
+            int profaneCount = 0;
 
             // Call the search.list method to retrieve results matching the specified query term.
             var searchListResponse = await searchListRequest.ExecuteAsync();
@@ -178,18 +193,21 @@ namespace MarbleBot.Modules
         [Summary("Displays a list of videos that match the search critera.")]
         public async Task SearchVideoCommandAsync([Remainder] string searchTerm)
         {
-            await Context.Channel.TriggerTypingAsync();
-            var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            SearchResource.ListRequest searchListRequest;
+
+            using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
-            });
+            }))
+            {
+                searchListRequest = youtubeService.Search.List("snippet");
+            }
 
-            int profaneCount = 0;
-
-            var searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
+
+            int profaneCount = 0;
 
             // Call the search.list method to retrieve results matching the specified query term.
             var searchListResponse = await searchListRequest.ExecuteAsync();

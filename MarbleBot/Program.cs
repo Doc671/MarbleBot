@@ -38,7 +38,7 @@ namespace MarbleBot
         {
             Console.Title = "MarbleBot";
 
-            Global.StartTime = new Lazy<DateTime>(() => DateTime.UtcNow);
+            Global.StartTime = DateTime.UtcNow;
             _client = new DiscordSocketClient();
 
             string token = "";
@@ -50,12 +50,21 @@ namespace MarbleBot
                 string json;
                 using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
                     json = await users.ReadToEndAsync();
-                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MBServer>>(json);
+                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotServer>>(json);
                 foreach (var server in allServers)
                 {
                     var server2 = server.Value;
                     server2.Id = server.Key;
                     Global.Servers.Value.Add(server2);
+                }
+            }
+
+            using (var autoresponseFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
+            {
+                while (!autoresponseFile.EndOfStream)
+                {
+                    var autoresponsePair = (await autoresponseFile.ReadLineAsync()).Split(';');
+                    Global.Autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
                 }
             }
 
@@ -82,7 +91,7 @@ namespace MarbleBot
 
             await _client.SetGameAsync("Try mb/help!");
 
-            await Log($"MarbleBot by Doc671\nStarted running: {Global.StartTime.Value.ToString("yyyy-MM-dd HH:mm:ss")}\n", true);
+            await Log($"MarbleBot by Doc671\nStarted running: {Global.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}\n", true);
 
             _handler = new CommandHandler(_client);
 

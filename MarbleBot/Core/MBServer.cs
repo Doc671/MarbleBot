@@ -5,7 +5,7 @@ using System.Linq;
 namespace MarbleBot.Core
 {   
     /// <summary> Represents a server. </summary>
-    public class MBServer
+    public class MarbleBotServer
     {
         /// <summary> The ID of the server. </summary>
         public ulong Id { get; set; }
@@ -22,7 +22,7 @@ namespace MarbleBot.Core
 
         /// <summary> Represents a server. </summary>
         /// <param name="id"> The ID of the server. </param>
-        public MBServer(ulong id)
+        public MarbleBotServer(ulong id)
         {
             Id = id;
             AnnouncementChannel = 0;
@@ -40,7 +40,7 @@ namespace MarbleBot.Core
         /// <param name="roles"> The role list roles of the server. </param>
         /// <param name="usableChannels"> The channels where commands can be used. If empty, commands can be used anywhere in the server. </param>
         [JsonConstructor]
-        public MBServer(ulong id, ulong announcementChannel, ulong autoresponseChannel, string color, IEnumerable<ulong> roles, IEnumerable<ulong> usableChannels)
+        public MarbleBotServer(ulong id, ulong announcementChannel, ulong autoresponseChannel, string color, IEnumerable<ulong> roles, IEnumerable<ulong> usableChannels)
         {
             Id = id;
             AnnouncementChannel = announcementChannel;

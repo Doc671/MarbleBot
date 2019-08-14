@@ -29,7 +29,6 @@ namespace MarbleBot.Modules
         /// <param name="gameType"> The type of game. </param>
         internal static async Task CheckearnAsync(SocketCommandContext context, GameType gameType)
         {
-            await context.Channel.TriggerTypingAsync();
             var user = GetUser(context);
             var lastWin = gameType switch
             {
@@ -55,7 +54,6 @@ namespace MarbleBot.Modules
         /// <param name="gameType"> The type of game. </param>
         internal static async Task ClearAsync(SocketCommandContext context, GameType gameType)
         {
-            await context.Channel.TriggerTypingAsync();
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             if (context.User.Id == 224267581370925056 || context.IsPrivate)
             {
@@ -71,7 +69,6 @@ namespace MarbleBot.Modules
         /// <param name="gameType"> The type of game. </param>
         internal static async Task ContestantsAsync(SocketCommandContext context, GameType gameType)
         {
-            await context.Channel.TriggerTypingAsync();
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
             if (!File.Exists(marbleListDirectory))
@@ -203,7 +200,6 @@ namespace MarbleBot.Modules
         internal static async Task SignupAsync(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
             Func<Task> startCommand, string itemId = "")
         {
-            await context.Channel.TriggerTypingAsync();
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
             if (!File.Exists(marbleListDirectory)) File.Create(marbleListDirectory).Close();
@@ -226,12 +222,14 @@ namespace MarbleBot.Modules
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, this item cannot be used as a weapon!");
                         return;
                     }
+
                     var user = GetUser(context);
                     if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] < 1)
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, you don't have this item!");
                         return;
                     }
+
                     if (WarInfo.ContainsKey(fileId))
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, a battle is currently ongoing!");
@@ -271,7 +269,8 @@ namespace MarbleBot.Modules
             using (var marbleList = new StreamReader(marbleListDirectory, true))
                 marbleNo = (await marbleList.ReadToEndAsync()).Split('\n').Length;
             await context.Channel.SendMessageAsync(embed: builder.Build());
-            if (marbleNo > marbleLimit - 1)
+
+            if (marbleNo > marbleLimit)
             {
                 await context.Channel.SendMessageAsync($"The limit of {marbleLimit} contestants has been reached!");
                 await startCommand();

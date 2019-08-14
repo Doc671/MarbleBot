@@ -16,38 +16,31 @@ namespace MarbleBot.Core
     /// <summary> Represents a siege game. </summary>
     public class Siege : IDisposable
     {
+        /// <summary> The siege game. </summary>
         public Task Actions { get; set; }
+        /// <summary> Whether the siege is active. </summary>
         public bool Active { get; set; } = true;
+        /// <summary> The boss that the marbles are fighting. </summary>
         public Boss Boss { get; set; } = Boss.Empty;
+        /// <summary> The number which marble damage is multiplied by. </summary>
         public double DamageMultiplier => (1.0 + (Marbles.Aggregate(0, (totalDeaths, m) =>
                                                         {
                                                             if (m.HP < 1) totalDeaths++;
                                                             return totalDeaths;
                                                         }) * 0.2)) * (Morales + 1);
+        /// <summary> The ID of the user's DM or server where the siege is being played. </summary>
         public ulong Id { get; }
+        /// <summary> The last time a Morale Boost power-up was activated. </summary>
         public DateTime LastMorale { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
+        /// <summary> The marbles (player characters) fighting the boss. </summary>
         public List<SiegeMarble> Marbles { get; set; } = new List<SiegeMarble>();
+        /// <summary> The number of Morale Boost power-ups active. </summary>
         public int Morales { get; set; }
-        private PowerUp powerUp;
-        public PowerUp PowerUp {
-            get => powerUp;
-            set
-            {
-                powerUp = value;
-                PUImageUrl = value switch
-                {
-                    PowerUp.Clone => "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
-                    PowerUp.Cure => "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
-                    PowerUp.Heal => "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
-                    PowerUp.MoraleBoost => "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
-                    PowerUp.Overclock => "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
-                    PowerUp.Summon => "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
-                    _ => ""
-                };
-            }
-        }
-        public string PUImageUrl { get; private set; } = "";
-        public bool VictoryCalled { get; set; }
+        /// <summary> The current power-up that can be grabbed. </summary>
+        public PowerUp PowerUp { get; set; }
+
+        private bool _disposed = false;
+        private bool _victoryCalled = false;
 
         public async Task DealDamageAsync(SocketCommandContext context, int dmg)
         {
@@ -55,7 +48,6 @@ namespace MarbleBot.Core
             if (Boss.HP < 1) await SiegeVictoryAsync(context);
         }
 
-        private bool _disposed = false;
         public void Dispose() => Dispose(true);
 
         private void Dispose(bool disposing)
@@ -179,7 +171,7 @@ namespace MarbleBot.Core
                 if (_disposed) return;
                 else if (Boss.HP < 1)
                 {
-                    if (!VictoryCalled) await SiegeVictoryAsync(context);
+                    if (!_victoryCalled) await SiegeVictoryAsync(context);
                     break;
                 }
                 else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 20)
@@ -279,30 +271,42 @@ namespace MarbleBot.Core
                     // Cause new power-up to appear
                     if (PowerUp == PowerUp.None)
                     {
+                        string GetPowerUpImageUrl()
+                        => PowerUp switch
+                        {
+                            PowerUp.Clone => "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
+                            PowerUp.Cure => "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
+                            PowerUp.Heal => "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
+                            PowerUp.MoraleBoost => "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
+                            PowerUp.Overclock => "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
+                            PowerUp.Summon => "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
+                            _ => ""
+                        };
+
                         switch (Global.Rand.Next(0, 8))
                         {
                             case 1:
                                 PowerUp = PowerUp.Clone;
                                 builder.AddField("Power-up spawned!", "A **Clone** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(PUImageUrl);
+                                    .WithThumbnailUrl(GetPowerUpImageUrl());
                                 break;
                             case 2:
                                 if (Marbles.Any(m => m.StatusEffect != StatusEffect.None))
                                 {
                                     PowerUp = PowerUp.Cure;
                                     builder.AddField("Power-up spawned!", "A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                        .WithThumbnailUrl(PUImageUrl);
+                                        .WithThumbnailUrl(GetPowerUpImageUrl());
                                 }
                                 break;
                             case 4:
                                 PowerUp = PowerUp.MoraleBoost;
                                 builder.AddField("Power-up spawned!", "A **Morale Boost** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(PUImageUrl);
+                                    .WithThumbnailUrl(GetPowerUpImageUrl());
                                 break;
                             case 6:
                                 PowerUp = PowerUp.Summon;
                                 builder.AddField("Power-up spawned!", "A **Summon** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(PUImageUrl);
+                                    .WithThumbnailUrl(GetPowerUpImageUrl());
                                 break;
                         }
                     }
@@ -334,8 +338,8 @@ namespace MarbleBot.Core
 
         public async Task SiegeVictoryAsync(SocketCommandContext context)
         {
-            if (VictoryCalled) return;
-            VictoryCalled = true;
+            if (_victoryCalled) return;
+            _victoryCalled = true;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp()

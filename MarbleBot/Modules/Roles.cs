@@ -16,7 +16,6 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GiveRoleCommandAsync([Remainder] string roleName)
         {
-            await Context.Channel.TriggerTypingAsync();
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
@@ -37,7 +36,6 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakeRoleCommandAsync([Remainder] string roleName)
         {
-            await Context.Channel.TriggerTypingAsync();
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
@@ -58,7 +56,6 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task RoleToggleCommandAsync([Remainder] string roleName)
         {
-            await Context.Channel.TriggerTypingAsync();
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
@@ -86,7 +83,6 @@ namespace MarbleBot.Modules
         [Summary("Shows a list of roles that can be given/taken by `mb/give` and `mb/take`.")]
         public async Task RoleListCommandAsync()
         {
-            await Context.Channel.TriggerTypingAsync();
             var output = new StringBuilder();
             var server = GetServer(Context);
             foreach (var role in server.Roles)

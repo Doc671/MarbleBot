@@ -34,7 +34,6 @@ namespace MarbleBot.Modules
             [Summary("Starts the marble race.")]
             public async Task RaceStartCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -159,7 +158,6 @@ namespace MarbleBot.Modules
             [Summary("Shows a leaderboard of most used marbles or winning marbles.")]
             public async Task RaceLeaderboardCommandAsync(string option, string rawPage = "1")
             {
-                await Context.Channel.TriggerTypingAsync();
                 if (int.TryParse(rawPage, out int page))
                 {
                     ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;

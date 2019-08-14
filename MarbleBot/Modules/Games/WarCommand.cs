@@ -36,7 +36,6 @@ namespace MarbleBot.Modules
             [RequireSlowmode]
             public async Task WarStartCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var marbles = new List<WarMarble>();
                 using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
@@ -155,7 +154,6 @@ namespace MarbleBot.Modules
             [RequireSlowmode]
             public async Task WarAttackCommandAsync([Remainder] string target)
             {
-                await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
@@ -233,7 +231,6 @@ namespace MarbleBot.Modules
             [RequireSlowmode]
             public async Task WarBonkCommandAsync([Remainder] string target)
             {
-                await Context.Channel.TriggerTypingAsync();
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();

@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Commands;
-using MarbleBot.Core;
 using MarbleBot.Extensions;
 using System.Collections.Generic;
 using System.Globalization;
@@ -37,7 +36,6 @@ namespace MarbleBot.Modules
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task ClearCommandAsync(uint amount)
         {
-            await Context.Channel.TriggerTypingAsync();
             var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).FlattenAsync();
             foreach (var msg in messages) await Context.Channel.DeleteMessageAsync(msg);
             const int delay = 5000;
@@ -153,7 +151,7 @@ namespace MarbleBot.Modules
             }
             server.Roles.Remove(id);
             WriteServers();
-            await ReplyAsync("Succesfully updated.");   
+            await ReplyAsync("Succesfully updated.");
         }
 
         [Command("setchannel")]

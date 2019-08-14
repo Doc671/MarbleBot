@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using MarbleBot.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -78,8 +77,8 @@ namespace MarbleBot.Modules
         public async Task FixBalanceCommandAsync()
         {
             var itemsObj = GetItemsObject();
-            var usersDict = GetUsersObject().ToObject<Dictionary<string, MBUser>>();
-            var newUsersDict = new Dictionary<string, MBUser>();
+            var usersDict = GetUsersObject().ToObject<Dictionary<string, MarbleBotUser>>();
+            var newUsersDict = new Dictionary<string, MarbleBotUser>();
             foreach (var userPair in usersDict)
             {
                 var user = userPair.Value;
@@ -107,7 +106,7 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            foreach (MBServer server in Servers.Value)
+            foreach (MarbleBotServer server in Servers.Value)
             {
                 if (server.AnnouncementChannel != 0)
                 {
@@ -168,12 +167,13 @@ namespace MarbleBot.Modules
         [Command("setstatus")]
         [RequireOwner]
         public async Task SetStatusCommandAsync(string status)
-        => await Context.Client.SetStatusAsync(status switch {
-                "idle" => UserStatus.Idle,
-                "dnd" => UserStatus.DoNotDisturb,
-                "invisible" => UserStatus.Invisible,
-                _ => UserStatus.Online
-            });
+        => await Context.Client.SetStatusAsync(status switch
+        {
+            "idle" => UserStatus.Idle,
+            "dnd" => UserStatus.DoNotDisturb,
+            "invisible" => UserStatus.Invisible,
+            _ => UserStatus.Online
+        });
 
         [Command("siegedict")]
         [RequireOwner]

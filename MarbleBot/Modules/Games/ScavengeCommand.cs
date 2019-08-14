@@ -20,9 +20,8 @@ namespace MarbleBot.Modules
         {
             private const GameType Type = GameType.Race;
 
-            public async Task ScavengeStartAsync(MBUser user, ScavengeLocation location)
+            public async Task ScavengeStartAsync(MarbleBotUser user, ScavengeLocation location)
             {
-                await Context.Channel.TriggerTypingAsync();
                 if (DateTime.UtcNow.Subtract(user.LastScavenge).TotalHours < 6)
                 {
                     var sixHoursAgo = DateTime.UtcNow.AddHours(-6);
@@ -91,7 +90,6 @@ namespace MarbleBot.Modules
             [Summary("Grabs an item found in a scavenge session.")]
             public async Task ScavengeGrabCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
 
@@ -131,16 +129,16 @@ namespace MarbleBot.Modules
             [Summary("Extracts an ore found in a scavenge session.")]
             public async Task ScavengeDrillCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
 
                 if (!ScavengeInfo.ContainsKey(Context.User.Id) || ScavengeInfo[Context.User.Id] == null)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
+                    return;
                 }
 
-                if (ScavengeInfo[Context.User.Id].OreItems.Count == 0)
+                if (ScavengeInfo[Context.User.Id].Ores.Count == 0)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, there is nothing to drill!");
                     return;
@@ -152,7 +150,7 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                var item = ScavengeInfo[Context.User.Id].OreItems.Dequeue();
+                var item = ScavengeInfo[Context.User.Id].Ores.Dequeue();
                 if (user.Items != null)
                 {
                     if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -174,11 +172,10 @@ namespace MarbleBot.Modules
             [Summary("Sells an item found in a scavenge session.")]
             public async Task ScavengeSellCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
 
-                if (ScavengeInfo.ContainsKey(Context.User.Id) || ScavengeInfo[Context.User.Id] == null)
+                if (!ScavengeInfo.ContainsKey(Context.User.Id) || ScavengeInfo[Context.User.Id] == null)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                     return;
@@ -201,7 +198,6 @@ namespace MarbleBot.Modules
             [Summary("Shows scavenge locations.")]
             public async Task ScavengeLocationCommandAsync()
             {
-                await Context.Channel.TriggerTypingAsync();
                 var stageTwoLocations = GetUser(Context).Stage > 1 ? "Destroyer's Remains\nViolet Volcanoes"
                     : $":lock: LOCKED\n:lock: LOCKED";
                 await ReplyAsync(embed: new EmbedBuilder()
@@ -220,7 +216,6 @@ namespace MarbleBot.Modules
 
             public async Task ScavengeInfoAsync(ScavengeLocation location)
             {
-                await Context.Channel.TriggerTypingAsync();
                 var output = new StringBuilder();
                 string json;
                 using (var users = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = users.ReadToEnd();
@@ -287,7 +282,6 @@ namespace MarbleBot.Modules
             [Summary("Scavenge help.")]
             public async Task ScavengeHelpCommandAsync([Remainder] string _ = "")
             {
-                await Context.Channel.TriggerTypingAsync();
                 var helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
                 var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
                 var helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
