@@ -12,7 +12,7 @@ namespace MarbleBot
         internal const ulong BotId = 286228526234075136;
         internal const string UoM = "<:unitofmoney:372385317581488128>";
         internal static DateTime AutoresponseLastUse { get; set; }
-        internal static Dictionary<string, string> Autoresponses { get; set; }
+        internal static Dictionary<string, string> Autoresponses { get; set; } = new Dictionary<string, string>();
         internal static CommandService CommandService { get; set; }
         internal static ushort DailyTimeout  { get; set; } = 48;
         internal static Random Rand { get; } = new Random();
