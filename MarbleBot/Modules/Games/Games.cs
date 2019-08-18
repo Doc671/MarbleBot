@@ -102,7 +102,7 @@ namespace MarbleBot.Modules
                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(context))
                     .WithCurrentTimestamp()
-                    .WithFooter($"Contestant count: {count}")
+                    .WithFooter($"Contestant count: {count - 1}")
                     .WithTitle($"Marble {GameName(gameType)}: Contestants")
                     .AddField("Contestants", output)
                     .Build());
@@ -204,6 +204,8 @@ namespace MarbleBot.Modules
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
             if (!File.Exists(marbleListDirectory)) File.Create(marbleListDirectory).Close();
 
+            var weapon = new Item();
+
             if (gameType == GameType.Siege || gameType == GameType.War)
             {
                 if (gameType == GameType.Siege)
@@ -222,15 +224,15 @@ namespace MarbleBot.Modules
                         return;
                     }
 
-                    var item = GetItem(itemId);
-                    if (item.WarClass == 0)
+                    weapon = GetItem(itemId);
+                    if (weapon.WarClass == 0)
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, this item cannot be used as a weapon!");
                         return;
                     }
 
                     var user = GetUser(context);
-                    if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] < 1)
+                    if (!user.Items.ContainsKey(weapon.Id) || user.Items[weapon.Id] < 1)
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, you don't have this item!");
                         return;
@@ -256,7 +258,8 @@ namespace MarbleBot.Modules
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
-                .AddField($"Marble {GameName(gameType)}: Signed up!", $"**{context.User.Username}** has successfully signed up as {(asteriskPresent ? "" : "**")}{marbleName}{(asteriskPresent ? "" : "**")}!");
+                .AddField($"Marble {GameName(gameType)}: Signed up!", 
+                    $"**{context.User.Username}** has successfully signed up as {(asteriskPresent ? "" : "**")}{marbleName}{(asteriskPresent ? "" : "**")}{(gameType == GameType.War ? $" with the weapon **{weapon.Name}**" : "")}!");
             using (var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
                 await racers.WriteLineAsync(marbleName);
 
