@@ -249,7 +249,7 @@ namespace MarbleBot.Modules
 
                 if (!SiegeInfo.ContainsKey(fileId) || !SiegeInfo[fileId].Active)
                 {
-                    await ReplyAsync("There is no currently ongoing Siege!");
+                    await ReplyAsync($"**{Context.User.Username}**, there is no currently ongoing Siege!");
                     return;
                 }
 
@@ -262,7 +262,7 @@ namespace MarbleBot.Modules
 
                 if (currentSiege.PowerUp == PowerUp.None)
                 {
-                    await ReplyAsync("There is no power-up to grab!");
+                    await ReplyAsync($"**{Context.User.Username}**, there is no power-up to grab!");
                     return;
                 }
 
