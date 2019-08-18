@@ -36,6 +36,29 @@ namespace MarbleBot.Modules
                 .WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator}")
                 .Build());
 
+        [Command("checkearn")]
+        [Alias("check", "checktimes")]
+        [Summary("Shows the time remaining for each activity with a cooldown.")]
+        public async Task CheckTimesCommandAsync()
+        {
+            var user = GetUser(Context);
+            var timeUntilNextDaily = user.LastDaily.Subtract(DateTime.UtcNow.AddHours(-24));
+            var timeUntilNextRace = user.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6));
+            var timeUntilNextScavenge = user.LastScavenge.Subtract(DateTime.UtcNow.AddHours(-6));
+            var timeUntilNextSiege = user.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6));
+            var timeUntilNextWar = user.LastWarWin.Subtract(DateTime.UtcNow.AddHours(-6));
+            await ReplyAsync(embed: new EmbedBuilder()
+                .AddField("Daily", timeUntilNextDaily.TotalHours > 24 ? "**Ready!**" : timeUntilNextDaily.ToString(), true)
+                .AddField("Race", timeUntilNextRace.TotalHours > 6 ? "**Ready!**" : timeUntilNextRace.ToString(), true)
+                .AddField("Scavenge", timeUntilNextScavenge.TotalHours > 6 ? "**Ready!**" : timeUntilNextScavenge.ToString(), true)
+                .AddField("Siege", timeUntilNextSiege.TotalHours > 6 ? "**Ready!**" : timeUntilNextSiege.ToString(), true)
+                .AddField("War", timeUntilNextWar.TotalHours > 6 ? "**Ready!**" : timeUntilNextWar.ToString(), true)
+                .WithAuthor(Context.User)
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .Build());
+        }
+
         [Command("help")]
         [Alias("cmds")]
         [Summary("Gives the user help.")]

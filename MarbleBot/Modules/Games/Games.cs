@@ -37,8 +37,8 @@ namespace MarbleBot.Modules
                 GameType.War => user.LastWarWin,
                 _ => user.LastScavenge,
             };
-            var nextDaily = DateTime.UtcNow.Subtract(lastWin);
-            var output = nextDaily.TotalHours < 6 ?
+            var nextEarn = DateTime.UtcNow.Subtract(lastWin);
+            var output = nextEarn.TotalHours < 6 ?
                 $"You can earn money from racing in **{GetDateString(lastWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
                 : "You can earn money from racing now!";
             await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
@@ -82,7 +82,7 @@ namespace MarbleBot.Modules
             using (var marbleList = new StreamReader(marbleListDirectory))
             {
                 var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                for (count = 0; count < allMarbles.Length - 1; count++)
+                for (count = 0; count < allMarbles.Length; count++)
                 {
                     string marble = allMarbles[count];
                     if (marble.Length > 16)
@@ -216,6 +216,12 @@ namespace MarbleBot.Modules
                 }
                 else if (gameType == GameType.War)
                 {
+                    if (WarInfo.ContainsKey(fileId))
+                    {
+                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, a battle is currently ongoing!");
+                        return;
+                    }
+
                     var item = GetItem(itemId);
                     if (item.WarClass == 0)
                     {
@@ -227,12 +233,6 @@ namespace MarbleBot.Modules
                     if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] < 1)
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, you don't have this item!");
-                        return;
-                    }
-
-                    if (WarInfo.ContainsKey(fileId))
-                    {
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, a battle is currently ongoing!");
                         return;
                     }
                 }
@@ -252,10 +252,11 @@ namespace MarbleBot.Modules
             }
             else marbleName = marbleName.Replace('\n', ' ').Replace(',', ';');
 
+            bool asteriskPresent = marbleName.Contains('*');
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
-                .AddField($"Marble {GameName(gameType)}: Signed up!", $"**{context.User.Username}** has successfully signed up as **{marbleName}**!");
+                .AddField($"Marble {GameName(gameType)}: Signed up!", $"**{context.User.Username}** has successfully signed up as {(asteriskPresent ? "" : "**")}{marbleName}{(asteriskPresent ? "" : "**")}!");
             using (var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
                 await racers.WriteLineAsync(marbleName);
 

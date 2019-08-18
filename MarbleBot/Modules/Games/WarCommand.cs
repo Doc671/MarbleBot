@@ -50,6 +50,7 @@ namespace MarbleBot.Modules
                             user.Items.Where(i => GetItem(i.Key.ToString("000")).Name.Contains("Spikes")).LastOrDefault().Key));
                     }
                 }
+
                 // Shuffles marble list
                 for (var i = 0; i < marbles.Count - 1; ++i)
                 {
@@ -85,12 +86,14 @@ namespace MarbleBot.Modules
                         if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
                     }
                 }
+
                 var nameList = new List<string>();
                 using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
                 {
                     while (!teamNames.EndOfStream)
                         nameList.Add(await teamNames.ReadLineAsync());
                 }
+
                 war.Team1Name = nameList[Rand.Next(0, nameList.Count)];
                 do war.Team2Name = nameList[Rand.Next(0, nameList.Count)];
                 while (string.Compare(war.Team1Name, war.Team2Name, false) == 0);
@@ -155,6 +158,13 @@ namespace MarbleBot.Modules
             public async Task WarAttackCommandAsync([Remainder] string target)
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+
+                if (!WarInfo.ContainsKey(fileId))
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
+                    return;
+                }
+
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
                 if (currentMarble.HP < 1)
@@ -162,6 +172,7 @@ namespace MarbleBot.Modules
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
                     return;
                 }
+
                 var user = GetUser(Context);
                 var ammo = new Item();
                 if (currentMarble.WarClass == WarClass.Ranged)
@@ -186,6 +197,7 @@ namespace MarbleBot.Modules
                         ammo = GetItem(ammoId.ToString("000"));
                     }
                 }
+
                 List<WarMarble> enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
                 for (int i = 0; i < enemyTeam.Count; i++)
                 {
@@ -199,9 +211,7 @@ namespace MarbleBot.Modules
                                 await ReplyAsync($"**{Context.User.Username}**, you cannot attack a dead marble!");
                                 return;
                             }
-                            var dmg = currentMarble.WarClass == WarClass.Ranged
-                            ? (int)Math.Round(currentMarble.Weapon.Damage + ammo.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (0.5 + Rand.NextDouble())))
-                            : (int)Math.Round(currentMarble.Weapon.Damage * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (0.5 + Rand.NextDouble())));
+                            var dmg = (int)Math.Round(currentMarble.Weapon.Damage + (currentMarble.WarClass == WarClass.Ranged ? ammo.Damage : 0) * (1 + currentMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (0.5 + Rand.NextDouble())));
                             enemy.HP -= dmg;
                             currentMarble.DamageDealt += dmg;
                             await ReplyAsync(embed: new EmbedBuilder()
@@ -232,6 +242,13 @@ namespace MarbleBot.Modules
             public async Task WarBonkCommandAsync([Remainder] string target)
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+
+                if (!WarInfo.ContainsKey(fileId))
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
+                    return;
+                }
+
                 var war = WarInfo[fileId];
                 var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
                 if (currentMarble.HP < 1)
@@ -239,6 +256,7 @@ namespace MarbleBot.Modules
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
                     return;
                 }
+
                 var user = GetUser(Context);
                 List<WarMarble> enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
                 for (int i = 0; i < enemyTeam.Count; i++)
