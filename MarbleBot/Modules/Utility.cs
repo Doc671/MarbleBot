@@ -27,7 +27,7 @@ namespace MarbleBot.Modules
                 .AddField("Ongoing Scavenges", ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", SiegeInfo.Count, true)
                 .AddField("Ongoing Wars", WarInfo.Count, true)
-                .AddField("Servers", Servers.Value.Count, true)
+                .AddField("Servers", Servers.Count, true)
                 .AddField("Start Time (UTC)", StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
                 .AddField("Uptime", DateTime.UtcNow.Subtract(StartTime).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
@@ -299,7 +299,7 @@ namespace MarbleBot.Modules
                         }
                         catch (NullReferenceException ex)
                         {
-                            await Log(ex.ToString());
+                            Log(ex.ToString());
                             await ReplyAsync("Invalid ID!");
                             userFound = false;
                         }
@@ -313,7 +313,7 @@ namespace MarbleBot.Modules
                         }
                         catch (NullReferenceException ex)
                         {
-                            await Log(ex.ToString());
+                            Log(ex.ToString());
                             await ReplyAsync("Could not find the requested user!");
                             userFound = false;
                         }

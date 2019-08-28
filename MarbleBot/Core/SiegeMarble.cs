@@ -10,13 +10,6 @@ namespace MarbleBot.Core
         public int PowerUpHits { get; set; }
         /// <summary> The marble's chance of dodging an attack. </summary>
         public int Evade { get; set; }
-        private int _itemAccuracy = 100;
-        /// <summary> The marble's chance of an offensive item dealing damage. </summary>
-        public int ItemAccuracy
-        {
-            get => _itemAccuracy;
-            set => _itemAccuracy = value < 0 ? 0 : value; 
-        }
         /// <summary> Whether or not the Rocket Boots have been used. </summary>
         public bool BootsUsed { get; set; }
         /// <summary> Whether or not the marble is cloned. </summary>

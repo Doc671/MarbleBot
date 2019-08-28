@@ -83,7 +83,8 @@ namespace MarbleBot.Modules
                         while (string.Compare(marbles[eliminated].Item1, "///out", true) == 0);
                         string deathMessage;
                         deathMessage = messages[Rand.Next(0, messages.Count - 1)];
-                        builder.AddField($"**{marbles[eliminated].Item1}** is eliminated!", $"{marbles[eliminated].Item1} {deathMessage} and is now out of the competition!");
+                        string bold = marbles[eliminated].Item1.Contains('*') || marbles[eliminated].Item1.Contains('\\') ? "" : "**";
+                        builder.AddField($"{bold}{marbles[eliminated].Item1}{bold} is eliminated!", $"{marbles[eliminated].Item1} {deathMessage} and is now out of the competition!");
 
                         // A special message may be displayed depending on the name of last place
                         if (alive == marbleCount && marbleCount > 1)
@@ -103,7 +104,8 @@ namespace MarbleBot.Modules
 
                     // Race finish
                     var winningMarble = marbles.Find(m => string.Compare(m.Item1, "///out") != 0);
-                    builder.AddField($"**{winningMarble.Item1}** wins!", winningMarble.Item1 + " is the winner!");
+                    string bold2 = winningMarble.Item1.Contains('*') || winningMarble.Item1.Contains('\\') ? "" : "**";
+                    builder.AddField($"{bold2}{winningMarble.Item1}{bold2} wins!", winningMarble.Item1 + " is the winner!");
                     if (marbleCount > 1)
                     {
                         using var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}RaceWinners.txt", true);

@@ -37,7 +37,7 @@ namespace MarbleBot.Core
             Global.WarInfo.TryRemove(Id, out _);
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}war.csv", false))
                 marbleList.Write("");
-            if (disposing)
+            if (disposing && Actions != null)
             {
                 Actions.Wait();
                 Actions.Dispose();
@@ -67,7 +67,7 @@ namespace MarbleBot.Core
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
                     var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Count)];
-                    if (Global.Rand.Next(0, 10) < 8)
+                    if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
                         var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
                         randMarble.HP -= dmg;

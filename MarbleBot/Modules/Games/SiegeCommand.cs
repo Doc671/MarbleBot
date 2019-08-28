@@ -59,7 +59,7 @@ namespace MarbleBot.Modules
                         };
                         var user = GetUser(Context, marble.Id);
                         if (user.Items.ContainsKey(63) && user.Items[63] >= 1)
-                            marble.Shield = GetItem("063");
+                            marble.Shield = GetItem<Item>("063");
                         if (user.Items.ContainsKey(80)) marble.DamageIncrease = 110;
                         else if (user.Items.ContainsKey(74)) marble.DamageIncrease = 95;
                         else if (user.Items.ContainsKey(71)) marble.DamageIncrease = 60;
@@ -213,6 +213,7 @@ namespace MarbleBot.Modules
                     url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
                 }
                 dmg = (int)Math.Round(dmg * SiegeInfo[fileId].DamageMultiplier * (marble.StatusEffect == StatusEffect.Chill ? 0.5 : 1.0) * (marble.DamageIncrease / 100.0 + 1));
+
                 var clone = false;
                 if (marble.Cloned)
                 {
@@ -228,6 +229,7 @@ namespace MarbleBot.Modules
                     .WithDescription($"**{marble.Name}** dealt **{dmg}** damage to **{SiegeInfo[fileId].Boss.Name}**!")
                     .AddField("Boss HP", $"**{SiegeInfo[fileId].Boss.HP}**/{SiegeInfo[fileId].Boss.MaxHP}");
                 await ReplyAsync(embed: builder.Build());
+
                 if (clone)
                 {
                     if (marble.Name.Last() != 's') await ReplyAsync($"{marble.Name}'s clones disappeared!");
@@ -418,7 +420,6 @@ namespace MarbleBot.Modules
                     .AddField("Status Effect", Enum.GetName(typeof(StatusEffect), currentMarble.StatusEffect), true)
                     .AddField("Shield", currentMarble.Shield.Name, true)
                     .AddField("Damage Increase", $"{currentMarble.DamageIncrease}%", true)
-                    .AddField("Item Accuracy", $"{currentMarble.ItemAccuracy}%", true)
                     .AddField("Damage Dealt", currentMarble.DamageDealt, true)
                     .AddField("Power-up Hits", currentMarble.PowerUpHits, true)
                     .AddField("Rocket Boots Used?", currentMarble.BootsUsed, true)
@@ -528,7 +529,7 @@ namespace MarbleBot.Modules
                         {
                             var dropAmount = drop.MinCount == drop.MaxCount ? drop.MinCount.ToString() : $"{drop.MinCount}-{drop.MaxCount}";
                             var idString = drop.ItemId.ToString("000");
-                            drops.AppendLine($"`[{idString}]` **{GetItem(idString).Name}**: {dropAmount} ({drop.Chance}%)");
+                            drops.AppendLine($"`[{idString}]` **{GetItem<Item>(idString).Name}**: {dropAmount} ({drop.Chance}%)");
                         }
                         await ReplyAsync(embed: new EmbedBuilder()
                             .AddField("HP", $"**{boss.MaxHP}**")

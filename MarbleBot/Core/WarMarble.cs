@@ -4,10 +4,10 @@
     public class WarMarble : BaseMarble
     {
         public int Team { get; set; }
-        public WarClass WarClass { get; }
-        public Item Weapon { get; }
+        public WeaponClass WarClass { get; }
+        public Weapon Weapon { get; }
 
-        public WarMarble(ulong id, int HP, string name, Item weapon, Item shield, int spikeId = 0)
+        public WarMarble(ulong id, int HP, string name, Weapon weapon, Item shield, int spikeId = 0)
         {
             Id = id;
             SetHP(HP);

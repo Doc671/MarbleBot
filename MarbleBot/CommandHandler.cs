@@ -36,12 +36,12 @@ namespace MarbleBot
 
             if (!context.IsPrivate)
             {
-                if (Global.Servers.Value.Any(sr => sr.Id == context.Guild.Id))
+                if (Global.Servers.Any(sr => sr.Id == context.Guild.Id))
                     server = MarbleBotModule.GetServer(context);
                 else
                 {
                     server = new MarbleBotServer(context.Guild.Id);
-                    Global.Servers.Value.Add(server);
+                    Global.Servers.Add(server);
                 }
             }
 
@@ -56,10 +56,19 @@ namespace MarbleBot
                 {
                     switch (result.Error)
                     {
-                        case CommandError.BadArgCount: await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command."); break;
-                        case CommandError.UnknownCommand: break;
-                        case CommandError.UnmetPrecondition: await context.Channel.SendMessageAsync("Insufficient permissions."); break;
-                        default: await Program.Log($"{result.Error.Value}: {result.ErrorReason}"); break;
+                        case CommandError.BadArgCount:
+                            await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
+                            break;
+                        case CommandError.UnknownCommand:
+                            await context.Channel.TriggerTypingAsync();
+                            break;
+                        case CommandError.UnmetPrecondition:
+                            await context.Channel.SendMessageAsync("Insufficient permissions.");
+                            break;
+                        default:
+                            Program.Log($"{result.Error.Value}: {result.ErrorReason}");
+                            await context.Channel.TriggerTypingAsync();
+                            break;
                     }
                 }
 
@@ -77,7 +86,7 @@ namespace MarbleBot
                     }
                 }
             }
-            if (context.IsPrivate) await Program.Log($"{context.User}: {context.Message}");
+            if (context.IsPrivate) Program.Log($"{context.User}: {context.Message}");
         }
     }
 }

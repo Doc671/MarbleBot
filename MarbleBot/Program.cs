@@ -39,6 +39,7 @@ namespace MarbleBot
             Console.Title = "MarbleBot";
 
             Global.StartTime = DateTime.UtcNow;
+
             _client = new DiscordSocketClient();
 
             string token = "";
@@ -55,7 +56,7 @@ namespace MarbleBot
                 {
                     var server2 = server.Value;
                     server2.Id = server.Key;
-                    Global.Servers.Value.Add(server2);
+                    Global.Servers.Add(server2);
                 }
             }
 
@@ -91,7 +92,7 @@ namespace MarbleBot
 
             await _client.SetGameAsync("Try mb/help!");
 
-            await Log($"MarbleBot by Doc671\nStarted running: {Global.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}\n", true);
+            Log($"MarbleBot by Doc671\nStarted running: {Global.StartTime.ToString("yyyy-MM-dd HH:mm:ss")}\n", true);
 
             _handler = new CommandHandler(_client);
 
@@ -99,14 +100,14 @@ namespace MarbleBot
             await Task.Delay(-1);
         }
 
-        public static async Task Log(string log, bool noDate = false)
-        => await Task.Run(async () =>
+        public static void Log(string log, bool noDate = false)
+        => Task.Run(() =>
         {
             var logString = noDate ? log : $"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {log}";
             Console.WriteLine(logString);
 
             // Get the end of the document
-            Document doc = await _request.ExecuteAsync();
+            Document doc = _request.Execute();
             var index = doc.Body.Content.Last().EndIndex - 1;
 
             // Write to the document
@@ -120,7 +121,7 @@ namespace MarbleBot
             };
 
             var body = new BatchUpdateDocumentRequest() { Requests = requests };
-            await _service.Documents.BatchUpdate(body, _documentId).ExecuteAsync();
+            _service.Documents.BatchUpdate(body, _documentId).Execute();
         });
     }
 }

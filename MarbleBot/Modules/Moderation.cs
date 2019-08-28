@@ -131,7 +131,7 @@ namespace MarbleBot.Modules
                     break;
                 }
             }
-            if (swearPresent) await Log($"Profanity detected, violation: {msg}");
+            if (swearPresent) Log($"Profanity detected, violation: {msg}");
             return swearPresent;
         }
 

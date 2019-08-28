@@ -59,13 +59,15 @@ namespace MarbleBot.Core
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
                 marbleList.Write("");
             Global.SiegeInfo.TryRemove(Id, out _);
-            if (disposing)
+            if (disposing && Actions != null)
             {
                 Actions.Wait();
                 Actions.Dispose();
             }
         }
 
+        /// <summary> Gets a boss using a string. </summary>
+        /// <param name="searchTerm"> The string to search with. </param>
         public static Boss GetBoss(string searchTerm)
         {
             string json;
@@ -79,9 +81,14 @@ namespace MarbleBot.Core
             return boss;
         }
 
+        /// <summary> Attacks the boss with a non-weapon item. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="obj"> The JSON object storing the users. </param>
+        /// <param name="itemId"> The ID of the item. </param>
+        /// <param name="damage"> The damage being dealt by the item. </param>
+        /// <param name="consumable"> Whether or not the item is consumed upon use. </param>
         public async Task ItemAttack(SocketCommandContext context, JObject obj, int itemId,
-                                     int damage, bool consumable = false, int ammoId = 0,
-                                     int ammoRequired = 1)
+                                     int damage, bool consumable = false)
         {
             if (_disposed)
             {
@@ -89,8 +96,7 @@ namespace MarbleBot.Core
                 return;
             }
 
-            var item = GetItem(itemId.ToString("000"));
-            var ammo = GetItem(ammoId.ToString("000"));
+            var item = GetItem<Item>(itemId.ToString("000"));
             var marble = Marbles.Find(m => m.Id == context.User.Id);
 
             if (marble.HP == 0)
@@ -101,63 +107,111 @@ namespace MarbleBot.Core
 
             var user = GetUser(context);
 
-            // Removes items from the user (consumable offensive items or ammo)
-            void UpdateUser(Item itm, int noOfItems)
-            {
-                user.Items[itm.Id] -= noOfItems;
-                user.NetWorth -= itm.Price * noOfItems;
-                WriteUsers(obj, context.User, user);
-            }
-
             if (item.Id == 10 && marble.QefpedunCharmUsed)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, you can only use the **{item.Name}** once per battle!");
                 return;
             }
 
-            if (ammoId != 0 && user.Items[ammoId] < ammoRequired)
+            damage = (int)Math.Round(damage * DamageMultiplier);
+            await DealDamageAsync(context, damage);
+            await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
+                .WithAuthor(context.User)
+                .WithColor(GetColor(context))
+                .WithCurrentTimestamp()
+                .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
+                .WithTitle(item.Name)
+                .Build());
+            marble.DamageDealt += damage;
+            if (consumable)
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you do not have enough ammo for this item!");
+                user.Items[item.Id]--;
+                user.NetWorth -= item.Price;
+                WriteUsers(obj, context.User, user);
+            }
+            if (item.Id == 10) marble.QefpedunCharmUsed = true;
+        }
+
+        /// <summary> Attacks the boss with a weapon. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="weapon"> The weapon used to attack. </param>
+        public async Task WeaponAttack(SocketCommandContext context, Weapon weapon)
+        {
+            if (_disposed)
+            {
+                await context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
                 return;
             }
 
-            if (item.WarClass != WarClass.None)
+            var ammo = new Ammo();
+            var marble = Marbles.Find(m => m.Id == context.User.Id);
+            var user = GetUser(context);
+
+            if (weapon.Ammo != null)
             {
-                damage = (int)Math.Round(damage * DamageMultiplier);
-                if (ammoId != 0) damage += ammo.Damage;
-                await DealDamageAsync(context, damage);
-                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                    .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
+                for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
+                {
+                    if (user.Items.ContainsKey(weapon.Ammo[i]) && user.Items[weapon.Ammo[i]] >= weapon.Uses)
+                    {
+                        ammo = GetItem<Ammo>(weapon.Ammo[i].ToString("000"));
+                        break;
+                    }
+                }
+
+                if (ammo.Id == 0)
+                {
+                    await context.Channel.SendMessageAsync($"**{context.User.Username}**, you do not have enough ammo for this item!");
+                    return;
+                }
+
+                var obj = GetUsersObject();
+                user.Items[ammo.Id] -= weapon.Uses;
+                user.NetWorth -= ammo.Price * weapon.Uses;
+                WriteUsers(obj, context.User, user);
+            }
+
+            var builder = new EmbedBuilder()
+                    .WithAuthor(context.User)
                     .WithColor(GetColor(context))
                     .WithCurrentTimestamp()
-                    .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
-                    .WithTitle(item.Name)
-                    .Build());
-                marble.DamageDealt += damage;
-                if (ammoId != 0) UpdateUser(ammo, -ammoRequired);
-            }
-            else if (Global.Rand.Next(0, 100) < marble.ItemAccuracy)
+                    .WithTitle(weapon.Name);
+
+            if (weapon.Uses == 1)
             {
-                damage = (int)Math.Round(damage * DamageMultiplier);
-                await DealDamageAsync(context, damage);
-                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                    .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
-                    .WithColor(GetColor(context))
-                    .WithCurrentTimestamp()
-                    .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
-                    .WithTitle(item.Name)
-                    .Build());
-                marble.DamageDealt += damage;
-                marble.ItemAccuracy -= 30;
-                if (consumable) UpdateUser(item, 1);
-                if (item.Id == 10) marble.QefpedunCharmUsed = true;
+                if (Global.Rand.Next(0, 100) < weapon.Accuracy)
+                {
+                    var damage = (int)Math.Round(weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                    await DealDamageAsync(context, damage);
+                    marble.DamageDealt += damage;
+                    await context.Channel.SendMessageAsync(embed: builder
+                        .WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{damage}** damage to **{Boss.Name}**!")
+                        .Build());
+                }
+                await context.Channel.SendMessageAsync(embed: builder
+                        .WithDescription($"**{marble.Name}** used their **{weapon.Name}**! It missed!")
+                        .Build());
             }
-            else await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                                    .WithColor(GetColor(context))
-                                    .WithCurrentTimestamp()
-                                    .WithDescription($"**{marble.Name}** used their **{item.Name}**! It missed!")
-                                    .WithTitle(item.Name)
-                                    .Build());
+            else
+            {
+                var totalDamage = 0;
+                for (int i = 0; i < weapon.Uses; i++)
+                {
+                    if (Global.Rand.Next(0, 100) < weapon.Accuracy)
+                    {
+                        var damage = (int)Math.Round(weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                        await DealDamageAsync(context, damage);
+                        totalDamage += damage;
+                        builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss.Name}**.");
+                    }
+                    else builder.AddField($"Attack {i + 1}", "Missed!");
+                    await Task.Delay(1);
+                }
+                marble.DamageDealt += totalDamage;
+                await context.Channel.SendMessageAsync(embed: builder
+                        .WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing a total of **{totalDamage}** to **{Boss.Name}**!")
+                        .Build());
+            }
         }
 
         // Separate task dealing with time-based boss responses
@@ -394,7 +448,7 @@ namespace MarbleBot.Core
                                 else amount = (ushort)Global.Rand.Next(itemDrops.MinCount, itemDrops.MaxCount + 1);
                                 if (user.Items.ContainsKey(itemDrops.ItemId)) user.Items[itemDrops.ItemId] += amount;
                                 else user.Items.Add(itemDrops.ItemId, amount);
-                                var item = GetItem(itemDrops.ItemId.ToString("000"));
+                                var item = GetItem<Item>(itemDrops.ItemId.ToString("000"));
                                 user.NetWorth += item.Price * amount;
                                 drops++;
                                 output.AppendLine($"`[{itemDrops.ItemId.ToString("000")}]` {item.Name} x{amount}");

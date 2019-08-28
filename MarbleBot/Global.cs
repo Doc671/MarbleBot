@@ -16,7 +16,7 @@ namespace MarbleBot
         internal static CommandService CommandService { get; set; }
         internal static ushort DailyTimeout  { get; set; } = 48;
         internal static Random Rand { get; } = new Random();
-        internal static Lazy<List<MarbleBotServer>> Servers  { get; set; } = new Lazy<List<MarbleBotServer>>();
+        internal static List<MarbleBotServer> Servers  { get; set; } = new List<MarbleBotServer>();
         internal static DateTime StartTime { get; set; }
         internal static string YTKey { get; set; } = "";
 

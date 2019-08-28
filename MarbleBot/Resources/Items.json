@@ -405,7 +405,8 @@
     "Price": 0.00,
     "Description": "A rock.",
     "OnSale": false,
-    "ScavengeLocation": 2
+    "ScavengeLocation": 2,
+    "Damage": 12
   },
   "049": {
     "Name": "Rope",
@@ -417,9 +418,14 @@
   "050": {
     "Name": "Oak Trebuchet",
     "Price": 40.00,
-    "Description": "A trebuchet made from oak wood and rope. Requires ammo (rocks).",
+    "Description": "A trebuchet made from oak wood and rope.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 50,
+    "Ammo": [ 48 ],
+    "Damage": 20,
+    "Uses": 1,
+    "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 5,
@@ -430,9 +436,14 @@
   "051": {
     "Name": "Ash Trebuchet",
     "Price": 40.00,
-    "Description": "A trebuchet made from ash wood and rope. Requires ammo (rocks).",
+    "Description": "A trebuchet made from ash wood and rope.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 50,
+    "Ammo": [ 48 ],
+    "Damage": 20,
+    "Uses": 1,
+    "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 5,
@@ -443,9 +454,14 @@
   "052": {
     "Name": "Elm Trebuchet",
     "Price": 40.00,
-    "Description": "A trebuchet made from elm wood and rope. Requires ammo (rocks).",
+    "Description": "A trebuchet made from elm wood and rope.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 50,
+    "Ammo": [ 48 ],
+    "Damage": 20,
+    "Uses": 1,
+    "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 5,
@@ -456,9 +472,14 @@
   "053": {
     "Name": "Trebuchet Array",
     "Price": 125.00,
-    "Description": "An array of three trebuchets. Requires ammo (rocks) - uses three per shot.",
+    "Description": "An array of three trebuchets, each made of different types of wood.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 50,
+    "Ammo": [ 48 ],
+    "Damage": 20,
+    "Uses": 3,
+    "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "049": 1,
@@ -831,7 +852,9 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 80,
     "Damage": 15,
+    "Uses": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -848,7 +871,9 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 95,
     "Damage": 8,
+    "Uses": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -864,7 +889,9 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 90,
     "Damage": 10,
+    "Uses": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -882,7 +909,9 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 95,
     "Damage": 9,
+    "Uses": 1,
     "WarClass": 1
   },
   "089": {
@@ -892,7 +921,9 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 85,
     "Damage": 10,
+    "Uses": 1,
     "WarClass": 1
   },
   "090": {
@@ -942,8 +973,10 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 80,
     "Ammo": [ 92 ],
     "Damage": 10,
+    "Uses": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -959,7 +992,9 @@
     "Description": "A sword made from oak wood.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 95,
     "Damage": 5,
+    "Uses": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -973,7 +1008,9 @@
     "Description": "A striking tool of ash wood with a sharp stone blade on one side.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 85,
     "Damage": 6,
+    "Uses": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -989,8 +1026,10 @@
     "Description": "A bow fixed across a support of elm wood with a groove to fire bolts.",
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 85,
     "Ammo": [ 98, 100, 101 ],
     "Damage": 4,
+    "Uses": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1005,8 +1044,10 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
-    "Ammo": [98, 100, 101],
+    "Accuracy": 80,
+    "Ammo": [ 98, 100, 101 ],
     "Damage": 8,
+    "Uses": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1080,7 +1121,9 @@
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
+    "Accuracy": 90,
     "Damage": 12,
+    "Uses": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1101,5 +1144,13 @@
       "061": 3,
       "070": 5
     }
+  },
+  "104": {
+    "Name": "Matrix Overloader",
+    "Price": 1500.00,
+    "Description": "Alters the Siege so that only Stage 1 bosses can be encountered.",
+    "Stage": 2,
+    "OnSale": false,
+    "ScavengeLocation": 0
   }
 }

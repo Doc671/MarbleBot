@@ -184,7 +184,7 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
-                else await Log($"Profanity detected: {input}");
+                else Log($"Profanity detected: {input}");
             }
             else await ReplyAsync($"**{Context.User.Username}**, I choose **{choices[choice].Trim()}**!");
         }
@@ -224,7 +224,7 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
-                else await Log($"Profanity detected: {input}");
+                else Log($"Profanity detected: {input}");
             }
             else await ReplyAsync(orangeified.ToString());
         }
@@ -388,7 +388,7 @@ namespace MarbleBot.Modules
                         IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                         await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                     }
-                    else await Log($"Profanity detected: {input}");
+                    else Log($"Profanity detected: {input}");
                 }
                 else await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
             }
@@ -406,7 +406,7 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
-                else await Log($"Profanity detected: {repeat}");
+                else Log($"Profanity detected: {repeat}");
             }
             else await ReplyAsync(repeat);
         }
@@ -430,7 +430,7 @@ namespace MarbleBot.Modules
                     IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
                     await ReplyAsync($"Profanity detected. {Doc671.Mention}");
                 }
-                else await Log($"Profanity detected: {input}");
+                else Log($"Profanity detected: {input}");
             }
             else await ReplyAsync(reverse.ToString());
         }

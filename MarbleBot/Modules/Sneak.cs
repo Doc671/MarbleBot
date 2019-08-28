@@ -4,6 +4,8 @@ using Discord.WebSocket;
 using MarbleBot.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +19,63 @@ namespace MarbleBot.Modules
     /// <summary> Owner-only commands. >:) </summary>
     public class Sneak : MarbleBotModule
     {
+
+        [Command("backup")]
+        [Summary("Copies all files in the Data directory to the Backup directory.")]
+        [RequireOwner]
+        public async Task BackupCommandAsync()
+        {
+            System.IO.Compression.ZipFile.CreateFromDirectory("Data", $"Backup-{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.zip");
+            await ReplyAsync("Success.");
+        }
+
+        [Command("clearmemory")]
+        [Alias("cm")]
+        [Summary("Resets all values in MarbleBot.Global")]
+        [RequireOwner]
+        public async Task ClearMemoryCommandAsync()
+        {
+            AutoresponseLastUse = new DateTime();
+            Autoresponses = new Dictionary<string, string>();
+            using (var autoresponseFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
+            {
+                while (!autoresponseFile.EndOfStream)
+                {
+                    var autoresponsePair = (await autoresponseFile.ReadLineAsync()).Split(';');
+                    Autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
+                }
+            }
+
+            DailyTimeout = 48;
+            Servers = new List<MarbleBotServer>();
+            using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
+            {
+                string json;
+                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
+                    json = await users.ReadToEndAsync();
+                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotServer>>(json);
+                foreach (var server in allServers)
+                {
+                    var server2 = server.Value;
+                    server2.Id = server.Key;
+                    Servers.Add(server2);
+                }
+            }
+
+            foreach (var pair in ScavengeInfo)
+                pair.Value.Dispose();
+            foreach (var pair in SiegeInfo)
+                pair.Value.Dispose();
+            foreach (var pair in WarInfo)
+                pair.Value.Dispose();
+            ScavengeInfo = new ConcurrentDictionary<ulong, Scavenge>();
+            SiegeInfo = new ConcurrentDictionary<ulong, Siege>();
+            WarInfo = new ConcurrentDictionary<ulong, War>();
+
+            using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBK.txt")) YTKey = stream.ReadLine();
+
+            await ReplyAsync("Success.");
+        }
 
         [Command("dailytimeout")]
         [Alias("dt")]
@@ -106,7 +165,7 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            foreach (MarbleBotServer server in Servers.Value)
+            foreach (MarbleBotServer server in Servers)
             {
                 if (server.AnnouncementChannel != 0)
                 {

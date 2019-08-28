@@ -1,9 +1,10 @@
 ﻿namespace MarbleBot.Core
 {
-    public enum WarClass
+    public enum WeaponClass
     {
         None,
         Melee,
-        Ranged
+        Ranged,
+        Artillery
     }
 }

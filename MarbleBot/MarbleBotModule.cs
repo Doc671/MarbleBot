@@ -58,26 +58,19 @@ namespace MarbleBot
         }
 
         /// <summary> Returns an item using its ID </summary> 
-        protected internal static Item GetItem(string searchTerm)
+        protected internal static T GetItem<T>(string searchTerm) where T : Item
         {
-            var item = new Item();
-            if (int.TryParse(searchTerm, out int itemID))
+            T item;
+            if (int.TryParse(searchTerm, out int itemId))
             {
                 var obj = GetItemsObject();
-                if (obj[itemID.ToString("000")] != null)
+                if (obj[itemId.ToString("000")] != null)
                 {
-                    item = obj[itemID.ToString("000")].ToObject<Item>();
-                    item = new Item(item, itemID);
-                    item.Description.Replace(';', ',');
-                    if (item.Stage == 0) item = new Item(item, stage: 1);
-                    if (item.CraftingRecipe == null) item = new Item(item, craftingRecipe: new Dictionary<string, int>());
+                    item = obj[itemId.ToString("000")].ToObject<T>();
+                    item.Id = itemId;
                     return item;
                 }
-                else
-                {
-                    item = new Item(item, -1);
-                    return item;
-                }
+                else return null;
             }
             else
             {
@@ -87,19 +80,14 @@ namespace MarbleBot
                 var obj = JObject.Parse(json);
                 foreach (var objItemPair in obj)
                 {
-                    var objItem = objItemPair.Value.ToObject<Item>();
-                    objItem = new Item (objItem, int.Parse(objItemPair.Key));
-                    if (objItem.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(objItem.Name.ToLower()))
+                    item = objItemPair.Value.ToObject<T>();
+                    if (item.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(item.Name.ToLower()))
                     {
-                        item = objItem;
-                        item.Description.Replace(';', ',');
-                        if (item.Stage == 0) item = new Item(item, stage: 1);
-                        if (item.CraftingRecipe == null) item = new Item(item, craftingRecipe: new Dictionary<string, int>());
+                        item.Id = itemId;
                         return item;
                     }
                 }
-                item = new Item(item, -2);
-                return item;
+                return null;
             }
         }
 
@@ -114,7 +102,7 @@ namespace MarbleBot
 
         /// <summary> Returns a MBServer object with the ID of the current server. </summary>
         protected internal static MarbleBotServer GetServer(SocketCommandContext context)
-        => Global.Servers.Value.Find(s => s.Id == context.Guild.Id);
+        => Global.Servers.Find(s => s.Id == context.Guild.Id);
 
         /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser. </summary>
         protected internal static MarbleBotUser GetUser(SocketCommandContext context)
@@ -218,7 +206,7 @@ namespace MarbleBot
         }
 
         /// <summary> Logs to the console and the online logs. </summary>
-        protected internal static async Task Log(string log) => await Program.Log(log);
+        protected internal static void Log(string log) => Program.Log(log);
 
         /// <summary> Returns a string that indicates the user's Stage is too low. </summary>
         protected internal static string StageTooHighString() 
@@ -235,7 +223,7 @@ namespace MarbleBot
         {
             using var servers = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Servers.json"));
             var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-            var dict = Global.Servers.Value.ToDictionary(s => s.Id);
+            var dict = Global.Servers.ToDictionary(s => s.Id);
             serialiser.Serialize(servers, dict);
         }
 
