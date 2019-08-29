@@ -115,10 +115,10 @@ namespace MarbleBot.Modules
                             _ => "097"
                         }), GetItem<Item>("063"), Rand.Next(0, 4) switch
                         {
-                            0 => 66,
-                            1 => 71,
-                            2 => 74,
-                            _ => 80
+                            0 => 66u,
+                            1 => 71u,
+                            2 => 74u,
+                            _ => 80u
                         });
                     else aiMarble = new WarMarble(BotId, 35, "MarbleBot",
                         GetItem<Weapon>(Rand.Next(0, 2) switch
@@ -178,7 +178,7 @@ namespace MarbleBot.Modules
                 var ammo = new Ammo();
                 if (currentMarble.WarClass == WeaponClass.Ranged)
                 {
-                    var ammoId = 0;
+                    var ammoId = 0u;
                     for (int i = currentMarble.Weapon.Ammo.Length - 1; i >= 0; i--)
                     {
                         if (user.Items.ContainsKey(currentMarble.Weapon.Ammo[i]) && user.Items[currentMarble.Weapon.Ammo[i]] >= currentMarble.Weapon.Uses)
@@ -451,7 +451,7 @@ namespace MarbleBot.Modules
                 foreach (var itemPair in items)
                 {
                     var item = itemPair.Value;
-                    item.Id = int.Parse(itemPair.Key);
+                    item.Id = uint.Parse(itemPair.Key);
                     if (item.WarClass != 0 && item.WarClass != WeaponClass.Artillery && item.Stage <= GetUser(Context).Stage)
                         output.AppendLine($"{item} ({Enum.GetName(typeof(WeaponClass), item.WarClass)})");
                 }

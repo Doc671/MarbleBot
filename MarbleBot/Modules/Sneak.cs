@@ -104,31 +104,6 @@ namespace MarbleBot.Modules
             await ReplyAsync("All separate tasks successfully disposed.");
         }
 
-        [Command("melmon")]
-        [Summary("melmon")]
-        [RequireOwner]
-        public async Task MelmonCommandAsync(string melmon, [Remainder] string msg)
-        {
-            SocketGuild srvr = Context.Client.GetGuild(THS);
-            ISocketMessageChannel chnl = srvr.GetTextChannel(THS);
-            switch (melmon)
-            {
-                case "desk": await chnl.SendMessageAsync(msg); break;
-                case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
-                case "ken": srvr = Context.Client.GetGuild(CM); chnl = srvr.GetTextChannel(CM); await chnl.SendMessageAsync(msg); break;
-                case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
-                case "brady": chnl = srvr.GetTextChannel(237158048282443776); await chnl.SendMessageAsync(msg); break;
-                default:
-                    var split = melmon.Split(',');
-                    ulong.TryParse(split[0], out ulong srvrId);
-                    ulong.TryParse(split[1], out ulong chnlId);
-                    srvr = Context.Client.GetGuild(srvrId);
-                    chnl = srvr.GetTextChannel(chnlId);
-                    await chnl.SendMessageAsync(msg);
-                    break;
-            }
-        }
-
         [Command("fixbalance")]
         [Summary("Fixes the balance of each user.")]
         [Alias("fixbal")]
@@ -152,27 +127,28 @@ namespace MarbleBot.Modules
             await ReplyAsync("Success.");
         }
 
-        [Command("update")]
-        [Summary("Releases update info to all bot channels.")]
+        [Command("melmon")]
+        [Summary("melmon")]
         [RequireOwner]
-        public async Task UpdateCommandAsync(string _major, [Remainder] string info)
+        public async Task MelmonCommandAsync(string melmon, [Remainder] string msg)
         {
-            var major = string.Compare(_major, "major", true) == 0;
-
-            var builder = new EmbedBuilder()
-                .WithColor(Color.Red)
-                .WithCurrentTimestamp()
-                .WithDescription(info)
-                .WithTitle("MarbleBot Update");
-
-            foreach (MarbleBotServer server in Servers)
+            SocketGuild srvr = Context.Client.GetGuild(THS);
+            ISocketMessageChannel chnl = srvr.GetTextChannel(THS);
+            switch (melmon)
             {
-                if (server.AnnouncementChannel != 0)
-                {
-                    var channel = Context.Client.GetGuild(server.Id).GetTextChannel(server.AnnouncementChannel);
-                    var msg = await channel.SendMessageAsync(embed: builder.Build());
-                    if (major) await msg.PinAsync();
-                }
+                case "desk": await chnl.SendMessageAsync(msg); break;
+                case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
+                case "ken": srvr = Context.Client.GetGuild(CM); chnl = srvr.GetTextChannel(CM); await chnl.SendMessageAsync(msg); break;
+                case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
+                case "brady": chnl = srvr.GetTextChannel(237158048282443776); await chnl.SendMessageAsync(msg); break;
+                default:
+                    var split = melmon.Split(',');
+                    ulong.TryParse(split[0], out ulong srvrId);
+                    ulong.TryParse(split[1], out ulong chnlId);
+                    srvr = Context.Client.GetGuild(srvrId);
+                    chnl = srvr.GetTextChannel(chnlId);
+                    await chnl.SendMessageAsync(msg);
+                    break;
             }
         }
 
@@ -221,18 +197,25 @@ namespace MarbleBot.Modules
 
         [Command("setgame")]
         [RequireOwner]
-        public async Task SetGameCommandAsync([Remainder] string game) => await Context.Client.SetGameAsync(game);
+        public async Task SetGameCommandAsync([Remainder] string game)
+        {
+            await Context.Client.SetGameAsync(game);
+            await ReplyAsync("Success.");
+        }
 
         [Command("setstatus")]
         [RequireOwner]
         public async Task SetStatusCommandAsync(string status)
-        => await Context.Client.SetStatusAsync(status switch
         {
-            "idle" => UserStatus.Idle,
-            "dnd" => UserStatus.DoNotDisturb,
-            "invisible" => UserStatus.Invisible,
-            _ => UserStatus.Online
-        });
+            await Context.Client.SetStatusAsync(status switch
+            {
+                "idle" => UserStatus.Idle,
+                "dnd" => UserStatus.DoNotDisturb,
+                "invisible" => UserStatus.Invisible,
+                _ => UserStatus.Online
+            });
+            await ReplyAsync("Success.");
+        }
 
         [Command("siegedict")]
         [RequireOwner]
@@ -247,6 +230,30 @@ namespace MarbleBot.Modules
                 .WithDescription(output.ToString())
                 .WithTitle("`SiegeInfo`")
                 .Build());
+        }
+
+        [Command("update")]
+        [Summary("Releases update info to all bot channels.")]
+        [RequireOwner]
+        public async Task UpdateCommandAsync(string _major, [Remainder] string info)
+        {
+            var major = string.Compare(_major, "major", true) == 0;
+
+            var builder = new EmbedBuilder()
+                .WithColor(Color.Red)
+                .WithCurrentTimestamp()
+                .WithDescription(info)
+                .WithTitle("MarbleBot Update");
+
+            foreach (MarbleBotServer server in Servers)
+            {
+                if (server.AnnouncementChannel != 0)
+                {
+                    var channel = Context.Client.GetGuild(server.Id).GetTextChannel(server.AnnouncementChannel);
+                    var msg = await channel.SendMessageAsync(embed: builder.Build());
+                    if (major) await msg.PinAsync();
+                }
+            }
         }
     }
 }

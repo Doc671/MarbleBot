@@ -88,7 +88,7 @@ namespace MarbleBot.Modules
                 }
                 else
                 {
-                    user.Items = new SortedDictionary<int, int> {
+                    user.Items = new SortedDictionary<uint, int> {
                         { item.Id, noOfItems }
                     };
                 }
@@ -130,14 +130,14 @@ namespace MarbleBot.Modules
             var sufficientMaterials = true;
             foreach (var item in requestedItem.CraftingRecipe)
             {
-                if (!user.Items.ContainsKey(int.Parse(item.Key)) || item.Value * noOfItems > user.Items[int.Parse(item.Key)])
+                if (!user.Items.ContainsKey(uint.Parse(item.Key)) || item.Value * noOfItems > user.Items[uint.Parse(item.Key)])
                 {
                     sufficientMaterials = false;
                     break;
                 }
             }
 
-            if (sufficientMaterials)
+            if (!sufficientMaterials)
             {
                 await ReplyAsync($":warning: | **{Context.User.Username}**, you do not have enough items to craft this!");
                 return;
@@ -156,7 +156,7 @@ namespace MarbleBot.Modules
                 var item = GetItem<Item>(rawItem.Key);
                 var noLost = rawItem.Value * noOfItems;
                 output.AppendLine($"`[{item.Id:000}]` {item.Name}: {noLost}");
-                user.Items[int.Parse(rawItem.Key)] -= noLost;
+                user.Items[uint.Parse(rawItem.Key)] -= noLost;
                 user.NetWorth -= item.Price * noOfItems;
             }
             if (!user.Items.ContainsKey(requestedItem.Id)) user.Items.Add(requestedItem.Id, noCrafted);
@@ -180,16 +180,18 @@ namespace MarbleBot.Modules
                 if (itemPair.Value.CraftingProduced != 0)
                 {
                     var craftable = true;
+                    var noCraftable = 0;
                     foreach (var ingredient in itemPair.Value.CraftingRecipe)
                     {
-                        var id = int.Parse(ingredient.Key);
+                        var id = uint.Parse(ingredient.Key);
                         if (!user.Items.ContainsKey(id) || user.Items[id] < ingredient.Value)
                         {
                             craftable = false;
                             break;
                         }
+                        noCraftable = noCraftable == 0 ? user.Items[id] / ingredient.Value : Math.Min(user.Items[id] / ingredient.Value, noCraftable);
                     }
-                    if (craftable) output.AppendLine($"`[{itemPair.Key}]` {itemPair.Value.Name}");
+                    if (craftable) output.AppendLine($"`[{itemPair.Key}]` {itemPair.Value.Name}: {noCraftable}");
                 }
             }
             if (output.Length < 1) output.Append("There are no items you can craft!");
@@ -287,7 +289,7 @@ namespace MarbleBot.Modules
                     var item = GetItem<Item>(rawItem.Key);
                     var noGained = rawItem.Value * noOfItems;
                     output.AppendLine($"`[{item.Id:000}]` {item.Name}: {noGained}");
-                    if (user.Items.ContainsKey(item.Id)) user.Items[int.Parse(rawItem.Key)] += noGained;
+                    if (user.Items.ContainsKey(item.Id)) user.Items[uint.Parse(rawItem.Key)] += noGained;
                     else user.Items.Add(item.Id, noGained);
                     user.NetWorth += item.Price * noOfItems;
                 }
@@ -385,62 +387,65 @@ namespace MarbleBot.Modules
         public async Task ItemCommandAsync([Remainder] string searchTerm)
         {
             var item = GetItem<Weapon>(searchTerm);
-            if (item.Id == -1) await ReplyAsync(":warning: | Could not find the requested item!");
-            else if (item.Id == -2) await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
-            else
+            if (item == null)
             {
-                var user = GetUser(Context);
-                if (item.Stage > user.Stage)
-                {
-                    await ReplyAsync(embed: new EmbedBuilder()
-                        .WithColor(GetColor(Context))
-                        .WithCurrentTimestamp()
-                        .WithDescription($"{StageTooHighString()}\n\nYou are unable to view information about this item!")
-                        .WithTitle(item.Name)
-                        .Build());
-                    return;
-                }
-                var price = item.Price == -1 ? "N/A" : $"{UoM}{item.Price:n2}";
-                var builder = new EmbedBuilder()
+                await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                return;
+            }
+
+
+            var user = GetUser(Context);
+            if (item.Stage > user.Stage)
+            {
+                await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
-                    .WithDescription(item.Description)
+                    .WithDescription($"{StageTooHighString()}\n\nYou are unable to view information about this item!")
                     .WithTitle(item.Name)
-                    .AddField("ID", $"{item.Id:000}", true)
-                    .AddField("Price", price, true)
-                    .AddField("For Sale", item.OnSale ? "Yes" : "No", true)
-                    .AddField("Scavenge Location", Enum.GetName(typeof(ScavengeLocation), item.ScavengeLocation), true);
+                    .Build());
+                return;
+            }
 
-                if (user.Stage > 1) builder.AddField("Stage", item.Stage, true);
+            var price = item.Price == -1 ? "N/A" : $"{UoM}{item.Price:n2}";
+            var builder = new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithDescription(item.Description)
+                .WithTitle(item.Name)
+                .AddField("ID", $"{item.Id:000}", true)
+                .AddField("Price", price, true)
+                .AddField("For Sale", item.OnSale ? "Yes" : "No", true)
+                .AddField("Scavenge Location", Enum.GetName(typeof(ScavengeLocation), item.ScavengeLocation), true);
 
-                if (item.WarClass > 0)
-                {
-                    builder.AddField("Weapon Info", new StringBuilder()
-                        .AppendLine($"Class: **{Enum.GetName(typeof(WeaponClass), item.WarClass)}**")
-                        .AppendLine($"Accuracy: **{item.Accuracy}**%")
-                        .AppendLine($"Damage: **{item.Damage}**")
-                        .AppendLine($"Uses: **{item.Uses}**"), true);
-                    if (item.Ammo != null)
-                    {
-                        var output = new StringBuilder();
-                        foreach (var itemId in item.Ammo)
-                            output.AppendLine($"`[{itemId:000}]` {GetItem<Item>(itemId.ToString("000")).Name}");
-                        builder.AddField("Ammo", output.ToString(), true);
-                    }
-                }
-                else if (item.Damage > 0)
-                    builder.AddField("Ammo Damage", item.Damage, true);
+            if (user.Stage > 1) builder.AddField("Stage", item.Stage, true);
 
-                if (item.CraftingRecipe.Count > 0)
+            if (item.WarClass > 0)
+            {
+                builder.AddField("Weapon Info", new StringBuilder()
+                    .AppendLine($"Class: **{Enum.GetName(typeof(WeaponClass), item.WarClass)}**")
+                    .AppendLine($"Accuracy: **{item.Accuracy}**%")
+                    .AppendLine($"Damage: **{item.Damage}**")
+                    .AppendLine($"Uses: **{item.Uses}**"), true);
+                if (item.Ammo != null)
                 {
                     var output = new StringBuilder();
-                    foreach (var rawItem in item.CraftingRecipe)
-                        output.AppendLine($"`[{rawItem.Key}]` {GetItem<Item>(rawItem.Key).Name}: {rawItem.Value}");
-                    builder.AddField($"Crafting Recipe (produces **{item.CraftingProduced}**)", output.ToString());
+                    foreach (var itemId in item.Ammo)
+                        output.AppendLine($"`[{itemId:000}]` {GetItem<Item>(itemId.ToString("000")).Name}");
+                    builder.AddField("Ammo", output.ToString(), true);
                 }
-
-                await ReplyAsync(embed: builder.Build());
             }
+            else if (item.Damage > 0)
+                builder.AddField("Ammo Damage", item.Damage, true);
+
+            if (item.CraftingRecipe.Count > 0)
+            {
+                var output = new StringBuilder();
+                foreach (var rawItem in item.CraftingRecipe)
+                    output.AppendLine($"`[{rawItem.Key}]` {GetItem<Item>(rawItem.Key).Name}: {rawItem.Value}");
+                builder.AddField($"Crafting Recipe (produces **{item.CraftingProduced}**)", output.ToString());
+            }
+
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("itemlist")]

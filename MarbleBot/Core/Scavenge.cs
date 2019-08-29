@@ -64,7 +64,7 @@ namespace MarbleBot.Core
                 if (itemPair.Value.ScavengeLocation == Location)
                 {
                     var outputItem = itemPair.Value;
-                    outputItem = new Item(outputItem, int.Parse(itemPair.Key));
+                    outputItem = new Item(outputItem, uint.Parse(itemPair.Key));
                     collectableItems.Add(outputItem);
                 }
             }
@@ -100,6 +100,9 @@ namespace MarbleBot.Core
             Dispose(true);
         }
 
+        /// <summary> Updates the original message with the current items and ores available. </summary>
+        /// <param name="gameEnded"> Whether the game has ended. </param>
+        /// <param name="stage"> The stage of the user (see MarbleBot.Core.MBUser.Stage). </param>
         internal async Task UpdateEmbedAsync(bool gameEnded = false, int stage = 1)
         {
             bool first = false;

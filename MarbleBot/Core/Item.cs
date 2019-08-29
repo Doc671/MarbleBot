@@ -7,7 +7,7 @@ namespace MarbleBot.Core
     public class Item
     {
         /// <summary> The identification number of the item. </summary>
-        public int Id { get; internal set; }
+        public uint Id { get; internal set; }
         /// <summary> The name of the item. </summary>
         public string Name { get; protected set; }
         /// <summary> The price of the item. </summary>
@@ -28,7 +28,7 @@ namespace MarbleBot.Core
         public int CraftingStationRequired { get; protected set; }
 
         [JsonConstructor]
-        public Item(int id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
+        public Item(uint id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
             int stage = 1, ScavengeLocation scavengeLocation = ScavengeLocation.None, uint craftingProduced = 0u, 
             Dictionary<string, int> craftingRecipe = null, int craftingStationRequired = 0)
         {
@@ -44,7 +44,7 @@ namespace MarbleBot.Core
             CraftingStationRequired = craftingStationRequired;
         }
 
-        public Item(Item baseItem, int id = 0, bool onSale = false, int stage = 1, Dictionary<string, int> craftingRecipe = null)
+        public Item(Item baseItem, uint id = 0, bool onSale = false, int stage = 1, Dictionary<string, int> craftingRecipe = null)
         {
             Id = id == 0 ? baseItem.Id : id;
             Name = baseItem.Name;

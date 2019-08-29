@@ -113,7 +113,7 @@ namespace MarbleBot.Modules
                 }
                 else
                 {
-                    user.Items = new SortedDictionary<int, int> {
+                    user.Items = new SortedDictionary<uint, int> {
                         { item.Id, 1 }
                     };
                 }
@@ -158,7 +158,7 @@ namespace MarbleBot.Modules
                 }
                 else
                 {
-                    user.Items = new SortedDictionary<int, int> {
+                    user.Items = new SortedDictionary<uint, int> {
                         { item.Id, 1 }
                     };
                 }

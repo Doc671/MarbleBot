@@ -87,7 +87,7 @@ namespace MarbleBot.Core
         /// <param name="itemId"> The ID of the item. </param>
         /// <param name="damage"> The damage being dealt by the item. </param>
         /// <param name="consumable"> Whether or not the item is consumed upon use. </param>
-        public async Task ItemAttack(SocketCommandContext context, JObject obj, int itemId,
+        public async Task ItemAttack(SocketCommandContext context, JObject obj, uint itemId,
                                      int damage, bool consumable = false)
         {
             if (_disposed)

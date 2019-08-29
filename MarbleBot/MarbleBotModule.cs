@@ -61,7 +61,7 @@ namespace MarbleBot
         protected internal static T GetItem<T>(string searchTerm) where T : Item
         {
             T item;
-            if (int.TryParse(searchTerm, out int itemId))
+            if (uint.TryParse(searchTerm, out uint itemId))
             {
                 var obj = GetItemsObject();
                 if (obj[itemId.ToString("000")] != null)
@@ -112,7 +112,7 @@ namespace MarbleBot
             if (obj.ContainsKey(context.User.Id.ToString()))
             {
                 user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {
@@ -133,7 +133,7 @@ namespace MarbleBot
             if (obj.ContainsKey(Id.ToString()))
             {
                 user = obj[Id.ToString()].ToObject<MarbleBotUser>();
-                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {
@@ -153,7 +153,7 @@ namespace MarbleBot
             if (obj.ContainsKey(context.User.Id.ToString()))
             {
                 user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {
@@ -173,7 +173,7 @@ namespace MarbleBot
             if (obj.ContainsKey(id.ToString()))
             {
                 user = obj[id.ToString()].ToObject<MarbleBotUser>();
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<int, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {

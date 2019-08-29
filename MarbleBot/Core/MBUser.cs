@@ -39,7 +39,7 @@ namespace MarbleBot.Core
         /// <summary> The last time the user has won a Siege game. </summary>
         public DateTime LastWarWin { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
         /// <summary> The items of the user - a key value pair storing item IDs against their quantities. </summary>
-        public SortedDictionary<int, int> Items { get; set; } = new SortedDictionary<int, int>();
+        public SortedDictionary<uint, int> Items { get; set; } = new SortedDictionary<uint, int>();
 
         /// <summary> Converts the user into a string representation. </summary>
         public override string ToString() => $"{Name}#{Discriminator}";
