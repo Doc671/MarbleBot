@@ -751,6 +751,7 @@ namespace MarbleBot.Modules
                     }
 
                     await SiegeInfo[fileId].WeaponAttack(Context, item);
+                    return;
                 }
 
                 switch (item.Id)

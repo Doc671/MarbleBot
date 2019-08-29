@@ -181,14 +181,14 @@ namespace MarbleBot.Core
             {
                 if (Global.Rand.Next(0, 100) < weapon.Accuracy)
                 {
-                    var damage = (int)Math.Round(weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                    var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                     await DealDamageAsync(context, damage);
                     marble.DamageDealt += damage;
                     await context.Channel.SendMessageAsync(embed: builder
                         .WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{damage}** damage to **{Boss.Name}**!")
                         .Build());
                 }
-                await context.Channel.SendMessageAsync(embed: builder
+                else await context.Channel.SendMessageAsync(embed: builder
                         .WithDescription($"**{marble.Name}** used their **{weapon.Name}**! It missed!")
                         .Build());
             }
@@ -199,7 +199,7 @@ namespace MarbleBot.Core
                 {
                     if (Global.Rand.Next(0, 100) < weapon.Accuracy)
                     {
-                        var damage = (int)Math.Round(weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                        var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                         await DealDamageAsync(context, damage);
                         totalDamage += damage;
                         builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss.Name}**.");

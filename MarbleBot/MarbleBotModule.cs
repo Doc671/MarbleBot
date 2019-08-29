@@ -210,11 +210,13 @@ namespace MarbleBot
 
         /// <summary> Returns a string that indicates the user's Stage is too low. </summary>
         protected internal static string StageTooHighString() 
-        => (Global.Rand.Next(0, 4)) switch
+        => (Global.Rand.Next(0, 6)) switch
             {
                 0 => "*Your inexperience blinds you...*",
                 1 => "*Your vision is blurry...*",
                 2 => "*Screams echo in your head...*",
+                3 => "*You sense a desk restricting your path...*",
+                4 => "*You feel as if there is more to be done...*",
                 _=> "*Your mind is wracked with pain...*",
             };
 
