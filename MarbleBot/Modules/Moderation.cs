@@ -16,7 +16,7 @@ namespace MarbleBot.Modules
         [Summary("Adds a role to the role list.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task AddRoleCommandAsync([Remainder] string searchTerm)
+        public async Task AddRoleCommand([Remainder] string searchTerm)
         {
             if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0))
             {
@@ -34,7 +34,7 @@ namespace MarbleBot.Modules
         [Summary("Deletes the specified amount of messages.")]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
-        public async Task ClearCommandAsync(uint amount)
+        public async Task ClearCommand(uint amount)
         {
             var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).FlattenAsync();
             foreach (var msg in messages) await Context.Channel.DeleteMessageAsync(msg);
@@ -48,7 +48,7 @@ namespace MarbleBot.Modules
         [Summary("Clears channels.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageChannels)]
-        public async Task ClearChannelCommandAsync(string option)
+        public async Task ClearChannelCommand(string option)
         {
             var server = GetServer(Context);
             switch (option.ToLower().RemoveChar(' '))
@@ -68,7 +68,7 @@ namespace MarbleBot.Modules
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        public async Task ClearRecentSpamCommandAsync(string rserver, string rchannel)
+        public async Task ClearRecentSpamCommand(string rserver, string rchannel)
         {
             var server = ulong.Parse(rserver);
             var channel = ulong.Parse(rchannel);
@@ -139,7 +139,7 @@ namespace MarbleBot.Modules
         [Summary("Removes a role from the role list.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task RemoveRoleCommandAsync([Remainder] string searchTerm)
+        public async Task RemoveRoleCommand([Remainder] string searchTerm)
         {
             var server = GetServer(Context);
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
@@ -182,7 +182,7 @@ namespace MarbleBot.Modules
         [Summary("Sets the embed colour of the server using a hexadecimal colour string.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageChannels)]
-        public async Task SetColorCommandAsync(string input)
+        public async Task SetColorCommand(string input)
         {
             if (!uint.TryParse(input, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _))
             {

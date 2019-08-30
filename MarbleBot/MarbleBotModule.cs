@@ -229,7 +229,7 @@ namespace MarbleBot
             serialiser.Serialize(servers, dict);
         }
 
-        /// <summary> Writes users to the appropriate JSON file/ </summary>
+        /// <summary> Writes users to the appropriate JSON file. </summary>
         protected internal static void WriteUsers(JObject obj)
         {
             using var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));

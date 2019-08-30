@@ -21,7 +21,7 @@ namespace MarbleBot.Modules
         [Command("balance")]
         [Alias("credits", "money", "bal")]
         [Summary("Returns how much money you or someone else has.")]
-        public async Task BalanceCommandAsync([Remainder] string searchTerm = "")
+        public async Task BalanceCommand([Remainder] string searchTerm = "")
         {
             var user = new MarbleBotUser();
             var id = Context.User.Id;
@@ -50,7 +50,7 @@ namespace MarbleBot.Modules
         [Command("buy")]
         [Alias("buyitem")]
         [Summary("Buys items.")]
-        public async Task BuyCommandAsync(string rawID, string rawNo = "1")
+        public async Task BuyCommand(string rawID, string rawNo = "1")
         {
             if (!int.TryParse(rawNo, out int noOfItems) && noOfItems > 0)
             {
@@ -101,7 +101,7 @@ namespace MarbleBot.Modules
 
         [Command("craft")]
         [Summary("Crafts an item out of other items.")]
-        public async Task CraftCommandAsync(string searchTerm, string rawNo = "1")
+        public async Task CraftCommand(string searchTerm, string rawNo = "1")
         {
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
@@ -170,7 +170,7 @@ namespace MarbleBot.Modules
 
         [Command("craftable")]
         [Summary("Returns a list of all items that can be crafted with the user's inventory.")]
-        public async Task CraftableCommandAsync()
+        public async Task CraftableCommand()
         {
             var user = GetUser(Context);
             var output = new StringBuilder();
@@ -205,7 +205,7 @@ namespace MarbleBot.Modules
 
         [Command("daily")]
         [Summary("Gives daily Units of Money (200 to the power of (your streak / 100 - 1)).")]
-        public async Task DailyCommandAsync()
+        public async Task DailyCommand()
         {
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
@@ -242,7 +242,7 @@ namespace MarbleBot.Modules
         [Command("dismantle")]
         [Alias("decraft", "disassemble", "dismantle")]
         [Summary("Turns a crafted item back into its ingredients.")]
-        public async Task DecraftCommandAsync(string searchTerm, string rawNo = "1")
+        public async Task DecraftCommand(string searchTerm, string rawNo = "1")
         {
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
@@ -306,7 +306,7 @@ namespace MarbleBot.Modules
         [Command("inventory")]
         [Alias("inv", "items")]
         [Summary("Shows all the items a user has.")]
-        public async Task InventoryCommandAsync([Remainder] string rawSearchTerm = "")
+        public async Task InventoryCommand([Remainder] string rawSearchTerm = "")
         {
             var user = new MarbleBotUser();
             var id = Context.User.Id;
@@ -384,7 +384,7 @@ namespace MarbleBot.Modules
         [Command("item")]
         [Alias("iteminfo")]
         [Summary("Returns information about an item.")]
-        public async Task ItemCommandAsync([Remainder] string searchTerm)
+        public async Task ItemCommand([Remainder] string searchTerm)
         {
             var item = GetItem<Weapon>(searchTerm);
             if (item == null)
@@ -450,13 +450,13 @@ namespace MarbleBot.Modules
 
         [Command("itemlist")]
         [Summary("Gives a link to the item list.")]
-        public async Task ItemListCommandAsync()
+        public async Task ItemListCommand()
             => await ReplyAsync("https://docs.google.com/spreadsheets/d/1tKT8nFH4Aa1VkH_UeieoOkN_iBAfueZLqLOdHsVTJ1I/edit#gid=0");
 
         [Command("poupsoop")]
         [Alias("poupsoopcalc", "poupcalc")]
         [Summary("Calculates the total price of Poup Soop.")]
-        public async Task PoupSoopCalcCommandAsync([Remainder] string msg)
+        public async Task PoupSoopCalcCommand([Remainder] string msg)
         {
             var splitMsg = msg.Split('|');
             var totalCost = 0m;
@@ -491,7 +491,7 @@ namespace MarbleBot.Modules
         [Command("profile")]
         [Alias("stats")]
         [Summary("Returns the profile of you or someone else.")]
-        public async Task ProfileCommandAsync([Remainder] string searchTerm = "")
+        public async Task ProfileCommand([Remainder] string searchTerm = "")
         {
             var user = new MarbleBotUser();
             var id = Context.User.Id;
@@ -570,7 +570,7 @@ namespace MarbleBot.Modules
 
         [Command("recipes")]
         [Summary("Shows all crafting recipes in a range of IDs.")]
-        public async Task RecipesCommandAsync(string rawPage = "1")
+        public async Task RecipesCommand(string rawPage = "1")
         {
             var embed = new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -618,7 +618,7 @@ namespace MarbleBot.Modules
         [Command("richlist")]
         [Alias("richest", "top10", "leaderboard", "networthleaderboard")]
         [Summary("Shows the ten richest people globally by Net Worth.")]
-        public async Task RichListCommandAsync(string rawPage = "1")
+        public async Task RichListCommand(string rawPage = "1")
         {
             if (!int.TryParse(rawPage, out int page)) await ReplyAsync($"**{Context.User.Username}**, this is not a valid integer!");
             else if (page < 1) await ReplyAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
@@ -666,7 +666,7 @@ namespace MarbleBot.Modules
         [Command("sell")]
         [Alias("sellitem")]
         [Summary("Sells items.")]
-        public async Task SellCommandAsync(string rawID, string rawNo = "1")
+        public async Task SellCommand(string rawID, string rawNo = "1")
         {
             if (!int.TryParse(rawNo, out int noOfItems) && noOfItems > 0)
             {
@@ -702,7 +702,7 @@ namespace MarbleBot.Modules
         [Command("shop")]
         [Alias("store")]
         [Summary("Shows all items available for sale, their IDs and their prices.")]
-        public async Task ShopCommandAsync()
+        public async Task ShopCommand()
         {
             var output = new StringBuilder();
             string json;
@@ -725,7 +725,7 @@ namespace MarbleBot.Modules
         [Command("use")]
         [Alias("useitem")]
         [Summary("Uses an item.")]
-        public async Task UseCommandAsync([Remainder] string searchTerm)
+        public async Task UseCommand([Remainder] string searchTerm)
         {
             var item = GetItem<Weapon>(searchTerm);
             var obj = GetUsersObject();

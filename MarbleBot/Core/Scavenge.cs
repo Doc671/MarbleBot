@@ -44,14 +44,14 @@ namespace MarbleBot.Core
 
         public Scavenge(SocketCommandContext context, ScavengeLocation location, IUserMessage message)
         {
-            Actions = Task.Run(async () => { await ScavengeSessionAsync(context); });
+            Actions = Task.Run(async () => { await Session(context); });
             Id = context.User.Id;
             Location = location;
             _originalMessage = message;
         }
 
-        /// <summary> The scavenge session function. </summary>
-        public async Task ScavengeSessionAsync(SocketCommandContext context)
+        /// <summary> The scavenge session. </summary>
+        public async Task Session(SocketCommandContext context)
         {
             var startTime = DateTime.UtcNow;
             var collectableItems = new List<Item>();
@@ -78,7 +78,7 @@ namespace MarbleBot.Core
                         Ores.Enqueue(item);
                     else
                         Items.Enqueue(item);
-                    await UpdateEmbedAsync();
+                    await UpdateEmbed();
                 }
             } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 63));
 
@@ -95,7 +95,7 @@ namespace MarbleBot.Core
             }
             MarbleBotModule.WriteUsers(obj2, context.User, user);
 
-            await UpdateEmbedAsync(true, user.Stage);
+            await UpdateEmbed(true, user.Stage);
 
             Dispose(true);
         }
@@ -103,7 +103,7 @@ namespace MarbleBot.Core
         /// <summary> Updates the original message with the current items and ores available. </summary>
         /// <param name="gameEnded"> Whether the game has ended. </param>
         /// <param name="stage"> The stage of the user (see MarbleBot.Core.MBUser.Stage). </param>
-        internal async Task UpdateEmbedAsync(bool gameEnded = false, int stage = 1)
+        internal async Task UpdateEmbed(bool gameEnded = false, int stage = 1)
         {
             bool first = false;
             var itemOutput = new StringBuilder();

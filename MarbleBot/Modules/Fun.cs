@@ -21,7 +21,7 @@ namespace MarbleBot.Modules
         [Command("7ball")]
         [Summary("Predicts the outcome to a user-defined event.")]
 #pragma warning disable IDE0060 // Remove unused parameter
-        public async Task SevenBallCommandAsync([Remainder] string input)
+        public async Task SevenBallCommand([Remainder] string input)
 #pragma warning restore IDE0060 // Remove unused parameter
         {
             string outcome = Rand.Next(0, 13) switch
@@ -47,7 +47,7 @@ namespace MarbleBot.Modules
         [Command("advice")]
         [Alias("progress", "sage")]
         [Summary("Gives advice on progression.")]
-        public async Task AdviceCommandAsync()
+        public async Task AdviceCommand()
         {
             var user = GetUser(Context);
             string msg;
@@ -121,7 +121,7 @@ namespace MarbleBot.Modules
         [Command("best")]
         [Summary("Picks a random person to call the best.")]
         [RequireContext(ContextType.Guild)]
-        public async Task BestCommandAsync()
+        public async Task BestCommand()
         {
             if (Context.Guild.MemberCount > 1)
             {
@@ -135,7 +135,7 @@ namespace MarbleBot.Modules
 
         [Command("bet")]
         [Summary("Bets on a marble.")]
-        public async Task BetCommandAsync(string no)
+        public async Task BetCommand(string no)
         {
             int noOfMarbles = int.Parse(no);
             if (noOfMarbles > 100) await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
@@ -161,7 +161,7 @@ namespace MarbleBot.Modules
         [Command("buyhat")]
         [Summary("Fakes buying an Uglee Hat.")]
         [Remarks("Not CM")]
-        public async Task BuyHatCommandAsync()
+        public async Task BuyHatCommand()
         {
             if (Context.Guild.Id != CM)
             {
@@ -173,7 +173,7 @@ namespace MarbleBot.Modules
 
         [Command("choose")]
         [Summary("Chooses between several provided choices.")]
-        public async Task ChooseCommandAsync([Remainder] string input)
+        public async Task ChooseCommand([Remainder] string input)
         {
             string[] choices = input.Split('|');
             int choice = Rand.Next(0, choices.Length);
@@ -192,7 +192,7 @@ namespace MarbleBot.Modules
         [Command("orange")]
         [Summary("Gives the user a random statement in Orange Language.")]
         [Remarks("Not CM")]
-        public async Task OrangeCommandAsync()
+        public async Task OrangeCommand()
         {
             await base.ReplyAsync((Rand.Next(1, 6)) switch
             {
@@ -208,7 +208,7 @@ namespace MarbleBot.Modules
         [Command("orangeify")]
         [Summary("Returns the user input in Orange Language.")]
         [Remarks("Not CM")]
-        public async Task OrangeifyCommandAsync([Remainder] string input)
+        public async Task OrangeifyCommand([Remainder] string input)
         {
             var orangeified = new StringBuilder();
             int length = input.Length - 1;
@@ -231,7 +231,7 @@ namespace MarbleBot.Modules
 
         [Command("random")]
         [Summary("Returns a random number with user-defined bounds.")]
-        public async Task RandomCommandAsync(string rStart, string rEnd)
+        public async Task RandomCommand(string rStart, string rEnd)
         {
             var start = rStart.ToInt();
             var end = rEnd.ToInt();
@@ -266,7 +266,7 @@ namespace MarbleBot.Modules
 
         [Command("rank")]
         [Summary("Returns a randomised level and XP count.")]
-        public async Task RankCommandAsync()
+        public async Task RankCommand()
         {
             EmbedBuilder builder = new EmbedBuilder();
             int level = Rand.Next(0, 25);
@@ -320,7 +320,7 @@ namespace MarbleBot.Modules
 
         [Command("rate")]
         [Summary("Rates something out of 10.")]
-        public async Task RateCommandAsync([Remainder] string input)
+        public async Task RateCommand([Remainder] string input)
         {
             var lowerInput = input.ToLower();
             string message = "";
@@ -396,7 +396,7 @@ namespace MarbleBot.Modules
 
         [Command("repeat")]
         [Summary("Repeats the given message.")]
-        public async Task RepeatCommandAsync([Remainder] string repeat)
+        public async Task RepeatCommand([Remainder] string repeat)
         {
             if (repeat == "Am Melmon") await ReplyAsync("No U");
             else if (await Moderation.CheckSwearAsync(repeat))
@@ -413,7 +413,7 @@ namespace MarbleBot.Modules
 
         [Command("reverse")]
         [Summary("Returns the user input reversed.")]
-        public async Task ReverseCommandAsync([Remainder] string input)
+        public async Task ReverseCommand([Remainder] string input)
         {
             // Another version of orangeify, but for CM (can secretly be used elsewhere)
             var reverse = new StringBuilder();
@@ -438,7 +438,7 @@ namespace MarbleBot.Modules
         [Command("vinhglish")]
         [Summary("Returns a Vinhglish word, its inventor and meaning.")]
         [Remarks("Not CM")]
-        public async Task VinhglishCommandAsync([Remainder] string word = "")
+        public async Task VinhglishCommand([Remainder] string word = "")
         {
             int randNo = 0;
             bool wordSet = false;

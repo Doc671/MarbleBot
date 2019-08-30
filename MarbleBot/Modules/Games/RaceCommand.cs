@@ -26,13 +26,13 @@ namespace MarbleBot.Modules
             [Command("signup")]
             [Alias("join")]
             [Summary("Sign up to the marble race!")]
-            public async Task RaceSignupCommandAsync([Remainder] string marbleName = "")
-            => await SignupAsync(Context, Type, marbleName, 10, async () => { await RaceStartCommandAsync(); });
+            public async Task RaceSignupCommand([Remainder] string marbleName = "")
+            => await Signup(Context, Type, marbleName, 10, async () => { await RaceStartCommand(); });
 
             [Command("start")]
             [Alias("begin")]
             [Summary("Starts the marble race.")]
-            public async Task RaceStartCommandAsync()
+            public async Task RaceStartCommand()
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var builder = new EmbedBuilder()
@@ -142,23 +142,23 @@ namespace MarbleBot.Modules
 
             [Command("checkearn")]
             [Summary("Shows whether you can earn money from racing and if not, when.")]
-            public async Task RaceCheckearnCommandAsync()
-            => await CheckearnAsync(Context, Type);
+            public async Task RaceCheckearnCommand()
+            => await Checkearn(Context, Type);
 
             [Command("clear")]
             [Summary("Clears the list of racers.")]
-            public async Task RaceClearCommandAsync()
-            => await ClearAsync(Context, Type);
+            public async Task RaceClearCommand()
+            => await Clear(Context, Type);
 
             [Command("contestants")]
             [Alias("marbles", "participants")]
             [Summary("Shows a list of all the contestants in the race.")]
-            public async Task RaceContestantsCommandAsync()
-            => await ContestantsAsync(Context, Type);
+            public async Task RaceContestantsCommand()
+            => await ShowContestants(Context, Type);
 
             [Command("leaderboard")]
             [Summary("Shows a leaderboard of most used marbles or winning marbles.")]
-            public async Task RaceLeaderboardCommandAsync(string option, string rawPage = "1")
+            public async Task RaceLeaderboardCommand(string option, string rawPage = "1")
             {
                 if (int.TryParse(rawPage, out int page))
                 {
@@ -212,14 +212,14 @@ namespace MarbleBot.Modules
 
             [Command("remove")]
             [Summary("Removes a contestant from the contestant list.")]
-            public async Task RaceRemoveCommandAsync([Remainder] string marbleToRemove)
-            => await RemoveAsync(Context, Type, marbleToRemove);
+            public async Task RaceRemoveCommand([Remainder] string marbleToRemove)
+            => await RemoveContestant(Context, Type, marbleToRemove);
 
             [Command("")]
             [Alias("help")]
             [Priority(-1)]
             [Summary("Race help.")]
-            public async Task RaceHelpCommandAsync([Remainder] string _ = "")
+            public async Task RaceHelpCommand([Remainder] string _ = "")
                 => await ReplyAsync(embed: new EmbedBuilder()
                     .AddField("How to play",
                         new StringBuilder()

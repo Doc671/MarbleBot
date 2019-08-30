@@ -14,7 +14,7 @@ namespace MarbleBot.Modules
         [Alias("giverole")]
         [Summary("Gives a role if it is on the role list.")]
         [RequireContext(ContextType.Guild)]
-        public async Task GiveRoleCommandAsync([Remainder] string roleName)
+        public async Task GiveRoleCommand([Remainder] string roleName)
         {
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
@@ -34,7 +34,7 @@ namespace MarbleBot.Modules
         [Alias("removerole, takerole")]
         [Summary("Takes a role if it is on the role list.")]
         [RequireContext(ContextType.Guild)]
-        public async Task TakeRoleCommandAsync([Remainder] string roleName)
+        public async Task TakeRoleCommand([Remainder] string roleName)
         {
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
@@ -54,7 +54,7 @@ namespace MarbleBot.Modules
         [Alias("roletoggle")]
         [Summary("Toggles role list roles.")]
         [RequireContext(ContextType.Guild)]
-        public async Task RoleToggleCommandAsync([Remainder] string roleName)
+        public async Task RoleToggleCommand([Remainder] string roleName)
         {
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
@@ -81,7 +81,7 @@ namespace MarbleBot.Modules
         [Command("rolelist")]
         [Alias("roles")]
         [Summary("Shows a list of roles that can be given/taken by `mb/give` and `mb/take`.")]
-        public async Task RoleListCommandAsync()
+        public async Task RoleListCommand()
         {
             var output = new StringBuilder();
             var server = GetServer(Context);

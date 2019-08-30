@@ -19,7 +19,7 @@ namespace MarbleBot.Modules
     {
         [Command("channelinfo")]
         [Summary("Returns information about a channel.")]
-        public async Task ChannelInfoCommandAsync([Remainder] string searchTerm)
+        public async Task ChannelInfoCommand([Remainder] string searchTerm)
         {
             // Channel display;
 
@@ -51,7 +51,7 @@ namespace MarbleBot.Modules
         [Command("cv")]
         [Summary("Allows verified users to send a video in Community Marble channel #community-videos.")]
         [Remarks("CM Only")]
-        public async Task CommunityVideosCommandAsync(string url, [Remainder] string desc = "")
+        public async Task CommunityVideosCommand(string url, [Remainder] string desc = "")
         {
             if (Context.IsPrivate)
             {
@@ -141,7 +141,7 @@ namespace MarbleBot.Modules
 
         [Command("searchchannel")]
         [Summary("Displays a list of channels that match the search criteria.")]
-        public async Task SearchChannelCommandAsync([Remainder] string searchTerm)
+        public async Task SearchChannelCommand([Remainder] string searchTerm)
         {
             SearchResource.ListRequest searchListRequest;
 
@@ -191,7 +191,7 @@ namespace MarbleBot.Modules
 
         [Command("searchvideo")]
         [Summary("Displays a list of videos that match the search critera.")]
-        public async Task SearchVideoCommandAsync([Remainder] string searchTerm)
+        public async Task SearchVideoCommand([Remainder] string searchTerm)
         {
             SearchResource.ListRequest searchListRequest;
 

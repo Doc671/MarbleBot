@@ -42,10 +42,190 @@ namespace MarbleBot.Core
         private bool _disposed = false;
         private bool _victoryCalled = false;
 
-        public async Task DealDamageAsync(SocketCommandContext context, int dmg)
+        // Separate task dealing with time-based boss responses
+        public async Task BossActions(SocketCommandContext context)
+        {
+            var startTime = DateTime.UtcNow;
+            var timeout = false;
+            do
+            {
+                await Task.Delay(15000);
+
+                if (_disposed) return;
+
+                if (Boss.HP < 1)
+                {
+                    if (!_victoryCalled) await Victory(context);
+                    break;
+                }
+
+                if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 20)
+                {
+                    timeout = true;
+                    break;
+                }
+
+                // Attack marbles
+                var atk = Boss.Attacks[Global.Rand.Next(0, Boss.Attacks.Length)];
+                var builder = new EmbedBuilder()
+                    .WithAuthor(Boss.Name, Boss.ImageUrl)
+                    .WithColor(GetColor(context))
+                    .WithCurrentTimestamp()
+                    .WithDescription($"**{Boss.Name}** used **{atk.Name}**!")
+                    .WithTitle($"WARNING: {atk.Name.ToUpper()} INBOUND!");
+
+                var attackMissed = true;
+                foreach (var marble in Marbles)
+                {
+                    if (marble.HP > 0)
+                    {
+                        if (!(Global.Rand.Next(0, 100) > atk.Accuracy))
+                        {
+                            marble.DealDamage(atk.Damage);
+                            attackMissed = false;
+                            if (marble.HP < 1)
+                            {
+                                marble.HP = 0;
+                                builder.AddField($"**{marble.Name}** has been killed!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{DamageMultiplier}**");
+                            }
+                            else
+                            {
+                                switch (atk.StatusEffect == marble.StatusEffect ? StatusEffect.None : atk.StatusEffect)
+                                {
+                                    case StatusEffect.Chill:
+                                        marble.StatusEffect = StatusEffect.Chill;
+                                        builder.AddField($"**{marble.Name}** has been chilled! All attacks will deal half damage unless cured!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Chill**");
+                                        break;
+                                    case StatusEffect.Doom:
+                                        marble.StatusEffect = StatusEffect.Doom;
+                                        builder.AddField($"**{marble.Name}** has been doomed and will die in ~45 seconds if not cured!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Doom**");
+                                        marble.DoomStart = DateTime.UtcNow;
+                                        break;
+                                    case StatusEffect.Poison:
+                                        marble.StatusEffect = StatusEffect.Poison;
+                                        builder.AddField($"**{marble.Name}** has been poisoned and will lose HP every ~15 seconds until cured/at 1 HP!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Poison**");
+                                        break;
+                                    case StatusEffect.Stun:
+                                        marble.StatusEffect = StatusEffect.Stun;
+                                        builder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Stun**");
+                                        marble.LastStun = DateTime.UtcNow;
+                                        break;
+                                    default: builder.AddField($"**{marble.Name}** has been damaged!", $"HP: **{marble.HP}**/{marble.MaxHP}"); break;
+                                }
+                            }
+                        }
+
+                        // Perform status effects
+                        switch (marble.StatusEffect)
+                        {
+                            case StatusEffect.Doom:
+                                if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45)
+                                {
+                                    marble.HP = 0;
+                                    builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{DamageMultiplier}**");
+                                }
+                                break;
+                            case StatusEffect.Poison:
+                                if (DateTime.UtcNow.Subtract(marble.LastPoisonTick).TotalSeconds > 15)
+                                {
+                                    if (marble.HP < 1) break;
+                                    marble.HP -= (int)Math.Round((double)marble.MaxHP / 10);
+                                    marble.LastPoisonTick = DateTime.UtcNow;
+                                    if (marble.HP < 2)
+                                    {
+                                        marble.HP = 1;
+                                        marble.StatusEffect = StatusEffect.None;
+                                    }
+                                    builder.AddField($"**{marble.Name}** has taken Poison damage!", $"HP: **{marble.HP}**/{marble.MaxHP}");
+                                }
+                                marble.LastPoisonTick = DateTime.UtcNow;
+                                break;
+                        }
+                    }
+                }
+                if (attackMissed) builder.AddField("Missed!", "No-one got hurt!");
+
+                // Wear off Morale Boost
+                if (DateTime.UtcNow.Subtract(LastMorale).TotalSeconds > 20 && Morales > 0)
+                {
+                    Morales--;
+                    builder.AddField("Morale Boost has worn off!",
+                        $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
+                }
+
+                // Cause new power-up to appear
+                if (PowerUp == PowerUp.None)
+                {
+                    string GetPowerUpImageUrl()
+                    => PowerUp switch
+                    {
+                        PowerUp.Clone => "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
+                        PowerUp.Cure => "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
+                        PowerUp.Heal => "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
+                        PowerUp.MoraleBoost => "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
+                        PowerUp.Overclock => "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
+                        PowerUp.Summon => "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
+                        _ => ""
+                    };
+
+                    switch (Global.Rand.Next(0, 8))
+                    {
+                        case 1:
+                            PowerUp = PowerUp.Clone;
+                            builder.AddField("Power-up spawned!", "A **Clone** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                .WithThumbnailUrl(GetPowerUpImageUrl());
+                            break;
+                        case 2:
+                            if (Marbles.Any(m => m.StatusEffect != StatusEffect.None))
+                            {
+                                PowerUp = PowerUp.Cure;
+                                builder.AddField("Power-up spawned!", "A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                    .WithThumbnailUrl(GetPowerUpImageUrl());
+                            }
+                            break;
+                        case 4:
+                            PowerUp = PowerUp.MoraleBoost;
+                            builder.AddField("Power-up spawned!", "A **Morale Boost** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                .WithThumbnailUrl(GetPowerUpImageUrl());
+                            break;
+                        case 6:
+                            PowerUp = PowerUp.Summon;
+                            builder.AddField("Power-up spawned!", "A **Summon** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
+                                .WithThumbnailUrl(GetPowerUpImageUrl());
+                            break;
+                    }
+                }
+
+                await context.Channel.SendMessageAsync(embed: builder.Build());
+
+            } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0 && !_disposed);
+
+            if (Boss.HP > 0 && !_disposed)
+            {
+                if (timeout) await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
+                else
+                {
+                    var marbles = new StringBuilder();
+                    foreach (var marble in Marbles)
+                        marbles.AppendLine(marble.ToString(context, false));
+                    await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        .WithAuthor(Boss.Name, Boss.ImageUrl)
+                        .WithColor(GetColor(context))
+                        .WithCurrentTimestamp()
+                        .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal HP: **{Boss.HP}**/{Boss.MaxHP}")
+                        .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
+                        .WithThumbnailUrl(Boss.ImageUrl)
+                        .WithTitle("Siege Failure!")
+                        .Build());
+                }
+                Dispose(true);
+            }
+        }
+
+        public async Task DealDamage(SocketCommandContext context, int dmg)
         {
             Boss.HP -= dmg;
-            if (Boss.HP < 1) await SiegeVictoryAsync(context);
+            if (Boss.HP < 1) await Victory(context);
         }
 
         public void Dispose() => Dispose(true);
@@ -114,7 +294,7 @@ namespace MarbleBot.Core
             }
 
             damage = (int)Math.Round(damage * DamageMultiplier);
-            await DealDamageAsync(context, damage);
+            await DealDamage(context, damage);
             await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                 .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
                 .WithAuthor(context.User)
@@ -133,264 +313,17 @@ namespace MarbleBot.Core
             if (item.Id == 10) marble.QefpedunCharmUsed = true;
         }
 
-        /// <summary> Attacks the boss with a weapon. </summary>
-        /// <param name="context"> The context of the command. </param>
-        /// <param name="weapon"> The weapon used to attack. </param>
-        public async Task WeaponAttack(SocketCommandContext context, Weapon weapon)
-        {
-            if (_disposed)
+        public static string PowerUpString(PowerUp powerUp)
+            => powerUp switch
             {
-                await context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
-                return;
-            }
+                PowerUp.None => "",
+                PowerUp.MoraleBoost => "Morale Boost",
+                _ => Enum.GetName(typeof(PowerUp), powerUp)
+            };
 
-            var ammo = new Ammo();
-            var marble = Marbles.Find(m => m.Id == context.User.Id);
-            var user = GetUser(context);
+        public override string ToString() => $"[{Id}] {Boss.Name}: {Marbles.Count}";
 
-            if (weapon.Ammo != null)
-            {
-                for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
-                {
-                    if (user.Items.ContainsKey(weapon.Ammo[i]) && user.Items[weapon.Ammo[i]] >= weapon.Uses)
-                    {
-                        ammo = GetItem<Ammo>(weapon.Ammo[i].ToString("000"));
-                        break;
-                    }
-                }
-
-                if (ammo.Id == 0)
-                {
-                    await context.Channel.SendMessageAsync($"**{context.User.Username}**, you do not have enough ammo for this item!");
-                    return;
-                }
-
-                var obj = GetUsersObject();
-                user.Items[ammo.Id] -= weapon.Uses;
-                user.NetWorth -= ammo.Price * weapon.Uses;
-                WriteUsers(obj, context.User, user);
-            }
-
-            var builder = new EmbedBuilder()
-                    .WithAuthor(context.User)
-                    .WithColor(GetColor(context))
-                    .WithCurrentTimestamp()
-                    .WithTitle(weapon.Name);
-
-            if (weapon.Uses == 1)
-            {
-                if (Global.Rand.Next(0, 100) < weapon.Accuracy)
-                {
-                    var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
-                    await DealDamageAsync(context, damage);
-                    marble.DamageDealt += damage;
-                    await context.Channel.SendMessageAsync(embed: builder
-                        .WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{damage}** damage to **{Boss.Name}**!")
-                        .Build());
-                }
-                else await context.Channel.SendMessageAsync(embed: builder
-                        .WithDescription($"**{marble.Name}** used their **{weapon.Name}**! It missed!")
-                        .Build());
-            }
-            else
-            {
-                var totalDamage = 0;
-                for (int i = 0; i < weapon.Uses; i++)
-                {
-                    if (Global.Rand.Next(0, 100) < weapon.Accuracy)
-                    {
-                        var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
-                        await DealDamageAsync(context, damage);
-                        totalDamage += damage;
-                        builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss.Name}**.");
-                    }
-                    else builder.AddField($"Attack {i + 1}", "Missed!");
-                    await Task.Delay(1);
-                }
-                marble.DamageDealt += totalDamage;
-                await context.Channel.SendMessageAsync(embed: builder
-                        .WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing a total of **{totalDamage}** to **{Boss.Name}**!")
-                        .Build());
-            }
-        }
-
-        // Separate task dealing with time-based boss responses
-        public async Task SiegeBossActionsAsync(SocketCommandContext context)
-        {
-            var startTime = DateTime.UtcNow;
-            var timeout = false;
-            do
-            {
-                await Task.Delay(15000);
-                if (_disposed) return;
-                else if (Boss.HP < 1)
-                {
-                    if (!_victoryCalled) await SiegeVictoryAsync(context);
-                    break;
-                }
-                else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 20)
-                {
-                    timeout = true;
-                    break;
-                }
-                else
-                {
-                    // Attack marbles
-                    var atk = Boss.Attacks[Global.Rand.Next(0, Boss.Attacks.Length)];
-                    var builder = new EmbedBuilder()
-                        .WithAuthor(Boss.Name, Boss.ImageUrl)
-                        .WithColor(GetColor(context))
-                        .WithCurrentTimestamp()
-                        .WithDescription($"**{Boss.Name}** used **{atk.Name}**!")
-                        .WithTitle($"WARNING: {atk.Name.ToUpper()} INBOUND!");
-                    var hits = 0;
-                    foreach (var marble in Marbles)
-                    {
-                        if (marble.HP > 0)
-                        {
-                            if (!(Global.Rand.Next(0, 100) > atk.Accuracy))
-                            {
-                                marble.DealDamage(atk.Damage);
-                                hits++;
-                                if (marble.HP < 1)
-                                {
-                                    marble.HP = 0;
-                                    builder.AddField($"**{marble.Name}** has been killed!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{DamageMultiplier}**");
-                                }
-                                else
-                                {
-                                    switch (atk.StatusEffect == marble.StatusEffect ? StatusEffect.None : atk.StatusEffect)
-                                    {
-                                        case StatusEffect.Chill:
-                                            marble.StatusEffect = StatusEffect.Chill;
-                                            builder.AddField($"**{marble.Name}** has been chilled! All attacks will deal half damage unless cured!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Chill**");
-                                            break;
-                                        case StatusEffect.Doom:
-                                            marble.StatusEffect = StatusEffect.Doom;
-                                            builder.AddField($"**{marble.Name}** has been doomed and will die in ~45 seconds if not cured!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Doom**");
-                                            marble.DoomStart = DateTime.UtcNow;
-                                            break;
-                                        case StatusEffect.Poison:
-                                            marble.StatusEffect = StatusEffect.Poison;
-                                            builder.AddField($"**{marble.Name}** has been poisoned and will lose HP every ~15 seconds until cured/at 1 HP!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Poison**");
-                                            break;
-                                        case StatusEffect.Stun:
-                                            marble.StatusEffect = StatusEffect.Stun;
-                                            builder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!", $"HP: **{marble.HP}**/{marble.MaxHP}\nStatus Effect: **Stun**");
-                                            marble.LastStun = DateTime.UtcNow;
-                                            break;
-                                        default: builder.AddField($"**{marble.Name}** has been damaged!", $"HP: **{marble.HP}**/{marble.MaxHP}"); break;
-                                    }
-                                }
-                            }
-
-                            // Perform status effects
-                            switch (marble.StatusEffect)
-                            {
-                                case StatusEffect.Doom:
-                                    if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45)
-                                    {
-                                        marble.HP = 0;
-                                        builder.AddField($"**{marble.Name}** has died of Doom!", $"HP: **0**/{marble.MaxHP}\nDamage Multiplier: **{DamageMultiplier}**");
-                                    }
-                                    break;
-                                case StatusEffect.Poison:
-                                    if (DateTime.UtcNow.Subtract(marble.LastPoisonTick).TotalSeconds > 15)
-                                    {
-                                        if (marble.HP < 1) break;
-                                        marble.HP -= (int)Math.Round((double)marble.MaxHP / 10);
-                                        marble.LastPoisonTick = DateTime.UtcNow;
-                                        if (marble.HP < 2)
-                                        {
-                                            marble.HP = 1;
-                                            marble.StatusEffect = StatusEffect.None;
-                                        }
-                                        builder.AddField($"**{marble.Name}** has taken Poison damage!", $"HP: **{marble.HP}**/{marble.MaxHP}");
-                                    }
-                                    marble.LastPoisonTick = DateTime.UtcNow;
-                                    break;
-                            }
-                        }
-                    }
-                    if (hits < 1) builder.AddField("Missed!", "No-one got hurt!");
-
-                    // Wear off Morale Boost
-                    if (DateTime.UtcNow.Subtract(LastMorale).TotalSeconds > 20 && Morales > 0)
-                    {
-                        Morales--;
-                        builder.AddField("Morale Boost has worn off!", 
-                            $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
-                    }
-
-                    // Cause new power-up to appear
-                    if (PowerUp == PowerUp.None)
-                    {
-                        string GetPowerUpImageUrl()
-                        => PowerUp switch
-                        {
-                            PowerUp.Clone => "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
-                            PowerUp.Cure => "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
-                            PowerUp.Heal => "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
-                            PowerUp.MoraleBoost => "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
-                            PowerUp.Overclock => "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
-                            PowerUp.Summon => "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
-                            _ => ""
-                        };
-
-                        switch (Global.Rand.Next(0, 8))
-                        {
-                            case 1:
-                                PowerUp = PowerUp.Clone;
-                                builder.AddField("Power-up spawned!", "A **Clone** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(GetPowerUpImageUrl());
-                                break;
-                            case 2:
-                                if (Marbles.Any(m => m.StatusEffect != StatusEffect.None))
-                                {
-                                    PowerUp = PowerUp.Cure;
-                                    builder.AddField("Power-up spawned!", "A **Cure** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                        .WithThumbnailUrl(GetPowerUpImageUrl());
-                                }
-                                break;
-                            case 4:
-                                PowerUp = PowerUp.MoraleBoost;
-                                builder.AddField("Power-up spawned!", "A **Morale Boost** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(GetPowerUpImageUrl());
-                                break;
-                            case 6:
-                                PowerUp = PowerUp.Summon;
-                                builder.AddField("Power-up spawned!", "A **Summon** power-up has spawned in the arena! Use `mb/siege grab` to try and activate it!")
-                                    .WithThumbnailUrl(GetPowerUpImageUrl());
-                                break;
-                        }
-                    }
-
-                    await context.Channel.SendMessageAsync(embed: builder.Build());
-                }
-            } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0 && !_disposed);
-            if (Boss.HP > 0 && !_disposed)
-            {
-                if (timeout) await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
-                else
-                {
-                    var marbles = new StringBuilder();
-                    foreach (var marble in Marbles)
-                        marbles.AppendLine(marble.ToString(context, false));
-                    await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                        .WithAuthor(Boss.Name, Boss.ImageUrl)
-                        .WithColor(GetColor(context))
-                        .WithCurrentTimestamp()
-                        .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal HP: **{Boss.HP}**/{Boss.MaxHP}")
-                        .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
-                        .WithThumbnailUrl(Boss.ImageUrl)
-                        .WithTitle("Siege Failure!")
-                        .Build());
-                }
-                Dispose(true);
-            }
-        }
-
-        public async Task SiegeVictoryAsync(SocketCommandContext context)
+        public async Task Victory(SocketCommandContext context)
         {
             if (_victoryCalled) return;
             _victoryCalled = true;
@@ -469,14 +402,83 @@ namespace MarbleBot.Core
             Dispose(true);
         }
 
-        public override string ToString() => $"{Boss.Name}: {Marbles.Count}";
+        /// <summary> Attacks the boss with a weapon. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="weapon"> The weapon used to attack. </param>
+        public async Task WeaponAttack(SocketCommandContext context, Weapon weapon)
+        {
+            if (_disposed)
+            {
+                await context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
+                return;
+            }
 
-        public static string PowerUpString(PowerUp powerUp)
-        => powerUp switch {
-            PowerUp.None => "",
-            PowerUp.MoraleBoost => "Morale Boost",
-            _ => Enum.GetName(typeof(PowerUp), powerUp)
-        };
+            var ammo = new Ammo();
+            var marble = Marbles.Find(m => m.Id == context.User.Id);
+            var user = GetUser(context);
+
+            if (weapon.Ammo != null)
+            {
+                for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
+                {
+                    if (user.Items.ContainsKey(weapon.Ammo[i]) && user.Items[weapon.Ammo[i]] >= weapon.Uses)
+                    {
+                        ammo = GetItem<Ammo>(weapon.Ammo[i].ToString("000"));
+                        break;
+                    }
+                }
+
+                if (ammo.Id == 0)
+                {
+                    await context.Channel.SendMessageAsync($"**{context.User.Username}**, you do not have enough ammo for this item!");
+                    return;
+                }
+
+                var obj = GetUsersObject();
+                user.Items[ammo.Id] -= weapon.Uses;
+                user.NetWorth -= ammo.Price * weapon.Uses;
+                WriteUsers(obj, context.User, user);
+            }
+
+            var builder = new EmbedBuilder()
+                    .WithAuthor(context.User)
+                    .WithColor(GetColor(context))
+                    .WithCurrentTimestamp()
+                    .WithTitle(weapon.Name);
+
+            if (weapon.Uses == 1)
+            {
+                if (Global.Rand.Next(0, 100) < weapon.Accuracy)
+                {
+                    var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                    await DealDamage(context, damage);
+                    marble.DamageDealt += damage;
+                    builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{damage}** damage to **{Boss.Name}**!");
+                }
+                else builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**! It missed!");
+            }
+            else
+            {
+                var totalDamage = 0;
+                for (int i = 0; i < weapon.Uses; i++)
+                {
+                    if (Global.Rand.Next(0, 100) < weapon.Accuracy)
+                    {
+                        var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                        await DealDamage(context, damage);
+                        totalDamage += damage;
+                        builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss.Name}**.");
+                    }
+                    else builder.AddField($"Attack {i + 1}", "Missed!");
+                    await Task.Delay(1);
+                }
+                marble.DamageDealt += totalDamage;
+                builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing a total of **{totalDamage}** to **{Boss.Name}**!");
+            }
+            await context.Channel.SendMessageAsync(embed: builder
+                        .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
+                        .Build());
+        }
 
         public Siege(SocketCommandContext context, SiegeMarble[] marbles)
         {

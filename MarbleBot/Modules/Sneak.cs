@@ -23,7 +23,7 @@ namespace MarbleBot.Modules
         [Command("backup")]
         [Summary("Copies all files in the Data directory to the Backup directory.")]
         [RequireOwner]
-        public async Task BackupCommandAsync()
+        public async Task BackupCommand()
         {
             System.IO.Compression.ZipFile.CreateFromDirectory("Data", $"Backup-{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.zip");
             await ReplyAsync("Success.");
@@ -33,7 +33,7 @@ namespace MarbleBot.Modules
         [Alias("cm")]
         [Summary("Resets all values in MarbleBot.Global")]
         [RequireOwner]
-        public async Task ClearMemoryCommandAsync()
+        public async Task ClearMemoryCommand()
         {
             AutoresponseLastUse = new DateTime();
             Autoresponses = new Dictionary<string, string>();
@@ -81,7 +81,7 @@ namespace MarbleBot.Modules
         [Alias("dt")]
         [Summary("Changes daily timeout (in hours).")]
         [RequireOwner]
-        public async Task DailyTimeoutCommandAsync(string rawHours)
+        public async Task DailyTimeoutCommand(string rawHours)
         {
             if (ushort.TryParse(rawHours, out ushort hours))
             {
@@ -108,7 +108,7 @@ namespace MarbleBot.Modules
         [Summary("Fixes the balance of each user.")]
         [Alias("fixbal")]
         [RequireOwner]
-        public async Task FixBalanceCommandAsync()
+        public async Task FixBalanceCommand()
         {
             var itemsObj = GetItemsObject();
             var usersDict = GetUsersObject().ToObject<Dictionary<string, MarbleBotUser>>();
@@ -130,7 +130,7 @@ namespace MarbleBot.Modules
         [Command("melmon")]
         [Summary("melmon")]
         [RequireOwner]
-        public async Task MelmonCommandAsync(string melmon, [Remainder] string msg)
+        public async Task MelmonCommand(string melmon, [Remainder] string msg)
         {
             SocketGuild srvr = Context.Client.GetGuild(THS);
             ISocketMessageChannel chnl = srvr.GetTextChannel(THS);
@@ -154,7 +154,7 @@ namespace MarbleBot.Modules
 
         [Command("seezun")]
         [RequireOwner]
-        public async Task SeezunCommandAsync(string seezun)
+        public async Task SeezunCommand(string seezun)
         {
             var obj = GetItemsObject();
             var items = obj.ToObject<Dictionary<string, Item>>();
@@ -197,7 +197,7 @@ namespace MarbleBot.Modules
 
         [Command("setgame")]
         [RequireOwner]
-        public async Task SetGameCommandAsync([Remainder] string game)
+        public async Task SetGameCommand([Remainder] string game)
         {
             await Context.Client.SetGameAsync(game);
             await ReplyAsync("Success.");
@@ -205,7 +205,7 @@ namespace MarbleBot.Modules
 
         [Command("setstatus")]
         [RequireOwner]
-        public async Task SetStatusCommandAsync(string status)
+        public async Task SetStatusCommand(string status)
         {
             await Context.Client.SetStatusAsync(status switch
             {
@@ -219,7 +219,7 @@ namespace MarbleBot.Modules
 
         [Command("siegedict")]
         [RequireOwner]
-        public async Task SiegeDictCommandAsync()
+        public async Task SiegeDictCommand()
         {
             var output = new StringBuilder();
             foreach (var siegePair in SiegeInfo)
@@ -235,7 +235,7 @@ namespace MarbleBot.Modules
         [Command("update")]
         [Summary("Releases update info to all bot channels.")]
         [RequireOwner]
-        public async Task UpdateCommandAsync(string _major, [Remainder] string info)
+        public async Task UpdateCommand(string _major, [Remainder] string info)
         {
             var major = string.Compare(_major, "major", true) == 0;
 

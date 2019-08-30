@@ -21,7 +21,7 @@ namespace MarbleBot.Modules
         [Command("botinfo")]
         [Alias("info")]
         [Summary("Shows bot info.")]
-        public async Task BotInfoCommandAsync()
+        public async Task BotInfoCommand()
             => await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Daily Timeout", $"{DailyTimeout} hours", true)
                 .AddField("Ongoing Scavenges", ScavengeInfo.Count, true)
@@ -39,7 +39,7 @@ namespace MarbleBot.Modules
         [Command("checkearn")]
         [Alias("check", "checktimes")]
         [Summary("Shows the time remaining for each activity with a cooldown.")]
-        public async Task CheckTimesCommandAsync()
+        public async Task CheckTimesCommand()
         {
             var user = GetUser(Context);
             var timeUntilNextDaily = user.LastDaily.Subtract(DateTime.UtcNow.AddHours(-24));
@@ -62,7 +62,7 @@ namespace MarbleBot.Modules
         [Command("help")]
         [Alias("cmds")]
         [Summary("Gives the user help.")]
-        public async Task HelpCommandAsync([Remainder] string command = "")
+        public async Task HelpCommand([Remainder] string command = "")
         {
             var builder = new EmbedBuilder()
                 .WithCurrentTimestamp()
@@ -182,7 +182,7 @@ namespace MarbleBot.Modules
         [Command("invite")]
         [Alias("invitelink")]
         [Summary("Gives the bot's invite link.")]
-        public async Task InviteCommandAsync() => await ReplyAsync(new StringBuilder()
+        public async Task InviteCommand() => await ReplyAsync(new StringBuilder()
                 .AppendLine("Use this link to invite MarbleBot to your server: https://discordapp.com/oauth2/authorize?client_id=286228526234075136&scope=bot&permissions=1")
                 .Append("\nUse `mb/setchannel announcement <channel ID>` to set the channel where bot updates get posted, ")
                 .Append("`mb/setchannel autoresponse <channel ID>` to set the channel where autoresponses can be used and ")
@@ -193,7 +193,7 @@ namespace MarbleBot.Modules
         [Command("serverinfo")]
         [Summary("Displays information about the current server.")]
         [Remarks("Not DMs")]
-        public async Task ServerInfoCommandAsync()
+        public async Task ServerInfoCommand()
         {
             if (!Context.IsPrivate)
             {
@@ -248,7 +248,7 @@ namespace MarbleBot.Modules
         [Summary("Displays a list of all staff members and their statuses.")]
         [Remarks("Not DMs")]
         [RequireContext(ContextType.Guild)]
-        public async Task StaffCheckCommandAsync()
+        public async Task StaffCheckCommand()
         {
             var output = new StringBuilder();
             foreach (var user in Context.Guild.Users)
@@ -274,13 +274,13 @@ namespace MarbleBot.Modules
 
         [Command("uptime")]
         [Summary("Displays how long the bot has been running for.")]
-        public async Task UptimeCommandAsync()
+        public async Task UptimeCommand()
         => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(StartTime))}**.");
 
         [Command("userinfo")]
         [Summary("Displays information about a user.")]
         [Remarks("Not DMs")]
-        public async Task UserInfoCommandAsync([Remainder] string username = "")
+        public async Task UserInfoCommand([Remainder] string username = "")
         {
             if (!Context.IsPrivate)
             {

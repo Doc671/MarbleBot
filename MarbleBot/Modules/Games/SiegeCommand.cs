@@ -27,14 +27,14 @@ namespace MarbleBot.Modules
             [Alias("join")]
             [Summary("Sign up to the Marble Siege!")]
             [RequireSlowmode]
-            public async Task SiegeSignupCommandAsync([Remainder] string marbleName = "")
-            => await SignupAsync(Context, Type, marbleName, 20, async () => { await SiegeStartCommandAsync(); });
+            public async Task SiegeSignupCommand([Remainder] string marbleName = "")
+            => await Signup(Context, Type, marbleName, 20, async () => { await SiegeStartCommand(); });
 
             [Command("start")]
             [Alias("begin")]
             [Summary("Starts the Marble Siege Battle.")]
             [RequireSlowmode]
-            public async Task SiegeStartCommandAsync([Remainder] string over = "")
+            public async Task SiegeStartCommand([Remainder] string over = "")
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
 
@@ -109,14 +109,14 @@ namespace MarbleBot.Modules
                     }
 
                     // Siege Start
-                    var cdown = await ReplyAsync("**3**");
+                    var countdownMessage = await ReplyAsync("**3**");
                     await Task.Delay(1000);
-                    await cdown.ModifyAsync(m => m.Content = "**2**");
+                    await countdownMessage.ModifyAsync(m => m.Content = "**2**");
                     await Task.Delay(1000);
-                    await cdown.ModifyAsync(m => m.Content = "**1**");
+                    await countdownMessage.ModifyAsync(m => m.Content = "**1**");
                     await Task.Delay(1000);
-                    await cdown.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
-                    currentSiege.Actions = Task.Run(async () => { await currentSiege.SiegeBossActionsAsync(Context); });
+                    await countdownMessage.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
+                    currentSiege.Actions = Task.Run(async () => { await currentSiege.BossActions(Context); });
                     await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
@@ -137,7 +137,7 @@ namespace MarbleBot.Modules
 
             [Command("stop")]
             [RequireOwner]
-            public async Task SiegeStopCommandAsync()
+            public async Task SiegeStopCommand()
             {
                 SiegeInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Dispose();
                 await ReplyAsync("Siege successfully stopped.");
@@ -147,7 +147,7 @@ namespace MarbleBot.Modules
             [Alias("bonk")]
             [Summary("Attacks the boss.")]
             [RequireSlowmode]
-            public async Task SiegeAttackCommandAsync()
+            public async Task SiegeAttackCommand()
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 EmbedBuilder builder = new EmbedBuilder()
@@ -218,11 +218,11 @@ namespace MarbleBot.Modules
                 if (marble.Cloned)
                 {
                     clone = true;
-                    await SiegeInfo[fileId].DealDamageAsync(Context, dmg * 5);
+                    await SiegeInfo[fileId].DealDamage(Context, dmg * 5);
                     builder.AddField("Clones attack!", $"Each of the clones dealt **{dmg}** damage to the boss!");
                     marble.Cloned = false;
                 }
-                await SiegeInfo[fileId].DealDamageAsync(Context, dmg);
+                await SiegeInfo[fileId].DealDamage(Context, dmg);
                 marble.DamageDealt += dmg;
                 builder.WithTitle(title)
                     .WithThumbnailUrl(url)
@@ -236,13 +236,13 @@ namespace MarbleBot.Modules
                     else await ReplyAsync($"{marble.Name}' clones disappeared!");
                 }
 
-                if (SiegeInfo[fileId].Boss.HP < 1) await SiegeInfo[fileId].SiegeVictoryAsync(Context);
+                if (SiegeInfo[fileId].Boss.HP < 1) await SiegeInfo[fileId].Victory(Context);
             }
 
             [Command("grab")]
             [Summary("Has a 1/3 chance of activating the power-up.")]
             [RequireSlowmode]
-            public async Task SiegeGrabCommandAsync()
+            public async Task SiegeGrabCommand()
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 EmbedBuilder builder = new EmbedBuilder()
@@ -330,31 +330,31 @@ namespace MarbleBot.Modules
 
             [Command("checkearn")]
             [Summary("Shows whether you can earn money from Sieges and if not, when.")]
-            public async Task SiegeCheckearnCommandAsync()
-            => await CheckearnAsync(Context, Type);
+            public async Task SiegeCheckearnCommand()
+            => await Checkearn(Context, Type);
 
             [Command("clear")]
             [Summary("Clears the list of contestants.")]
-            public async Task SiegeClearCommandAsync()
-            => await ClearAsync(Context, Type);
+            public async Task SiegeClearCommand()
+            => await Clear(Context, Type);
 
             [Command("contestants")]
             [Alias("marbles", "participants")]
             [Summary("Shows a list of all the contestants in the Siege.")]
             [RequireSlowmode]
-            public async Task SiegeContestantsCommandAsync()
-            => await ContestantsAsync(Context, Type);
+            public async Task SiegeContestantsCommand()
+            => await ShowContestants(Context, Type);
 
             [Command("remove")]
             [Summary("Removes a contestant from the contestant list.")]
             [RequireSlowmode]
-            public async Task SiegeRemoveCommandAsync([Remainder] string marbleToRemove)
-            => await RemoveAsync(Context, Type, marbleToRemove);
+            public async Task SiegeRemoveCommand([Remainder] string marbleToRemove)
+            => await RemoveContestant(Context, Type, marbleToRemove);
 
             [Command("info")]
             [Summary("Shows information about the Siege.")]
             [RequireSlowmode]
-            public async Task SiegeInfoCommandAsync()
+            public async Task SiegeInfoCommand()
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var marbles = new StringBuilder();
@@ -402,7 +402,7 @@ namespace MarbleBot.Modules
             [Command("marbleinfo")]
             [Summary("Displays information about the current marble.")]
             [Alias("minfo")]
-            public async Task MarbleInfoCommandAsync(string searchTerm = null)
+            public async Task MarbleInfoCommand(string searchTerm = null)
             {
                 SiegeMarble currentMarble;
                 try
@@ -433,7 +433,7 @@ namespace MarbleBot.Modules
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
             [Summary("Shows a leaderboard of most used marbles in Sieges.")]
-            public async Task SiegeLeaderboardCommandAsync(string rawPage = "1")
+            public async Task SiegeLeaderboardCommand(string rawPage = "1")
             {
                 if (int.TryParse(rawPage, out int page))
                 {
@@ -464,7 +464,7 @@ namespace MarbleBot.Modules
             [Command("boss")]
             [Alias("bossinfo")]
             [Summary("Returns information about a boss.")]
-            public async Task SiegeBossCommandAsync([Remainder] string searchTerm)
+            public async Task SiegeBossCommand([Remainder] string searchTerm)
             {
                 var boss = Boss.Empty;
                 var state = 1;
@@ -549,7 +549,7 @@ namespace MarbleBot.Modules
             [Command("bosschance")]
             [Alias("spawnchance", "boss chance", "spawn chance", "chance")]
             [Summary("Displays the spawn chances of each boss.")]
-            public async Task SiegeBossChanceCommandAsync([Remainder] string option)
+            public async Task SiegeBossChanceCommand([Remainder] string option)
             {
                 var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -588,7 +588,7 @@ namespace MarbleBot.Modules
             [Command("bosslist")]
             [Alias("bosses")]
             [Summary("Returns a list of bosses.")]
-            public async Task SiegeBosslistCommandAsync(string rawStage = "1")
+            public async Task SiegeBosslistCommand(string rawStage = "1")
             {
                 if (int.TryParse(rawStage, out int stage) && (stage == 1 || stage == 2))
                 {
@@ -618,7 +618,7 @@ namespace MarbleBot.Modules
             [Command("powerup")]
             [Alias("power-up", "powerupinfo", "power-upinfo", "puinfo")]
             [Summary("Returns information about a power-up.")]
-            public async Task SiegePowerupCommandAsync(string searchTerm)
+            public async Task SiegePowerupCommand(string searchTerm)
             {
                 var powerup = "";
                 var desc = "";
@@ -658,7 +658,7 @@ namespace MarbleBot.Modules
 
             [Command("ping")]
             [Summary("Toggles whether you are pinged when a Siege that you are in starts.")]
-            public async Task SiegePingCommandAsync(string option = "")
+            public async Task SiegePingCommand(string option = "")
             {
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
@@ -707,7 +707,7 @@ namespace MarbleBot.Modules
             [Alias("help")]
             [Priority(-1)]
             [Summary("Siege help.")]
-            public async Task SiegeHelpCommandAsync()
+            public async Task SiegeHelpCommand()
                 => await ReplyAsync(embed: new EmbedBuilder()
                     .AddField("How to play", new StringBuilder()
                         .AppendLine("Use `mb/siege signup <marble name>` to sign up as a marble! (you can only sign up once)")

@@ -44,55 +44,7 @@ namespace MarbleBot.Core
             }
         }
 
-        public void SetAIMarble(WarMarble aiMarble)
-        {
-            _aiMarble = aiMarble;
-            _aiMarblePresent = true;
-        }
-
-        public async Task WarActions(SocketCommandContext context)
-        {
-            var startTime = DateTime.UtcNow;
-            var timeout = false;
-            do
-            {
-                await Task.Delay(7000);
-                if (_disposed) return;
-                else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
-                {
-                    timeout = true;
-                    break;
-                }
-                else if (_aiMarblePresent && _aiMarble.HP > 0)
-                {
-                    var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
-                    var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Count)];
-                    if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
-                    {
-                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
-                        randMarble.HP -= dmg;
-                        await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                            .AddField("Remaining HP", $"**{randMarble.HP}**/{randMarble.MaxHP}")
-                            .WithColor(GetColor(context))
-                            .WithCurrentTimestamp()
-                            .WithDescription($"**{_aiMarble.Name}** dealt **{dmg}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
-                            .WithTitle($"**{_aiMarble.Name}** attacks!")
-                            .Build());
-                    }
-                    else await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                          .WithColor(GetColor(context))
-                          .WithCurrentTimestamp()
-                          .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
-                          .WithTitle($"**{_aiMarble.Name}** attacks!")
-                          .Build());
-                }
-            }
-            while (!timeout && Team1.Sum(m => m.HP) > 0 && Team2.Sum(m => m.HP) > 0 && !_disposed);
-            if (!timeout) await WarEndAsync(context);
-            else Dispose(true);
-        }
-
-        public async Task WarEndAsync(SocketCommandContext context)
+        public async Task End(SocketCommandContext context)
         {
             if (_endCalled) return;
             _endCalled = true;
@@ -157,6 +109,54 @@ namespace MarbleBot.Core
             await context.Channel.SendMessageAsync(embed: builder.Build());
             WriteUsers(obj);
             Dispose(true);
+        }
+
+        public void SetAIMarble(WarMarble aiMarble)
+        {
+            _aiMarble = aiMarble;
+            _aiMarblePresent = true;
+        }
+
+        public async Task WarActions(SocketCommandContext context)
+        {
+            var startTime = DateTime.UtcNow;
+            var timeout = false;
+            do
+            {
+                await Task.Delay(7000);
+                if (_disposed) return;
+                else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
+                {
+                    timeout = true;
+                    break;
+                }
+                else if (_aiMarblePresent && _aiMarble.HP > 0)
+                {
+                    var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
+                    var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Count)];
+                    if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
+                    {
+                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
+                        randMarble.HP -= dmg;
+                        await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                            .AddField("Remaining HP", $"**{randMarble.HP}**/{randMarble.MaxHP}")
+                            .WithColor(GetColor(context))
+                            .WithCurrentTimestamp()
+                            .WithDescription($"**{_aiMarble.Name}** dealt **{dmg}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
+                            .WithTitle($"**{_aiMarble.Name}** attacks!")
+                            .Build());
+                    }
+                    else await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                          .WithColor(GetColor(context))
+                          .WithCurrentTimestamp()
+                          .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
+                          .WithTitle($"**{_aiMarble.Name}** attacks!")
+                          .Build());
+                }
+            }
+            while (!timeout && Team1.Sum(m => m.HP) > 0 && Team2.Sum(m => m.HP) > 0 && !_disposed);
+            if (!timeout) await End(context);
+            else Dispose(true);
         }
 
         ~War() => Dispose(true);

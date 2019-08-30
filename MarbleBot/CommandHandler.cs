@@ -19,12 +19,12 @@ namespace MarbleBot
             _service = new CommandService();
             _service.AddModulesAsync(Assembly.GetEntryAssembly(), null);
             Global.CommandService = _service;
-            _client.MessageReceived += HandleCommandAsync;
+            _client.MessageReceived += HandleCommand;
         }
 
         public string Name { get; }
 
-        private async Task HandleCommandAsync(SocketMessage s)
+        private async Task HandleCommand(SocketMessage s)
         {
             if (!(s is SocketUserMessage msg)) return;
 

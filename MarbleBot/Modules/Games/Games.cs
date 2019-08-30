@@ -27,7 +27,7 @@ namespace MarbleBot.Modules
         /// <summary> Sends a message showing whether a user can earn from a game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        internal static async Task CheckearnAsync(SocketCommandContext context, GameType gameType)
+        internal static async Task Checkearn(SocketCommandContext context, GameType gameType)
         {
             var user = GetUser(context);
             var lastWin = gameType switch
@@ -52,7 +52,7 @@ namespace MarbleBot.Modules
         /// <summary> Clears the contestant list. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        internal static async Task ClearAsync(SocketCommandContext context, GameType gameType)
+        internal static async Task Clear(SocketCommandContext context, GameType gameType)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             if (context.User.Id == 224267581370925056 || context.IsPrivate)
@@ -62,52 +62,6 @@ namespace MarbleBot.Modules
                 await context.Channel.SendMessageAsync("Contestant list successfully cleared!");
             }
             else await context.Channel.SendMessageAsync($"**{context.User.Username}**, you cannot do this!");
-        }
-
-        /// <summary> Returns a message showing the contestants currently signed up to the game. </summary>
-        /// <param name="context"> The context of the command. </param>
-        /// <param name="gameType"> The type of game. </param>
-        internal static async Task ContestantsAsync(SocketCommandContext context, GameType gameType)
-        {
-            ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
-            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
-            if (!File.Exists(marbleListDirectory))
-            {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "server")}! No-one is signed up!");
-                return;
-            }
-
-            var marbles = new StringBuilder();
-            int count = 0;
-            using (var marbleList = new StreamReader(marbleListDirectory))
-            {
-                var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                for (count = 0; count < allMarbles.Length; count++)
-                {
-                    string marble = allMarbles[count];
-                    if (marble.Length > 16)
-                    {
-                        var marbleInfo = marble.Split(',');
-                        var user = context.Client.GetUser(ulong.Parse(marbleInfo[1]));
-
-                        string bold = marbleInfo[0].Contains('*') || marbleInfo[0].Contains('\\') ? "" : "**";
-
-                        marbles.AppendLine($"{bold}{marbleInfo[0]}{bold} {(context.IsPrivate ? "" : $"[{user.Username}#{user.Discriminator}]")}");
-                    }
-                }
-            }
-
-            var output = marbles.ToString();
-            if (output.IsEmpty())
-                await context.Channel.SendMessageAsync("No-one is signed up!");
-            else
-                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                    .WithColor(GetColor(context))
-                    .WithCurrentTimestamp()
-                    .WithFooter($"Contestant count: {count - 1}")
-                    .WithTitle($"Marble {GameName(gameType)}: Contestants")
-                    .AddField("Contestants", output)
-                    .Build());
         }
 
         /// <summary> Shows leaderboards for mb/race and mb/siege. </summary>
@@ -147,7 +101,7 @@ namespace MarbleBot.Modules
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
         /// <param name="marbleToRemove"> The name of the marble to remove. </param>
-        internal static async Task RemoveAsync(SocketCommandContext context, GameType gameType, string marbleToRemove)
+        internal static async Task RemoveContestant(SocketCommandContext context, GameType gameType, string marbleToRemove)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
@@ -192,6 +146,52 @@ namespace MarbleBot.Modules
             }
         }
 
+        /// <summary> Returns a message showing the contestants currently signed up to the game. </summary>
+        /// <param name="context"> The context of the command. </param>
+        /// <param name="gameType"> The type of game. </param>
+        internal static async Task ShowContestants(SocketCommandContext context, GameType gameType)
+        {
+            ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
+            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
+            if (!File.Exists(marbleListDirectory))
+            {
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "server")}! No-one is signed up!");
+                return;
+            }
+
+            var marbles = new StringBuilder();
+            int count = 0;
+            using (var marbleList = new StreamReader(marbleListDirectory))
+            {
+                var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
+                for (count = 0; count < allMarbles.Length; count++)
+                {
+                    string marble = allMarbles[count];
+                    if (marble.Length > 16)
+                    {
+                        var marbleInfo = marble.Split(',');
+                        var user = context.Client.GetUser(ulong.Parse(marbleInfo[1]));
+
+                        string bold = marbleInfo[0].Contains('*') || marbleInfo[0].Contains('\\') ? "" : "**";
+
+                        marbles.AppendLine($"{bold}{marbleInfo[0]}{bold} {(context.IsPrivate ? "" : $"[{user.Username}#{user.Discriminator}]")}");
+                    }
+                }
+            }
+
+            var output = marbles.ToString();
+            if (output.IsEmpty())
+                await context.Channel.SendMessageAsync("No-one is signed up!");
+            else
+                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    .WithColor(GetColor(context))
+                    .WithCurrentTimestamp()
+                    .WithFooter($"Contestant count: {count - 1}")
+                    .WithTitle($"Marble {GameName(gameType)}: Contestants")
+                    .AddField("Contestants", output)
+                    .Build());
+        }
+
         /// <summary> Removes a contestant from the contestant list of a game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
@@ -199,7 +199,7 @@ namespace MarbleBot.Modules
         /// <param name="marbleLimit"> The maximum number of marbles that can be signed up. </param>
         /// <param name="startCommand"> The command to execute if the marble limit has been met. </param>
         /// <param name="itemId"> (War only) The ID of the weapon the marble is joining with. </param>
-        internal static async Task SignupAsync(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
+        internal static async Task Signup(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
             Func<Task> startCommand, string itemId = "")
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;

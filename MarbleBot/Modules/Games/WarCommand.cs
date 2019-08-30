@@ -28,14 +28,14 @@ namespace MarbleBot.Modules
             [Alias("join")]
             [Summary("Sign up to the Marble War!")]
             [RequireSlowmode]
-            public async Task WarSignupCommandAsync(string itemId, [Remainder] string marbleName = "")
-            => await SignupAsync(Context, Type, marbleName, 20, async () => { await WarStartCommandAsync(); }, itemId);
+            public async Task WarSignupCommand(string itemId, [Remainder] string marbleName = "")
+            => await Signup(Context, Type, marbleName, 20, async () => { await WarStartCommand(); }, itemId);
 
             [Command("start")]
             [Alias("commence")]
             [Summary("Start the Marble War!")]
             [RequireSlowmode]
-            public async Task WarStartCommandAsync()
+            public async Task WarStartCommand()
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var marbles = new List<WarMarble>();
@@ -147,7 +147,7 @@ namespace MarbleBot.Modules
 
             [Command("stop")]
             [RequireOwner]
-            public async Task WarStopCommandAsync()
+            public async Task WarStopCommand()
             {
                 WarInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Dispose();
                 await ReplyAsync("War successfully stopped.");
@@ -156,7 +156,7 @@ namespace MarbleBot.Modules
             [Command("attack")]
             [Summary("Attacks a member of the opposing team with the equipped weapon.")]
             [RequireSlowmode]
-            public async Task WarAttackCommandAsync([Remainder] string target)
+            public async Task WarAttackCommand([Remainder] string target)
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
 
@@ -250,7 +250,7 @@ namespace MarbleBot.Modules
                                 .WithDescription($"**{currentMarble.Name}** dealt a total of **{totalDamage}** to **{enemy.Name}** with **{currentMarble.Weapon.Name}**!")
                                 .Build());
                         }
-                        if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.WarEndAsync(Context);
+                        if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.End(Context);
                         return;
                     }
                 }
@@ -261,7 +261,7 @@ namespace MarbleBot.Modules
             [Alias("bonk", "charge")]
             [Summary("Attacks a member of the opposing team without a weapon.")]
             [RequireSlowmode]
-            public async Task WarBonkCommandAsync([Remainder] string target)
+            public async Task WarBonkCommand([Remainder] string target)
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
 
@@ -301,7 +301,7 @@ namespace MarbleBot.Modules
                             .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemy.Name}**!")
                             .WithTitle($"**{currentMarble.Name}** attacks!")
                             .Build());
-                        if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.WarEndAsync(Context);
+                        if (war.Team1.Sum(m => m.HP) < 1 || war.Team2.Sum(m => m.HP) < 1) await war.End(Context);
                         return;
                     }
                 }
@@ -310,25 +310,25 @@ namespace MarbleBot.Modules
 
             [Command("checkearn")]
             [Summary("Shows whether you can earn money from wars and if not, when.")]
-            public async Task WarCheckearnCommandAsync()
-            => await CheckearnAsync(Context, Type);
+            public async Task WarCheckearnCommand()
+            => await Checkearn(Context, Type);
 
             [Command("clear")]
             [Summary("Clears the list of contestants.")]
-            public async Task WarClearCommandAsync()
-            => await ClearAsync(Context, Type);
+            public async Task WarClearCommand()
+            => await Clear(Context, Type);
 
             [Command("contestants")]
             [Alias("marbles", "participants")]
             [Summary("Shows a list of all the contestants in the war.")]
             [RequireSlowmode]
-            public async Task WarContestantsCommandAsync()
-            => await ContestantsAsync(Context, Type);
+            public async Task WarContestantsCommand()
+            => await ShowContestants(Context, Type);
 
             [Command("info")]
             [Summary("Shows information about the war.")]
             [RequireSlowmode]
-            public async Task WarInfoCommandAsync()
+            public async Task WarInfoCommand()
             {
                 ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                 var builder = new EmbedBuilder()
@@ -384,7 +384,7 @@ namespace MarbleBot.Modules
             [Command("leaderboard")]
             [Alias("leaderboard mostused")]
             [Summary("Shows a leaderboard of most used marbles in wars.")]
-            public async Task WarLeaderboardCommandAsync(string rawPage = "1")
+            public async Task WarLeaderboardCommand(string rawPage = "1")
             {
                 if (int.TryParse(rawPage, out int page))
                 {
@@ -414,7 +414,7 @@ namespace MarbleBot.Modules
 
             [Command("ping")]
             [Summary("Toggles whether you are pinged when a war that you are in starts.")]
-            public async Task WarPingCommandAsync(string option = "")
+            public async Task WarPingCommand(string option = "")
             {
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
@@ -438,13 +438,13 @@ namespace MarbleBot.Modules
             [Command("remove")]
             [Summary("Removes a contestant from the contestant list.")]
             [RequireSlowmode]
-            public async Task WarRemoveCommandAsync([Remainder] string marbleToRemove)
-            => await RemoveAsync(Context, Type, marbleToRemove);
+            public async Task WarRemoveCommand([Remainder] string marbleToRemove)
+            => await RemoveContestant(Context, Type, marbleToRemove);
 
             [Command("valid")]
             [Alias("validweapons")]
             [Summary("Shows all valid weapons to use in war battles.")]
-            public async Task WarValidWeaponsCommandAsync()
+            public async Task WarValidWeaponsCommand()
             {
                 var items = GetItemsObject().ToObject<Dictionary<string, Weapon>>();
                 var output = new StringBuilder();
@@ -467,7 +467,7 @@ namespace MarbleBot.Modules
             [Alias("help")]
             [Priority(-1)]
             [Summary("War help.")]
-            public async Task WarHelpCommandAsync([Remainder] string _ = "")
+            public async Task WarHelpCommand([Remainder] string _ = "")
                 => await ReplyAsync(embed: new EmbedBuilder()
                     .AddField("How to play",
                         new StringBuilder()

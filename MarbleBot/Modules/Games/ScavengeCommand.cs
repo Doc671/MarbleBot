@@ -46,14 +46,14 @@ namespace MarbleBot.Modules
             [Command("canarybeach")]
             [Alias("canary beach")]
             [Summary("Starts a scavenge session in Canary Beach.")]
-            public async Task ScavengeCanaryCommandAsync()
+            public async Task ScavengeCanaryCommand()
                 => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.CanaryBeach);
 
             [Command("destroyersremains")]
             [Alias("destroyer'sremains", "destroyer's remains")]
             [Remarks("Stage2")]
             [Summary("Starts a scavenge session in Destroyer's Remains.")]
-            public async Task ScavengeDestroyerCommandAsync()
+            public async Task ScavengeDestroyerCommand()
             {
                 if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -67,14 +67,14 @@ namespace MarbleBot.Modules
             [Command("treewurld")]
             [Alias("tree wurld")]
             [Summary("Starts a scavenge session in Tree Wurld.")]
-            public async Task ScavengeTreeCommandAsync()
+            public async Task ScavengeTreeCommand()
                 => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.TreeWurld);
 
             [Command("violetvolcanoes")]
             [Alias("violet volcanoes")]
             [Remarks("Stage2")]
             [Summary("Starts a scavenge session in the Violet Volcanoes.")]
-            public async Task ScavengeVolcanoCommandAsync()
+            public async Task ScavengeVolcanoCommand()
             {
                 if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -88,7 +88,7 @@ namespace MarbleBot.Modules
             [Command("grab")]
             [Alias("take")]
             [Summary("Grabs an item found in a scavenge session.")]
-            public async Task ScavengeGrabCommandAsync()
+            public async Task ScavengeGrabCommand()
             {
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
@@ -119,7 +119,7 @@ namespace MarbleBot.Modules
                 }
                 user.NetWorth += item.Price;
                 WriteUsers(obj, Context.User, user);
-                await ScavengeInfo[Context.User.Id].UpdateEmbedAsync();
+                await ScavengeInfo[Context.User.Id].UpdateEmbed();
                 await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
             }
 
@@ -127,7 +127,7 @@ namespace MarbleBot.Modules
             [Alias("extract", "mine")]
             [Remarks("Stage2")]
             [Summary("Extracts an ore found in a scavenge session.")]
-            public async Task ScavengeDrillCommandAsync()
+            public async Task ScavengeDrillCommand()
             {
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
@@ -164,13 +164,13 @@ namespace MarbleBot.Modules
                 }
                 user.NetWorth += item.Price;
                 WriteUsers(obj, Context.User, user);
-                await ScavengeInfo[Context.User.Id].UpdateEmbedAsync();
+                await ScavengeInfo[Context.User.Id].UpdateEmbed();
                 await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
             }
 
             [Command("sell")]
             [Summary("Sells an item found in a scavenge session.")]
-            public async Task ScavengeSellCommandAsync()
+            public async Task ScavengeSellCommand()
             {
                 var obj = GetUsersObject();
                 var user = GetUser(Context, obj);
@@ -190,13 +190,13 @@ namespace MarbleBot.Modules
                 user.Balance += item.Price;
                 user.NetWorth += item.Price;
                 WriteUsers(obj, Context.User, user);
-                await ScavengeInfo[Context.User.Id].UpdateEmbedAsync();
+                await ScavengeInfo[Context.User.Id].UpdateEmbed();
                 await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n2}**!");
             }
 
             [Command("locations")]
             [Summary("Shows scavenge locations.")]
-            public async Task ScavengeLocationCommandAsync()
+            public async Task ScavengeLocationCommand()
             {
                 var stageTwoLocations = GetUser(Context).Stage > 1 ? "Destroyer's Remains\nViolet Volcanoes"
                     : $":lock: LOCKED\n:lock: LOCKED";
@@ -212,7 +212,7 @@ namespace MarbleBot.Modules
             [Alias("checkearn")]
             [Summary("Shows whether you can scavenge and if not, when you will be able to.")]
             public async Task ScavengeCheckearnAsync()
-            => await CheckearnAsync(Context, Type);
+            => await Checkearn(Context, Type);
 
             public async Task ScavengeInfoAsync(ScavengeLocation location)
             {
@@ -237,14 +237,14 @@ namespace MarbleBot.Modules
             [Command("location canarybeach")]
             [Alias("location canary", "location canary beach", "info canarybeach", "info canary", "info canary beach")]
             [Summary("Shows scavenge location info for Canary Beach.")]
-            public async Task ScavengeLocationCanaryCommandAsync()
+            public async Task ScavengeLocationCanaryCommand()
                 => await ScavengeInfoAsync(ScavengeLocation.CanaryBeach);
 
             [Command("location destroyersremains")]
             [Alias("location destroyer'sremains", "location destroyer's remains", "info destroyersremains", "info destroyer'sremains", "info destroyer's remains")]
             [Remarks("Stage2")]
             [Summary("Shows scavenge location info for Destroyer's Remains")]
-            public async Task ScavengeLocationDestroyerCommandAsync()
+            public async Task ScavengeLocationDestroyerCommand()
             {
                 if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -258,14 +258,14 @@ namespace MarbleBot.Modules
             [Command("location treewurld")]
             [Alias("location tree", "location tree wurld", "info treewurld", "info tree", "info tree wurld")]
             [Summary("Shows scavenge location info for Tree Wurld")]
-            public async Task ScavengeLocationTreeCommandAsync()
+            public async Task ScavengeLocationTreeCommand()
                 => await ScavengeInfoAsync(ScavengeLocation.TreeWurld);
 
             [Command("location violetvolcanoes")]
             [Alias("location violet volcanoes", "info violetvolcanoes", "info violet volcanoes")]
             [Remarks("Stage2")]
             [Summary("Starts a scavenge session in Destroyer's Remains")]
-            public async Task ScavengeLocationVolcanoCommandAsync()
+            public async Task ScavengeLocationVolcanoCommand()
             {
                 if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -280,7 +280,7 @@ namespace MarbleBot.Modules
             [Alias("help")]
             [Priority(-1)]
             [Summary("Scavenge help.")]
-            public async Task ScavengeHelpCommandAsync([Remainder] string _ = "")
+            public async Task ScavengeHelpCommand([Remainder] string _ = "")
             {
                 var helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
                 var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";

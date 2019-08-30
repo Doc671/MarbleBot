@@ -14,7 +14,7 @@ namespace MarbleBot.Core
         public int HP
         {
             get => _HP;
-            set { _HP = value > MaxHP ? MaxHP : value < 1 ? 0 : value; }
+            set => _HP = value > MaxHP ? MaxHP : value < 1 ? 0 : value;
         }
         /// <summary> The maximum number of health points the marble can have. </summary>
         public int MaxHP { get; private set; }
@@ -29,7 +29,7 @@ namespace MarbleBot.Core
         /// <summary> Deals damage to a marble. </summary>
         public void DealDamage(int damage)
         {
-            if (Shield.Id == 63) damage = (int)Math.Round(damage * 0.8);
+            if (Shield != null && Shield.Id == 63) damage = (int)Math.Round(damage * 0.8);
             HP -= damage;
         }
 
