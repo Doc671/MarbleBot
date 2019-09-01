@@ -153,7 +153,7 @@ namespace MarbleBot.Modules
                 await ReplyAsync("War successfully stopped.");
             }
 
-            [Command("attack")]
+            [Command("attack", RunMode = RunMode.Async)]
             [Summary("Attacks a member of the opposing team with the equipped weapon.")]
             [RequireSlowmode]
             public async Task WarAttackCommand([Remainder] string target)
@@ -257,7 +257,7 @@ namespace MarbleBot.Modules
                 await ReplyAsync($"**{currentMarble.Name}**, could not find the enemy!");
             }
 
-            [Command("bash")]
+            [Command("bash", RunMode = RunMode.Async)]
             [Alias("bonk", "charge")]
             [Summary("Attacks a member of the opposing team without a weapon.")]
             [RequireSlowmode]

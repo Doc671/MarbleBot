@@ -722,7 +722,7 @@ namespace MarbleBot.Modules
             await ReplyAsync(embed: builder.Build());
         }
 
-        [Command("use")]
+        [Command("use", RunMode = RunMode.Async)]
         [Alias("useitem")]
         [Summary("Uses an item.")]
         public async Task UseCommand([Remainder] string searchTerm)

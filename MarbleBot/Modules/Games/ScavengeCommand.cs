@@ -129,9 +129,6 @@ namespace MarbleBot.Modules
             [Summary("Extracts an ore found in a scavenge session.")]
             public async Task ScavengeDrillCommand()
             {
-                var obj = GetUsersObject();
-                var user = GetUser(Context, obj);
-
                 if (!ScavengeInfo.ContainsKey(Context.User.Id) || ScavengeInfo[Context.User.Id] == null)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
@@ -144,6 +141,8 @@ namespace MarbleBot.Modules
                     return;
                 }
 
+                var obj = GetUsersObject();
+                var user = GetUser(Context, obj);
                 if (!(user.Items.ContainsKey(81) || user.Items.ContainsKey(82)))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you need a drill to mine ore!");

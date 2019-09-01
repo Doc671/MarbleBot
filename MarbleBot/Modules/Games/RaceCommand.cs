@@ -29,7 +29,7 @@ namespace MarbleBot.Modules
             public async Task RaceSignupCommand([Remainder] string marbleName = "")
             => await Signup(Context, Type, marbleName, 10, async () => { await RaceStartCommand(); });
 
-            [Command("start")]
+            [Command("start", RunMode = RunMode.Async)]
             [Alias("begin")]
             [Summary("Starts the marble race.")]
             public async Task RaceStartCommand()
