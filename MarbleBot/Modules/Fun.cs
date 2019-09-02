@@ -20,9 +20,7 @@ namespace MarbleBot.Modules
     {
         [Command("7ball")]
         [Summary("Predicts the outcome to a user-defined event.")]
-#pragma warning disable IDE0060 // Remove unused parameter
-        public async Task SevenBallCommand([Remainder] string input)
-#pragma warning restore IDE0060 // Remove unused parameter
+        public async Task SevenBallCommand([Remainder] string _)
         {
             string outcome = Rand.Next(0, 13) switch
             {
@@ -41,7 +39,7 @@ namespace MarbleBot.Modules
                 12 => "and the sign points to... no!",
                 _ => "probably not, but there is still a chance..."
             };
-            await ReplyAsync($":seven: |  **{Context.User.Username }**, {outcome}");
+            await ReplyAsync($":seven: |  **{Context.User.Username}**, {outcome}");
         }
 
         [Command("advice")]

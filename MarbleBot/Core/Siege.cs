@@ -377,7 +377,7 @@ namespace MarbleBot.Core
                     if (output.Length > 0)
                     {
                         if (marble.HP > 0) user.LastSiegeWin = DateTime.UtcNow;
-                        if (Boss.Drops.Length > 0) output.AppendLine("Item Drops:");
+                        if (Boss.Drops.Length > 0) output.AppendLine("**Item Drops:**");
                         var dropPresent = false;
                         foreach (var itemDrops in Boss.Drops)
                         {

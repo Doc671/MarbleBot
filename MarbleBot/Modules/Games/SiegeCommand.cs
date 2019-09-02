@@ -277,7 +277,6 @@ namespace MarbleBot.Modules
                         .WithThumbnailUrl(Siege.GetPowerUpImageUrl(currentSiege.PowerUp));
 
                     marble.PowerUpHits++;
-                    currentSiege.PowerUp = PowerUp.None;
                     switch (currentSiege.PowerUp)
                     {
                         case PowerUp.Clone:
@@ -312,6 +311,7 @@ namespace MarbleBot.Modules
                                 .WithDescription($"**{marble.Name}** activated **Summon**! **{ally}** came into the arena and dealt **{dmg}** damage to the boss!");
                             break;
                     }
+                    currentSiege.PowerUp = PowerUp.None;
                     await ReplyAsync(embed: builder.WithTitle("POWER-UP ACTIVATED!")
                         .Build());
                 }

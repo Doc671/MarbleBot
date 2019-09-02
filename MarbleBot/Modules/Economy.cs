@@ -199,7 +199,8 @@ namespace MarbleBot.Modules
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithDescription($"**Craftable items**\n{output.ToString()}")
+                .WithDescription(output.ToString())
+                .WithTitle("Craftable items")
                 .Build());
         }
 
