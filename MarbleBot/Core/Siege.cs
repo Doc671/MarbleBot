@@ -276,9 +276,13 @@ namespace MarbleBot.Core
                 return;
             }
 
-            var item = GetItem<Item>(itemId.ToString("000"));
-            var marble = Marbles.Find(m => m.Id == context.User.Id);
+            if (!Marbles.Any(m => m.Id == context.User.Id))
+            {
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you aren't in this Siege!");
+                return;
+            }
 
+            var marble = Marbles.Find(m => m.Id == context.User.Id);
             if (marble.HP == 0)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, you are out and can no longer attack!");
@@ -286,7 +290,7 @@ namespace MarbleBot.Core
             }
 
             var user = GetUser(context);
-
+            var item = GetItem<Item>(itemId.ToString("000"));
             if (item.Id == 10 && marble.QefpedunCharmUsed)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, you can only use the **{item.Name}** once per battle!");
@@ -427,8 +431,20 @@ namespace MarbleBot.Core
                 return;
             }
 
-            var ammo = new Ammo();
+            if (!Marbles.Any(m => m.Id == context.User.Id))
+            {
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you aren't in this Siege!");
+                return;
+            }
+
             var marble = Marbles.Find(m => m.Id == context.User.Id);
+            if (marble.HP == 0)
+            {
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you are out and can no longer attack!");
+                return;
+            }
+
+            var ammo = new Ammo();
             var user = GetUser(context);
 
             if (weapon.Ammo != null)

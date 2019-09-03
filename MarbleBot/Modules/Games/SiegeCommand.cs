@@ -163,7 +163,7 @@ namespace MarbleBot.Modules
                 }
 
                 var marble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
-                if (marble.HP < 1)
+                if (marble.HP == 0)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
                     return;

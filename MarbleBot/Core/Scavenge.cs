@@ -23,7 +23,10 @@ namespace MarbleBot.Core
         public ScavengeLocation Location { get; set; }
         /// <summary> The ores currently available during the game. </summary>
         public Queue<Item> Ores { get; set; } = new Queue<Item>();
-        /// <summary> The original message sent to modify. </summary>
+        /// <summary> The items that have already been grabbed/sold. </summary>
+        public Queue<Item> UsedItems { get; set; } = new Queue<Item>();
+        /// <summary> The ores that have already been drilled. </summary>
+        public Queue<Item> UsedOres { get; set; } = new Queue<Item>();
 
         private bool _disposed = false;
         private readonly IUserMessage _originalMessage;
@@ -107,6 +110,8 @@ namespace MarbleBot.Core
         {
             bool first = false;
             var itemOutput = new StringBuilder();
+            foreach (var item in UsedItems)
+                itemOutput.AppendLine($"~~{item.Name}~~");
             foreach (var item in Items)
             {
                 itemOutput.AppendLine(first || gameEnded ? item.Name : $"**{item.Name}**");
@@ -115,6 +120,8 @@ namespace MarbleBot.Core
 
             first = false;
             var oreOutput = new StringBuilder();
+            foreach (var ore in UsedOres)
+                oreOutput.AppendLine($"~~{ore.Name}~~");
             foreach (var ore in Ores)
             {
                 oreOutput.AppendLine(first || gameEnded ? ore.Name : $"**{ore.Name}**");

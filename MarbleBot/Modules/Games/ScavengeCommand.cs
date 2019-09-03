@@ -106,6 +106,7 @@ namespace MarbleBot.Modules
                 }
 
                 var item = ScavengeInfo[Context.User.Id].Items.Dequeue();
+                ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
                 if (user.Items != null)
                 {
                     if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -120,7 +121,15 @@ namespace MarbleBot.Modules
                 user.NetWorth += item.Price;
                 WriteUsers(obj, Context.User, user);
                 await ScavengeInfo[Context.User.Id].UpdateEmbed();
-                await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
+                var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
+
+                // Clean up the messages created if the bot can delete messages
+                if (!Context.IsPrivate && Context.Guild.GetUser(BotId).GuildPermissions.ManageMessages)
+                {
+                    await Task.Delay(4000);
+                    await Context.Message.DeleteAsync();
+                    await confirmationMessage.DeleteAsync();
+                }
             }
 
             [Command("drill")]
@@ -150,6 +159,7 @@ namespace MarbleBot.Modules
                 }
 
                 var item = ScavengeInfo[Context.User.Id].Ores.Dequeue();
+                ScavengeInfo[Context.User.Id].UsedOres.Enqueue(item);
                 if (user.Items != null)
                 {
                     if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
@@ -164,7 +174,15 @@ namespace MarbleBot.Modules
                 user.NetWorth += item.Price;
                 WriteUsers(obj, Context.User, user);
                 await ScavengeInfo[Context.User.Id].UpdateEmbed();
-                await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
+                var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
+
+                // Clean up the messages created if the bot can delete messages
+                if (!Context.IsPrivate && Context.Guild.GetUser(BotId).GuildPermissions.ManageMessages)
+                {
+                    await Task.Delay(4000);
+                    await Context.Message.DeleteAsync();
+                    await confirmationMessage.DeleteAsync();
+                }
             }
 
             [Command("sell")]
@@ -186,11 +204,20 @@ namespace MarbleBot.Modules
                 }
 
                 var item = ScavengeInfo[Context.User.Id].Items.Dequeue();
+                ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
                 user.Balance += item.Price;
                 user.NetWorth += item.Price;
                 WriteUsers(obj, Context.User, user);
                 await ScavengeInfo[Context.User.Id].UpdateEmbed();
-                await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n2}**!");
+                var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n2}**!");
+
+                // Clean up the messages created if the bot can delete messages
+                if (!Context.IsPrivate && Context.Guild.GetUser(BotId).GuildPermissions.ManageMessages)
+                {
+                    await Task.Delay(4000);
+                    await Context.Message.DeleteAsync();
+                    await confirmationMessage.DeleteAsync();
+                }
             }
 
             [Command("locations")]
@@ -281,11 +308,14 @@ namespace MarbleBot.Modules
             [Summary("Scavenge help.")]
             public async Task ScavengeHelpCommand([Remainder] string _ = "")
             {
-                var helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
-                var helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
-                var helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
+                bool userCanDrill = GetUser(Context).Stage > 1;
+                const string helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
+                const string helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
+                const string helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
+                const string helpP4 = "\n\nIf you find an ore, you can use `mb/scavenge drill` to drill it. Drilling requires a drill in your inventory.";
+                string helpP5 = $"\n\nAt the end of the scavenge, all {(userCanDrill ? "non-ore" : "")} items are automatically added to your inventory.";
                 await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("How to play", $"{helpP1} {helpP2} {helpP3}")
+                    .AddField("How to play", $"{helpP1}{helpP2}{helpP3}{(userCanDrill ? helpP4 : "")}{helpP5}")
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
                     .WithTitle("Item Scavenge!")
