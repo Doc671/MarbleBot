@@ -1,11 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using MarbleBot.Core;
 using MarbleBot.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -60,48 +60,46 @@ namespace MarbleBot.Modules
         }
 
         [Command("help")]
-        [Alias("cmds")]
+        [Alias("cmds", "commands", "searchcommand")]
         [Summary("Gives the user help.")]
-        public async Task HelpCommand([Remainder] string command = "")
+        public async Task HelpCommand([Remainder] string commandToFind = "")
         {
             var builder = new EmbedBuilder()
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context));
-            switch (command.ToLower())
+
+            var module = Global.CommandService.Modules.Where(m => m.Name.ToLower() == commandToFind.ToLower()).FirstOrDefault();
+            if (module != null)
             {
-                case "":
-                    if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
-                        builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
-                    else builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube");
-                    builder.WithDescription("*by Doc671#1965*\n\nUse `mb/help` followed by the name of a module or a command for more info.")
-                        .WithTitle("MarbleBot Help");
-                    await ReplyAsync(embed: builder.Build());
-                    break;
-                case "economy":
-                    var allCmds = new StringBuilder();
-                    var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => string.Compare(c.Module.Name, command, true) == 0
+                if (module.Name == "Moderation" && !(Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
+                {
+                    await SendErrorAsync("You cannot access this module!");
+                    return;
+                }
+
+                var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => string.Compare(c.Module.Name, commandToFind, true) == 0
                         && !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
-                    if (Context.IsPrivate) commands = commands.Where(c => c.Remarks != "Not DMs" || c.Remarks != "CM Only");
-                    else
-                    {
-                        if (Context.Guild.Id == CM) commands = commands.Where(c => c.Remarks != "Not CM");
-                        else commands = commands.Where(c => c.Remarks != "CM Only");
-                    }
-                    if (GetUser(Context).Stage < 2) commands = commands.Where(c => c.Remarks != "Stage2");
-                    foreach (var cmd in commands)
-                    {
-                        var name = cmd.Name.IsEmpty() ? "help" : cmd.Name;
-                        allCmds.AppendLine($"**{name}** - {cmd.Summary}");
-                    }
-                    builder.AddField(
-                            $"{System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command)} Commands",
-                            allCmds.ToString())
-                        .WithTitle("MarbleBot Help");
-                    await ReplyAsync(embed: builder.Build());
-                    break;
-                case "fun": goto case "economy";
-                case "games":
-                    await ReplyAsync(embed: builder
+
+                if (Context.Guild.Id != CM) commands = commands.Where(c => c.Remarks != "CM Only");
+
+                if (Context.IsPrivate) commands = commands.Where(c => !c.Preconditions.Any(p => p is RequireContextAttribute));
+
+                if (GetUser(Context).Stage < 2) commands = commands.Where(c => c.Remarks != "Stage2");
+
+                await ReplyAsync(embed: builder
+                    .AddField(
+                            $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(commandToFind)} Commands",
+                            commands.Aggregate(new StringBuilder(), (builder, c) =>
+                            {
+                                builder.AppendLine($"**{c.Name}** - {c.Summary}");
+                                return builder;
+                            }).ToString())
+                    .WithTitle("MarbleBot Help")
+                    .Build());
+            }
+            else if (commandToFind.ToLower() == "games")
+            {
+                await ReplyAsync(embed: builder
                         .AddField("Games commands", new StringBuilder()
                             .AppendLine("**race** - Participate in a marble race!")
                             .AppendLine("**scavenge** - Scavenge for items!")
@@ -111,71 +109,71 @@ namespace MarbleBot.Modules
                         .WithDescription("*by Doc671#1965*")
                         .WithTitle("MarbleBot Help")
                         .Build());
-                    break;
-                case "race":
-                case "roles":
-                case "scavenge":
-                case "siege":
-                case "utility":
-                case "war":
-                case "youtube": goto case "economy";
-                case "moderation":
-                    if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages) goto case "economy";
-                    else break;
-                case "yt":
-                    command = "youtube";
-                    goto case "economy";
-                case "full":
-                    var output = new StringBuilder();
-                    foreach (var cmd in Global.CommandService.Commands)
-                    {
-                        var user = GetUser(Context);
-                        if (string.Compare(cmd.Module.Name, "Sneak", true) != 0 && (GetUser(Context).Stage > 2 || (GetUser(Context).Stage < 2 && string.Compare(cmd.Remarks, "Stage2", true) != 0)))
-                            output.Append($"`{cmd.Name}` ");
-                    }
-                    output.Append("\n\nThis has been deprecated.");
-                    await ReplyAsync(embed: new EmbedBuilder()
-                        .WithColor(GetColor(Context))
-                        .WithCurrentTimestamp()
-                        .WithDescription(output.ToString())
+            }
+            else
+            {
+                // If a module could not be found, try searching for a command
+                var command = Global.CommandService.Commands.Where(c => c.Name.ToLower() == commandToFind || c.Aliases.Any(alias => alias == commandToFind)
+                    && !c.Preconditions.Any(p => p is RequireOwnerAttribute)).FirstOrDefault();
+
+                // If neither a command nor a module could be found, show a list of modules
+                if (command == null)
+                {
+                    if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
+                        builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
+                    else builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube");
+
+                    await ReplyAsync(embed: builder
+                        .WithDescription("*by Doc671#1965*\n\nUse `mb/help` followed by the name of a module or a command for more info.")
                         .WithTitle("MarbleBot Help")
                         .Build());
-                    break;
-                default:
-                    var hCommand = new HelpCommand();
-                    var rawCommand = Global.CommandService.Commands.Where(c => c.Name.ToLower() == command.ToLower() || c.Aliases.Any(alias => alias == command)).First();
-                    hCommand = new HelpCommand(rawCommand.Name, rawCommand.Summary, $"mb/{rawCommand.Name.ToLower()}", rawCommand.Aliases);
+                    return;
+                }
 
-                    string json;
-                    using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}ExtraCommandInfo.json"))
-                        json = itemFile.ReadToEnd();
-                    var commandDict = JObject.Parse(json).ToObject<Dictionary<string, Dictionary<string, string>>>();
-                    if (commandDict.ContainsKey(hCommand.Name) || hCommand.Aliases.Any(alias => commandDict.ContainsKey(alias)))
+                string example = "";
+                string usage = $"mb/{command.Aliases[0]}";
+
+                // Gets extra command info (e.g. an example of the command's usage) if present
+                string json;
+                using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}ExtraCommandInfo.json"))
+                    json = itemFile.ReadToEnd();
+                var commandDict = JObject.Parse(json).ToObject<Dictionary<string, Dictionary<string, string>>>();
+                if (commandDict.ContainsKey(command.Name) || command.Aliases.Any(alias => commandDict.ContainsKey(alias)))
+                {
+                    example = commandDict[command.Name]["Example"];
+                    usage = commandDict[command.Name]["Usage"];
+                }
+
+                builder.WithDescription(command.Summary)
+                    .AddField("Usage", $"`{usage}`")
+                    .WithTitle($"MarbleBot Help: **{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command.Name)}**");
+
+                if (!example.IsEmpty()) builder.AddField("Example", $"`{example}`", true);
+
+                builder.AddField("Module", $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command.Module.Name)}", true);
+
+                if (command.Aliases.Count() != 0)
+                    builder.AddField("Aliases", command.Aliases.Aggregate(new StringBuilder(), (builder, alias) =>
                     {
-                        hCommand.Example = commandDict[hCommand.Name]["Example"];
-                        hCommand.Usage = commandDict[hCommand.Name]["Usage"];
-                    }
+                        builder.AppendLine($"`mb/{alias}`");
+                        return builder;
+                    }).ToString(), true);
 
-                    if (!hCommand.Desc.IsEmpty())
+                if (command.Parameters.Count() != 0)
+                    builder.AddField("Parameters", command.Parameters.Aggregate(new StringBuilder(), (builder, param) =>
                     {
-                        builder.WithDescription(hCommand.Desc)
-                            .AddField("Usage", $"`{hCommand.Usage}`")
-                            .WithTitle($"MarbleBot Help: **{hCommand.Name[0].ToString().ToUpper() + string.Concat(hCommand.Name.Skip(1))}**");
+                        builder.AppendLine($"{param.Name} ({(param.IsOptional ? "optional " : "")}{(param.IsRemainder ? "remainder " : "")}{param.Type.Name})");
+                        return builder;
+                    }).ToString(), true);
 
-                        if (hCommand.Aliases.Length > 1)
-                        {
-                            var aliases = new StringBuilder();
-                            foreach (var alias in hCommand.Aliases)
-                                aliases.AppendLine($"`mb/{alias}`");
-                            builder.AddField("Aliases", aliases.ToString());
-                        }
+                if (command.Preconditions.Count() != 0)
+                    builder.AddField("Preconditions", command.Preconditions.Aggregate(new StringBuilder(), (builder, precondition) =>
+                    {
+                        builder.AppendLine((precondition.TypeId as Type).Name);
+                        return builder;
+                    }).ToString(), true);
 
-                        if (!hCommand.Example.IsEmpty()) builder.AddField("Example", $"`{hCommand.Example}`");
-
-                        await ReplyAsync(embed: builder.Build());
-                    }
-                    else await ReplyAsync("Could not find requested command!");
-                    break;
+                await ReplyAsync(embed: builder.Build());
             }
         }
 
@@ -183,70 +181,65 @@ namespace MarbleBot.Modules
         [Alias("invitelink")]
         [Summary("Gives the bot's invite link.")]
         public async Task InviteCommand() => await ReplyAsync(new StringBuilder()
-                .AppendLine("Use this link to invite MarbleBot to your server: https://discordapp.com/oauth2/authorize?client_id=286228526234075136&scope=bot&permissions=1")
+                .AppendLine("Use this link to invite MarbleBot to your guild: https://discordapp.com/oauth2/authorize?client_id=286228526234075136&scope=bot&permissions=1")
                 .Append("\nUse `mb/setchannel announcement <channel ID>` to set the channel where bot updates get posted, ")
                 .Append("`mb/setchannel autoresponse <channel ID>` to set the channel where autoresponses can be used and ")
                 .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used! ")
                 .Append("If no usable channel is set, commands can be used anywhere.")
                 .ToString());
 
-        [Command("serverinfo")]
-        [Summary("Displays information about the current server.")]
-        [Remarks("Not DMs")]
+        [Command("guildinfo")]
+        [Summary("Displays information about the current guild.")]
+        [RequireContext(ContextType.Guild)]
         public async Task ServerInfoCommand()
         {
-            if (!Context.IsPrivate)
+            var builder = new EmbedBuilder();
+            int botUsers = 0;
+            int onlineUsers = 0;
+            SocketGuildUser[] users = Context.Guild.Users.ToArray();
+            for (int i = 0; i < Context.Guild.Users.Count - 1; i++)
             {
-                EmbedBuilder builder = new EmbedBuilder();
-                int botUsers = 0;
-                int onlineUsers = 0;
-                SocketGuildUser[] users = Context.Guild.Users.ToArray();
-                for (int i = 0; i < Context.Guild.Users.Count - 1; i++)
-                {
-                    if (users[i].IsBot) botUsers++;
-                    if (users[i].Status.ToString().ToLower() == "online") onlineUsers++;
-                }
-
-                var owner = Context.Guild.GetUser(Context.Guild.OwnerId);
-                var mbServer = GetServer(Context);
-
-                builder.WithThumbnailUrl(Context.Guild.IconUrl)
-                    .WithTitle(Context.Guild.Name)
-                    .AddField("Owner", $"{owner.Username}#{owner.Discriminator}", true)
-                    .AddField("Voice Region", Context.Guild.VoiceRegionId, true)
-                    .AddField("Text Channels", Context.Guild.TextChannels.Count, true)
-                    .AddField("Voice Channels", Context.Guild.VoiceChannels.Count, true)
-                    .AddField("Members", Context.Guild.Users.Count, true)
-                    .AddField("Bots", botUsers, true)
-                    .AddField("Online", onlineUsers, true)
-                    .AddField("Roles", Context.Guild.Roles.Count, true)
-                    .AddField("Embed", mbServer.Color.ToString(), true)
-                    .WithColor(GetColor(Context))
-                    .WithTimestamp(DateTime.UtcNow)
-                    .WithFooter(Context.Guild.Id.ToString());
-
-                if (mbServer.AnnouncementChannel != 0)
-                    builder.AddField("Announcement Channel", $"<#{mbServer.AnnouncementChannel}>", true);
-
-                if (mbServer.AutoresponseChannel != 0)
-                    builder.AddField("Autoresponse Channel", $"<#{mbServer.AutoresponseChannel}>", true);
-
-                if (mbServer.UsableChannels.Count != 0)
-                {
-                    var output = new StringBuilder();
-                    foreach (var channel in mbServer.UsableChannels)
-                        output.AppendLine($"<#{channel}>");
-                    builder.AddField("Usable Channels", output.ToString(), true);
-                }
-
-                await ReplyAsync(embed: builder.Build());
+                if (users[i].IsBot) botUsers++;
+                if (users[i].Status.ToString().ToLower() == "online") onlineUsers++;
             }
-            else await ReplyAsync("This is a DM, not a server!");
+
+            var owner = Context.Guild.GetUser(Context.Guild.OwnerId);
+            var mbServer = GetGuild(Context);
+
+            builder.WithThumbnailUrl(Context.Guild.IconUrl)
+                .WithTitle(Context.Guild.Name)
+                .AddField("Owner", $"{owner.Username}#{owner.Discriminator}", true)
+                .AddField("Voice Region", Context.Guild.VoiceRegionId, true)
+                .AddField("Text Channels", Context.Guild.TextChannels.Count, true)
+                .AddField("Voice Channels", Context.Guild.VoiceChannels.Count, true)
+                .AddField("Members", Context.Guild.Users.Count, true)
+                .AddField("Bots", botUsers, true)
+                .AddField("Online", onlineUsers, true)
+                .AddField("Roles", Context.Guild.Roles.Count, true)
+                .AddField("Embed", mbServer.Color.ToString(), true)
+                .WithColor(GetColor(Context))
+                .WithTimestamp(DateTime.UtcNow)
+                .WithFooter(Context.Guild.Id.ToString());
+
+            if (mbServer.AnnouncementChannel != 0)
+                builder.AddField("Announcement Channel", $"<#{mbServer.AnnouncementChannel}>", true);
+
+            if (mbServer.AutoresponseChannel != 0)
+                builder.AddField("Autoresponse Channel", $"<#{mbServer.AutoresponseChannel}>", true);
+
+            if (mbServer.UsableChannels.Count != 0)
+            {
+                var output = new StringBuilder();
+                foreach (var channel in mbServer.UsableChannels)
+                    output.AppendLine($"<#{channel}>");
+                builder.AddField("Usable Channels", output.ToString(), true);
+            }
+
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("staffcheck")]
         [Summary("Displays a list of all staff members and their statuses.")]
-        [Remarks("Not DMs")]
         [RequireContext(ContextType.Guild)]
         public async Task StaffCheckCommand()
         {
@@ -279,13 +272,13 @@ namespace MarbleBot.Modules
 
         [Command("userinfo")]
         [Summary("Displays information about a user.")]
-        [Remarks("Not DMs")]
+        [RequireContext(ContextType.Guild)]
         public async Task UserInfoCommand([Remainder] string username = "")
         {
             if (!Context.IsPrivate)
             {
-                EmbedBuilder builder = new EmbedBuilder();
-                SocketGuildUser user = (SocketGuildUser)Context.User;
+                var builder = new EmbedBuilder();
+                var user = (SocketGuildUser)Context.User;
                 var userFound = true;
                 username = username.ToLower();
                 if (!username.IsEmpty())

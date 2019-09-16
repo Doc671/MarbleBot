@@ -19,8 +19,8 @@ namespace MarbleBot.Modules
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
-                var server = GetServer(Context);
-                if (server.Roles.Any(r => r == role.Id))
+                var guild = GetGuild(Context);
+                if (guild.Roles.Any(r => r == role.Id))
                 {
                     await (Context.User as IGuildUser).AddRoleAsync(role);
                     await ReplyAsync($"Success. The **{role.Name}** role has been given to you.");
@@ -39,8 +39,8 @@ namespace MarbleBot.Modules
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
-                var server = GetServer(Context);
-                if (server.Roles.Any(r => r == role.Id))
+                var guild = GetGuild(Context);
+                if (guild.Roles.Any(r => r == role.Id))
                 {
                     await (Context.User as IGuildUser).RemoveRoleAsync(role);
                     await ReplyAsync($"Success. The **{role.Name}** role has been taken from you.");
@@ -59,8 +59,8 @@ namespace MarbleBot.Modules
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
-                var server = GetServer(Context);
-                if (server.Roles.Any(r => r == role.Id))
+                var guild = GetGuild(Context);
+                if (guild.Roles.Any(r => r == role.Id))
                 {
                     if ((Context.User as SocketGuildUser).Roles.Any(r => r.Id == role.Id))
                     {
@@ -84,10 +84,10 @@ namespace MarbleBot.Modules
         public async Task RoleListCommand()
         {
             var output = new StringBuilder();
-            var server = GetServer(Context);
-            foreach (var role in server.Roles)
+            var guild = GetGuild(Context);
+            foreach (var role in guild.Roles)
                 output.AppendLine(Context.Guild.GetRole(role).Name);
-            if (server.Roles.Count < 1) output.Append("There aren't any roles here!");
+            if (guild.Roles.Count < 1) output.Append("There aren't any roles here!");
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()

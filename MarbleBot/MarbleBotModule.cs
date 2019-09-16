@@ -22,11 +22,11 @@ namespace MarbleBot
         protected internal const ulong THS = 224277738608001024; // The Hat Stoar
         protected internal const ulong THSC = 318053169999511554; // The Hat Stoar Crew
 
-        /// <summary> Gets colour for embed depending on server </summary>
+        /// <summary> Gets colour for embed depending on guild </summary>
         protected internal static Color GetColor(SocketCommandContext context)
         {
             if (context.IsPrivate) return Color.DarkerGrey;
-            else return new Color(uint.Parse(GetServer(context).Color, System.Globalization.NumberStyles.HexNumber));
+            else return new Color(uint.Parse(GetGuild(context).Color, System.Globalization.NumberStyles.HexNumber));
         }
 
         /// <summary> Gets a date string </summary>
@@ -100,11 +100,11 @@ namespace MarbleBot
             return JObject.Parse(json);
         }
 
-        /// <summary> Returns a MBServer object with the ID of the current server. </summary>
-        protected internal static MarbleBotServer GetServer(SocketCommandContext context)
+        /// <summary> Returns a MarbleBotUser object with the ID of the current guild. </summary>
+        protected internal static MarbleBotGuild GetGuild(SocketCommandContext context)
         => Global.Servers.Find(s => s.Id == context.Guild.Id);
 
-        /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser. </summary>
+        /// <summary> Returns an instance of a MarbleBotUser with the ID of the SocketGuildUser. </summary>
         protected internal static MarbleBotUser GetUser(SocketCommandContext context)
         {
             var obj = GetUsersObject();
@@ -125,7 +125,7 @@ namespace MarbleBot
             return user;
         }
 
-        /// <summary> Returns an instance of a MBUser with the given ID. </summary>
+        /// <summary> Returns an instance of a MarbleBotUser with the given ID. </summary>
         protected internal static MarbleBotUser GetUser(SocketCommandContext context, ulong Id)
         {
             var obj = GetUsersObject();
@@ -146,7 +146,7 @@ namespace MarbleBot
             return user;
         }
 
-        /// <summary> Returns an instance of a MBUser with the ID of the SocketGuildUser in the given JObject. </summary>
+        /// <summary> Returns an instance of a MarbleBotUser with the ID of the SocketGuildUser in the given JObject. </summary>
         protected internal static MarbleBotUser GetUser(SocketCommandContext context, JObject obj)
         {
             MarbleBotUser user;
@@ -166,7 +166,7 @@ namespace MarbleBot
             return user;
         }
 
-        /// <summary> Returns an instance of a MBUser with the given ID in the given JObject. </summary>
+        /// <summary> Returns an instance of a MarbleBotUser with the given ID in the given JObject. </summary>
         protected internal static MarbleBotUser GetUser(SocketCommandContext context, JObject obj, ulong id)
         {
             MarbleBotUser user;
@@ -208,6 +208,11 @@ namespace MarbleBot
         /// <summary> Logs to the console and the online logs. </summary>
         protected internal static void Log(string log) => Program.Log(log);
 
+        /// <summary> Sends a message preceeded by the warning emoji. </summary>
+        /// <param name="messageContent"> The text to display. </param>
+        protected internal async Task<IUserMessage> SendErrorAsync(string messageContent)
+            => await ReplyAsync($":warning: | {messageContent}");
+
         /// <summary> Returns a string that indicates the user's Stage is too low. </summary>
         protected internal static string StageTooHighString() 
         => (Global.Rand.Next(0, 6)) switch
@@ -220,13 +225,13 @@ namespace MarbleBot
                 _=> "*Your mind is wracked with pain...*",
             };
 
-        /// <summary> Writes servers to the appropriate file. </summary>
-        protected internal static void WriteServers()
+        /// <summary> Writes guilds to the appropriate file. </summary>
+        protected internal static void WriteGuilds()
         {
-            using var servers = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Servers.json"));
+            using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Servers.json"));
             var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
             var dict = Global.Servers.ToDictionary(s => s.Id);
-            serialiser.Serialize(servers, dict);
+            serialiser.Serialize(guilds, dict);
         }
 
         /// <summary> Writes users to the appropriate JSON file. </summary>

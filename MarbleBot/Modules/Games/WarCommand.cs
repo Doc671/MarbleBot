@@ -463,16 +463,15 @@ namespace MarbleBot.Modules
                     .Build());
             }
 
-            [Command("")]
-            [Alias("help")]
+            [Command("help")]
+            [Alias("")]
             [Priority(-1)]
             [Summary("War help.")]
             public async Task WarHelpCommand([Remainder] string _ = "")
                 => await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("How to play",
-                        new StringBuilder()
+                    .AddField("How to play", new StringBuilder()
                             .AppendLine("Use `mb/war signup <weapon ID> <marble name>` to sign up as a marble!")
-                            .AppendLine("When everyone's done, use `mb/war start`! The war begins automatically if 20 people have signed up.")
+                            .AppendLine("When everyone's done, use `mb/war start`! The war begins automatically if 20 marbles have signed up.")
                             .Append("\nWhen the war begins, use `mb/war attack <marble name>` to attack an enemy with your weapon")
                             .AppendLine(" and `mb/war bash <marble name>` to attack without. Spikes are twice as effective with `mb/war bash`.")
                             .Append("\nEveryone is split into two teams. If there is an odd number of contestants, an AI marble joins")

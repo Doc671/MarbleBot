@@ -47,7 +47,7 @@ namespace MarbleBot.Modules
         [Summary("Gives advice on progression.")]
         public async Task AdviceCommand()
         {
-            var user = GetUser(Context);
+            MarbleBotUser user = GetUser(Context);
             string msg;
             if (user.Items.ContainsKey(78))
                 msg = new StringBuilder().Append("Combine the terror-inducing essence of the bosses you have just ")
@@ -119,27 +119,29 @@ namespace MarbleBot.Modules
         [Command("best")]
         [Summary("Picks a random person to call the best.")]
         [RequireContext(ContextType.Guild)]
-        public async Task BestCommand()
-        {
-            if (Context.Guild.MemberCount > 1)
-            {
-                string[] names = new string[Context.Guild.MemberCount];
-                SocketGuildUser[] users = Context.Guild.Users.ToArray();
-                for (int i = 0; i < Context.Guild.MemberCount - 1; i++)
-                    names[i] = users[i].Username;
-                await ReplyAsync($"**{names[Rand.Next(0, Context.Guild.MemberCount - 1)]}** is the best!");
-            }
-        }
+        public async Task BestCommand() 
+            => await ReplyAsync($"**{Context.Guild.Users.ElementAt(Rand.Next(0, Context.Guild.Users.Count))}** is the best!");
 
         [Command("bet")]
         [Summary("Bets on a marble.")]
         public async Task BetCommand(string no)
         {
             int noOfMarbles = int.Parse(no);
-            if (noOfMarbles > 100) await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
-            else if (noOfMarbles < 1) await ReplyAsync("The number you gave is too small.");
-            string[,] marbles = new string[10, 10];
-            using (StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Marbles.csv"))
+
+            if (noOfMarbles > 100)
+            {
+                await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
+                return;
+            }
+
+            if (noOfMarbles < 1)
+            {
+                await ReplyAsync("The number you gave is too small.");
+                return;
+            }
+
+            string[,] marbles = new string[10,10];
+            using (var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Marbles.csv"))
             {
                 int a = 0;
                 while (!stream.EndOfStream)
@@ -158,16 +160,8 @@ namespace MarbleBot.Modules
 
         [Command("buyhat")]
         [Summary("Fakes buying an Uglee Hat.")]
-        [Remarks("Not CM")]
-        public async Task BuyHatCommand()
-        {
-            if (Context.Guild.Id != CM)
-            {
-                var price = Rand.Next(0, int.MaxValue);
-                var hatNo = Rand.Next(0, 69042);
-                await ReplyAsync($"That'll be **{price}** units of money please. Thank you for buying Uglee Hat #**{hatNo}**!");
-            }
-        }
+        public async Task BuyHatCommand() 
+            => await ReplyAsync($"That'll be **{Rand.Next(0, int.MaxValue)}** units of money please. Thank you for buying Uglee Hat #**{Rand.Next(0, 69042)}**!");
 
         [Command("choose")]
         [Summary("Chooses between several provided choices.")]
@@ -189,23 +183,18 @@ namespace MarbleBot.Modules
 
         [Command("orange")]
         [Summary("Gives the user a random statement in Orange Language.")]
-        [Remarks("Not CM")]
-        public async Task OrangeCommand()
+        public async Task OrangeCommand() => await ReplyAsync((Rand.Next(1, 6)) switch
         {
-            await base.ReplyAsync((Rand.Next(1, 6)) switch
-            {
-                1 => "!olleH",
-                2 => "!raotS taH ehT owt oG",
-                3 => "!pooS puoP knirD",
-                4 => ".depfeQ ,ytiC ogitreV ni evil I",
-                5 => "!haoW",
-                _ => "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"
-            });
-        }
+            1 => "!olleH",
+            2 => "!raotS taH ehT owt oG",
+            3 => "!pooS puoP knirD",
+            4 => ".depfeQ ,ytiC ogitreV ni evil I",
+            5 => "!haoW",
+            _ => "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"
+        });
 
         [Command("orangeify")]
         [Summary("Returns the user input in Orange Language.")]
-        [Remarks("Not CM")]
         public async Task OrangeifyCommand([Remainder] string input)
         {
             var orangeified = new StringBuilder();
@@ -231,8 +220,8 @@ namespace MarbleBot.Modules
         [Summary("Returns a random number with user-defined bounds.")]
         public async Task RandomCommand(string rStart, string rEnd)
         {
-            var start = rStart.ToInt();
-            var end = rEnd.ToInt();
+            int start = rStart.ToInt();
+            int end = rEnd.ToInt();
             if (start < 0 || end < 0) await ReplyAsync("Only use positive numbers!");
             else if (start > end)
             {
@@ -266,11 +255,11 @@ namespace MarbleBot.Modules
         [Summary("Returns a randomised level and XP count.")]
         public async Task RankCommand()
         {
-            EmbedBuilder builder = new EmbedBuilder();
+            var builder = new EmbedBuilder();
             int level = Rand.Next(0, 25);
             int xp = level * 100 * Rand.Next(1, 5);
 
-            var msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
+            IEnumerable<IMessage> msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
             int ranks = 0;
 
             foreach (IMessage msg in msgs)
@@ -281,7 +270,7 @@ namespace MarbleBot.Modules
                     break;
             }
 
-            var flavour = ranks switch
+            string flavour = ranks switch
             {
                 1 => "Pretty cool, right?",
                 2 => "100% legitimate",
@@ -320,14 +309,14 @@ namespace MarbleBot.Modules
         [Summary("Rates something out of 10.")]
         public async Task RateCommand([Remainder] string input)
         {
-            var lowerInput = input.ToLower();
+            string lowerInput = input.ToLower();
             string message = "";
             int rating = Rand.Next(0, 11);
 
             string json;
             using (var specialMessages = new StreamReader($"Resources{Path.DirectorySeparatorChar}RateSpecialMessages.json"))
                 json = specialMessages.ReadToEnd();
-            var messageDict = JsonConvert.DeserializeObject<Dictionary<string, RateInfo>>(json);
+            Dictionary<string, RateInfo> messageDict = JsonConvert.DeserializeObject<Dictionary<string, RateInfo>>(json);
 
             if (messageDict.ContainsKey(lowerInput))
             {
@@ -435,18 +424,17 @@ namespace MarbleBot.Modules
 
         [Command("vinhglish")]
         [Summary("Returns a Vinhglish word, its inventor and meaning.")]
-        [Remarks("Not CM")]
         public async Task VinhglishCommand([Remainder] string word = "")
         {
             int randNo = 0;
             bool wordSet = false;
-            var wordList = new string[100];
-            var invList = new string[100];
-            var descList = new string[100];
+            string[] wordList = new string[100];
+            string[] invList = new string[100];
+            string[] descList = new string[100];
             int a = 0;
             if (word == "")
             {
-                using (StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
+                using (var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
                 {
                     while (!stream.EndOfStream)
                     {
@@ -462,7 +450,7 @@ namespace MarbleBot.Modules
             }
             else
             {
-                using StreamReader stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv");
+                using var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv");
                 while (!stream.EndOfStream)
                 {
                     string list = stream.ReadLine();

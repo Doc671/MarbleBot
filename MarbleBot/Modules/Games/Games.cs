@@ -107,7 +107,7 @@ namespace MarbleBot.Modules
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
             if (!File.Exists(marbleListDirectory))
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "server")}! There are no marbles signed up to remove!");
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "guild")}! There are no marbles signed up to remove!");
                 return;
             }
             // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
@@ -155,7 +155,7 @@ namespace MarbleBot.Modules
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
             if (!File.Exists(marbleListDirectory))
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "server")}! No-one is signed up!");
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "guild")}! No-one is signed up!");
                 return;
             }
 
@@ -170,9 +170,14 @@ namespace MarbleBot.Modules
                     if (marble.Length > 16)
                     {
                         var marbleInfo = marble.Split(',');
+                        string bold = marbleInfo[0].Contains('*') || marbleInfo[0].Contains('\\') ? "" : "**";
                         var user = context.Client.GetUser(ulong.Parse(marbleInfo[1]));
 
-                        string bold = marbleInfo[0].Contains('*') || marbleInfo[0].Contains('\\') ? "" : "**";
+                        if (user == null)
+                        {
+                            marbles.AppendLine($"{bold}{marbleInfo[0]}{bold}");
+                            continue;
+                        }
 
                         marbles.AppendLine($"{bold}{marbleInfo[0]}{bold} {(context.IsPrivate ? "" : $"[{user.Username}#{user.Discriminator}]")}");
                     }

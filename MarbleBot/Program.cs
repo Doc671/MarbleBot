@@ -4,6 +4,8 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Docs.v1;
 using Google.Apis.Docs.v1.Data;
 using Google.Apis.Services;
+using Google.Apis.Sheets.v4;
+using Google.Apis.Util.Store;
 using MarbleBot.Core;
 using Newtonsoft.Json;
 using System;
@@ -25,8 +27,6 @@ namespace MarbleBot
 #pragma warning disable IDE0052 // Remove unread private members
         private CommandHandler _handler;
 #pragma warning restore IDE0052 // Remove unread private members
-
-        private static UserCredential _credential;
 
         private static DocsService _service;
 
@@ -51,12 +51,12 @@ namespace MarbleBot
                 string json;
                 using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
                     json = await users.ReadToEndAsync();
-                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotServer>>(json);
-                foreach (var server in allServers)
+                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotGuild>>(json);
+                foreach (var guild in allServers)
                 {
-                    var server2 = server.Value;
-                    server2.Id = server.Key;
-                    Global.Servers.Add(server2);
+                    var guild2 = guild.Value;
+                    guild2.Id = guild.Key;
+                    Global.Servers.Add(guild2);
                 }
             }
 
@@ -71,16 +71,17 @@ namespace MarbleBot
 
             using (var stream = new FileStream($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
             {
-                _credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                Global.Credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.Load(stream).Secrets,
-                    new string[] { DocsService.Scope.Documents },
+                    new string[] { DocsService.Scope.Documents, SheetsService.Scope.Spreadsheets },
                     "user",
-                    CancellationToken.None);
+                    CancellationToken.None,
+                    new FileDataStore("token.json", true));
             }
 
             _service = new DocsService(new BaseClientService.Initializer()
             {
-                HttpClientInitializer = _credential,
+                HttpClientInitializer = Global.Credential,
                 ApplicationName = "MarbleBot",
             });
 

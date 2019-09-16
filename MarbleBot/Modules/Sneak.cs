@@ -47,18 +47,18 @@ namespace MarbleBot.Modules
             }
 
             DailyTimeout = 48;
-            Servers = new List<MarbleBotServer>();
+            Servers = new List<MarbleBotGuild>();
             using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
             {
                 string json;
                 using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
                     json = await users.ReadToEndAsync();
-                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotServer>>(json);
-                foreach (var server in allServers)
+                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotGuild>>(json);
+                foreach (var guild in allServers)
                 {
-                    var server2 = server.Value;
-                    server2.Id = server.Key;
-                    Servers.Add(server2);
+                    var guild2 = guild.Value;
+                    guild2.Id = guild.Key;
+                    Servers.Add(guild2);
                 }
             }
 
@@ -245,11 +245,11 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            foreach (MarbleBotServer server in Servers)
+            foreach (MarbleBotGuild guild in Servers)
             {
-                if (server.AnnouncementChannel != 0)
+                if (guild.AnnouncementChannel != 0)
                 {
-                    var channel = Context.Client.GetGuild(server.Id).GetTextChannel(server.AnnouncementChannel);
+                    var channel = Context.Client.GetGuild(guild.Id).GetTextChannel(guild.AnnouncementChannel);
                     var msg = await channel.SendMessageAsync(embed: builder.Build());
                     if (major) await msg.PinAsync();
                 }

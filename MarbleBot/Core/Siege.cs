@@ -28,7 +28,7 @@ namespace MarbleBot.Core
                                                             if (m.HP < 1) totalDeaths++;
                                                             return totalDeaths;
                                                         }) * 0.2)) * (Morales + 1);
-        /// <summary> The ID of the user's DM or server where the siege is being played. </summary>
+        /// <summary> The ID of the user's DM or guild where the siege is being played. </summary>
         public ulong Id { get; }
         /// <summary> The last time a Morale Boost power-up was activated. </summary>
         public DateTime LastMorale { get; set; } = DateTime.Parse("2019-01-01 00:00:00");
@@ -320,7 +320,6 @@ namespace MarbleBot.Core
         public static string PowerUpString(PowerUp powerUp)
             => powerUp switch
             {
-                PowerUp.None => "",
                 PowerUp.MoraleBoost => "Morale Boost",
                 _ => Enum.GetName(typeof(PowerUp), powerUp)
             };
@@ -337,6 +336,7 @@ namespace MarbleBot.Core
                 .WithTitle("Siege Victory!")
                 .WithDescription($"**{Boss.Name}** has been defeated!");
             var obj = GetUsersObject();
+
             for (int i = 0; i < Marbles.Count; i++)
             {
                 var marble = Marbles[i];
@@ -471,16 +471,16 @@ namespace MarbleBot.Core
             }
 
             var builder = new EmbedBuilder()
-                    .WithAuthor(context.User)
-                    .WithColor(GetColor(context))
-                    .WithCurrentTimestamp()
-                    .WithTitle(weapon.Name);
+                .WithAuthor(context.User)
+                .WithColor(GetColor(context))
+                .WithCurrentTimestamp()
+                .WithTitle(weapon.Name);
 
             if (weapon.Uses == 1)
             {
                 if (Global.Rand.Next(0, 100) < weapon.Accuracy)
                 {
-                    var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) 
+                    var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
                         * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                     await DealDamage(context, damage);
                     marble.DamageDealt += damage;
@@ -495,7 +495,7 @@ namespace MarbleBot.Core
                 {
                     if (Global.Rand.Next(0, 100) < weapon.Accuracy)
                     {
-                        var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0)) 
+                        var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
                             * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                         await DealDamage(context, damage);
                         totalDamage += damage;

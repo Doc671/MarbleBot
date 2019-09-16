@@ -1,10 +1,15 @@
 ﻿using Discord;
 using Discord.Commands;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
+using Google.Apis.Sheets.v4;
+using Google.Apis.Sheets.v4.Data;
 using MarbleBot.Extensions;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
@@ -20,14 +25,26 @@ namespace MarbleBot.Modules
         {
             if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0))
             {
-                await ReplyAsync("Could not find the role!");
+                await SendErrorAsync("Could not find the role!");
                 return;
             }
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
-            var server = GetServer(Context);
-            server.Roles.Add(id);
-            WriteServers();
+            var guild = GetGuild(Context);
+            guild.Roles.Add(id);
+            WriteGuilds();
             await ReplyAsync("Succesfully updated.");
+        }
+
+        [Command("addwarningsheet")]
+        [Alias("addwsheet", "addsheet")]
+        [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        public async Task AddWarningSheetCommand(string link)
+        {
+            var guild = GetGuild(Context);
+            guild.WarningSheetLink = link;
+            WriteGuilds();
+            await ReplyAsync("Success.");
         }
 
         [Command("clear")]
@@ -50,15 +67,15 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task ClearChannelCommand(string option)
         {
-            var server = GetServer(Context);
+            var guild = GetGuild(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
-                case "announcement": server.AnnouncementChannel = 0; break;
-                case "autoresponse": server.AutoresponseChannel = 0; break;
-                case "usable": server.UsableChannels = new List<ulong>(); break;
+                case "announcement": guild.AnnouncementChannel = 0; break;
+                case "autoresponse": guild.AutoresponseChannel = 0; break;
+                case "usable": guild.UsableChannels = new List<ulong>(); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
             }
-            WriteServers();
+            WriteGuilds();
             await ReplyAsync("Succesfully cleared.");
         }
 
@@ -68,19 +85,19 @@ namespace MarbleBot.Modules
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        public async Task ClearRecentSpamCommand(string rserver, string rchannel)
+        public async Task ClearRecentSpamCommand(string rguild, string rchannel)
         {
-            var server = ulong.Parse(rserver);
+            var guild = ulong.Parse(rguild);
             var channel = ulong.Parse(rchannel);
-            var msgs = await Context.Client.GetGuild(server).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
+            var msgs = await Context.Client.GetGuild(guild).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
             var srvr = new EmbedAuthorBuilder();
-            if (server == THS)
+            if (guild == THS)
             {
                 var _THS = Context.Client.GetGuild(THS);
                 srvr.WithName(_THS.Name);
                 srvr.WithIconUrl(_THS.IconUrl);
             }
-            else if (server == CM)
+            else if (guild == CM)
             {
                 var _CM = Context.Client.GetGuild(CM);
                 srvr.WithName(_CM.Name);
@@ -88,8 +105,8 @@ namespace MarbleBot.Modules
             }
             var builder = new EmbedBuilder()
                 .WithAuthor(srvr)
-                .WithTitle("Bulk delete in " + Context.Client.GetGuild(server).GetTextChannel(channel).Mention)
-                .WithColor(Color.Red)
+                .WithTitle("Bulk delete in " + Context.Client.GetGuild(guild).GetTextChannel(channel).Mention)
+                .WithColor(Discord.Color.Red)
                 .WithDescription("Reason: Empty Messages")
                 .WithFooter("ID: " + channel)
                 .WithCurrentTimestamp();
@@ -103,12 +120,12 @@ namespace MarbleBot.Modules
                     await msg.DeleteAsync();
                 }
             }
-            if (server == THS)
+            if (guild == THS)
             {
                 var logs = Context.Client.GetGuild(THS).GetTextChannel(327132239257272327);
                 await logs.SendMessageAsync("", false, builder.Build());
             }
-            else if (server == CM)
+            else if (guild == CM)
             {
                 var logs = Context.Client.GetGuild(CM).GetTextChannel(387306347936350213);
                 await logs.SendMessageAsync("", false, builder.Build());
@@ -135,22 +152,257 @@ namespace MarbleBot.Modules
             return swearPresent;
         }
 
+        public async Task LogWarningAsync(IGuildUser user, string warningCode, int warningsToGive)
+        {
+            using var service = new SheetsService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = Global.Credential,
+                ApplicationName = "MarbleBot",
+            });
+
+            string spreadsheetId = GetGuild(Context).WarningSheetLink;
+            const string range = "Warnings!A3:J";
+
+            var result = new ValueRange();
+            try
+            {
+                result = await service.Spreadsheets.Values.Get(spreadsheetId, range).ExecuteAsync();
+            }
+            catch (System.Exception ex)
+            {
+                Log(ex.ToString());
+            }
+
+            // Get the warning sheet
+            int? sheetId = (await service.Spreadsheets.Get(spreadsheetId).ExecuteAsync()).Sheets
+                .Where(sheet => sheet.Properties.Title == "Warnings")
+                .First().Properties.SheetId;
+
+            var userToWarnRow = new string[10];
+
+            int rowIndex = 3;
+
+            // Find the row corresponding to the user to be warned
+            for (rowIndex = 3; rowIndex < result.Values.Count + 3; rowIndex++)
+            {
+                var row = result.Values[rowIndex - 3];
+                if ((row.First() as string).Contains(user.ToString()))
+                {
+                    userToWarnRow = row.Select(cell => cell.ToString()).ToArray();
+                    break;
+                }
+            }
+
+            var requests = new List<Request>();
+
+            // If the user could not be found, add a new row with the user's details
+            if (userToWarnRow[0] == null)
+            {
+                userToWarnRow = new string[] { user.ToString(), "", "", "", "", "", "", "Normal", "0", "0" };
+                var rowData = new RowData()
+                {
+                    Values = new List<CellData>()
+                };
+
+                int cellNumber = 0;
+                ExtendedValue cellContents;
+                foreach (var cell in userToWarnRow)
+                {
+                    cellContents = new ExtendedValue();
+
+                    // If the cell is a number, write it as a number rather than a string
+                    if (int.TryParse(cell, out cellNumber))
+                        cellContents.NumberValue = cellNumber;
+                    else
+                        cellContents.StringValue = cell;
+
+                    rowData.Values.Add(new CellData()
+                    {
+                        UserEnteredValue = cellContents
+                    });
+                }
+
+                requests.Add(new Request()
+                {
+                    AppendCells = new AppendCellsRequest()
+                    {
+                        SheetId = sheetId,
+                        Rows = new List<RowData>() {
+                            rowData
+                        },
+                        Fields = "*"
+                    }
+                });
+            }
+
+            int expiredWarnings = int.Parse(userToWarnRow[8]);
+            int totalWarnings = int.Parse(userToWarnRow[9]);
+
+            int currentWarnings = expiredWarnings - totalWarnings;
+
+            totalWarnings += warningsToGive;
+
+            static Google.Apis.Sheets.v4.Data.Color GetCellBackgroundColour(int warnings)
+                => warnings switch
+                {
+                    3 => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 1f,
+                        Green = 0.5f,
+                        Blue = 0f,
+                    },
+                    4 => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 1f,
+                        Green = 0f,
+                        Blue = 0f,
+                    },
+                    5 => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 0.5f,
+                        Green = 0f,
+                        Blue = 0f,
+                    },
+                    6 => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 0f,
+                        Green = 0f,
+                        Blue = 0f,
+                    },
+                    _ => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 1f,
+                        Green = 1f,
+                        Blue = 0f,
+                    }
+                };
+
+            static Google.Apis.Sheets.v4.Data.Color GetCellForegroundColour(int warnings)
+                => warnings switch
+                {
+                    5 => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 1f,
+                        Green = 1f,
+                        Blue = 1f,
+                    },
+                    6 => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 1f,
+                        Green = 1f,
+                        Blue = 1f,
+                    },
+                    _ => new Google.Apis.Sheets.v4.Data.Color
+                    {
+                        Red = 0f,
+                        Green = 0f,
+                        Blue = 0f,
+                    }
+                };
+
+            // Add the appropriate colours and text to the sheet
+            for (int i = 0; i < warningsToGive; i++)
+            {
+                requests.Add(new Request()
+                {
+                    RepeatCell = new RepeatCellRequest()
+                    {
+                        Range = new GridRange()
+                        {
+                            SheetId = sheetId,
+                            StartColumnIndex = currentWarnings + i + 1,
+                            EndColumnIndex = currentWarnings + i + 2,
+                            StartRowIndex = rowIndex - 1,
+                            EndRowIndex = rowIndex
+                        },
+                        Cell = new CellData()
+                        {
+                            UserEnteredFormat = new CellFormat()
+                            {
+                                BackgroundColor = GetCellBackgroundColour(currentWarnings + i + 1),
+                                TextFormat = new TextFormat()
+                                {
+                                    ForegroundColor = GetCellForegroundColour(currentWarnings + i + 1)
+                                }
+                            },
+                            UserEnteredValue = new ExtendedValue()
+                            {
+                                StringValue = warningCode
+                            }
+                        },
+                        Fields = "*"
+                    }
+                });
+            }
+
+            requests.Add(new Request()
+            {
+                RepeatCell = new RepeatCellRequest()
+                {
+                    Range = new GridRange()
+                    {
+                        SheetId = sheetId,
+                        StartColumnIndex = 9,
+                        EndColumnIndex = 10,
+                        StartRowIndex = rowIndex - 1,
+                        EndRowIndex = rowIndex
+                    },
+                    Cell = new CellData()
+                    {
+                        UserEnteredValue = new ExtendedValue()
+                        {
+                            StringValue = currentWarnings < 3 ? "Normal" : currentWarnings == 6 ? "Banned" : "Criminal"
+                        }
+                    },
+                    Fields = "*"
+                }
+            });
+
+            requests.Add(new Request()
+            {
+                RepeatCell = new RepeatCellRequest()
+                {
+                    Range = new GridRange()
+                    {
+                        SheetId = sheetId,
+                        StartColumnIndex = 9,
+                        EndColumnIndex = 10,
+                        StartRowIndex = rowIndex - 1,
+                        EndRowIndex = rowIndex
+                    },
+                    Cell = new CellData()
+                    {
+                        UserEnteredValue = new ExtendedValue()
+                        {
+                            NumberValue = totalWarnings
+                        }
+                    },
+                    Fields = "*"
+                }
+            });
+
+            await service.Spreadsheets.BatchUpdate(new BatchUpdateSpreadsheetRequest
+            {
+                Requests = requests
+            }, spreadsheetId).ExecuteAsync();
+        }
+
         [Command("removerole")]
         [Summary("Removes a role from the role list.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task RemoveRoleCommand([Remainder] string searchTerm)
         {
-            var server = GetServer(Context);
+            var guild = GetGuild(Context);
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
             if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0) ||
-                !server.Roles.Contains(id))
+                !guild.Roles.Contains(id))
             {
-                await ReplyAsync("Could not find the role!");
+                await SendErrorAsync("Could not find the role!");
                 return;
             }
-            server.Roles.Remove(id);
-            WriteServers();
+            guild.Roles.Remove(id);
+            WriteGuilds();
             await ReplyAsync("Succesfully updated.");
         }
 
@@ -165,21 +417,21 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Invalid channel!");
                 return;
             }
-            var server = GetServer(Context);
+            var guild = GetGuild(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
-                case "announcement": server.AnnouncementChannel = channel; break;
-                case "autoresponse": server.AutoresponseChannel = channel; break;
-                case "usable": server.UsableChannels.Add(channel); break;
+                case "announcement": guild.AnnouncementChannel = channel; break;
+                case "autoresponse": guild.AutoresponseChannel = channel; break;
+                case "usable": guild.UsableChannels.Add(channel); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info."); return;
             }
-            WriteServers();
+            WriteGuilds();
             await ReplyAsync("Successfully updated.");
         }
 
         [Command("setcolor")]
         [Alias("setcolour", "setembedcolor", "setembedcolour")]
-        [Summary("Sets the embed colour of the server using a hexadecimal colour string.")]
+        [Summary("Sets the embed colour of the guild using a hexadecimal colour string.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task SetColorCommand(string input)
@@ -189,10 +441,60 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Invalid hexadecimal colour string.");
                 return;
             }
-            var server = GetServer(Context);
-            server.Color = input;
-            WriteServers();
+            var guild = GetGuild(Context);
+            guild.Color = input;
+            WriteGuilds();
             await ReplyAsync("Successfully updated.");
+        }
+
+        [Command("warn", RunMode = RunMode.Async)]
+        [Summary("Warns a user.")]
+        [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        public async Task WarnCommand(IGuildUser user, string warningCode, int warningsToGive)
+            => await WarnUserAsync(Context, user, warningCode, warningsToGive);
+
+        [Command("warn", RunMode = RunMode.Async)]
+        [Summary("Warns a user.")]
+        [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        public async Task WarnCommand(ulong userId, string warningCode, int warningsToGive)
+        {
+            if (Context.Guild.Users.Any(u => u.Id == userId))
+                await WarnUserAsync(Context, Context.Guild.GetUser(userId), warningCode, warningsToGive);
+            else
+                await SendErrorAsync("Could not find a user to warn!");
+        }
+
+        public async Task WarnUserAsync(SocketCommandContext context, IGuildUser user, string warningCode, int warningsToGive)
+        {
+            if (warningsToGive < 1)
+            {
+                await SendErrorAsync("The number of warnings issued must be at least 1!");
+                return;
+            }
+
+            string pluralChar = warningsToGive > 1 ? "s" : "";
+
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithAuthor(context.User)
+                .WithColor(Discord.Color.Red)
+                .WithCurrentTimestamp()
+                .WithDescription($"**{user}** has been given **{warningsToGive}** warning{pluralChar} for violating rule **{warningCode}**.")
+                .WithFooter("If you believe this was a mistake, please contact a staff member.")
+                .WithTitle($":warning: Warning{pluralChar} Issued :warning:")
+                .Build());
+
+            await (await user.GetOrCreateDMChannelAsync()).SendMessageAsync(embed: new EmbedBuilder()
+                .WithAuthor(context.User)
+                .WithColor(Discord.Color.Red)
+                .WithCurrentTimestamp()
+                .WithDescription($"You have been given **{warningsToGive}** warning{pluralChar} for violating rule **{warningCode}**.")
+                .WithFooter("If you believe this was a mistake, please contact a staff member.")
+                .WithTitle($":warning: Warning{pluralChar} Issued :warning:")
+                .Build());
+
+            await LogWarningAsync(user, warningCode, warningsToGive);
         }
     }
 }

@@ -38,6 +38,10 @@ namespace MarbleBot.Core
             if (_disposed) return;
             _disposed = true;
             Global.ScavengeInfo.TryRemove(Id, out _);
+            Items = null;
+            Ores = null;
+            UsedItems = null;
+            UsedOres = null;
             if (disposing && Actions != null)
             {
                 Actions.Wait();
@@ -58,10 +62,8 @@ namespace MarbleBot.Core
         {
             var startTime = DateTime.UtcNow;
             var collectableItems = new List<Item>();
-            string json;
-            using (var users = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = users.ReadToEnd();
-            var obj = JObject.Parse(json);
-            var items = obj.ToObject<Dictionary<string, Item>>();
+            var itemObject = MarbleBotModule.GetItemsObject();
+            var items = itemObject.ToObject<Dictionary<string, Item>>();
             foreach (var itemPair in items)
             {
                 if (itemPair.Value.ScavengeLocation == Location)
@@ -85,10 +87,8 @@ namespace MarbleBot.Core
                 }
             } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 63));
 
-            string json2;
-            using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json2 = users.ReadToEnd();
-            var obj2 = JObject.Parse(json2);
-            var user = MarbleBotModule.GetUser(context, obj2);
+            var usersObject = MarbleBotModule.GetUsersObject();
+            var user = MarbleBotModule.GetUser(context, usersObject);
             user.LastScavenge = DateTime.UtcNow;
             foreach (var item in Items)
             {
@@ -96,7 +96,7 @@ namespace MarbleBot.Core
                 if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
                 else user.Items.Add(item.Id, 1);
             }
-            MarbleBotModule.WriteUsers(obj2, context.User, user);
+            MarbleBotModule.WriteUsers(usersObject, context.User, user);
 
             await UpdateEmbed(true, user.Stage);
 
@@ -128,22 +128,22 @@ namespace MarbleBot.Core
                 first = true;
             }
 
-            var fields = new List<EmbedFieldBuilder>();
-            if (Items.Count > 0)
-                fields.Add(new EmbedFieldBuilder()
+            var fields = new List<EmbedFieldBuilder>
+            {
+                new EmbedFieldBuilder()
                     .WithName("Items")
-                    .WithValue($"{itemOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"));
-            if (Ores.Count > 0)
-                fields.Add(new EmbedFieldBuilder()
+                    .WithValue($"{itemOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"),
+                new EmbedFieldBuilder()
                     .WithName("Ores")
-                    .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}"));
+                    .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}")
+            };
 
             var embed = _originalMessage.Embeds.First();
             await _originalMessage.ModifyAsync(m => m.Embed = new EmbedBuilder()
             {
                 Color = embed.Color,
-                Description = gameEnded ? stage == 1 ? "The scavenge session is over! Any remaining items have been added to your inventory!" 
-                    : "The scavenge session is over! Any remaining non-ore items have been added to your inventory!" 
+                Description = gameEnded ? stage == 1 ? "The scavenge session is over! Any remaining items have been added to your inventory!"
+                    : "The scavenge session is over! Any remaining non-ore items have been added to your inventory!"
                     : "Scavenge session ongoing.",
                 Fields = fields,
                 Timestamp = embed.Timestamp,

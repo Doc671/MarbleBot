@@ -215,16 +215,15 @@ namespace MarbleBot.Modules
             public async Task RaceRemoveCommand([Remainder] string marbleToRemove)
             => await RemoveContestant(Context, Type, marbleToRemove);
 
-            [Command("")]
-            [Alias("help")]
+            [Command("help")]
+            [Alias("")]
             [Priority(-1)]
             [Summary("Race help.")]
             public async Task RaceHelpCommand([Remainder] string _ = "")
                 => await ReplyAsync(embed: new EmbedBuilder()
-                    .AddField("How to play",
-                        new StringBuilder()
+                    .AddField("How to play", new StringBuilder()
                             .AppendLine("Use `mb/race signup <marble name>` to sign up as a marble!")
-                            .AppendLine("When everyone's done, use `mb/race start`! This happens automatically if 10 people have signed up.\n")
+                            .AppendLine("When everyone's done, use `mb/race start`! This happens automatically if 10 marbles have signed up.\n")
                             .AppendLine("Check who's participating with `mb/race contestants`!\n")
                             .AppendLine("You can earn Units of Money if you win! (6 hour cooldown)")
                             .ToString())

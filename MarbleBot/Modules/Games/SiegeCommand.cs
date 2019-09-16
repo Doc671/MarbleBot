@@ -186,7 +186,7 @@ namespace MarbleBot.Modules
                 if (SiegeInfo[fileId].Morales > 0 && DateTime.UtcNow.Subtract(SiegeInfo[fileId].LastMorale).TotalSeconds > 20)
                 {
                     SiegeInfo[fileId].Morales--;
-                    builder.AddField("Morale Boost has worn off!", 
+                    builder.AddField("Morale Boost has worn off!",
                         $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{SiegeInfo[fileId].DamageMultiplier}**!");
                 }
 
@@ -357,10 +357,13 @@ namespace MarbleBot.Modules
                     var siege = SiegeInfo[fileId];
                     foreach (var marble in siege.Marbles)
                         marbles.AppendLine(marble.ToString(Context));
+
                     builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHP: **{siege.Boss.HP}**/{siege.Boss.MaxHP}\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**");
+
                     if (marbles.Length > 1024) builder.AddField($"Marbles: **{siege.Marbles.Count}**", string.Concat(marbles.ToString().Take(1024)))
                         .AddField("Marbles (cont.)", string.Concat(marbles.ToString().Skip(1024)));
                     else builder.AddField($"Marbles: **{siege.Marbles.Count}**", marbles.ToString());
+
                     builder.WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{Siege.PowerUpString(siege.PowerUp)}**")
                          .WithThumbnailUrl(siege.Boss.ImageUrl);
                 }
@@ -693,15 +696,15 @@ namespace MarbleBot.Modules
                 else currentSiege.Boss = Siege.GetBoss("Overlord");
             }
 
-            [Command("")]
-            [Alias("help")]
+            [Command("help")]
+            [Alias("")]
             [Priority(-1)]
             [Summary("Siege help.")]
             public async Task SiegeHelpCommand()
                 => await ReplyAsync(embed: new EmbedBuilder()
                     .AddField("How to play", new StringBuilder()
                         .AppendLine("Use `mb/siege signup <marble name>` to sign up as a marble! (you can only sign up once)")
-                        .AppendLine("When everyone's done, use `mb/siege start`! The Siege begins automatically when 20 people have signed up.\n")
+                        .AppendLine("When everyone's done, use `mb/siege start`! The Siege begins automatically when 20 marbles have signed up.\n")
                         .AppendLine("When the Siege begins, use `mb/siege attack` to attack the boss!")
                         .AppendLine("Power-ups occasionally appear. Use `mb/siege grab` to try and activate the power-up (1/3 chance).\n")
                         .AppendLine("Check who's participating with `mb/siege contestants` and view Siege information with `mb/siege info`!")

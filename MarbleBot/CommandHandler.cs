@@ -32,21 +32,21 @@ namespace MarbleBot
 
             int argPos = 0;
 
-            var server = new MarbleBotServer(0);
+            var guild = new MarbleBotGuild(0);
 
             if (!context.IsPrivate)
             {
                 if (Global.Servers.Any(sr => sr.Id == context.Guild.Id))
-                    server = MarbleBotModule.GetServer(context);
+                    guild = MarbleBotModule.GetGuild(context);
                 else
                 {
-                    server = new MarbleBotServer(context.Guild.Id);
-                    Global.Servers.Add(server);
+                    guild = new MarbleBotGuild(context.Guild.Id);
+                    Global.Servers.Add(guild);
                 }
             }
 
             if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate ||
-                server.UsableChannels.Count == 0 || server.UsableChannels.Contains(context.Channel.Id)))
+                guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
             {
 
                 await context.Channel.TriggerTypingAsync();
@@ -59,11 +59,11 @@ namespace MarbleBot
                         case CommandError.BadArgCount:
                             await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
                             break;
-                        case CommandError.UnknownCommand:
-                            await context.Channel.TriggerTypingAsync();
-                            break;
                         case CommandError.UnmetPrecondition:
                             await context.Channel.SendMessageAsync("Insufficient permissions.");
+                            break;
+                        case CommandError.UnknownCommand:
+                            await context.Channel.SendMessageAsync("Unknown command. Use `mb/help` to see what commands there are.");
                             break;
                         default:
                             Program.Log($"{result.Error.Value}: {result.ErrorReason}");
@@ -73,7 +73,7 @@ namespace MarbleBot
                 }
 
             }
-            else if (!context.IsPrivate && server.AutoresponseChannel == context.Channel.Id
+            else if (!context.IsPrivate && guild.AutoresponseChannel == context.Channel.Id
               && DateTime.UtcNow.Subtract(Global.AutoresponseLastUse).TotalSeconds > 2)
             {
                 foreach (var response in Global.Autoresponses)

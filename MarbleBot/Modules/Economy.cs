@@ -50,30 +50,30 @@ namespace MarbleBot.Modules
         [Command("buy")]
         [Alias("buyitem")]
         [Summary("Buys items.")]
-        public async Task BuyCommand(string rawID, string rawNo = "1")
+        public async Task BuyCommand(string rawID, string rawNoOfItems = "1")
         {
-            if (!int.TryParse(rawNo, out int noOfItems) && noOfItems > 0)
+            if (!int.TryParse(rawNoOfItems, out int noOfItems) && noOfItems > 0)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
                 return;
             }
 
             var item = GetItem<Item>(rawID);
             if (item == null)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
                 return;
             }
 
             if (item.Price == -1)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, this item cannot be sold!");
+                await SendErrorAsync($"**{Context.User.Username}**, this item cannot be sold!");
                 return;
             }
 
             if (!item.OnSale)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, this item is not on sale!");
+                await SendErrorAsync($"**{Context.User.Username}**, this item is not on sale!");
                 return;
             }
 
@@ -96,34 +96,34 @@ namespace MarbleBot.Modules
                 WriteUsers(obj, Context.User, user);
                 await ReplyAsync($"**{user.Name}** has successfully purchased **{item.Name}** x**{noOfItems}** for {UoM}**{item.Price:n2}** each!\nTotal price: {UoM}**{item.Price * noOfItems:n2}**\nNew balance: {UoM}**{user.Balance:n2}**.");
             }
-            else await ReplyAsync($":warning: | You can't afford this!");
+            else await SendErrorAsync($"You can't afford this!");
         }
 
         [Command("craft")]
         [Summary("Crafts an item out of other items.")]
-        public async Task CraftCommand(string searchTerm, string rawNo = "1")
+        public async Task CraftCommand(string searchTerm, string rawNoOfItems = "1")
         {
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (!user.Items.ContainsKey(17) && !user.Items.ContainsKey(62))
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, you need a Crafting Station to craft items!");
+                await SendErrorAsync($"**{Context.User.Username}**, you need a Crafting Station to craft items!");
                 return;
             }
 
-            if (!int.TryParse(rawNo, out int noOfItems))
-                searchTerm += rawNo;
+            if (!int.TryParse(rawNoOfItems, out int noOfItems))
+                searchTerm += rawNoOfItems;
 
             var requestedItem = GetItem<Item>(searchTerm);
             if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(62))
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, your current Crafting Station cannot craft this item!");
+                await SendErrorAsync($"**{Context.User.Username}**, your current Crafting Station cannot craft this item!");
                 return;
             }
 
             if (requestedItem.CraftingRecipe.Count < 1)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, the item **{requestedItem.Name}** cannot be crafted!");
+                await SendErrorAsync($"**{Context.User.Username}**, the item **{requestedItem.Name}** cannot be crafted!");
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace MarbleBot.Modules
 
             if (!sufficientMaterials)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, you do not have enough items to craft this!");
+                await SendErrorAsync($"**{Context.User.Username}**, you do not have enough items to craft this!");
                 return;
             }
 
@@ -243,35 +243,35 @@ namespace MarbleBot.Modules
         [Command("dismantle")]
         [Alias("decraft", "disassemble", "dismantle")]
         [Summary("Turns a crafted item back into its ingredients.")]
-        public async Task DecraftCommand(string searchTerm, string rawNo = "1")
+        public async Task DecraftCommand(string searchTerm, string rawNoOfItems = "1")
         {
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
             if (!user.Items.ContainsKey(17) && !user.Items.ContainsKey(62))
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, you need a Crafting Station to decraft items!");
+                await SendErrorAsync($"**{Context.User.Username}**, you need a Crafting Station to decraft items!");
                 return;
             }
 
-            if (!int.TryParse(rawNo, out int noOfItems))
-                searchTerm += rawNo;
+            if (!int.TryParse(rawNoOfItems, out int noOfItems))
+                searchTerm += rawNoOfItems;
 
             var requestedItem = GetItem<Item>(searchTerm);
             if (requestedItem.CraftingProduced == 0)
             {
-                await ReplyAsync($"**{Context.User.Username}**, you cannot dismantle this item!");
+                await SendErrorAsync($"**{Context.User.Username}**, you cannot dismantle this item!");
                 return;
             }
 
             if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(62))
             {
-                await ReplyAsync($"**{Context.User.Username}**, your Crafting Station is not advanced enough to dismantle this item!");
+                await SendErrorAsync($"**{Context.User.Username}**, your Crafting Station is not advanced enough to dismantle this item!");
                 return;
             }
 
             if (requestedItem.CraftingRecipe.Count < 1)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, the item **{requestedItem.Name}** cannot be decrafted!");
+                await SendErrorAsync($"**{Context.User.Username}**, the item **{requestedItem.Name}** cannot be decrafted!");
                 return;
             }
 
@@ -301,7 +301,7 @@ namespace MarbleBot.Modules
                 WriteUsers(obj, Context.User, user);
                 await ReplyAsync(embed: embed.Build());
             }
-            else await ReplyAsync($":warning: | **{Context.User.Username}**, you do not have enough of this item!");
+            else await SendErrorAsync($"**{Context.User.Username}**, you do not have enough of this item!");
         }
 
         [Command("inventory")]
@@ -336,7 +336,7 @@ namespace MarbleBot.Modules
                 user = GetUser(Context);
                 if (user.Items == null)
                 {
-                    await ReplyAsync($"**{Context.User.Username}**, you don't have any items!");
+                    await SendErrorAsync($"**{Context.User.Username}**, you don't have any items!");
                     return;
                 }
             }
@@ -350,12 +350,12 @@ namespace MarbleBot.Modules
                 || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
                 if (foundUser.Value == null)
                 {
-                    await ReplyAsync($"**{Context.User.Username}**, the requested user could not be found.");
+                    await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
                     return;
                 }
                 else if (foundUser.Value.Items == null)
                 {
-                    await ReplyAsync($"**{Context.User.Username}**, the user **{foundUser.Value.Name}** does not have any items!");
+                    await SendErrorAsync($"**{Context.User.Username}**, the user **{foundUser.Value.Name}** does not have any items!");
                     return;
                 }
                 id = ulong.Parse(foundUser.Key);
@@ -390,7 +390,7 @@ namespace MarbleBot.Modules
             var item = GetItem<Weapon>(searchTerm);
             if (item == null)
             {
-                await ReplyAsync(":warning: | Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                await SendErrorAsync($"Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
                 return;
             }
 
@@ -507,7 +507,7 @@ namespace MarbleBot.Modules
                 || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
                 if (foundUser.Value == null)
                 {
-                    await ReplyAsync($"**{Context.User.Username}**, the requested user could not be found.");
+                    await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
                     return;
                 }
                 id = ulong.Parse(foundUser.Key);
@@ -621,8 +621,8 @@ namespace MarbleBot.Modules
         [Summary("Shows the ten richest people globally by Net Worth.")]
         public async Task RichListCommand(string rawPage = "1")
         {
-            if (!int.TryParse(rawPage, out int page)) await ReplyAsync($"**{Context.User.Username}**, this is not a valid integer!");
-            else if (page < 1) await ReplyAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
+            if (!int.TryParse(rawPage, out int page)) await SendErrorAsync($"**{Context.User.Username}**, this is not a valid integer!");
+            else if (page < 1) await SendErrorAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
             else
             {
                 string json;
@@ -667,24 +667,24 @@ namespace MarbleBot.Modules
         [Command("sell")]
         [Alias("sellitem")]
         [Summary("Sells items.")]
-        public async Task SellCommand(string rawID, string rawNo = "1")
+        public async Task SellCommand(string rawID, string rawNoOfItems = "1")
         {
-            if (!int.TryParse(rawNo, out int noOfItems) && noOfItems > 0)
+            if (!int.TryParse(rawNoOfItems, out int noOfItems) && noOfItems > 0)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
+                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
                 return;
             }
 
             var item = GetItem<Item>(rawID);
             if (item == null)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
+                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
                 return;
             }
 
             if (item.Price == -1)
             {
-                await ReplyAsync($":warning: | **{Context.User.Username}**, this item cannot be sold!");
+                await SendErrorAsync($"**{Context.User.Username}**, this item cannot be sold!");
                 return;
             }
 
@@ -697,7 +697,7 @@ namespace MarbleBot.Modules
                 WriteUsers(obj, Context.User, user);
                 await ReplyAsync($"**{user.Name}** has successfully sold **{item.Name}** x**{noOfItems}** for {UoM}**{item.Price:n2}** each!\nTotal price: {UoM}**{item.Price * noOfItems:n2}**\nNew balance: {UoM}**{user.Balance:n2}**.");
             }
-            else await ReplyAsync(":warning: | You don't have enough of this item!");
+            else await SendErrorAsync($"You don't have enough of this item!");
         }
 
         [Command("shop")]
@@ -747,7 +747,7 @@ namespace MarbleBot.Modules
                     ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                     if (!SiegeInfo.ContainsKey(fileId))
                     {
-                        await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                         return;
                     }
 
@@ -778,7 +778,7 @@ namespace MarbleBot.Modules
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     case 10:
@@ -787,7 +787,7 @@ namespace MarbleBot.Modules
                             if (SiegeInfo.ContainsKey(fileId))
                                 await SiegeInfo[fileId].ItemAttack(Context, obj, item.Id,
                                     (int)Math.Round(90 + SiegeInfo[fileId].Boss.MaxHP * 0.05 * (Rand.NextDouble() * 0.12 + 0.94)));
-                            else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     case 14:
@@ -796,7 +796,7 @@ namespace MarbleBot.Modules
                             if (SiegeInfo.ContainsKey(fileId))
                                 await SiegeInfo[fileId].ItemAttack(Context, obj, 14,
                                     70 + 10 * (int)SiegeInfo[fileId].Boss.Difficulty, true);
-                            else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     case 17:
@@ -817,7 +817,7 @@ namespace MarbleBot.Modules
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the lava, turning it into a **Lava Bucket**!");
                             }
                         }
-                        else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                     case 19:
                     case 20:
@@ -836,7 +836,7 @@ namespace MarbleBot.Modules
                                 UpdateUser(GetItem<Item>(randDish.ToString("000")), 1);
                                 await ReplyAsync($"**{Context.User.Username}** used their **{item.Name}**! It somehow picked up a disease and is now a **{GetItem<Item>(randDish.ToString("000")).Name}**!");
                             }
-                            else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     case 23:
@@ -868,7 +868,7 @@ namespace MarbleBot.Modules
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     case 38:
@@ -887,7 +887,7 @@ namespace MarbleBot.Modules
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     case 39:
@@ -905,7 +905,7 @@ namespace MarbleBot.Modules
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     case 57:
@@ -938,11 +938,11 @@ namespace MarbleBot.Modules
                                 await ReplyAsync("*You hear the whirring of machinery...*");
                             }
                             else
-                                await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                             break;
                         }
                     default:
-                        await ReplyAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                         break;
                 }
             }

@@ -302,8 +302,8 @@ namespace MarbleBot.Modules
                 else await ScavengeInfoAsync(ScavengeLocation.VioletVolcanoes);
             }
 
-            [Command("")]
-            [Alias("help")]
+            [Command("help")]
+            [Alias("")]
             [Priority(-1)]
             [Summary("Scavenge help.")]
             public async Task ScavengeHelpCommand([Remainder] string _ = "")

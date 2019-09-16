@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using Google.Apis.Auth.OAuth2;
 using MarbleBot.Core;
 using System;
 using System.Collections.Concurrent;
@@ -14,9 +15,10 @@ namespace MarbleBot
         internal static DateTime AutoresponseLastUse { get; set; }
         internal static Dictionary<string, string> Autoresponses { get; set; } = new Dictionary<string, string>();
         internal static CommandService CommandService { get; set; }
-        internal static ushort DailyTimeout  { get; set; } = 48;
+        internal static UserCredential Credential { get; set; }
+        internal static ushort DailyTimeout { get; set; } = 48;
         internal static Random Rand { get; } = new Random();
-        internal static List<MarbleBotServer> Servers  { get; set; } = new List<MarbleBotServer>();
+        internal static List<MarbleBotGuild> Servers { get; set; } = new List<MarbleBotGuild>();
         internal static DateTime StartTime { get; set; }
         internal static string YTKey { get; set; } = "";
 
