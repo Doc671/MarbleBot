@@ -45,8 +45,15 @@ namespace MarbleBot
                 }
             }
 
-            if (msg.HasStringPrefix("mb/", ref argPos) && msg.Author.IsBot == false && (context.IsPrivate ||
-                guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
+
+            if (msg.HasStringPrefix("mb/", ref argPos) && !msg.Author.IsBot &&
+#if DEBUG
+            // If debugging, run commands in a single channel only
+            context.Channel.Id == 409655798730326016)
+#else
+            // Otherwise, run as usual
+            (context.IsPrivate || guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
+#endif
             {
 
                 await context.Channel.TriggerTypingAsync();

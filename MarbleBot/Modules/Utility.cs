@@ -162,14 +162,14 @@ namespace MarbleBot.Modules
                 if (command.Parameters.Count() != 0)
                     builder.AddField("Parameters", command.Parameters.Aggregate(new StringBuilder(), (builder, param) =>
                     {
-                        builder.AppendLine($"{param.Name} ({(param.IsOptional ? "optional " : "")}{(param.IsRemainder ? "remainder " : "")}{param.Type.Name})");
+                        builder.AppendLine($"{param.Name.CamelToTitleCase()} ({(param.IsOptional ? "optional " : "")}{(param.IsRemainder ? "remainder " : "")}{param.Type.Name})");
                         return builder;
                     }).ToString(), true);
 
                 if (command.Preconditions.Count() != 0)
                     builder.AddField("Preconditions", command.Preconditions.Aggregate(new StringBuilder(), (builder, precondition) =>
                     {
-                        builder.AppendLine((precondition.TypeId as Type).Name);
+                        builder.AppendLine((precondition.TypeId as Type).Name.CamelToTitleCase());
                         return builder;
                     }).ToString(), true);
 

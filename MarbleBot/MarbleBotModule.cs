@@ -228,7 +228,7 @@ namespace MarbleBot
         /// <summary> Writes guilds to the appropriate file. </summary>
         protected internal static void WriteGuilds()
         {
-            using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Servers.json"));
+            using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json"));
             var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
             var dict = Global.Servers.ToDictionary(s => s.Id);
             serialiser.Serialize(guilds, dict);

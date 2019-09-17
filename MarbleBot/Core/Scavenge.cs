@@ -29,6 +29,8 @@ namespace MarbleBot.Core
         public Queue<Item> UsedOres { get; set; } = new Queue<Item>();
 
         private bool _disposed = false;
+        private bool _itemHasAppeared = false;
+        private bool _oreHasAppeared = false;
         private readonly IUserMessage _originalMessage;
 
         public void Dispose() => Dispose(true);
@@ -80,9 +82,16 @@ namespace MarbleBot.Core
                 {
                     var item = collectableItems[Global.Rand.Next(0, collectableItems.Count)];
                     if (item.Name.Contains("Ore"))
+                    {
                         Ores.Enqueue(item);
+                        _oreHasAppeared = true;
+                    }
                     else
+                    {
                         Items.Enqueue(item);
+                        _itemHasAppeared = true;
+                    }
+
                     await UpdateEmbed();
                 }
             } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 63));
@@ -128,15 +137,17 @@ namespace MarbleBot.Core
                 first = true;
             }
 
-            var fields = new List<EmbedFieldBuilder>
-            {
-                new EmbedFieldBuilder()
+            var fields = new List<EmbedFieldBuilder>();
+
+            if (_itemHasAppeared)
+                fields.Add(new EmbedFieldBuilder()
                     .WithName("Items")
-                    .WithValue($"{itemOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"),
-                new EmbedFieldBuilder()
+                    .WithValue($"{itemOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"));
+
+            if (_oreHasAppeared)
+                fields.Add(new EmbedFieldBuilder()
                     .WithName("Ores")
-                    .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}")
-            };
+                    .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}"));
 
             var embed = _originalMessage.Embeds.First();
             await _originalMessage.ModifyAsync(m => m.Embed = new EmbedBuilder()

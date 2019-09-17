@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using MarbleBot.Core;
 using MarbleBot.Extensions;
 using Newtonsoft.Json;
@@ -163,6 +162,11 @@ namespace MarbleBot.Modules
         public async Task BuyHatCommand() 
             => await ReplyAsync($"That'll be **{Rand.Next(0, int.MaxValue)}** units of money please. Thank you for buying Uglee Hat #**{Rand.Next(0, 69042)}**!");
 
+        [Command("cameltotitlecase")]
+        [Alias("cameltotitle")]
+        public async Task CamelToTitleCaseCommand([Remainder] string input)
+            => await ReplyAsync(input.CamelToTitleCase());
+
         [Command("choose")]
         [Summary("Chooses between several provided choices.")]
         public async Task ChooseCommand([Remainder] string input)
@@ -220,35 +224,16 @@ namespace MarbleBot.Modules
         [Summary("Returns a random number with user-defined bounds.")]
         public async Task RandomCommand(string rStart, string rEnd)
         {
-            int start = rStart.ToInt();
-            int end = rEnd.ToInt();
-            if (start < 0 || end < 0) await ReplyAsync("Only use positive numbers!");
-            else if (start > end)
+            if (!int.TryParse(rStart, out int start) || !int.TryParse(rEnd, out int end))
             {
-                try
-                {
-                    int randNumber = Rand.Next(end, start);
-                    await ReplyAsync(randNumber.ToString());
-                }
-                catch (FormatException)
-                {
-                    await ReplyAsync("Number too large/small.");
-                    throw;
-                }
+                await SendErrorAsync("This is not a valid integer!");
+                return;
             }
+
+            if (start > end)
+                await ReplyAsync(Rand.Next(end, start).ToString());
             else
-            {
-                try
-                {
-                    int randNumber = Rand.Next(start, end);
-                    await ReplyAsync(randNumber.ToString());
-                }
-                catch (FormatException)
-                {
-                    await ReplyAsync("Number too large/small.");
-                    throw;
-                }
-            }
+                await ReplyAsync(Rand.Next(start, end).ToString());
         }
 
         [Command("rank")]

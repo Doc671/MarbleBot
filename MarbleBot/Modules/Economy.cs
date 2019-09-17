@@ -468,7 +468,7 @@ namespace MarbleBot.Modules
             decimal[] poupSoopPrices = { 364400, 552387946, 140732609585, 180269042735, 221548933670, 262310854791, 303496572188, 1802201667100, 374180952623987 };
             for (int i = 0; i < splitMsg.Length; i++)
             {
-                var no = splitMsg[i].ToDecimal();
+                var no = Convert.ToDecimal(splitMsg[i]);
                 var subtot = (no * poupSoopPrices[i]);
                 totalCost += subtot;
                 var type = i switch

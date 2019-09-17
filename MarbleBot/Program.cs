@@ -34,7 +34,7 @@ namespace MarbleBot
 
         private const string _documentId = "1HlzCpdMG7Wn5cAGDCLb_k9NqMk6jsZG9P1Q-VwCrp9E";
 
-        public async Task StartAsync()
+        private async Task StartAsync()
         {
             Console.Title = "MarbleBot";
 
@@ -46,10 +46,10 @@ namespace MarbleBot
             using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBT.txt")) token = stream.ReadLine();
             using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBK.txt")) Global.YTKey = stream.ReadLine();
 
-            using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
+            using (var guildFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
             {
                 string json;
-                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
+                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
                     json = await users.ReadToEndAsync();
                 var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotGuild>>(json);
                 foreach (var guild in allServers)

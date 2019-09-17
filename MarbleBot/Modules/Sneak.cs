@@ -48,10 +48,10 @@ namespace MarbleBot.Modules
 
             DailyTimeout = 48;
             Servers = new List<MarbleBotGuild>();
-            using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
+            using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
             {
                 string json;
-                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Servers.json"))
+                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
                     json = await users.ReadToEndAsync();
                 var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotGuild>>(json);
                 foreach (var guild in allServers)
