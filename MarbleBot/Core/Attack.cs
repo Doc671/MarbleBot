@@ -13,7 +13,7 @@ namespace MarbleBot.Core
         public StatusEffect StatusEffect { get; }
 
         /// <summary> An empty instance of an attack. </summary>
-        public static Attack Empty = new Attack("", 0, 0, StatusEffect.None);
+        public static Attack Empty => new Attack("", 0, 0, StatusEffect.None);
 
         /// <summary> Represents a boss' attack during a Marble Siege. </summary>
         /// <param name="name"> The name of the attack. </param>

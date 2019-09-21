@@ -6,7 +6,6 @@ using Google.Apis.Docs.v1.Data;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
-using MarbleBot.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,20 +16,24 @@ using System.Threading.Tasks;
 
 namespace MarbleBot
 {
-    internal class Program
+    internal sealed class Program
     {
         private static void Main()
         => new Program().StartAsync().GetAwaiter().GetResult();
 
-        private static DiscordSocketClient _client;
+        private readonly static DiscordSocketClient _client = new DiscordSocketClient();
 
 #pragma warning disable IDE0052 // Remove unread private members
         private CommandHandler _handler;
 #pragma warning restore IDE0052 // Remove unread private members
 
-        private static DocsService _service;
+        private readonly static DocsService _service = new DocsService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = Global.Credential,
+                ApplicationName = "MarbleBot",
+            });
 
-        private static DocumentsResource.GetRequest _request;
+        private readonly static DocumentsResource.GetRequest _request = _service.Documents.Get(_documentId);
 
         private const string _documentId = "1HlzCpdMG7Wn5cAGDCLb_k9NqMk6jsZG9P1Q-VwCrp9E";
 
@@ -40,34 +43,8 @@ namespace MarbleBot
 
             Global.StartTime = DateTime.UtcNow;
 
-            _client = new DiscordSocketClient();
-
             string token = "";
             using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBT.txt")) token = stream.ReadLine();
-            using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBK.txt")) Global.YTKey = stream.ReadLine();
-
-            using (var guildFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
-            {
-                string json;
-                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
-                    json = await users.ReadToEndAsync();
-                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotGuild>>(json);
-                foreach (var guild in allServers)
-                {
-                    var guild2 = guild.Value;
-                    guild2.Id = guild.Key;
-                    Global.Servers.Add(guild2);
-                }
-            }
-
-            using (var autoresponseFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
-            {
-                while (!autoresponseFile.EndOfStream)
-                {
-                    var autoresponsePair = (await autoresponseFile.ReadLineAsync()).Split(';');
-                    Global.Autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
-                }
-            }
 
             using (var stream = new FileStream($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
             {
@@ -78,14 +55,6 @@ namespace MarbleBot
                     CancellationToken.None,
                     new FileDataStore("token.json", true));
             }
-
-            _service = new DocsService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = Global.Credential,
-                ApplicationName = "MarbleBot",
-            });
-
-            _request = _service.Documents.Get(_documentId);
 
             await _client.LoginAsync(TokenType.Bot, token);
 
@@ -101,7 +70,7 @@ namespace MarbleBot
             await Task.Delay(-1);
         }
 
-        public static void Log(string log, bool noDate = false)
+        internal static void Log(string log, bool noDate = false)
         => Task.Run(() =>
         {
             var logString = noDate ? log : $"[{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss")}] {log}";

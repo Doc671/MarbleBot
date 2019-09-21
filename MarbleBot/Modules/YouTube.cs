@@ -73,15 +73,13 @@ namespace MarbleBot.Modules
                 if (validUser)
                 {
                     SearchResource.ListRequest searchListRequest;
-                    using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                    using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
                         ApiKey = YTKey,
                         ApplicationName = GetType().ToString()
-                    }))
-                    {
-                        searchListRequest = youtubeService.Search.List("snippet");
-                    }
+                    });
 
+                    searchListRequest = youtubeService.Search.List("snippet");
                     searchListRequest.Q = channelLink;
                     searchListRequest.MaxResults = 10;
                     var searchListResponse = await searchListRequest.ExecuteAsync();
@@ -145,15 +143,13 @@ namespace MarbleBot.Modules
         {
             SearchResource.ListRequest searchListRequest;
 
-            using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
-            }))
-            {
-                searchListRequest = youtubeService.Search.List("snippet");
-            }
+            });
 
+            searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
 
@@ -162,7 +158,7 @@ namespace MarbleBot.Modules
             // Call the search.list method to retrieve results matching the specified query term.
             var searchListResponse = await searchListRequest.ExecuteAsync();
 
-            List<string> channels = new List<string>();
+            var channels = new List<string>();
 
             // Add each result to the appropriate list, and then display the lists of
             // matching channels.
@@ -195,15 +191,13 @@ namespace MarbleBot.Modules
         {
             SearchResource.ListRequest searchListRequest;
 
-            using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
             {
                 ApiKey = YTKey,
                 ApplicationName = GetType().ToString()
-            }))
-            {
-                searchListRequest = youtubeService.Search.List("snippet");
-            }
+            });
 
+            searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
 
@@ -212,7 +206,7 @@ namespace MarbleBot.Modules
             // Call the search.list method to retrieve results matching the specified query term.
             var searchListResponse = await searchListRequest.ExecuteAsync();
 
-            List<string> videos = new List<string>();
+            var videos = new List<string>();
 
             // Add each result to the appropriate list, and then display the lists of
             // matching videos.

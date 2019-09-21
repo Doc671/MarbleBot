@@ -287,8 +287,8 @@ namespace MarbleBot.Modules
                     {
                         try
                         {
-                            ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong ID);
-                            user = Context.Guild.GetUser(ID);
+                            ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong Id);
+                            user = Context.Guild.GetUser(Id);
                         }
                         catch (NullReferenceException ex)
                         {

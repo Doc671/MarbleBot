@@ -15,7 +15,7 @@ using static MarbleBot.Global;
 
 namespace MarbleBot.Modules
 {
-    public partial class Games
+    public static partial class Games
     {
         [Group("race")]
         [Summary("Participate in a marble race!")]

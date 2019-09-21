@@ -5,7 +5,6 @@ using MarbleBot.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,7 +14,7 @@ using static MarbleBot.Global;
 
 namespace MarbleBot.Modules
 {
-    public partial class Games
+    public static partial class Games
     {
         [Group("war")]
         [Summary("Participate in a Marble War battle!")]
@@ -60,10 +59,9 @@ namespace MarbleBot.Modules
                     marbles[i] = marbles[r];
                     marbles[r] = temp;
                 }
-                var war = new War
-                {
-                    Id = fileId
-                };
+
+                var team1 = new List<WarMarble>();
+                var team2 = new List<WarMarble>();
                 var t1Output = new StringBuilder();
                 var t2Output = new StringBuilder();
                 var pings = new StringBuilder();
@@ -72,7 +70,7 @@ namespace MarbleBot.Modules
                     WarMarble marble = marbles[i];
                     if (i < (int)Math.Ceiling(marbles.Count / 2d))
                     {
-                        war.Team1.Add(marble);
+                        team1.Add(marble);
                         var user = Context.Client.GetUser(marble.Id);
                         marble.Team = 1;
                         t1Output.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
@@ -80,7 +78,7 @@ namespace MarbleBot.Modules
                     }
                     else
                     {
-                        war.Team2.Add(marble);
+                        team2.Add(marble);
                         var user = Context.Client.GetUser(marble.Id);
                         marble.Team = 2;
                         t2Output.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
@@ -88,20 +86,11 @@ namespace MarbleBot.Modules
                     }
                 }
 
-                var nameList = new List<string>();
-                using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
+                WarMarble aiMarble = null;
+                if ((team1.Count + team2.Count) % 2 > 0)
                 {
-                    while (!teamNames.EndOfStream)
-                        nameList.Add(await teamNames.ReadLineAsync());
-                }
-
-                war.Team1Name = nameList[Rand.Next(0, nameList.Count)];
-                do war.Team2Name = nameList[Rand.Next(0, nameList.Count)];
-                while (string.Compare(war.Team1Name, war.Team2Name, false) == 0);
-                if (war.AllMarbles.Count() % 2 > 0)
-                {
-                    WarMarble aiMarble;
-                    if (Math.Round(war.AllMarbles.Sum(m => GetUser(Context, m.Id).Stage) / (double)war.AllMarbles.Count()) == 2)
+                    var allMarbles = team1.Union(team2);
+                    if (Math.Round(allMarbles.Sum(m => GetUser(Context, m.Id).Stage) / (double)allMarbles.Count()) == 2)
                         aiMarble = new WarMarble(BotId, 35, "MarbleBot", GetItem<Weapon>(Rand.Next(0, 9) switch
                         {
                             0 => "086",
@@ -128,10 +117,11 @@ namespace MarbleBot.Modules
                             _ => "096"
                         }), GetItem<Item>("000"));
                     aiMarble.Team = 2;
-                    war.Team2.Add(aiMarble);
+                    team2.Add(aiMarble);
                     t2Output.AppendLine("**MarbleBot** [MarbleBot#7194]");
-                    war.SetAIMarble(aiMarble);
                 }
+
+                var war = new War(fileId, team1, team2, aiMarble);
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
@@ -200,7 +190,7 @@ namespace MarbleBot.Modules
                     WriteUsers(obj, Context.User, user);
                 }
 
-                List<WarMarble> enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
+                var enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
                 foreach (WarMarble enemy in enemyTeam)
                 {
                     if (string.Compare(enemy.Name, target, true) == 0)
@@ -280,8 +270,8 @@ namespace MarbleBot.Modules
                 }
 
                 var user = GetUser(Context);
-                List<WarMarble> enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
-                for (int i = 0; i < enemyTeam.Count; i++)
+                var enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
+                for (int i = 0; i < enemyTeam.Length; i++)
                 {
                     WarMarble enemy = enemyTeam[i];
                     if (string.Compare(enemy.Name, target, true) == 0)

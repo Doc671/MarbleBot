@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using MarbleBot.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -158,7 +159,7 @@ namespace MarbleBot.Core
                     : "Scavenge session ongoing.",
                 Fields = fields,
                 Timestamp = embed.Timestamp,
-                Title = $"Item Scavenge: {Enum.GetName(typeof(ScavengeLocation), Location)}"
+                Title = $"Item Scavenge: {Enum.GetName(typeof(ScavengeLocation), Location).CamelToTitleCase()}"
             }.Build());
         }
 

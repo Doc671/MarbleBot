@@ -35,17 +35,6 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task ClearMemoryCommand()
         {
-            AutoresponseLastUse = new DateTime();
-            Autoresponses = new Dictionary<string, string>();
-            using (var autoresponseFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
-            {
-                while (!autoresponseFile.EndOfStream)
-                {
-                    var autoresponsePair = (await autoresponseFile.ReadLineAsync()).Split(';');
-                    Autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
-                }
-            }
-
             DailyTimeout = 48;
             Servers = new List<MarbleBotGuild>();
             using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
@@ -71,8 +60,6 @@ namespace MarbleBot.Modules
             ScavengeInfo = new ConcurrentDictionary<ulong, Scavenge>();
             SiegeInfo = new ConcurrentDictionary<ulong, Siege>();
             WarInfo = new ConcurrentDictionary<ulong, War>();
-
-            using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBK.txt")) YTKey = stream.ReadLine();
 
             await ReplyAsync("Success.");
         }

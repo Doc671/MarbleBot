@@ -16,11 +16,11 @@ namespace MarbleBot.Core
     public class War : IDisposable
     {
         public Task Actions { get; set; }
-        public IEnumerable<WarMarble> AllMarbles => Team1.Union(Team2);
+        public IEnumerable<WarMarble> AllMarbles { get; }
         public ulong Id { get; set; }
-        public List<WarMarble> Team1 { get; set; } = new List<WarMarble>();
+        public WarMarble[] Team1 { get; set; }
         public string Team1Name { get; set; }
-        public List<WarMarble> Team2 { get; set; } = new List<WarMarble>();
+        public WarMarble[] Team2 { get; set; }
         public string Team2Name { get; set; }
 
         private WarMarble _aiMarble;
@@ -111,12 +111,6 @@ namespace MarbleBot.Core
             Dispose(true);
         }
 
-        public void SetAIMarble(WarMarble aiMarble)
-        {
-            _aiMarble = aiMarble;
-            _aiMarblePresent = true;
-        }
-
         public async Task WarActions(SocketCommandContext context)
         {
             var startTime = DateTime.UtcNow;
@@ -133,7 +127,7 @@ namespace MarbleBot.Core
                 else if (_aiMarblePresent && _aiMarble.HP > 0)
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
-                    var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Count)];
+                    var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Length)];
                     if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
                         var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
@@ -157,6 +151,28 @@ namespace MarbleBot.Core
             while (!timeout && Team1.Sum(m => m.HP) > 0 && Team2.Sum(m => m.HP) > 0 && !_disposed);
             if (!timeout) await End(context);
             else Dispose(true);
+        }
+
+        public War(ulong id, IEnumerable<WarMarble> team1, IEnumerable<WarMarble> team2, WarMarble aiMarble)
+        {
+            Id = id;
+            _aiMarble = aiMarble;
+            _aiMarblePresent = aiMarble != null;
+            AllMarbles = Team1.Union(Team2);
+            Team1 = team1.ToArray();
+            Team2 = team2.ToArray();
+
+            // Decide team names
+            var nameList = new List<string>();
+            using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
+            {
+                while (!teamNames.EndOfStream)
+                    nameList.Add(teamNames.ReadLine());
+            }
+
+            Team1Name = nameList[Global.Rand.Next(0, nameList.Count)];
+            do Team2Name = nameList[Global.Rand.Next(0, nameList.Count)];
+            while (string.Compare(Team1Name, Team2Name, false) == 0);
         }
 
         ~War() => Dispose(true);

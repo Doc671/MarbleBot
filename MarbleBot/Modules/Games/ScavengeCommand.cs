@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using MarbleBot.Core;
+using MarbleBot.Extensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using static MarbleBot.Global;
 
 namespace MarbleBot.Modules
 {
-    public partial class Games
+    public static partial class Games
     {
         [Group("scavenge")]
         [Summary("Scavenge for items!")]
@@ -36,7 +37,7 @@ namespace MarbleBot.Modules
                         var scavengeMessage = await ReplyAsync(embed: new EmbedBuilder()
                             .WithColor(GetColor(Context))
                             .WithCurrentTimestamp()
-                            .WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)}**!")
+                            .WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location).CamelToTitleCase()}**!")
                             .WithTitle("Item Scavenge Begin!").Build());
                         ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(Context, location, scavengeMessage));
                     }

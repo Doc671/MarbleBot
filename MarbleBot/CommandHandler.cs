@@ -1,7 +1,8 @@
 ﻿using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Core;
-using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -21,8 +22,6 @@ namespace MarbleBot
             Global.CommandService = _service;
             _client.MessageReceived += HandleCommand;
         }
-
-        public string Name { get; }
 
         private async Task HandleCommand(SocketMessage s)
         {
@@ -45,7 +44,6 @@ namespace MarbleBot
                 }
             }
 
-
             if (msg.HasStringPrefix("mb/", ref argPos) && !msg.Author.IsBot &&
 #if DEBUG
             // If debugging, run commands in a single channel only
@@ -55,7 +53,6 @@ namespace MarbleBot
             (context.IsPrivate || guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
 #endif
             {
-
                 await context.Channel.TriggerTypingAsync();
                 var result = await _service.ExecuteAsync(context, argPos, null);
 
@@ -80,18 +77,19 @@ namespace MarbleBot
                 }
 
             }
-            else if (!context.IsPrivate && guild.AutoresponseChannel == context.Channel.Id
-              && DateTime.UtcNow.Subtract(Global.AutoresponseLastUse).TotalSeconds > 2)
+            else if (!context.IsPrivate && guild.AutoresponseChannel == context.Channel.Id)
             {
-                foreach (var response in Global.Autoresponses)
+                var autoresponses = new Dictionary<string, string>();
+                using (var autoresponseFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Autoresponses.txt"))
                 {
-                    if (string.Compare(context.Message.Content, response.Key, true) == 0)
+                    while (!autoresponseFile.EndOfStream)
                     {
-                        Global.AutoresponseLastUse = DateTime.UtcNow;
-                        await context.Channel.SendMessageAsync(response.Value);
-                        break;
+                        var autoresponsePair = (await autoresponseFile.ReadLineAsync()).Split(';');
+                        autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
                     }
                 }
+                if (autoresponses.ContainsKey(context.Message.Content))
+                    await context.Channel.SendMessageAsync(autoresponses[context.Message.Content]);
             }
             if (context.IsPrivate) Program.Log($"{context.User}: {context.Message}");
         }

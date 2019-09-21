@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Text;
 using System.Threading;
 
@@ -24,6 +25,16 @@ namespace MarbleBot.Extensions
             return output.ToString();
         }
 
+        public static void GetHSV(this Color color, out float hue, out float saturation, out float value)
+        {
+            int max = Math.Max(color.R, Math.Max(color.G, color.B));
+            int min = Math.Min(color.R, Math.Min(color.G, color.B));
+
+            hue = color.GetHue();
+            saturation = (max == 0) ? 0 : 1f - (1f * min / max);
+            value = max / 255f;
+        }
+
         public static bool IsEmpty(this string str)
             => string.Compare(str, "", true) == 0 || string.Compare(str, " ", true) == 0 || str == null || str == string.Empty 
             || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
@@ -42,12 +53,11 @@ namespace MarbleBot.Extensions
 
         public static string RemoveChar(this string str, char charToRemove)
         {
-            var charArray = str.ToCharArray();
             var output = new StringBuilder();
-            for (int i = 0; i < charArray.Length; i++)
+            for (int i = 0; i < str.Length; i++)
             {
-                char c = charArray[i];
-                if (c != charToRemove) output.Append(c);
+                if (str[i] != charToRemove)
+                    output.Append(str[i]);
             }
             return output.ToString();
         }

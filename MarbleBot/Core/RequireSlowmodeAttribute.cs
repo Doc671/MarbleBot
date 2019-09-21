@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace MarbleBot.Core
 {
     /// <summary> Requires the command to be exectued in a channel with slowmode enabled. </summary>
-    public class RequireSlowmodeAttribute : PreconditionAttribute
+    public sealed class RequireSlowmodeAttribute : PreconditionAttribute
     {
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command,
             IServiceProvider services)

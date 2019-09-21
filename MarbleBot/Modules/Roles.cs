@@ -27,7 +27,7 @@ namespace MarbleBot.Modules
                     return;
                 }
             }
-            await ReplyAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
+            await SendErrorAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
         }
 
         [Command("take")]
@@ -47,7 +47,7 @@ namespace MarbleBot.Modules
                     return;
                 }
             }
-            await ReplyAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
+            await SendErrorAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
         }
 
         [Command("role")]
@@ -75,7 +75,7 @@ namespace MarbleBot.Modules
                     return;
                 }
             }
-            await ReplyAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
+            await SendErrorAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
         }
 
         [Command("rolelist")]

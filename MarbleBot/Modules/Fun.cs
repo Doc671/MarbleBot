@@ -164,6 +164,7 @@ namespace MarbleBot.Modules
 
         [Command("cameltotitlecase")]
         [Alias("cameltotitle")]
+        [Summary("Converts a camel case string to title case.")]
         public async Task CamelToTitleCaseCommand([Remainder] string input)
             => await ReplyAsync(input.CamelToTitleCase());
 
@@ -183,6 +184,118 @@ namespace MarbleBot.Modules
                 else Log($"Profanity detected: {input}");
             }
             else await ReplyAsync($"**{Context.User.Username}**, I choose **{choices[choice].Trim()}**!");
+        }
+
+        [Command("color")]
+        [Alias("colour")]
+        public async Task ColorCommand(int red, int green, int blue)
+        {
+            if (red > byte.MaxValue || red < byte.MinValue 
+                || green > byte.MaxValue || green < byte.MinValue 
+                || blue > byte.MaxValue || blue < byte.MinValue)
+            {
+                await SendErrorAsync("The red, green and blue values must be integers between 0 and 255.");
+                return;
+            }
+
+            var color = System.Drawing.Color.FromArgb(red, green, blue);
+            color.GetHSV(out float hue, out float saturation, out float value);
+            var builder = new EmbedBuilder()
+                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
+                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
+                .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
+                .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
+            
+            await ColorMessage(color, builder);
+        }
+
+        [Command("color")]
+        [Alias("colour")]
+        public async Task ColorCommand(float hue, float saturation, float value)
+        {
+            if (hue < 0f || hue > 360f)
+            {
+                await SendErrorAsync("The given hue must be between 0 and 360!");
+                return;
+            }
+
+            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+            double f = hue / 60 - Math.Floor(hue / 60);
+
+            value *= 255;
+            int v = Convert.ToInt32(value);
+            int p = Convert.ToInt32(value * (1 - saturation));
+            int q = Convert.ToInt32(value * (1 - f * saturation));
+            int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+
+            System.Drawing.Color color;
+
+            if (hi == 0)
+                color = System.Drawing.Color.FromArgb(v, t, p);
+            else if (hi == 1)
+                color = System.Drawing.Color.FromArgb(q, v, p);
+            else if (hi == 2)
+                color = System.Drawing.Color.FromArgb(p, v, t);
+            else if (hi == 3)
+                color = System.Drawing.Color.FromArgb(p, q, v);
+            else if (hi == 4)
+                color = System.Drawing.Color.FromArgb(t, p, v);
+            else
+                color = System.Drawing.Color.FromArgb(v, p, q);
+
+            var builder = new EmbedBuilder()
+                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
+                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
+                .AddField("HSL", $"Hue: **{hue}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
+                .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
+
+            await ColorMessage(color, builder);
+        }
+
+        [Command("color")]
+        [Alias("colour")]
+        public async Task ColorCommand(string hexCode)
+        {
+            hexCode = hexCode.RemoveChar('#');
+
+            if (hexCode.Length != 6)
+            {
+                await SendErrorAsync("Invalid hex code. Please enter a six-digit hexadecimal RGB code.");
+                return;
+            }
+
+            if (!int.TryParse(hexCode[0..2], System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture, out int red)
+                || !int.TryParse(hexCode[2..4], System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture, out int green)
+                || !int.TryParse(hexCode[4..6], System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture, out int blue))
+            {
+                await SendErrorAsync("Could not parse the given hex code!");
+                return;
+            }
+
+            var color = System.Drawing.Color.FromArgb(red, green, blue);
+            color.GetHSV(out float hue, out float saturation, out float value);
+
+            var builder = new EmbedBuilder()
+                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
+                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
+                .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
+                .AddField("Hex Code", $"#{hexCode.ToUpper()}");
+
+            await ColorMessage(color, builder);
+        }
+
+        public async Task ColorMessage(System.Drawing.Color color, EmbedBuilder builder)
+        {
+            builder.WithColor(new Color(color.R, color.G, color.B));
+
+            var colorEnumerable = Enum.GetValues(typeof(System.Drawing.KnownColor))
+                .Cast<System.Drawing.KnownColor>()
+                .Where(c => System.Drawing.Color.FromKnownColor(c).ToArgb() == color.ToArgb());
+
+            if (colorEnumerable.Count() > 0)
+                builder.WithTitle(Enum.GetName(typeof(System.Drawing.KnownColor), colorEnumerable.First()).CamelToTitleCase());
+
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("orange")]

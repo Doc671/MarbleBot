@@ -9,23 +9,23 @@ namespace MarbleBot.Core
         /// <summary> The identification number of the item. </summary>
         public uint Id { get; internal set; }
         /// <summary> The name of the item. </summary>
-        public string Name { get; protected set; }
+        public string Name { get;  }
         /// <summary> The price of the item. </summary>
-        public decimal Price { get; protected set; }
+        public decimal Price { get; }
         /// <summary> The description of the item. </summary>
-        public string Description { get; protected set; }
+        public string Description { get; }
         /// <summary> Whether the item is available to buy in the shop or not. </summary>
-        public bool OnSale { get; protected set; }
+        public bool OnSale { get; }
         /// <summary> The Stage at which the item can be obtained. </summary>
-        public int Stage { get; protected set; }
+        public int Stage { get; }
         /// <summary> The location the item can be found in during a Scavenge game. </summary>
-        public ScavengeLocation ScavengeLocation { get; protected set; } 
+        public ScavengeLocation ScavengeLocation { get; } 
         /// <summary> The quantity produced of this item upon being crafted. </summary>
-        public uint CraftingProduced { get; protected set; }
+        public uint CraftingProduced { get; }
         /// <summary> The crafting recipe - a key value pair of item IDs and their necessary quantities. </summary>
-        public Dictionary<string, int> CraftingRecipe { get; protected set; }
+        public Dictionary<string, int> CraftingRecipe { get; }
         /// <summary> Which crafting station is required to craft the item. </summary>
-        public int CraftingStationRequired { get; protected set; }
+        public int CraftingStationRequired { get; }
 
         [JsonConstructor]
         public Item(uint id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
@@ -44,17 +44,17 @@ namespace MarbleBot.Core
             CraftingStationRequired = craftingStationRequired;
         }
 
-        public Item(Item baseItem, uint id = 0, bool onSale = false, int stage = 1, Dictionary<string, int> craftingRecipe = null)
+        public Item(Item baseItem, uint id = 0, bool onSale = false)
         {
             Id = id == 0 ? baseItem.Id : id;
             Name = baseItem.Name;
             Price = baseItem.Price;
             Description = baseItem.Description;
             OnSale = onSale == baseItem.OnSale ? onSale : baseItem.OnSale;
-            Stage = stage == 1 && baseItem.Stage != 0 ? baseItem.Stage : stage;
+            Stage = baseItem.Stage;
             ScavengeLocation = baseItem.ScavengeLocation;
             CraftingProduced = baseItem.CraftingProduced;
-            CraftingRecipe = craftingRecipe ?? baseItem.CraftingRecipe;
+            CraftingRecipe = baseItem.CraftingRecipe;
             CraftingStationRequired = baseItem.CraftingStationRequired;
         }
 

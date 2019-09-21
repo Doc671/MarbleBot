@@ -14,7 +14,7 @@ using static MarbleBot.Global;
 
 namespace MarbleBot.Modules
 {
-    public partial class Games
+    public static partial class Games
     {
         [Group("siege")]
         [Summary("Participate in a Marble Siege boss battle!")]
@@ -47,33 +47,40 @@ namespace MarbleBot.Modules
                 int marbleCount = 0;
                 using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
                 {
+                    string line;
+                    string[] sLine;
+                    SiegeMarble marble;
+                    MarbleBotUser user;
+                    var marbles = new List<SiegeMarble>();
                     while (!marbleList.EndOfStream)
                     {
-                        var line = (await marbleList.ReadLineAsync()).RemoveChar('\n');
+                        line = (await marbleList.ReadLineAsync()).RemoveChar('\n');
                         if (!line.IsEmpty()) marbleCount++;
-                        var sLine = line.Split(',');
-                        var marble = new SiegeMarble()
+                        sLine = line.Split(',');
+                        marble = new SiegeMarble()
                         {
                             Id = ulong.Parse(sLine[1]),
                             Name = sLine[0]
                         };
-                        var user = GetUser(Context, marble.Id);
+                        user = GetUser(Context, marble.Id);
+
                         if (user.Items.ContainsKey(63) && user.Items[63] >= 1)
                             marble.Shield = GetItem<Item>("063");
                         if (user.Items.ContainsKey(80)) marble.DamageIncrease = 110;
                         else if (user.Items.ContainsKey(74)) marble.DamageIncrease = 95;
                         else if (user.Items.ContainsKey(71)) marble.DamageIncrease = 60;
                         else if (user.Items.ContainsKey(66)) marble.DamageIncrease = 40;
-                        if (SiegeInfo.ContainsKey(fileId) && !SiegeInfo[fileId].Marbles.Contains(marble))
-                            SiegeInfo[fileId].Marbles.Add(marble);
-                        else SiegeInfo.GetOrAdd(fileId, new Siege(Context, new SiegeMarble[] { marble }));
+
+                        marbles.Add(marble);
                     }
+                    SiegeInfo.GetOrAdd(fileId, new Siege(Context, marbles));
                 }
                 if (marbleCount == 0) await ReplyAsync("It doesn't look like anyone has signed up!");
                 else
                 {
                     var currentSiege = SiegeInfo[fileId];
                     currentSiege.Active = true;
+
                     // Pick boss & set battle stats based on boss
                     if (over.Contains("override") && (Context.User.Id == 224267581370925056 || Context.IsPrivate))
                         currentSiege.Boss = Siege.GetBoss(over.Split(' ')[1].RemoveChar(' '));
@@ -85,7 +92,8 @@ namespace MarbleBot.Modules
                             var user = GetUser(Context, marble.Id);
                             stageTotal += user.Stage;
                         }
-                        float stage = stageTotal / (float)currentSiege.Marbles.Count;
+                        // Choose a stage 1 or stage 2 boss depending on the stage of each participant
+                        float stage = stageTotal / (float)currentSiege.Marbles.Length;
                         if (stage == 1f) StageOneBossChooser(currentSiege);
                         else if (stage == 2f) StageTwoBossChooser(currentSiege);
                         else
@@ -123,7 +131,7 @@ namespace MarbleBot.Modules
                         .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
                         .WithTitle("The Siege has begun!")
                         .WithThumbnailUrl(currentSiege.Boss.ImageUrl)
-                        .AddField($"Marbles: **{currentSiege.Marbles.Count}**", marbles.ToString())
+                        .AddField($"Marbles: **{currentSiege.Marbles.Length}**", marbles.ToString())
                         .AddField($"Boss: **{currentSiege.Boss.Name}**", new StringBuilder()
                             .AppendLine($"HP: **{currentSiege.Boss.HP}**")
                             .AppendLine($"Attacks: **{currentSiege.Boss.Attacks.Length}**")
@@ -162,7 +170,7 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                var marble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                var marble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
                 if (marble.HP == 0)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
@@ -262,7 +270,7 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                var marble = currentSiege.Marbles.Find(m => m.Id == Context.User.Id);
+                var marble = Array.Find(currentSiege.Marbles, m => m.Id == Context.User.Id);
                 if (marble.HP < 1)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer grab power-ups!");
@@ -360,9 +368,9 @@ namespace MarbleBot.Modules
 
                     builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHP: **{siege.Boss.HP}**/{siege.Boss.MaxHP}\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**");
 
-                    if (marbles.Length > 1024) builder.AddField($"Marbles: **{siege.Marbles.Count}**", string.Concat(marbles.ToString().Take(1024)))
+                    if (marbles.Length > 1024) builder.AddField($"Marbles: **{siege.Marbles.Length}**", string.Concat(marbles.ToString().Take(1024)))
                         .AddField("Marbles (cont.)", string.Concat(marbles.ToString().Skip(1024)));
-                    else builder.AddField($"Marbles: **{siege.Marbles.Count}**", marbles.ToString());
+                    else builder.AddField($"Marbles: **{siege.Marbles.Length}**", marbles.ToString());
 
                     builder.WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{Siege.PowerUpString(siege.PowerUp)}**")
                          .WithThumbnailUrl(siege.Boss.ImageUrl);
@@ -397,17 +405,21 @@ namespace MarbleBot.Modules
             [Alias("minfo")]
             public async Task MarbleInfoCommand(string searchTerm = null)
             {
-                SiegeMarble currentMarble;
-                try
-                {
-                    currentMarble = searchTerm == null ? SiegeInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Marbles.Find(m => m.Id == Context.User.Id)
-                        : SiegeInfo[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Marbles.Find(m => string.Compare(m.Name, searchTerm, true) == 0);
-                }
-                catch (ArgumentNullException)
+                ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+                if (!SiegeInfo.ContainsKey(fileId))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, could not find the requested marble!");
                     return;
                 }
+
+                var currentMarble  = searchTerm == null ? Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id)
+                    : Array.Find(SiegeInfo[fileId].Marbles, m => string.Compare(m.Name, searchTerm, true) == 0);
+                if (currentMarble == null)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, could not find the requested marble!");
+                    return;
+                }
+
                 await ReplyAsync(embed: new EmbedBuilder()
                     .AddField("HP", $"**{currentMarble.HP}**/{currentMarble.MaxHP}", true)
                     .AddField("Status Effect", Enum.GetName(typeof(StatusEffect), currentMarble.StatusEffect), true)
@@ -672,9 +684,9 @@ namespace MarbleBot.Modules
                 else await ReplyAsync($"**{Context.User.Username}**, you will no longer be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn on)");
             }
 
-            public void StageOneBossChooser(Siege currentSiege)
+            public static void StageOneBossChooser(Siege currentSiege)
             {
-                var bossWeight = (int)Math.Round(currentSiege.Marbles.Count * ((Rand.NextDouble() * 5) + 1));
+                var bossWeight = (int)Math.Round(currentSiege.Marbles.Length * ((Rand.NextDouble() * 5) + 1));
                 if (bossWeight < 7) currentSiege.Boss = Siege.GetBoss("PreeTheTree");
                 else if (bossWeight < 14) currentSiege.Boss = Siege.GetBoss("HelpMeTheTree");
                 else if (bossWeight < 22) currentSiege.Boss = Siege.GetBoss("HattMann");
@@ -685,9 +697,9 @@ namespace MarbleBot.Modules
                 else currentSiege.Boss = Siege.GetBoss("Destroyer");
             }
 
-            public void StageTwoBossChooser(Siege currentSiege)
+            public static void StageTwoBossChooser(Siege currentSiege)
             {
-                var bossWeight = (int)Math.Round(currentSiege.Marbles.Count * ((Rand.NextDouble() * 5) + 1));
+                var bossWeight = (int)Math.Round(currentSiege.Marbles.Length * ((Rand.NextDouble() * 5) + 1));
                 if (bossWeight < 10) currentSiege.Boss = Siege.GetBoss("Chest");
                 else if (bossWeight < 19) currentSiege.Boss = Siege.GetBoss("ScaryFace");
                 else if (bossWeight < 28) currentSiege.Boss = Siege.GetBoss("Red");

@@ -26,7 +26,7 @@ namespace MarbleBot.Core
         public int Stage { get; set; }
 
         /// <summary> An empty instance of a boss. </summary>
-        public static Boss Empty = new Boss("", 0, Difficulty.None, 1, "",
+        public static Boss Empty => new Boss("", 0, Difficulty.None, 1, "",
             new Attack[] { Attack.Empty },
             new BossDrops[] { new BossDrops(0, 0, 0, 0) }
         );

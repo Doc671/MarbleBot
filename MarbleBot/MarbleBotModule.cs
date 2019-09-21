@@ -20,7 +20,6 @@ namespace MarbleBot
         // Server IDs
         protected internal const ulong CM = 223616088263491595; // Community Marble
         protected internal const ulong THS = 224277738608001024; // The Hat Stoar
-        protected internal const ulong THSC = 318053169999511554; // The Hat Stoar Crew
 
         /// <summary> Gets colour for embed depending on guild </summary>
         protected internal static Color GetColor(SocketCommandContext context)

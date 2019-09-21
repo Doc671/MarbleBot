@@ -33,7 +33,14 @@ namespace MarbleBot.Modules
                 var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
-                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).Last();
+                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
+
+                if (foundUser.Value == null)
+                {
+                    await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
+                    return;
+                }
+
                 id = ulong.Parse(foundUser.Key);
                 user = foundUser.Value;
             }
@@ -50,7 +57,7 @@ namespace MarbleBot.Modules
         [Command("buy")]
         [Alias("buyitem")]
         [Summary("Buys items.")]
-        public async Task BuyCommand(string rawID, string rawNoOfItems = "1")
+        public async Task BuyCommand(string rawId, string rawNoOfItems = "1")
         {
             if (!int.TryParse(rawNoOfItems, out int noOfItems) && noOfItems > 0)
             {
@@ -58,7 +65,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            var item = GetItem<Item>(rawID);
+            var item = GetItem<Item>(rawId);
             if (item == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
@@ -348,11 +355,13 @@ namespace MarbleBot.Modules
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
                 || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
+
                 if (foundUser.Value == null)
                 {
                     await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
                     return;
                 }
+
                 else if (foundUser.Value.Items == null)
                 {
                     await SendErrorAsync($"**{Context.User.Username}**, the user **{foundUser.Value.Name}** does not have any items!");
@@ -505,15 +514,18 @@ namespace MarbleBot.Modules
                 var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
                 || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
                 || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
+
                 if (foundUser.Value == null)
                 {
                     await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
                     return;
                 }
+
                 id = ulong.Parse(foundUser.Key);
                 user = foundUser.Value;
             }
 
+            // Set each date-based property to N/A if the value is 2019-01-01
             var lastDaily = user.LastDaily.ToString("yyyy-MM-dd HH:mm:ss");
             if (user.LastDaily.Year == 2019 && user.LastDaily.DayOfYear == 1) lastDaily = "N/A";
             var lastRaceWin = user.LastRaceWin.ToString("yyyy-MM-dd HH:mm:ss");
@@ -524,6 +536,7 @@ namespace MarbleBot.Modules
             if (user.LastSiegeWin.Year == 2019 && user.LastSiegeWin.DayOfYear == 1) lastSiegeWin = "N/A";
             var lastWarWin = user.LastWarWin.ToString("yyyy-MM-dd HH:mm:ss");
             if (user.LastWarWin.Year == 2019 && user.LastWarWin.DayOfYear == 1) lastWarWin = "N/A";
+
             var author = Context.Client.GetUser(id);
             var builder = new EmbedBuilder()
                 .WithAuthor(author)
@@ -621,53 +634,64 @@ namespace MarbleBot.Modules
         [Summary("Shows the ten richest people globally by Net Worth.")]
         public async Task RichListCommand(string rawPage = "1")
         {
-            if (!int.TryParse(rawPage, out int page)) await SendErrorAsync($"**{Context.User.Username}**, this is not a valid integer!");
-            else if (page < 1) await SendErrorAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
-            else
+            if (!int.TryParse(rawPage, out int page))
             {
-                string json;
-                using (var userFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = userFile.ReadToEnd();
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
-                var richList = from user in rawUsers orderby user.Value.NetWorth descending select user.Value;
-                var dataList = new List<(int, MarbleBotUser)>();
-                int displayedPlace = 0;
-                decimal lastValue = 0m;
-                foreach (var user in richList)
-                {
-                    if (user.NetWorth != lastValue)
-                        displayedPlace++;
-                    dataList.Add((displayedPlace, user));
-                    lastValue = user.NetWorth;
-                }
-                if (page > dataList.Last().Item1 / 10)
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, there is nobody in page **{page}**!");
-                    return;
-                }
-                int maxValue = page * 10, minValue = (page - 1) * 10 + 1, userPos = 0;
-                var output = new StringBuilder();
-                foreach (var userPair in dataList)
-                {
-                    if (userPair.Item1 < maxValue + 1 && userPair.Item1 >= minValue)
-                        output.AppendLine($"{userPair.Item1}{userPair.Item1.Ordinal()}: {userPair.Item2.Name}#{userPair.Item2.Discriminator} - {UoM}**{userPair.Item2.NetWorth:n2}**");
-                    if (string.Compare(userPair.Item2.Name, Context.User.Username, false) == 0 && string.Compare(userPair.Item2.Discriminator, Context.User.Discriminator) == 0)
-                        userPos = userPair.Item1;
-                }
-                var builder = new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithTitle("Net Worth Leaderboard")
-                    .WithDescription(output.ToString());
-                if (userPos != 0) builder.WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator} ({userPos}{userPos.Ordinal()})", Context.User.GetAvatarUrl());
-                else builder.WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator}");
-                await ReplyAsync(embed: builder.Build());
+                await SendErrorAsync($"**{Context.User.Username}**, this is not a valid integer!");
+                return;
             }
+
+            if (page < 1)
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
+                return;
+            }
+
+            string json;
+            using (var userFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = userFile.ReadToEnd();
+            var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
+            var richList = from user in rawUsers orderby user.Value.NetWorth descending select user.Value;
+            var dataList = new List<(int, MarbleBotUser)>();
+            int displayedPlace = 0;
+            decimal lastValue = 0m;
+
+            foreach (var user in richList)
+            {
+                if (user.NetWorth != lastValue)
+                    displayedPlace++;
+                dataList.Add((displayedPlace, user));
+                lastValue = user.NetWorth;
+            }
+
+            if (page > dataList.Last().Item1 / 10)
+            {
+                await ReplyAsync($"**{Context.User.Username}**, there is nobody in page **{page}**!");
+                return;
+            }
+
+            int maxValue = page * 10, minValue = (page - 1) * 10 + 1, userPos = 0;
+            var output = new StringBuilder();
+            foreach (var userPair in dataList)
+            {
+                if (userPair.Item1 < maxValue + 1 && userPair.Item1 >= minValue)
+                    output.AppendLine($"{userPair.Item1}{userPair.Item1.Ordinal()}: {userPair.Item2.Name}#{userPair.Item2.Discriminator} - {UoM}**{userPair.Item2.NetWorth:n2}**");
+                if (string.Compare(userPair.Item2.Name, Context.User.Username, false) == 0 && string.Compare(userPair.Item2.Discriminator, Context.User.Discriminator) == 0)
+                    userPos = userPair.Item1;
+            }
+
+            var builder = new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithTitle("Net Worth Leaderboard")
+                .WithDescription(output.ToString());
+            if (userPos != 0) builder.WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator} ({userPos}{userPos.Ordinal()})", Context.User.GetAvatarUrl());
+            else builder.WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator}");
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("sell")]
         [Alias("sellitem")]
         [Summary("Sells items.")]
-        public async Task SellCommand(string rawID, string rawNoOfItems = "1")
+        public async Task SellCommand(string rawId, string rawNoOfItems = "1")
         {
             if (!int.TryParse(rawNoOfItems, out int noOfItems) && noOfItems > 0)
             {
@@ -675,7 +699,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            var item = GetItem<Item>(rawID);
+            var item = GetItem<Item>(rawId);
             if (item == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
@@ -715,6 +739,7 @@ namespace MarbleBot.Modules
                 if (item.Value.OnSale)
                     output.AppendLine($"`[{item.Key:000}]` **{item.Value.Name}** - {UoM}**{item.Value.Price:n2}**");
             }
+
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -763,7 +788,7 @@ namespace MarbleBot.Modules
                             if (SiegeInfo.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
                                 foreach (var marble in SiegeInfo[fileId].Marbles)
                                 {
                                     marble.HP = marble.MaxHP;
@@ -857,7 +882,7 @@ namespace MarbleBot.Modules
                             if (SiegeInfo.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
                                 foreach (var marble in SiegeInfo[fileId].Marbles)
                                     marble.StatusEffect = StatusEffect.Poison;
                                 await ReplyAsync(embed: new EmbedBuilder()
@@ -876,7 +901,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
                                 foreach (var marble in SiegeInfo[fileId].Marbles)
                                     marble.StatusEffect = StatusEffect.Doom;
                                 await ReplyAsync(embed: new EmbedBuilder()
@@ -895,7 +920,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
                                 userMarble.StatusEffect = StatusEffect.None;
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .WithColor(GetColor(Context))
@@ -913,7 +938,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
                                 userMarble.Evade = 50;
                                 userMarble.BootsUsed = true;
                                 await ReplyAsync(embed: new EmbedBuilder()

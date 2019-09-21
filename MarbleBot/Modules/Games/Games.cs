@@ -15,7 +15,7 @@ using static MarbleBot.MarbleBotModule;
 namespace MarbleBot.Modules
 {
     /// <summary> Game commands. </summary>
-    public partial class Games
+    public static partial class Games
     {
         /// <summary> Gets the string representation of the game. </summary>
         /// <param name="gameType"> The type of game. </param>
@@ -253,7 +253,7 @@ namespace MarbleBot.Modules
                 }
             }
 
-            if (marbleName.IsEmpty() || marbleName.Contains("@")) marbleName = context.User.Username;
+            if (marbleName.IsEmpty() || marbleName.StartsWith("<@")) marbleName = context.User.Username;
             else if (marbleName.Length > 100)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, your entry exceeds the 100 character limit.");
