@@ -6,6 +6,7 @@ using Google.Apis.Docs.v1.Data;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
+using MarbleBot.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,20 @@ namespace MarbleBot
 
             string token = "";
             using (var stream = new StreamReader($"Keys{Path.DirectorySeparatorChar}MBT.txt")) token = stream.ReadLine();
+
+            using (var guildFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
+            {
+                string json;
+                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
+                    json = await users.ReadToEndAsync();
+                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotGuild>>(json);
+                foreach (var guild in allServers)
+                {
+                    var guild2 = guild.Value;
+                    guild2.Id = guild.Key;
+                    Global.Servers.Add(guild2);
+                }
+            }
 
             using (var stream = new FileStream($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
             {

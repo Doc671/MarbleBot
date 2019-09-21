@@ -82,7 +82,7 @@ namespace MarbleBot.Modules
 
                 if (Context.Guild.Id != CM) commands = commands.Where(c => c.Remarks != "CM Only");
 
-                if (Context.IsPrivate) commands = commands.Where(c => !c.Preconditions.Any(p => p is RequireContextAttribute));
+                if (Context.IsPrivate) commands = commands.Where(c => c.Preconditions != null && !c.Preconditions.Any(p => p is RequireContextAttribute));
 
                 if (GetUser(Context).Stage < 2) commands = commands.Where(c => c.Remarks != "Stage2");
 

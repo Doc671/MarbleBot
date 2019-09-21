@@ -188,6 +188,7 @@ namespace MarbleBot.Modules
 
         [Command("color")]
         [Alias("colour")]
+        [Summary("Shows info about a colo(u)r using its RGB values.")]
         public async Task ColorCommand(int red, int green, int blue)
         {
             if (red > byte.MaxValue || red < byte.MinValue 
@@ -211,6 +212,7 @@ namespace MarbleBot.Modules
 
         [Command("color")]
         [Alias("colour")]
+        [Summary("Shows info about a colo(u)r using its HSV values.")]
         public async Task ColorCommand(float hue, float saturation, float value)
         {
             if (hue < 0f || hue > 360f)
@@ -222,11 +224,10 @@ namespace MarbleBot.Modules
             int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
             double f = hue / 60 - Math.Floor(hue / 60);
 
-            value *= 255;
-            int v = Convert.ToInt32(value);
-            int p = Convert.ToInt32(value * (1 - saturation));
-            int q = Convert.ToInt32(value * (1 - f * saturation));
-            int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+            int v = Convert.ToInt32(value * 255);
+            int p = Convert.ToInt32(v * (1 - saturation));
+            int q = Convert.ToInt32(v * (1 - f * saturation));
+            int t = Convert.ToInt32(v * (1 - (1 - f) * saturation));
 
             System.Drawing.Color color;
 
@@ -254,6 +255,7 @@ namespace MarbleBot.Modules
 
         [Command("color")]
         [Alias("colour")]
+        [Summary("Shows info about a colo(u)r using its hex code.")]
         public async Task ColorCommand(string hexCode)
         {
             hexCode = hexCode.RemoveChar('#');
