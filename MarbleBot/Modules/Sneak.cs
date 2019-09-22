@@ -36,21 +36,6 @@ namespace MarbleBot.Modules
         public async Task ClearMemoryCommand()
         {
             DailyTimeout = 48;
-            Servers = new List<MarbleBotGuild>();
-            using (var srvrFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
-            {
-                string json;
-                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
-                    json = await users.ReadToEndAsync();
-                var allServers = JsonConvert.DeserializeObject<Dictionary<ulong, MarbleBotGuild>>(json);
-                foreach (var guild in allServers)
-                {
-                    var guild2 = guild.Value;
-                    guild2.Id = guild.Key;
-                    Servers.Add(guild2);
-                }
-            }
-
             foreach (var pair in ScavengeInfo)
                 pair.Value.Dispose();
             foreach (var pair in SiegeInfo)
@@ -232,11 +217,12 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            foreach (MarbleBotGuild guild in Servers)
+            var guildDict = GetGuildsObject().ToObject<Dictionary<ulong, MarbleBotGuild>>();
+            foreach (var guildPair in guildDict)
             {
-                if (guild.AnnouncementChannel != 0)
+                if (guildPair.Value.AnnouncementChannel != 0)
                 {
-                    var channel = Context.Client.GetGuild(guild.Id).GetTextChannel(guild.AnnouncementChannel);
+                    var channel = Context.Client.GetGuild(guildPair.Key).GetTextChannel(guildPair.Value.AnnouncementChannel);
                     var msg = await channel.SendMessageAsync(embed: builder.Build());
                     if (major) await msg.PinAsync();
                 }

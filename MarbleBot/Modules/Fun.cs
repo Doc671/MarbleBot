@@ -123,10 +123,8 @@ namespace MarbleBot.Modules
 
         [Command("bet")]
         [Summary("Bets on a marble.")]
-        public async Task BetCommand(string no)
+        public async Task BetCommand(int noOfMarbles)
         {
-            int noOfMarbles = int.Parse(no);
-
             if (noOfMarbles > 100)
             {
                 await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
@@ -337,14 +335,8 @@ namespace MarbleBot.Modules
 
         [Command("random")]
         [Summary("Returns a random number with user-defined bounds.")]
-        public async Task RandomCommand(string rStart, string rEnd)
+        public async Task RandomCommand(int start, int end)
         {
-            if (!int.TryParse(rStart, out int start) || !int.TryParse(rEnd, out int end))
-            {
-                await SendErrorAsync("This is not a valid integer!");
-                return;
-            }
-
             if (start > end)
                 await ReplyAsync(Rand.Next(end, start).ToString());
             else

@@ -101,7 +101,28 @@ namespace MarbleBot
 
         /// <summary> Returns a MarbleBotUser object with the ID of the current guild. </summary>
         protected internal static MarbleBotGuild GetGuild(SocketCommandContext context)
-        => Global.Servers.Find(s => s.Id == context.Guild.Id);
+        {
+            var obj = GetGuildsObject();
+            MarbleBotGuild guild;
+            if (obj.ContainsKey(context.Guild.Id.ToString()))
+            {
+                guild = obj[context.Guild.Id.ToString()].ToObject<MarbleBotGuild>();
+                guild.Id = context.Guild.Id;
+            }
+            else
+            {
+                guild = new MarbleBotGuild(context.Guild.Id);
+            }
+            return guild;
+        }
+
+        protected internal static JObject GetGuildsObject()
+        {
+            string json;
+            using (var itemFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
+                json = itemFile.ReadToEnd();
+            return JObject.Parse(json);
+        }
 
         /// <summary> Returns an instance of a MarbleBotUser with the ID of the SocketGuildUser. </summary>
         protected internal static MarbleBotUser GetUser(SocketCommandContext context)
@@ -225,12 +246,14 @@ namespace MarbleBot
             };
 
         /// <summary> Writes guilds to the appropriate file. </summary>
-        protected internal static void WriteGuilds()
+        protected internal static void WriteGuilds(JObject obj, SocketGuild socketGuild, MarbleBotGuild mbGuild)
         {
+            if (obj.ContainsKey(socketGuild.Id.ToString()))
+                obj.Remove(socketGuild.Id.ToString());
+            obj.Add(new JProperty(socketGuild.Id.ToString(), JObject.FromObject(mbGuild)));
             using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json"));
             var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-            var dict = Global.Servers.ToDictionary(s => s.Id);
-            serialiser.Serialize(guilds, dict);
+            serialiser.Serialize(guilds, obj);
         }
 
         /// <summary> Writes users to the appropriate JSON file. </summary>

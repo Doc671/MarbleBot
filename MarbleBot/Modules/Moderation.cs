@@ -31,7 +31,7 @@ namespace MarbleBot.Modules
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
             var guild = GetGuild(Context);
             guild.Roles.Add(id);
-            WriteGuilds();
+            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
             await ReplyAsync("Succesfully updated.");
         }
 
@@ -43,7 +43,7 @@ namespace MarbleBot.Modules
         {
             var guild = GetGuild(Context);
             guild.WarningSheetLink = link;
-            WriteGuilds();
+            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
             await ReplyAsync("Success.");
         }
 
@@ -75,7 +75,7 @@ namespace MarbleBot.Modules
                 case "usable": guild.UsableChannels = new List<ulong>(); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
             }
-            WriteGuilds();
+            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
             await ReplyAsync("Succesfully cleared.");
         }
 
@@ -402,7 +402,7 @@ namespace MarbleBot.Modules
                 return;
             }
             guild.Roles.Remove(id);
-            WriteGuilds();
+            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
             await ReplyAsync("Succesfully updated.");
         }
 
@@ -425,7 +425,7 @@ namespace MarbleBot.Modules
                 case "usable": guild.UsableChannels.Add(channel); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info."); return;
             }
-            WriteGuilds();
+            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
             await ReplyAsync("Successfully updated.");
         }
 
@@ -443,7 +443,7 @@ namespace MarbleBot.Modules
             }
             var guild = GetGuild(Context);
             guild.Color = input;
-            WriteGuilds();
+            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
             await ReplyAsync("Successfully updated.");
         }
 

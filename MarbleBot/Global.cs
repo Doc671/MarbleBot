@@ -3,7 +3,6 @@ using Google.Apis.Auth.OAuth2;
 using MarbleBot.Core;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 
 namespace MarbleBot
@@ -17,7 +16,6 @@ namespace MarbleBot
         internal static UserCredential Credential { get; set; }
         internal static ushort DailyTimeout { get; set; } = 48;
         internal static Random Rand { get; } = new Random();
-        internal static List<MarbleBotGuild> Servers { get; set; } = new List<MarbleBotGuild>();
         internal static DateTime StartTime { get; set; }
         internal static string YTKey
         {

@@ -27,7 +27,7 @@ namespace MarbleBot.Modules
                 .AddField("Ongoing Scavenges", ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", SiegeInfo.Count, true)
                 .AddField("Ongoing Wars", WarInfo.Count, true)
-                .AddField("Servers", Servers.Count, true)
+                .AddField("Servers", GetGuildsObject().Count, true)
                 .AddField("Start Time (UTC)", StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
                 .AddField("Uptime", DateTime.UtcNow.Subtract(StartTime).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
@@ -60,8 +60,8 @@ namespace MarbleBot.Modules
         }
 
         [Command("help")]
-        [Alias("cmds", "commands", "searchcommand")]
-        [Summary("Gives the user help.")]
+        [Alias("cmds", "commands", "searchcommand", "modules", "searchmodule")]
+        [Summary("Gives the user help. Using `mb/help <module name>` or `mb/help <command name>` will give information about the module or command respectively.")]
         public async Task HelpCommand([Remainder] string commandToFind = "")
         {
             var builder = new EmbedBuilder()
@@ -131,7 +131,7 @@ namespace MarbleBot.Modules
                 }
 
                 string example = "";
-                string usage = $"mb/{command.Aliases[0]}";
+                string usage = $"mb/{command.Aliases[0]}{command.Parameters.Aggregate(new StringBuilder(), (builder, param) => { builder.Append($" <{param.Name}>"); return builder; })}";
 
                 // Gets extra command info (e.g. an example of the command's usage) if present
                 string json;
@@ -146,7 +146,7 @@ namespace MarbleBot.Modules
 
                 builder.WithDescription(command.Summary)
                     .AddField("Usage", $"`{usage}`")
-                    .WithTitle($"MarbleBot Help: **{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command.Name)}**");
+                    .WithTitle($"MarbleBot Help: **{command.Name.CamelToTitleCase()}**");
 
                 if (!example.IsEmpty()) builder.AddField("Example", $"`{example}`", true);
 
@@ -188,7 +188,8 @@ namespace MarbleBot.Modules
                 .Append("If no usable channel is set, commands can be used anywhere.")
                 .ToString());
 
-        [Command("guildinfo")]
+        [Command("serverinfo")]
+        [Alias("guildinfo")]
         [Summary("Displays information about the current guild.")]
         [RequireContext(ContextType.Guild)]
         public async Task ServerInfoCommand()

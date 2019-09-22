@@ -23,8 +23,8 @@ namespace MarbleBot.Core
         public WarMarble[] Team2 { get; set; }
         public string Team2Name { get; set; }
 
-        private WarMarble _aiMarble;
-        private bool _aiMarblePresent = false;
+        private readonly WarMarble _aiMarble;
+        private readonly bool _aiMarblePresent = false;
         private bool _disposed = false;
         private bool _endCalled = false;
 
@@ -158,9 +158,9 @@ namespace MarbleBot.Core
             Id = id;
             _aiMarble = aiMarble;
             _aiMarblePresent = aiMarble != null;
-            AllMarbles = Team1.Union(Team2);
             Team1 = team1.ToArray();
             Team2 = team2.ToArray();
+            AllMarbles = Team1.Union(Team2);
 
             // Decide team names
             var nameList = new List<string>();

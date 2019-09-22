@@ -34,15 +34,7 @@ namespace MarbleBot
             var guild = new MarbleBotGuild(0);
 
             if (!context.IsPrivate)
-            {
-                if (Global.Servers.Any(sr => sr.Id == context.Guild.Id))
-                    guild = MarbleBotModule.GetGuild(context);
-                else
-                {
-                    guild = new MarbleBotGuild(context.Guild.Id);
-                    Global.Servers.Add(guild);
-                }
-            }
+                guild = MarbleBotModule.GetGuild(context);
 
             if (msg.HasStringPrefix("mb/", ref argPos) && !msg.Author.IsBot &&
 #if DEBUG
@@ -63,6 +55,9 @@ namespace MarbleBot
                         case CommandError.BadArgCount:
                             await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
                             break;
+                        case CommandError.ParseFailed:
+                            await context.Channel.SendMessageAsync("Failed to parse the given arguments. Use `mb/help <command name>` to see what type each argument should be.");
+                            return;
                         case CommandError.UnmetPrecondition:
                             await context.Channel.SendMessageAsync("Insufficient permissions.");
                             break;

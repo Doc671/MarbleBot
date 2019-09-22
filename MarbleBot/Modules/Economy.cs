@@ -403,7 +403,6 @@ namespace MarbleBot.Modules
                 return;
             }
 
-
             var user = GetUser(Context);
             if (item.Stage > user.Stage)
             {
