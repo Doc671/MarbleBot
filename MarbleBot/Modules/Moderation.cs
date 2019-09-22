@@ -163,20 +163,11 @@ namespace MarbleBot.Modules
             string spreadsheetId = GetGuild(Context).WarningSheetLink;
             const string range = "Warnings!A3:J";
 
-            var result = new ValueRange();
-            try
-            {
-                result = await service.Spreadsheets.Values.Get(spreadsheetId, range).ExecuteAsync();
-            }
-            catch (System.Exception ex)
-            {
-                Log(ex.ToString());
-            }
+            var result = await service.Spreadsheets.Values.Get(spreadsheetId, range).ExecuteAsync();
 
             // Get the warning sheet
-            int? sheetId = (await service.Spreadsheets.Get(spreadsheetId).ExecuteAsync()).Sheets
-                .Where(sheet => sheet.Properties.Title == "Warnings")
-                .First().Properties.SheetId;
+            int? sheetId = (await service.Spreadsheets.Get(spreadsheetId).ExecuteAsync()).Sheets.ToList()
+                .Find(sheet => sheet.Properties.Title == "Warnings").Properties.SheetId;
 
             var userToWarnRow = new string[10];
 
@@ -238,7 +229,7 @@ namespace MarbleBot.Modules
             int expiredWarnings = int.Parse(userToWarnRow[8]);
             int totalWarnings = int.Parse(userToWarnRow[9]);
 
-            int currentWarnings = expiredWarnings - totalWarnings;
+            int currentWarnings = totalWarnings - expiredWarnings;
 
             totalWarnings += warningsToGive;
 
