@@ -146,7 +146,7 @@ namespace MarbleBot.Core
                 if (attackMissed) builder.AddField("Missed!", "No-one got hurt!");
 
                 // Wear off Morale Boost
-                if (DateTime.UtcNow.Subtract(LastMorale).TotalSeconds > 20 && Morales > 0)
+                if (Morales > 0 && DateTime.UtcNow.Subtract(LastMorale).TotalSeconds > 20)
                 {
                     Morales--;
                     builder.AddField("Morale Boost has worn off!",
@@ -186,7 +186,7 @@ namespace MarbleBot.Core
 
                 await context.Channel.SendMessageAsync(embed: builder.Build());
 
-            } while (Boss.HP > 0 && !timeout && Marbles.Sum(m => m.HP) > 0 && !_disposed);
+            } while (Boss.HP > 0 && !timeout && !Marbles.All(m => m.HP == 0) && !_disposed);
 
             if (Boss.HP > 0 && !_disposed)
             {

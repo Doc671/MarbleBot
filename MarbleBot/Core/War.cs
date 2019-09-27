@@ -57,18 +57,22 @@ namespace MarbleBot.Core
                 .WithTitle($"Team {(t1Total > t2Total ? Team1Name : Team2Name)} has defeated Team {(t1Total > t2Total ? Team2Name : Team1Name)}!");
             var t1Output = new StringBuilder();
             var t2Output = new StringBuilder();
+
             foreach (var marble in Team1)
             {
                 var user = context.Client.GetUser(marble.Id);
                 t1Output.AppendLine($"{marble.Name} (HP: **{marble.HP}**/{marble.MaxHP}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
+
             foreach (var marble in Team2)
             {
                 var user = context.Client.GetUser(marble.Id);
                 t2Output.AppendLine($"{marble.Name} (HP: **{marble.HP}**/{marble.MaxHP}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
+
             builder.AddField($"Team {Team1Name} Final Stats", t1Output.ToString())
                 .AddField($"Team {Team2Name} Final Stats", t2Output.ToString());
+
             var obj = GetUsersObject();
             foreach (var marble in winningTeam)
             {
@@ -84,16 +88,19 @@ namespace MarbleBot.Core
                         user.WarWins++;
                     }
                     else break;
+
                     if (marble.HP > 0)
                     {
                         earnings += 200;
                         output.AppendLine($"Alive bonus: {Global.UoM}**{200:n2}**");
                     }
+
                     if (user.Items.ContainsKey(83))
                     {
                         earnings *= 3;
                         output.AppendLine("Pendant bonus: x**3**");
                     }
+
                     if (output.Length > 0)
                     {
                         user.LastWarWin = DateTime.UtcNow;
@@ -148,7 +155,7 @@ namespace MarbleBot.Core
                           .Build());
                 }
             }
-            while (!timeout && Team1.Sum(m => m.HP) > 0 && Team2.Sum(m => m.HP) > 0 && !_disposed);
+            while (!timeout && !_disposed && !Team1.All(m => m.HP == 0) && !Team2.All(m => m.HP == 0));
             if (!timeout) await End(context);
             else Dispose(true);
         }

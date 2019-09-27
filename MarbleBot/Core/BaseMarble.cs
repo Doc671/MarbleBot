@@ -8,7 +8,7 @@ namespace MarbleBot.Core
         /// <summary> The Discord user ID of the marble's user. </summary>
         public ulong Id { get; set; }
         /// <summary> The name of the marble. </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         private int _HP;
         /// <summary> The number of health points the marble currently has. </summary>
         public int HP

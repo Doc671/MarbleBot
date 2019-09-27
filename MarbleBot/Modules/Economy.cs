@@ -264,6 +264,11 @@ namespace MarbleBot.Modules
                 searchTerm += rawNoOfItems;
 
             var requestedItem = GetItem<Item>(searchTerm);
+            if (requestedItem == null)
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID!");
+            }
+
             if (requestedItem.CraftingProduced == 0)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you cannot dismantle this item!");
@@ -375,10 +380,12 @@ namespace MarbleBot.Modules
             var itemsPresent = items.Count() > 0;
             if (itemsPresent)
             {
-                foreach (var item in items)
+                foreach (var itemPair in items)
                 {
-                    if (item.Value > 0)
-                        itemOutput.AppendLine($"`[{item.Key:000}]` {GetItem<Item>(item.Key.ToString()).Name}: {item.Value}");
+                    if (itemPair.Value > 0)
+                    {
+                        itemOutput.AppendLine($"`[{itemPair.Key:000}]` {GetItem<Item>(itemPair.Key.ToString("000")).Name}: {itemPair.Value}");
+                    }
                 }
             }
             else itemOutput.Append($"**{Context.User.Username}**, there are no items on page **{page}**!");
@@ -753,6 +760,13 @@ namespace MarbleBot.Modules
         public async Task UseCommand([Remainder] string searchTerm)
         {
             var item = GetItem<Weapon>(searchTerm);
+
+            if (item == null)
+            {
+                await SendErrorAsync("Could not find the requested item!");
+                return;
+            }
+
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
 

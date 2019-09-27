@@ -232,6 +232,11 @@ namespace MarbleBot.Modules
                     }
 
                     weapon = GetItem<Weapon>(itemId);
+                    if (weapon == null)
+                    {
+                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, this is not a valid item!");
+                    }
+
                     if (weapon.WarClass == WeaponClass.None || weapon.WarClass == WeaponClass.Artillery)
                     {
                         await context.Channel.SendMessageAsync($"**{context.User.Username}**, this item cannot be used as a weapon!");

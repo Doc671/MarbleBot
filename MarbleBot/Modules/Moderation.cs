@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Commands;
-using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
@@ -9,7 +8,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
@@ -168,6 +166,12 @@ namespace MarbleBot.Modules
             // Get the warning sheet
             int? sheetId = (await service.Spreadsheets.Get(spreadsheetId).ExecuteAsync()).Sheets.ToList()
                 .Find(sheet => sheet.Properties.Title == "Warnings").Properties.SheetId;
+
+            if (sheetId == null)
+            {
+                await SendErrorAsync("Could not find the warning sheet!");
+                return;
+            }
 
             var userToWarnRow = new string[10];
 
