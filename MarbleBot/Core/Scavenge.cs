@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
 using MarbleBot.Extensions;
-using Newtonsoft.Json.Linq;
+using MarbleBot.Modules;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,9 +33,13 @@ namespace MarbleBot.Core
         private bool _oreHasAppeared = false;
         private readonly IUserMessage _originalMessage;
 
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
             _disposed = true;
@@ -159,6 +162,6 @@ namespace MarbleBot.Core
             }.Build());
         }
 
-        ~Scavenge() => Dispose(true);
+        ~Scavenge() => Dispose(false);
     }
 }

@@ -25,7 +25,7 @@ namespace MarbleBot.Modules
         {
             var user = new MarbleBotUser();
             var id = Context.User.Id;
-            if (searchTerm.IsEmpty()) user = GetUser(Context);
+            if (string.IsNullOrEmpty(searchTerm)) user = GetUser(Context);
             else
             {
                 string json;
@@ -343,7 +343,7 @@ namespace MarbleBot.Modules
             }
 
             var searchTerm = name.ToString();
-            if (searchTerm.IsEmpty())
+            if (string.IsNullOrEmpty(searchTerm))
             {
                 user = GetUser(Context);
                 if (user.Items == null)
@@ -511,7 +511,7 @@ namespace MarbleBot.Modules
         {
             var user = new MarbleBotUser();
             var id = Context.User.Id;
-            if (searchTerm.IsEmpty()) user = GetUser(Context);
+            if (string.IsNullOrEmpty(searchTerm)) user = GetUser(Context);
             else
             {
                 string json;
@@ -801,7 +801,7 @@ namespace MarbleBot.Modules
                             if (SiegeInfo.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
+                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 foreach (var marble in SiegeInfo[fileId].Marbles)
                                 {
                                     marble.HP = marble.MaxHP;
@@ -895,7 +895,7 @@ namespace MarbleBot.Modules
                             if (SiegeInfo.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
+                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 foreach (var marble in SiegeInfo[fileId].Marbles)
                                     marble.StatusEffect = StatusEffect.Poison;
                                 await ReplyAsync(embed: new EmbedBuilder()
@@ -914,7 +914,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
+                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 foreach (var marble in SiegeInfo[fileId].Marbles)
                                     marble.StatusEffect = StatusEffect.Doom;
                                 await ReplyAsync(embed: new EmbedBuilder()
@@ -933,7 +933,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
+                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 userMarble.StatusEffect = StatusEffect.None;
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .WithColor(GetColor(Context))
@@ -951,7 +951,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = Array.Find(SiegeInfo[fileId].Marbles, m => m.Id == Context.User.Id);
+                                var userMarble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 userMarble.Evade = 50;
                                 userMarble.BootsUsed = true;
                                 await ReplyAsync(embed: new EmbedBuilder()
@@ -968,7 +968,7 @@ namespace MarbleBot.Modules
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (!SiegeInfo.ContainsKey(fileId))
                             {
-                                SiegeInfo.GetOrAdd(fileId, new Siege(Context, new SiegeMarble[0])
+                                SiegeInfo.GetOrAdd(fileId, new Siege(Context, new List<SiegeMarble>())
                                 {
                                     Active = false,
                                     Boss = Siege.GetBoss("Destroyer")

@@ -8,11 +8,10 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MarbleBot
+namespace MarbleBot.Modules
 {
     /// <summary> Represents a command module for MarbleBot. </summary>
     public abstract class MarbleBotModule : ModuleBase<SocketCommandContext>
@@ -217,7 +216,7 @@ namespace MarbleBot
             return user;
         }
 
-         /// <summary> Returns a JObject containing all the users. </summary>
+        /// <summary> Returns a JObject containing all the users. </summary>
         protected internal static JObject GetUsersObject()
         {
             string json;
@@ -234,16 +233,16 @@ namespace MarbleBot
             => await ReplyAsync($":warning: | {messageContent}");
 
         /// <summary> Returns a string that indicates the user's Stage is too low. </summary>
-        protected internal static string StageTooHighString() 
+        protected internal static string StageTooHighString()
         => (Global.Rand.Next(0, 6)) switch
-            {
-                0 => "*Your inexperience blinds you...*",
-                1 => "*Your vision is blurry...*",
-                2 => "*Screams echo in your head...*",
-                3 => "*You sense a desk restricting your path...*",
-                4 => "*You feel as if there is more to be done...*",
-                _=> "*Your mind is wracked with pain...*",
-            };
+        {
+            0 => "*Your inexperience blinds you...*",
+            1 => "*Your vision is blurry...*",
+            2 => "*Screams echo in your head...*",
+            3 => "*You sense a desk restricting your path...*",
+            4 => "*You feel as if there is more to be done...*",
+            _ => "*Your mind is wracked with pain...*",
+        };
 
         /// <summary> Writes guilds to the appropriate file. </summary>
         protected internal static void WriteGuilds(JObject obj, SocketGuild socketGuild, MarbleBotGuild mbGuild)

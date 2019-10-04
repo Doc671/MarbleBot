@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace MarbleBot.Core
 {
     /// <summary> Represents a boss' attack during a Marble Siege. </summary>
@@ -26,6 +28,20 @@ namespace MarbleBot.Core
             Damage = damage;
             Accuracy = accuracy;
             StatusEffect = statusEffect;
+        }
+
+        public override bool Equals(object obj) => obj.GetHashCode() == GetHashCode();
+
+        public override int GetHashCode() => Name.Sum(c => c) + Damage + Accuracy + (int)StatusEffect;
+
+        public static bool operator ==(Attack left, Attack right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Attack left, Attack right)
+        {
+            return !(left == right);
         }
     }
 }

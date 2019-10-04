@@ -118,7 +118,7 @@ namespace MarbleBot.Modules
         [Command("best")]
         [Summary("Picks a random person to call the best.")]
         [RequireContext(ContextType.Guild)]
-        public async Task BestCommand() 
+        public async Task BestCommand()
             => await ReplyAsync($"**{Context.Guild.Users.ElementAt(Rand.Next(0, Context.Guild.Users.Count))}** is the best!");
 
         [Command("bet")]
@@ -137,7 +137,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            string[,] marbles = new string[10,10];
+            string[,] marbles = new string[10, 10];
             using (var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Marbles.csv"))
             {
                 int a = 0;
@@ -157,7 +157,7 @@ namespace MarbleBot.Modules
 
         [Command("buyhat")]
         [Summary("Fakes buying an Uglee Hat.")]
-        public async Task BuyHatCommand() 
+        public async Task BuyHatCommand()
             => await ReplyAsync($"That'll be **{Rand.Next(0, int.MaxValue)}** units of money please. Thank you for buying Uglee Hat #**{Rand.Next(0, 69042)}**!");
 
         [Command("cameltotitlecase")]
@@ -189,8 +189,8 @@ namespace MarbleBot.Modules
         [Summary("Shows info about a colo(u)r using its RGB values.")]
         public async Task ColorCommand(int red, int green, int blue)
         {
-            if (red > byte.MaxValue || red < byte.MinValue 
-                || green > byte.MaxValue || green < byte.MinValue 
+            if (red > byte.MaxValue || red < byte.MinValue
+                || green > byte.MaxValue || green < byte.MinValue
                 || blue > byte.MaxValue || blue < byte.MinValue)
             {
                 await SendErrorAsync("The red, green and blue values must be integers between 0 and 255.");
@@ -204,7 +204,7 @@ namespace MarbleBot.Modules
                 .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
                 .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
                 .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
-            
+
             await ColorMessage(color, builder);
         }
 

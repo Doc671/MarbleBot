@@ -20,7 +20,7 @@ namespace MarbleBot.Core
         /// <summary> The channels where commands can be used. If empty, commands can be used anywhere in the guild. </summary>
         public List<ulong> UsableChannels { get; set; } = new List<ulong>();
         /// <summary> The link to the warning sheet on Google Sheets. </summary>
-        public string WarningSheetLink { get; set;  }
+        public string WarningSheetLink { get; set; }
 
         /// <summary> Represents a guild. </summary>
         /// <param name="id"> The ID of the guild. </param>

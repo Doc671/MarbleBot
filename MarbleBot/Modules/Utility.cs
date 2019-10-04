@@ -148,7 +148,7 @@ namespace MarbleBot.Modules
                     .AddField("Usage", $"`{usage}`")
                     .WithTitle($"MarbleBot Help: **{command.Name.CamelToTitleCase()}**");
 
-                if (!example.IsEmpty()) builder.AddField("Example", $"`{example}`", true);
+                if (!string.IsNullOrEmpty(example)) builder.AddField("Example", $"`{example}`", true);
 
                 builder.AddField("Module", $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command.Module.Name)}", true);
 
@@ -257,7 +257,7 @@ namespace MarbleBot.Modules
                         UserStatus.Online => "Online",
                         _ => "Offline"
                     };
-                    if (user.Nickname.IsEmpty())
+                    if (string.IsNullOrEmpty(user.Nickname))
                         output.AppendLine($"{user.Username}#{user.Discriminator}: **{status}**");
                     else
                         output.AppendLine($"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
@@ -282,7 +282,7 @@ namespace MarbleBot.Modules
                 var user = (SocketGuildUser)Context.User;
                 var userFound = true;
                 username = username.ToLower();
-                if (!username.IsEmpty())
+                if (!string.IsNullOrEmpty(username))
                 {
                     if (username[0] == '<')
                     {
@@ -324,7 +324,7 @@ namespace MarbleBot.Modules
                         _ => "Offline"
                     };
 
-                    string nickname = user.Nickname.IsEmpty() ? "None" : user.Nickname;
+                    string nickname = string.IsNullOrEmpty(user.Nickname) ? "None" : user.Nickname;
                     var roles = new StringBuilder();
                     foreach (var role in user.Roles)
                         roles.AppendLine(role.Name);

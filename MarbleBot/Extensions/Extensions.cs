@@ -35,10 +35,6 @@ namespace MarbleBot.Extensions
             value = max / 255f;
         }
 
-        public static bool IsEmpty(this string str)
-            => string.Compare(str, "", true) == 0 || string.Compare(str, " ", true) == 0 || str == null || str == string.Empty 
-            || string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
-
         public static string Ordinal(this int no)
         {
             if (no > 20) no %= 10;
@@ -66,7 +62,7 @@ namespace MarbleBot.Extensions
         public static string ToPascalCase(this string str)
         {
             str = Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(str);
-            string[] parts = str.Split(new char[] { }, StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = str.Split(Array.Empty<char>(), StringSplitOptions.RemoveEmptyEntries);
             return string.Join(string.Empty, parts);
         }
     }

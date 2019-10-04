@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using static MarbleBot.MarbleBotModule;
+using static MarbleBot.Modules.MarbleBotModule;
 
 namespace MarbleBot.Core
 {
@@ -33,7 +33,7 @@ namespace MarbleBot.Core
         /// <summary> The last time a Morale Boost power-up was activated. </summary>
         public DateTime LastMorale { get; set; } = new DateTime(2019, 1, 1);
         /// <summary> The marbles (player characters) fighting the boss. </summary>
-        public SiegeMarble[] Marbles { get; set; }
+        public List<SiegeMarble> Marbles { get; set; }
         /// <summary> The number of Morale Boost power-ups active. </summary>
         public int Morales { get; set; }
         /// <summary> The current power-up that can be grabbed. </summary>
@@ -201,7 +201,7 @@ namespace MarbleBot.Core
                         .WithColor(GetColor(context))
                         .WithCurrentTimestamp()
                         .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal HP: **{Boss.HP}**/{Boss.MaxHP}")
-                        .AddField($"Fallen Marbles: **{Marbles.Length}**", marbles.ToString())
+                        .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
                         .WithThumbnailUrl(Boss.ImageUrl)
                         .WithTitle("Siege Failure!")
                         .Build());
@@ -216,9 +216,13 @@ namespace MarbleBot.Core
             if (Boss.HP < 1) await Victory(context);
         }
 
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
             Active = false;
@@ -282,7 +286,7 @@ namespace MarbleBot.Core
                 return;
             }
 
-            var marble = Array.Find(Marbles, m => m.Id == context.User.Id);
+            var marble = Marbles.Find(m => m.Id == context.User.Id);
             if (marble.HP == 0)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, you are out and can no longer attack!");
@@ -324,7 +328,7 @@ namespace MarbleBot.Core
                 _ => Enum.GetName(typeof(PowerUp), powerUp)
             };
 
-        public override string ToString() => $"[{Id}] {Boss.Name}: {Marbles.Length}";
+        public override string ToString() => $"[{Id}] {Boss.Name}: {Marbles.Count}";
 
         public async Task Victory(SocketCommandContext context)
         {
@@ -337,7 +341,7 @@ namespace MarbleBot.Core
                 .WithDescription($"**{Boss.Name}** has been defeated!");
             var obj = GetUsersObject();
 
-            for (int i = 0; i < Marbles.Length; i++)
+            for (int i = 0; i < Marbles.Count; i++)
             {
                 var marble = Marbles[i];
                 var user = GetUser(context, obj, marble.Id);
@@ -437,7 +441,7 @@ namespace MarbleBot.Core
                 return;
             }
 
-            var marble = Array.Find(Marbles, m => m.Id == context.User.Id);
+            var marble = Marbles.Find(m => m.Id == context.User.Id);
             if (marble.HP == 0)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, you are out and can no longer attack!");
@@ -515,9 +519,9 @@ namespace MarbleBot.Core
         public Siege(SocketCommandContext context, IEnumerable<SiegeMarble> marbles)
         {
             Id = context.IsPrivate ? context.User.Id : context.Guild.Id;
-            Marbles = marbles.ToArray();
+            Marbles = marbles.ToList();
         }
 
-        ~Siege() => Dispose(true);
+        ~Siege() => Dispose(false);
     }
 }

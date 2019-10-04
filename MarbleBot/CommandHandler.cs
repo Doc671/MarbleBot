@@ -3,7 +3,6 @@ using Discord.WebSocket;
 using MarbleBot.Core;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -34,7 +33,7 @@ namespace MarbleBot
             var guild = new MarbleBotGuild(0);
 
             if (!context.IsPrivate)
-                guild = MarbleBotModule.GetGuild(context);
+                guild = Modules.MarbleBotModule.GetGuild(context);
 
             if (msg.HasStringPrefix("mb/", ref argPos) && !msg.Author.IsBot &&
 #if DEBUG

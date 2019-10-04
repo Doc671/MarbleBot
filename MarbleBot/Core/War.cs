@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using static MarbleBot.MarbleBotModule;
+using static MarbleBot.Modules.MarbleBotModule;
 
 namespace MarbleBot.Core
 {
@@ -18,9 +18,9 @@ namespace MarbleBot.Core
         public Task Actions { get; set; }
         public IEnumerable<WarMarble> AllMarbles { get; }
         public ulong Id { get; set; }
-        public WarMarble[] Team1 { get; set; }
+        public List<WarMarble> Team1 { get; set; }
         public string Team1Name { get; set; }
-        public WarMarble[] Team2 { get; set; }
+        public List<WarMarble> Team2 { get; set; }
         public string Team2Name { get; set; }
 
         private readonly WarMarble _aiMarble;
@@ -28,9 +28,13 @@ namespace MarbleBot.Core
         private bool _disposed = false;
         private bool _endCalled = false;
 
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
             _disposed = true;
@@ -134,7 +138,7 @@ namespace MarbleBot.Core
                 else if (_aiMarblePresent && _aiMarble.HP > 0)
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
-                    var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Length)];
+                    var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Count)];
                     if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
                         var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
@@ -165,8 +169,8 @@ namespace MarbleBot.Core
             Id = id;
             _aiMarble = aiMarble;
             _aiMarblePresent = aiMarble != null;
-            Team1 = team1.ToArray();
-            Team2 = team2.ToArray();
+            Team1 = team1.ToList();
+            Team2 = team2.ToList();
             AllMarbles = Team1.Union(Team2);
 
             // Decide team names
@@ -182,6 +186,6 @@ namespace MarbleBot.Core
             while (string.Compare(Team1Name, Team2Name, false) == 0);
         }
 
-        ~War() => Dispose(true);
+        ~War() => Dispose(false);
     }
 }

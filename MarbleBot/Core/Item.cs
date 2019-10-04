@@ -9,7 +9,7 @@ namespace MarbleBot.Core
         /// <summary> The identification number of the item. </summary>
         public uint Id { get; internal set; }
         /// <summary> The name of the item. </summary>
-        public string Name { get;  }
+        public string Name { get; }
         /// <summary> The price of the item. </summary>
         public decimal Price { get; }
         /// <summary> The description of the item. </summary>
@@ -19,7 +19,7 @@ namespace MarbleBot.Core
         /// <summary> The Stage at which the item can be obtained. </summary>
         public int Stage { get; }
         /// <summary> The location the item can be found in during a Scavenge game. </summary>
-        public ScavengeLocation ScavengeLocation { get; } 
+        public ScavengeLocation ScavengeLocation { get; }
         /// <summary> The quantity produced of this item upon being crafted. </summary>
         public uint CraftingProduced { get; }
         /// <summary> The crafting recipe - a key value pair of item IDs and their necessary quantities. </summary>
@@ -29,7 +29,7 @@ namespace MarbleBot.Core
 
         [JsonConstructor]
         public Item(uint id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
-            int stage = 1, ScavengeLocation scavengeLocation = ScavengeLocation.None, uint craftingProduced = 0u, 
+            int stage = 1, ScavengeLocation scavengeLocation = ScavengeLocation.None, uint craftingProduced = 0u,
             Dictionary<string, int> craftingRecipe = null, int craftingStationRequired = 0)
         {
             Id = id;

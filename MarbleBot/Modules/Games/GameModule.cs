@@ -10,12 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using static MarbleBot.Global;
-using static MarbleBot.MarbleBotModule;
 
-namespace MarbleBot.Modules
+namespace MarbleBot.Modules.Games
 {
-    /// <summary> Game commands. </summary>
-    public static partial class Games
+    /// <summary> A module for game commands. </summary>
+    public abstract class GameModule : MarbleBotModule
     {
         /// <summary> Gets the string representation of the game. </summary>
         /// <param name="gameType"> The type of game. </param>
@@ -27,7 +26,7 @@ namespace MarbleBot.Modules
         /// <summary> Sends a message showing whether a user can earn from a game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        internal static async Task Checkearn(SocketCommandContext context, GameType gameType)
+        protected static async Task Checkearn(SocketCommandContext context, GameType gameType)
         {
             var user = GetUser(context);
             var lastWin = gameType switch
@@ -52,7 +51,7 @@ namespace MarbleBot.Modules
         /// <summary> Clears the contestant list. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        internal static async Task Clear(SocketCommandContext context, GameType gameType)
+        protected static async Task Clear(SocketCommandContext context, GameType gameType)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             if (context.User.Id == 224267581370925056 || context.IsPrivate)
@@ -68,7 +67,7 @@ namespace MarbleBot.Modules
         /// <param name="orderedData"> The data to be made into a leaderboard. </param>
         /// <param name="no"> The part of the leaderboard that will be displayed. </param>
         /// <returns> A string ready to be output. </returns>
-        internal static string Leaderboard(IEnumerable<(string, int)> orderedData, int no)
+        protected static string Leaderboard(IEnumerable<(string, int)> orderedData, int no)
         {
             // Key is the displayed place on the leaderboard; value item 1 is the item; value item 2 is its data
             // i.e. (1, "Red", 83) would be displayed as "1st: Red 83"
@@ -101,7 +100,7 @@ namespace MarbleBot.Modules
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
         /// <param name="marbleToRemove"> The name of the marble to remove. </param>
-        internal static async Task RemoveContestant(SocketCommandContext context, GameType gameType, string marbleToRemove)
+        protected static async Task RemoveContestant(SocketCommandContext context, GameType gameType, string marbleToRemove)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
@@ -149,7 +148,7 @@ namespace MarbleBot.Modules
         /// <summary> Returns a message showing the contestants currently signed up to the game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        internal static async Task ShowContestants(SocketCommandContext context, GameType gameType)
+        protected static async Task ShowContestants(SocketCommandContext context, GameType gameType)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
@@ -185,7 +184,7 @@ namespace MarbleBot.Modules
             }
 
             var output = marbles.ToString();
-            if (output.IsEmpty())
+            if (string.IsNullOrEmpty(output))
                 await context.Channel.SendMessageAsync("No-one is signed up!");
             else
                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
@@ -204,7 +203,7 @@ namespace MarbleBot.Modules
         /// <param name="marbleLimit"> The maximum number of marbles that can be signed up. </param>
         /// <param name="startCommand"> The command to execute if the marble limit has been met. </param>
         /// <param name="itemId"> (War only) The ID of the weapon the marble is joining with. </param>
-        internal static async Task Signup(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
+        protected static async Task Signup(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
             Func<Task> startCommand, string itemId = "")
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
@@ -258,7 +257,7 @@ namespace MarbleBot.Modules
                 }
             }
 
-            if (marbleName.IsEmpty() || marbleName.StartsWith("<@")) marbleName = context.User.Username;
+            if (string.IsNullOrEmpty(marbleName) || marbleName.StartsWith("<@")) marbleName = context.User.Username;
             else if (marbleName.Length > 100)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, your entry exceeds the 100 character limit.");
@@ -270,7 +269,7 @@ namespace MarbleBot.Modules
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
-                .AddField($"Marble {GameName(gameType)}: Signed up!", 
+                .AddField($"Marble {GameName(gameType)}: Signed up!",
                     $"**{context.User.Username}** has successfully signed up as {bold}{marbleName}{bold}{(gameType == GameType.War ? $" with the weapon **{weapon.Name}**" : "")}!");
             using (var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
                 await racers.WriteLineAsync(marbleName);

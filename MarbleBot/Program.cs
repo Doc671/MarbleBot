@@ -6,8 +6,6 @@ using Google.Apis.Docs.v1.Data;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
-using MarbleBot.Core;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,19 +20,19 @@ namespace MarbleBot
         private static void Main()
         => new Program().StartAsync().GetAwaiter().GetResult();
 
-        private readonly static DiscordSocketClient _client = new DiscordSocketClient();
+        private static readonly DiscordSocketClient _client = new DiscordSocketClient();
 
 #pragma warning disable IDE0052 // Remove unread private members
         private CommandHandler _handler;
 #pragma warning restore IDE0052 // Remove unread private members
 
-        private readonly static DocsService _service = new DocsService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = Global.Credential,
-                ApplicationName = "MarbleBot",
-            });
+        private static readonly DocsService _service = new DocsService(new BaseClientService.Initializer()
+        {
+            HttpClientInitializer = Global.Credential,
+            ApplicationName = "MarbleBot",
+        });
 
-        private readonly static DocumentsResource.GetRequest _request = _service.Documents.Get(_documentId);
+        private static readonly DocumentsResource.GetRequest _request = _service.Documents.Get(_documentId);
 
         private const string _documentId = "1HlzCpdMG7Wn5cAGDCLb_k9NqMk6jsZG9P1Q-VwCrp9E";
 
