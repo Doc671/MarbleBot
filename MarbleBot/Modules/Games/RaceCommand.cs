@@ -176,10 +176,10 @@ namespace MarbleBot.Modules.Games
                             else winners.Add(racerInfo, 1);
                         }
                     }
-                    var winList = new List<(string, int)>();
+                    var winList = new List<(string elementName, int value)>();
                     foreach (var winner in winners)
                         winList.Add((winner.Key, winner.Value));
-                    winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                    winList = (from winner in winList orderby winner.value descending select winner).ToList();
                     builder.WithTitle("Race Leaderboard: Winners")
                         .WithDescription(Leaderboard(winList, page));
                     await ReplyAsync(embed: builder.Build());
@@ -196,10 +196,10 @@ namespace MarbleBot.Modules.Games
                             else winners.Add(racerInfo, 1);
                         }
                     }
-                    var winList = new List<(string, int)>();
+                    var winList = new List<(string elementName, int value)>();
                     foreach (var winner in winners)
                         winList.Add((winner.Key, winner.Value));
-                    winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                    winList = (from winner in winList orderby winner.value descending select winner).ToList();
                     builder.WithTitle("Race Leaderboard: Most Used")
                         .WithDescription(Leaderboard(winList, page));
                     await ReplyAsync(embed: builder.Build());

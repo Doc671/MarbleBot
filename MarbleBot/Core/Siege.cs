@@ -66,7 +66,7 @@ namespace MarbleBot.Core
                 }
 
                 // Attack marbles
-                var atk = Boss.Attacks[Global.Rand.Next(0, Boss.Attacks.Length)];
+                var atk = Boss.Attacks.ElementAt(Global.Rand.Next(0, Boss.Attacks.Count));
                 var builder = new EmbedBuilder()
                     .WithAuthor(Boss.Name, Boss.ImageUrl)
                     .WithColor(GetColor(context))
@@ -233,7 +233,6 @@ namespace MarbleBot.Core
             Global.SiegeInfo.TryRemove(Id, out _);
             if (disposing && Actions != null)
             {
-                Actions.Wait();
                 Actions.Dispose();
             }
         }
@@ -385,7 +384,7 @@ namespace MarbleBot.Core
                     if (output.Length > 0)
                     {
                         if (marble.HP > 0) user.LastSiegeWin = DateTime.UtcNow;
-                        if (Boss.Drops.Length > 0) output.AppendLine("**Item Drops:**");
+                        if (Boss.Drops.Count > 0) output.AppendLine("**Item Drops:**");
                         var dropPresent = false;
                         foreach (var itemDrops in Boss.Drops)
                         {

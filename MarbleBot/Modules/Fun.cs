@@ -172,16 +172,8 @@ namespace MarbleBot.Modules
         {
             string[] choices = input.Split('|');
             int choice = Rand.Next(0, choices.Length);
-            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(choices[choice])))
-            {
-                if (Context.IsPrivate)
-                {
-                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                }
-                else Log($"Profanity detected: {input}");
-            }
-            else await ReplyAsync($"**{Context.User.Username}**, I choose **{choices[choice].Trim()}**!");
+            if (!(await Moderation.CheckSwearAsync(input) || await Moderation.CheckSwearAsync(choices[choice])))
+                await ReplyAsync($"**{Context.User.Username}**, I choose **{choices[choice].Trim()}**!");
         }
 
         [Command("color")]
@@ -321,16 +313,8 @@ namespace MarbleBot.Modules
                 orangeified.Append(input[length]);
                 length--;
             }
-            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(orangeified.ToString())))
-            {
-                if (Context.IsPrivate)
-                {
-                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                }
-                else Log($"Profanity detected: {input}");
-            }
-            else await ReplyAsync(orangeified.ToString());
+            if (!(await Moderation.CheckSwearAsync(input) || await Moderation.CheckSwearAsync(orangeified.ToString())))
+                await ReplyAsync(orangeified.ToString());
         }
 
         [Command("random")]
@@ -460,16 +444,8 @@ namespace MarbleBot.Modules
             if (rating == -2) await ReplyAsync($"**{Context.User.Username}**, I rATE {input} UNd3FINED10. {emoji}\n({message})");
             else
             {
-                if (await Moderation.CheckSwearAsync(input))
-                {
-                    if (Context.IsPrivate)
-                    {
-                        IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                        await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                    }
-                    else Log($"Profanity detected: {input}");
-                }
-                else await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
+                if (!await Moderation.CheckSwearAsync(input))
+                    await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
             }
         }
 
@@ -478,16 +454,8 @@ namespace MarbleBot.Modules
         public async Task RepeatCommand([Remainder] string repeat)
         {
             if (repeat == "Am Melmon") await ReplyAsync("No U");
-            else if (await Moderation.CheckSwearAsync(repeat))
-            {
-                if (Context.IsPrivate)
-                {
-                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                }
-                else Log($"Profanity detected: {repeat}");
-            }
-            else await ReplyAsync(repeat);
+            else if (!await Moderation.CheckSwearAsync(repeat))
+                await ReplyAsync(repeat);
         }
 
         [Command("reverse")]
@@ -502,16 +470,8 @@ namespace MarbleBot.Modules
                 reverse.Append(input[length]);
                 length--;
             }
-            if ((await Moderation.CheckSwearAsync(input)) || (await Moderation.CheckSwearAsync(reverse.ToString())))
-            {
-                if (Context.IsPrivate)
-                {
-                    IGuildUser Doc671 = Context.Guild.GetUser(224267581370925056);
-                    await ReplyAsync($"Profanity detected. {Doc671.Mention}");
-                }
-                else Log($"Profanity detected: {input}");
-            }
-            else await ReplyAsync(reverse.ToString());
+            if (!(await Moderation.CheckSwearAsync(input) || await Moderation.CheckSwearAsync(reverse.ToString())))
+                await ReplyAsync(reverse.ToString());
         }
 
         [Command("vinhglish")]
@@ -520,25 +480,21 @@ namespace MarbleBot.Modules
         {
             int randNo = 0;
             bool wordSet = false;
-            string[] wordList = new string[100];
-            string[] invList = new string[100];
-            string[] descList = new string[100];
-            int a = 0;
-            if (word == "")
+            var wordList = new List<(string word, string inventor, string description)>();
+            int noOfWords = 0;
+            if (string.IsNullOrEmpty(word))
             {
                 using (var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
                 {
                     while (!stream.EndOfStream)
                     {
                         string list = stream.ReadLine();
-                        string[] vocab = list.Split(',');
-                        wordList[a] = vocab[0];
-                        invList[a] = vocab[1];
-                        descList[a] = vocab[2];
-                        a++;
+                        string[] wordInfo = list.Split(',');
+                        wordList.Add((wordInfo[0], wordInfo[1], wordInfo[2]));
+                        noOfWords++;
                     }
                 }
-                randNo = Rand.Next(1, a);
+                randNo = Rand.Next(1, noOfWords);
             }
             else
             {
@@ -546,22 +502,20 @@ namespace MarbleBot.Modules
                 while (!stream.EndOfStream)
                 {
                     string list = stream.ReadLine();
-                    string[] vocab = list.Split(',');
-                    wordList[a] = vocab[0];
-                    invList[a] = vocab[1];
-                    descList[a] = vocab[2];
-                    if (wordList[a].ToLower() == word.ToLower())
+                    string[] wordInfo = list.Split(',');
+                    wordList.Add((wordInfo[0], wordInfo[1], wordInfo[2]));
+                    if (wordList[noOfWords].word.ToLower() == word.ToLower())
                     {
-                        randNo = a;
+                        randNo = noOfWords;
                         stream.Close();
                         wordSet = true;
                         break;
                     }
-                    a++;
+                    noOfWords++;
                 }
-                if (!wordSet) randNo = Rand.Next(1, a);
+                if (!wordSet) randNo = Rand.Next(1, noOfWords);
             }
-            await ReplyAsync($"**__{wordList[randNo]}__**\nInventor: {invList[randNo]}\nDescription: {descList[randNo]}");
+            await ReplyAsync($"**__{wordList[randNo].word}__**\nInventor: {wordList[randNo].inventor}\nDescription: {wordList[randNo].description}");
         }
     }
 }

@@ -71,14 +71,16 @@ namespace MarbleBot.Modules
             var module = Global.CommandService.Modules.Where(m => m.Name.ToLower() == commandToFind.ToLower()).FirstOrDefault();
             if (module != null)
             {
-                if (module.Name == "Moderation" && !(Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
+                bool owner = Context.User.Id == OwnerId;
+
+                if ((module.Name == "Moderation" && !(Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
+                    || (module.Name == "Sneak" && !owner))
                 {
                     await SendErrorAsync("You cannot access this module!");
                     return;
                 }
 
-                var commands = (IEnumerable<CommandInfo>)Global.CommandService.Commands.Where(c => string.Compare(c.Module.Name, commandToFind, true) == 0
-                        && !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
+                IEnumerable<CommandInfo> commands = module.Commands.Where(c => owner ? true : !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
 
                 if (Context.Guild.Id != CM) commands = commands.Where(c => c.Remarks != "CM Only");
 

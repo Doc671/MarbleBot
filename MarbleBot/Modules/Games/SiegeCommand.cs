@@ -80,7 +80,7 @@ namespace MarbleBot.Modules.Games
                 currentSiege.Active = true;
 
                 // Pick boss & set battle stats based on boss
-                if (over.Contains("override") && (Context.User.Id == 224267581370925056 || Context.IsPrivate))
+                if (over.Contains("override") && (Context.User.Id == Global.OwnerId || Context.IsPrivate))
                     currentSiege.Boss = Siege.GetBoss(over.Split(' ')[1].RemoveChar(' '));
                 else if (string.Compare(currentSiege.Boss.Name, "", true) == 0)
                 {
@@ -132,11 +132,11 @@ namespace MarbleBot.Modules.Games
                     .AddField($"Marbles: **{currentSiege.Marbles.Count}**", marbles.ToString())
                     .AddField($"Boss: **{currentSiege.Boss.Name}**", new StringBuilder()
                         .AppendLine($"HP: **{currentSiege.Boss.HP}**")
-                        .AppendLine($"Attacks: **{currentSiege.Boss.Attacks.Length}**")
+                        .AppendLine($"Attacks: **{currentSiege.Boss.Attacks.Count}**")
                         .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), currentSiege.Boss.Difficulty)} {(int)currentSiege.Boss.Difficulty}**/10")
                         .ToString())
                     .Build());
-                if (pings.Length != 0 || (Context.User.Id == 224267581370925056 && !over.Contains("noping")))
+                if (pings.Length != 0 || (Context.User.Id == OwnerId && !over.Contains("noping")))
                     await ReplyAsync(pings.ToString());
             }
         }
@@ -162,13 +162,13 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            if (!SiegeInfo[fileId].Marbles.Any(m => m.Id == Context.User.Id))
+            var marble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+            if (marble == null)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you aren't in this Siege!");
                 return;
             }
 
-            var marble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
             if (marble.HP == 0)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
@@ -255,20 +255,19 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var currentSiege = SiegeInfo[fileId];
-            if (!currentSiege.Marbles.Any(m => m.Id == Context.User.Id))
+            var marble = SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+            if (marble == null)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you aren't in this Siege!");
                 return;
             }
 
-            if (currentSiege.PowerUp == PowerUp.None)
+            if (SiegeInfo[fileId].PowerUp == PowerUp.None)
             {
                 await ReplyAsync($"**{Context.User.Username}**, there is no power-up to grab!");
                 return;
             }
 
-            var marble = currentSiege.Marbles.Find(m => m.Id == Context.User.Id);
             if (marble.HP < 1)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer grab power-ups!");
@@ -280,10 +279,10 @@ namespace MarbleBot.Modules.Games
                 EmbedBuilder builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
-                    .WithThumbnailUrl(Siege.GetPowerUpImageUrl(currentSiege.PowerUp));
+                    .WithThumbnailUrl(Siege.GetPowerUpImageUrl(SiegeInfo[fileId].PowerUp));
 
                 marble.PowerUpHits++;
-                switch (currentSiege.PowerUp)
+                switch (SiegeInfo[fileId].PowerUp)
                 {
                     case PowerUp.Clone:
                         marble.Cloned = true;
@@ -295,9 +294,9 @@ namespace MarbleBot.Modules.Games
                         marble.StatusEffect = StatusEffect.None;
                         break;
                     case PowerUp.MoraleBoost:
-                        currentSiege.Morales++;
-                        builder.WithDescription($"**{marble.Name}** activated **Morale Boost**! Damage multiplier increased to **{currentSiege.DamageMultiplier}**!");
-                        currentSiege.LastMorale = DateTime.UtcNow;
+                        SiegeInfo[fileId].Morales++;
+                        builder.WithDescription($"**{marble.Name}** activated **Morale Boost**! Damage multiplier increased to **{SiegeInfo[fileId].DamageMultiplier}**!");
+                        SiegeInfo[fileId].LastMorale = DateTime.UtcNow;
                         break;
                     case PowerUp.Summon:
                         var choice = Rand.Next(0, 2);
@@ -309,15 +308,15 @@ namespace MarbleBot.Modules.Games
                             case 1: ally = "Neptune"; url = "https://cdn.discordapp.com/attachments/296376584238137355/543745899591893012/Neptune.png"; break;
                             default: ally = "MarbleBot"; url = ""; break;
                         }
-                        var dmg = Rand.Next(25, 30) * currentSiege.Boss.Stage * ((int)currentSiege.Boss.Difficulty >> 1);
-                        currentSiege.Boss.HP -= (int)Math.Round(dmg * currentSiege.DamageMultiplier);
-                        if (currentSiege.Boss.HP < 0) currentSiege.Boss.HP = 0;
+                        var dmg = Rand.Next(25, 30) * SiegeInfo[fileId].Boss.Stage * ((int)SiegeInfo[fileId].Boss.Difficulty >> 1);
+                        SiegeInfo[fileId].Boss.HP -= (int)Math.Round(dmg * SiegeInfo[fileId].DamageMultiplier);
+                        if (SiegeInfo[fileId].Boss.HP < 0) SiegeInfo[fileId].Boss.HP = 0;
                         builder.WithThumbnailUrl(url)
-                            .AddField("Boss HP", $"**{currentSiege.Boss.HP}**/{currentSiege.Boss.MaxHP}")
+                            .AddField("Boss HP", $"**{SiegeInfo[fileId].Boss.HP}**/{SiegeInfo[fileId].Boss.MaxHP}")
                             .WithDescription($"**{marble.Name}** activated **Summon**! **{ally}** came into the arena and dealt **{dmg}** damage to the boss!");
                         break;
                 }
-                currentSiege.PowerUp = PowerUp.None;
+                SiegeInfo[fileId].PowerUp = PowerUp.None;
                 await ReplyAsync(embed: builder.WithTitle("POWER-UP ACTIVATED!")
                     .Build());
             }
@@ -364,7 +363,7 @@ namespace MarbleBot.Modules.Games
                 foreach (var marble in siege.Marbles)
                     marbles.AppendLine(marble.ToString(Context));
 
-                builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHP: **{siege.Boss.HP}**/{siege.Boss.MaxHP}\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**");
+                builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHP: **{siege.Boss.HP}**/{siege.Boss.MaxHP}\nAttacks: **{siege.Boss.Attacks.Count}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**");
 
                 if (marbles.Length > 1024) builder.AddField($"Marbles: **{siege.Marbles.Count}**", string.Concat(marbles.ToString().Take(1024)))
                     .AddField("Marbles (cont.)", string.Concat(marbles.ToString().Skip(1024)));
@@ -450,10 +449,10 @@ namespace MarbleBot.Modules.Games
                         else winners.Add(racerInfo, 1);
                     }
                 }
-                var winList = new List<(string, int)>();
+                var winList = new List<(string elementName, int value)>();
                 foreach (var winner in winners)
                     winList.Add((winner.Key, winner.Value));
-                winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                winList = (from winner in winList orderby winner.value descending select winner).ToList();
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
@@ -469,8 +468,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Returns information about a boss.")]
         public async Task SiegeBossCommand([Remainder] string searchTerm)
         {
-            var boss = Boss.Empty;
-            var state = 1;
+            Boss boss;
             switch (searchTerm.ToLower().RemoveChar(' '))
             {
                 case "pree":
@@ -496,7 +494,7 @@ namespace MarbleBot.Modules.Games
                 case "neptune":
                 case "lavachunk":
                 case "pyromaniac":
-                case "volcano": await ReplyAsync("No."); state = 3; break;
+                case "volcano": await ReplyAsync("No."); return;
                 case "red": boss = Siege.GetBoss("Red"); break;
                 case "spaceman":
                 case "rgvzdhjvewvy":
@@ -509,44 +507,43 @@ namespace MarbleBot.Modules.Games
                 case "overlord": boss = Siege.GetBoss("Overlord"); break;
                 case "vinemonster":
                 case "vinemonsters":
-                case "floatingore": await ReplyAsync("Excuse me?"); state = 3; break;
-                case "doc671": await ReplyAsync("No spoilers here!"); state = 4; break;
-                default: state = 0; break;
+                case "floatingore": await ReplyAsync("Excuse me?"); return;
+                case "rockgolem": boss = Siege.GetBoss("Rock Golem"); break;
+                case "doc671": await ReplyAsync("No spoilers here!"); return;
+                default:
+                    await ReplyAsync("Could not find the requested boss!");
+                    return;
             }
-            if (state == 1)
+            if (boss.Stage > GetUser(Context).Stage) await ReplyAsync(embed: new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithDescription(StageTooHighString())
+                .WithThumbnailUrl(boss.ImageUrl)
+                .WithTitle(boss.Name)
+                .Build());
+            else
             {
-                if (boss.Stage > GetUser(Context).Stage) await ReplyAsync(embed: new EmbedBuilder()
+                var attacks = new StringBuilder();
+                foreach (var attack in boss.Attacks)
+                    attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(StatusEffect), attack.StatusEffect)}>");
+                var drops = new StringBuilder();
+                foreach (var drop in boss.Drops)
+                {
+                    var dropAmount = drop.MinCount == drop.MaxCount ? drop.MinCount.ToString() : $"{drop.MinCount}-{drop.MaxCount}";
+                    var idString = drop.ItemId.ToString("000");
+                    drops.AppendLine($"`[{idString}]` **{GetItem<Item>(idString).Name}**: {dropAmount} ({drop.Chance}%)");
+                }
+                await ReplyAsync(embed: new EmbedBuilder()
+                    .AddField("HP", $"**{boss.MaxHP}**")
+                    .AddField("Attacks", attacks.ToString())
+                    .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
+                    .AddField("Drops", drops.ToString())
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
-                    .WithDescription(StageTooHighString())
                     .WithThumbnailUrl(boss.ImageUrl)
                     .WithTitle(boss.Name)
                     .Build());
-                else
-                {
-                    var attacks = new StringBuilder();
-                    foreach (var attack in boss.Attacks)
-                        attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(StatusEffect), attack.StatusEffect)}>");
-                    var drops = new StringBuilder();
-                    foreach (var drop in boss.Drops)
-                    {
-                        var dropAmount = drop.MinCount == drop.MaxCount ? drop.MinCount.ToString() : $"{drop.MinCount}-{drop.MaxCount}";
-                        var idString = drop.ItemId.ToString("000");
-                        drops.AppendLine($"`[{idString}]` **{GetItem<Item>(idString).Name}**: {dropAmount} ({drop.Chance}%)");
-                    }
-                    await ReplyAsync(embed: new EmbedBuilder()
-                        .AddField("HP", $"**{boss.MaxHP}**")
-                        .AddField("Attacks", attacks.ToString())
-                        .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
-                        .AddField("Drops", drops.ToString())
-                        .WithColor(GetColor(Context))
-                        .WithCurrentTimestamp()
-                        .WithThumbnailUrl(boss.ImageUrl)
-                        .WithTitle(boss.Name)
-                        .Build());
-                }
             }
-            else if (state == 0) await ReplyAsync("Could not find the requested boss!");
         }
 
         [Command("bosschance")]

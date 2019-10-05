@@ -54,7 +54,7 @@ namespace MarbleBot.Modules.Games
         protected static async Task Clear(SocketCommandContext context, GameType gameType)
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
-            if (context.User.Id == 224267581370925056 || context.IsPrivate)
+            if (context.User.Id == Global.OwnerId || context.IsPrivate)
             {
                 using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv", false);
                 await marbleList.WriteAsync("");
@@ -63,34 +63,32 @@ namespace MarbleBot.Modules.Games
             else await context.Channel.SendMessageAsync($"**{context.User.Username}**, you cannot do this!");
         }
 
-        /// <summary> Shows leaderboards for mb/race and mb/siege. </summary>
+        /// <summary> Shows leaderboards. </summary>
         /// <param name="orderedData"> The data to be made into a leaderboard. </param>
         /// <param name="no"> The part of the leaderboard that will be displayed. </param>
-        /// <returns> A string ready to be output. </returns>
-        protected static string Leaderboard(IEnumerable<(string, int)> orderedData, int no)
+        /// <returns> A leaderboard string ready to be printed. </returns>
+        protected static string Leaderboard(IEnumerable<(string elementName, int value)> orderedData, int no)
         {
-            // Key is the displayed place on the leaderboard; value item 1 is the item; value item 2 is its data
-            // i.e. (1, "Red", 83) would be displayed as "1st: Red 83"
-            var dataList = new List<(int, string, int)>();
+            var dataList = new List<(int place, string elementName, int value)>();
             int displayedPlace = 0, lastValue = 0;
-            foreach (var item in orderedData)
+            foreach (var (elementName, value) in orderedData)
             {
-                if (item.Item2 != lastValue)
+                if (value != lastValue)
                     displayedPlace++;
-                dataList.Add((displayedPlace, item.Item1, item.Item2));
-                lastValue = item.Item2;
+                dataList.Add((displayedPlace, elementName, value));
+                lastValue = value;
             }
-            if (no > dataList.Last().Item1 / 10)
+            if (no > dataList.Last().place / 10)
                 return $"There are no entries in page **{no}**!";
             // This displays in groups of ten (i.e. if no is 1, first 10 displayed;
             // no = 2, next 10, etc.
             int minValue = (no - 1) * 10 + 1, maxValue = no * 10;
             var output = new StringBuilder();
-            foreach (var itemPair in dataList)
+            foreach (var (place, elementName, value) in dataList)
             {
-                if (itemPair.Item1 > maxValue) break;
-                if (itemPair.Item1 < maxValue + 1 && itemPair.Item1 >= minValue)
-                    output.AppendLine($"{itemPair.Item1}{itemPair.Item1.Ordinal()}: {itemPair.Item2} {itemPair.Item3}");
+                if (place > maxValue) break;
+                if (place < maxValue + 1 && place >= minValue)
+                    output.AppendLine($"{place}{place.Ordinal()}: {elementName} {value}");
             }
             if (output.Length > 2048) return string.Concat(output.ToString().Take(2048));
             return output.ToString();
@@ -110,7 +108,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
             // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
-            int state = context.User.Id == 224267581370925056 ? 3 : 0;
+            int state = context.User.Id == Global.OwnerId ? 3 : 0;
             var wholeFile = new StringBuilder();
             using (var marbleList = new StreamReader(marbleListDirectory))
             {

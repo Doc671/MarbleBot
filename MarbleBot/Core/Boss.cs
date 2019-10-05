@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MarbleBot.Core
 {
     /// <summary> Represents a boss in a Marble Siege battle. </summary>
@@ -15,11 +17,11 @@ namespace MarbleBot.Core
         /// <summary> The maximum number of health points the boss can have. </summary>
         public int MaxHP { get; }
         /// <summary> The boss' attacks. </summary>
-        public Attack[] Attacks { get; set; }
+        public IReadOnlyCollection<Attack> Attacks { get; set; }
         /// <summary> The boss' difficulty. </summary>
         public Difficulty Difficulty { get; set; }
         /// <summary> The items that drop from the boss, the number of them and the chance each one has of dropping. </summary>
-        public BossDrops[] Drops { get; set; }
+        public IReadOnlyCollection<BossDrops> Drops { get; set; }
         /// <summary> A URL to the boss' image. </summary>
         public string ImageUrl { get; set; }
         /// <summary> The Stage the boss appears at. </summary>

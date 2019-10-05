@@ -140,7 +140,7 @@ namespace MarbleBot.Modules
             var swearPresent = false;
             foreach (var swear in swearList)
             {
-                if (msg.Contains(swear))
+                if (msg.ToLower().Contains(swear))
                 {
                     swearPresent = true;
                     break;

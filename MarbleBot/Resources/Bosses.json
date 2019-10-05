@@ -710,5 +710,34 @@
         "Chance": 1
       }
     ]
+  },
+  "RockGolem": {
+    "Name": "Rock Golem",
+    "HP": 2000,
+    "Difficulty": 4,
+    "Stage": 3,
+    "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/627480778535862302/unknown.png",
+    "Attacks": [
+      {
+        "Name": "Tremor",
+        "Damage": 10,
+        "Accuracy": 60,
+        "StatusEffect": 0
+      },
+      {
+        "Name": "Pound",
+        "Damage": 20,
+        "Accuracy": 40,
+        "StatusEffect": 0
+      }
+    ],
+    "Drops": [
+      {
+        "ItemId": 48,
+        "MinCount": 4,
+        "MaxCount": 12,
+        "Chance": 100
+      }
+    ]
   }
 }

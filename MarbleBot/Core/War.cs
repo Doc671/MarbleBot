@@ -18,9 +18,9 @@ namespace MarbleBot.Core
         public Task Actions { get; set; }
         public IEnumerable<WarMarble> AllMarbles { get; }
         public ulong Id { get; set; }
-        public List<WarMarble> Team1 { get; set; }
+        public IReadOnlyCollection<WarMarble> Team1 { get; set; }
         public string Team1Name { get; set; }
-        public List<WarMarble> Team2 { get; set; }
+        public IReadOnlyCollection<WarMarble> Team2 { get; set; }
         public string Team2Name { get; set; }
 
         private readonly WarMarble _aiMarble;
@@ -138,7 +138,7 @@ namespace MarbleBot.Core
                 else if (_aiMarblePresent && _aiMarble.HP > 0)
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
-                    var randMarble = enemyTeam[Global.Rand.Next(0, enemyTeam.Count)];
+                    var randMarble = enemyTeam.ElementAt(Global.Rand.Next(0, enemyTeam.Count));
                     if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
                         var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));

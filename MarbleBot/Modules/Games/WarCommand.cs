@@ -89,7 +89,7 @@ namespace MarbleBot.Modules.Games
             {
                 var allMarbles = team1.Union(team2);
                 if (Math.Round(allMarbles.Sum(m => GetUser(Context, m.Id).Stage) / (double)allMarbles.Count()) == 2)
-                    aiMarble = new WarMarble(BotId, 35, "MarbleBot", GetItem<Weapon>(Rand.Next(0, 9) switch
+                    aiMarble = new WarMarble(Context.Client.CurrentUser.Id, 35, "MarbleBot", GetItem<Weapon>(Rand.Next(0, 9) switch
                     {
                         0 => "086",
                         1 => "087",
@@ -107,7 +107,7 @@ namespace MarbleBot.Modules.Games
                         2 => 74u,
                         _ => 80u
                     });
-                else aiMarble = new WarMarble(BotId, 35, "MarbleBot",
+                else aiMarble = new WarMarble(Context.Client.CurrentUser.Id, 35, "MarbleBot",
                     GetItem<Weapon>(Rand.Next(0, 2) switch
                     {
                         0 => "094",
@@ -150,15 +150,21 @@ namespace MarbleBot.Modules.Games
 
             if (!WarInfo.ContainsKey(fileId))
             {
-                await ReplyAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
+                await SendErrorAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
                 return;
             }
 
             var war = WarInfo[fileId];
-            var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
+            var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            if (currentMarble == null)
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");
+                return;
+            }
+
             if (currentMarble.HP < 1)
             {
-                await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
+                await SendErrorAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
                 return;
             }
 
@@ -177,7 +183,7 @@ namespace MarbleBot.Modules.Games
                 }
                 if (ammoId == 0)
                 {
-                    await ReplyAsync($"{Context.User.Username}, you do not have enough ammo to use the weapon {currentMarble.Weapon.Name}!");
+                    await SendErrorAsync($"{Context.User.Username}, you do not have enough ammo to use the weapon {currentMarble.Weapon.Name}!");
                     return;
                 }
 
@@ -195,7 +201,7 @@ namespace MarbleBot.Modules.Games
                 {
                     if (enemy.HP < 0)
                     {
-                        await ReplyAsync($"**{Context.User.Username}**, you cannot attack a dead marble!");
+                        await SendErrorAsync($"**{Context.User.Username}**, you cannot attack a dead marble!");
                         return;
                     }
 
@@ -255,28 +261,33 @@ namespace MarbleBot.Modules.Games
 
             if (!WarInfo.ContainsKey(fileId))
             {
-                await ReplyAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
+                await SendErrorAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
                 return;
             }
 
             var war = WarInfo[fileId];
-            var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).First();
+            var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            if (currentMarble == null)
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");
+                return;
+            }
+
             if (currentMarble.HP < 1)
             {
-                await ReplyAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
+                await SendErrorAsync($"**{Context.User.Username}**, you are out and can no longer attack!");
                 return;
             }
 
             var user = GetUser(Context);
             var enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
-            for (int i = 0; i < enemyTeam.Count; i++)
+            foreach (var enemy in enemyTeam) 
             {
-                WarMarble enemy = enemyTeam[i];
                 if (string.Compare(enemy.Name, target, true) == 0)
                 {
                     if (enemy.HP < 0)
                     {
-                        await ReplyAsync($"**{Context.User.Username}**, you cannot attack a dead marble!");
+                        await SendErrorAsync($"**{Context.User.Username}**, you cannot attack a dead marble!");
                         return;
                     }
                     var dmg = (int)Math.Round(3 * (1 + currentMarble.DamageIncrease / 50d) * (1 - 0.2 * Convert.ToDouble(enemy.Shield.Id == 63) * (1 + 0.5 * Rand.NextDouble())));
@@ -386,10 +397,10 @@ namespace MarbleBot.Modules.Games
                         else winners.Add(racerInfo, 1);
                     }
                 }
-                var winList = new List<(string, int)>();
+                var winList = new List<(string elementName, int value)>();
                 foreach (var winner in winners)
                     winList.Add((winner.Key, winner.Value));
-                winList = (from winner in winList orderby winner.Item2 descending select winner).ToList();
+                winList = (from winner in winList orderby winner.value descending select winner).ToList();
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()

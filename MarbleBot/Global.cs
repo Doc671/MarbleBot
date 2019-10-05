@@ -10,7 +10,7 @@ namespace MarbleBot
     /// <summary> Contains global variables. </summary>
     internal static class Global
     {
-        internal const ulong BotId = 286228526234075136;
+        internal const ulong OwnerId = 224267581370925056;
         internal const string UoM = "<:unitofmoney:372385317581488128>";
         internal static CommandService CommandService { get; set; }
         internal static UserCredential Credential { get; set; }

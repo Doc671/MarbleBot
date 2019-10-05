@@ -123,7 +123,7 @@ namespace MarbleBot.Modules.Games
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
 
             // Clean up the messages created if the bot can delete messages
-            if (!Context.IsPrivate && Context.Guild.GetUser(BotId).GuildPermissions.ManageMessages)
+            if (!Context.IsPrivate && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.ManageMessages)
             {
                 await Task.Delay(4000);
                 await Context.Message.DeleteAsync();
@@ -176,7 +176,7 @@ namespace MarbleBot.Modules.Games
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
 
             // Clean up the messages created if the bot can delete messages
-            if (!Context.IsPrivate && Context.Guild.GetUser(BotId).GuildPermissions.ManageMessages)
+            if (!Context.IsPrivate && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.ManageMessages)
             {
                 await Task.Delay(4000);
                 await Context.Message.DeleteAsync();
@@ -211,7 +211,7 @@ namespace MarbleBot.Modules.Games
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n2}**!");
 
             // Clean up the messages created if the bot can delete messages
-            if (!Context.IsPrivate && Context.Guild.GetUser(BotId).GuildPermissions.ManageMessages)
+            if (!Context.IsPrivate && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.ManageMessages)
             {
                 await Task.Delay(4000);
                 await Context.Message.DeleteAsync();
