@@ -21,7 +21,7 @@ namespace MarbleBot.Modules
     {
 
         [Command("backup")]
-        [Summary("Copies all files in the Data directory to the Backup directory.")]
+        [Summary("Copies all files in the Data directory a compressed archive.")]
         [RequireOwner]
         public async Task BackupCommand()
         {
@@ -61,19 +61,6 @@ namespace MarbleBot.Modules
                 await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");
             }
             else await ReplyAsync("Invalid number of hours!");
-        }
-
-        [Command("disposeall")]
-        [RequireOwner]
-        public async Task DisposeAllAsync()
-        {
-            foreach (var pair in ScavengeInfo)
-                pair.Value.Dispose();
-            foreach (var pair in SiegeInfo)
-                pair.Value.Dispose();
-            foreach (var pair in WarInfo)
-                pair.Value.Dispose();
-            await ReplyAsync("All separate tasks successfully disposed.");
         }
 
         [Command("fixbalance")]

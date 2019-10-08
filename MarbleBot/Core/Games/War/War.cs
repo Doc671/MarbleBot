@@ -13,15 +13,14 @@ using static MarbleBot.Modules.MarbleBotModule;
 namespace MarbleBot.Core
 {
     /// <summary> Represents a game of war. </summary>
-    public class War : IDisposable
+    public partial class War : IDisposable
     {
         public Task Actions { get; set; }
-        public IEnumerable<WarMarble> AllMarbles { get; }
+        public IEnumerable<WarMarble> AllMarbles => Team1.Marbles.Union(Team2.Marbles);
         public ulong Id { get; set; }
-        public IReadOnlyCollection<WarMarble> Team1 { get; set; }
-        public string Team1Name { get; set; }
-        public IReadOnlyCollection<WarMarble> Team2 { get; set; }
-        public string Team2Name { get; set; }
+
+        public WarTeam Team1 { get; set; }
+        public WarTeam Team2 { get; set; }
 
         private readonly WarMarble _aiMarble;
         private readonly bool _aiMarblePresent = false;
@@ -52,33 +51,33 @@ namespace MarbleBot.Core
         {
             if (_endCalled) return;
             _endCalled = true;
-            var t1Total = Team1.Sum(m => m.HP);
-            var t2Total = Team2.Sum(m => m.HP);
+            var t1Total = Team1.Marbles.Sum(m => m.HP);
+            var t2Total = Team2.Marbles.Sum(m => m.HP);
             var winningTeam = t1Total > t2Total ? Team1 : Team2;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
-                .WithTitle($"Team {(t1Total > t2Total ? Team1Name : Team2Name)} has defeated Team {(t1Total > t2Total ? Team2Name : Team1Name)}!");
+                .WithTitle($"Team {winningTeam.Name} has defeated Team {(t1Total > t2Total ? Team2 : Team1).Name}!");
             var t1Output = new StringBuilder();
             var t2Output = new StringBuilder();
 
-            foreach (var marble in Team1)
+            foreach (var marble in Team1.Marbles)
             {
                 var user = context.Client.GetUser(marble.Id);
                 t1Output.AppendLine($"{marble.Name} (HP: **{marble.HP}**/{marble.MaxHP}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
 
-            foreach (var marble in Team2)
+            foreach (var marble in Team2.Marbles)
             {
                 var user = context.Client.GetUser(marble.Id);
                 t2Output.AppendLine($"{marble.Name} (HP: **{marble.HP}**/{marble.MaxHP}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
 
-            builder.AddField($"Team {Team1Name} Final Stats", t1Output.ToString())
-                .AddField($"Team {Team2Name} Final Stats", t2Output.ToString());
+            builder.AddField($"Team {Team1.Name} Final Stats", t1Output.ToString())
+                .AddField($"Team {Team2.Name} Final Stats", t2Output.ToString());
 
             var obj = GetUsersObject();
-            foreach (var marble in winningTeam)
+            foreach (var marble in winningTeam.Marbles)
             {
                 var user = GetUser(context, obj, marble.Id);
                 if (DateTime.UtcNow.Subtract(user.LastWarWin).TotalHours > 6)
@@ -138,7 +137,7 @@ namespace MarbleBot.Core
                 else if (_aiMarblePresent && _aiMarble.HP > 0)
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
-                    var randMarble = enemyTeam.ElementAt(Global.Rand.Next(0, enemyTeam.Count));
+                    var randMarble = enemyTeam.Marbles.ElementAt(Global.Rand.Next(0, enemyTeam.Marbles.Count));
                     if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
                         var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
@@ -159,19 +158,16 @@ namespace MarbleBot.Core
                           .Build());
                 }
             }
-            while (!timeout && !_disposed && !Team1.All(m => m.HP == 0) && !Team2.All(m => m.HP == 0));
+            while (!timeout && !_disposed && !Team1.Marbles.All(m => m.HP == 0) && !Team2.Marbles.All(m => m.HP == 0));
             if (!timeout) await End(context);
             else Dispose(true);
         }
 
-        public War(ulong id, IEnumerable<WarMarble> team1, IEnumerable<WarMarble> team2, WarMarble aiMarble)
+        public War(ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble aiMarble, WarBoost team1Boost, WarBoost team2Boost)
         {
             Id = id;
             _aiMarble = aiMarble;
             _aiMarblePresent = aiMarble != null;
-            Team1 = team1.ToList();
-            Team2 = team2.ToList();
-            AllMarbles = Team1.Union(Team2);
 
             // Decide team names
             var nameList = new List<string>();
@@ -181,9 +177,13 @@ namespace MarbleBot.Core
                     nameList.Add(teamNames.ReadLine());
             }
 
-            Team1Name = nameList[Global.Rand.Next(0, nameList.Count)];
-            do Team2Name = nameList[Global.Rand.Next(0, nameList.Count)];
-            while (string.Compare(Team1Name, Team2Name, false) == 0);
+            string team2Name;
+            var team1Name = nameList[Global.Rand.Next(0, nameList.Count)];
+            do team2Name = nameList[Global.Rand.Next(0, nameList.Count)];
+            while (string.Compare(team1Name, team2Name, false) == 0);
+
+            Team1 = new WarTeam(team1Name, team1Marbles, team1Boost);
+            Team2 = new WarTeam(team2Name, team2Marbles, team2Boost);
         }
 
         ~War() => Dispose(false);

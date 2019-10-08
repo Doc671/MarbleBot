@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace MarbleBot.Core
 {
@@ -9,7 +10,7 @@ namespace MarbleBot.Core
         /// <summary> The damage dealt by the weapon. </summary>
         public int Accuracy { get; }
         /// <summary> The ID of the ammo used by the ranged weapon. </summary>
-        public uint[] Ammo { get; }
+        public ImmutableArray<uint> Ammo { get; }
         /// <summary> The damage dealt by the weapon. </summary>
         public int Damage { get; }
         /// <summmary> The number of times the weapon attacks. </summmary>
@@ -27,7 +28,7 @@ namespace MarbleBot.Core
                                                                       craftingStationRequired)
         {
             Accuracy = accuracy;
-            Ammo = ammo;
+            Ammo = ImmutableArray.Create(ammo);
             Damage = damage;
             Uses = uses;
             WarClass = warClass;

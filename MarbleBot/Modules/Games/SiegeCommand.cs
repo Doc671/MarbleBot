@@ -38,7 +38,7 @@ namespace MarbleBot.Modules.Games
 
             if (SiegeInfo.ContainsKey(fileId) && SiegeInfo[fileId].Active)
             {
-                await ReplyAsync("A battle is currently ongoing!");
+                await SendErrorAsync("A battle is currently ongoing!");
                 return;
             }
             // Get marbles
@@ -73,72 +73,75 @@ namespace MarbleBot.Modules.Games
                 }
                 SiegeInfo.GetOrAdd(fileId, new Siege(Context, marbles));
             }
-            if (marbleCount == 0) await ReplyAsync("It doesn't look like anyone has signed up!");
-            else
+
+            if (marbleCount == 0)
             {
-                var currentSiege = SiegeInfo[fileId];
-                currentSiege.Active = true;
-
-                // Pick boss & set battle stats based on boss
-                if (over.Contains("override") && (Context.User.Id == Global.OwnerId || Context.IsPrivate))
-                    currentSiege.Boss = Siege.GetBoss(over.Split(' ')[1].RemoveChar(' '));
-                else if (string.Compare(currentSiege.Boss.Name, "", true) == 0)
-                {
-                    int stageTotal = 0;
-                    foreach (var marble in currentSiege.Marbles)
-                    {
-                        var user = GetUser(Context, marble.Id);
-                        stageTotal += user.Stage;
-                    }
-                    // Choose a stage 1 or stage 2 boss depending on the stage of each participant
-                    float stage = stageTotal / (float)currentSiege.Marbles.Count;
-                    if (stage == 1f) StageOneBossChooser(currentSiege);
-                    else if (stage == 2f) StageTwoBossChooser(currentSiege);
-                    else
-                    {
-                        stage--;
-                        if (Rand.NextDouble() < stage) StageTwoBossChooser(currentSiege);
-                        else StageOneBossChooser(currentSiege);
-                    }
-                }
-                var hp = ((int)currentSiege.Boss.Difficulty + 2) * 5;
-                foreach (var marble in currentSiege.Marbles)
-                    marble.SetHP(hp);
-
-                var marbles = new StringBuilder();
-                var pings = new StringBuilder();
-                foreach (var marble in currentSiege.Marbles)
-                {
-                    var user = Context.Client.GetUser(marble.Id);
-                    marbles.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
-                    if (GetUser(Context, marble.Id).SiegePing) pings.Append($"<@{marble.Id}> ");
-                }
-
-                // Siege Start
-                var countdownMessage = await ReplyAsync("**3**");
-                await Task.Delay(1000);
-                await countdownMessage.ModifyAsync(m => m.Content = "**2**");
-                await Task.Delay(1000);
-                await countdownMessage.ModifyAsync(m => m.Content = "**1**");
-                await Task.Delay(1000);
-                await countdownMessage.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
-                currentSiege.Actions = Task.Run(async () => { await currentSiege.BossActions(Context); });
-                await ReplyAsync(embed: new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
-                    .WithTitle("The Siege has begun!")
-                    .WithThumbnailUrl(currentSiege.Boss.ImageUrl)
-                    .AddField($"Marbles: **{currentSiege.Marbles.Count}**", marbles.ToString())
-                    .AddField($"Boss: **{currentSiege.Boss.Name}**", new StringBuilder()
-                        .AppendLine($"HP: **{currentSiege.Boss.HP}**")
-                        .AppendLine($"Attacks: **{currentSiege.Boss.Attacks.Count}**")
-                        .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), currentSiege.Boss.Difficulty)} {(int)currentSiege.Boss.Difficulty}**/10")
-                        .ToString())
-                    .Build());
-                if (pings.Length != 0 || (Context.User.Id == OwnerId && !over.Contains("noping")))
-                    await ReplyAsync(pings.ToString());
+                await SendErrorAsync("It doesn't look like anyone has signed up!");
+                return;
             }
+
+            var currentSiege = SiegeInfo[fileId];
+            currentSiege.Active = true;
+
+            // Pick boss & set battle stats based on boss
+            if (over.Contains("override") && (Context.User.Id == Global.OwnerId || Context.IsPrivate))
+                currentSiege.Boss = Siege.GetBoss(over.Split(' ')[1].RemoveChar(' '));
+            else if (string.Compare(currentSiege.Boss.Name, "", true) == 0)
+            {
+                int stageTotal = 0;
+                foreach (var marble in currentSiege.Marbles)
+                {
+                    var user = GetUser(Context, marble.Id);
+                    stageTotal += user.Stage;
+                }
+                // Choose a stage 1 or stage 2 boss depending on the stage of each participant
+                float stage = stageTotal / (float)currentSiege.Marbles.Count;
+                if (stage == 1f) StageOneBossChooser(currentSiege);
+                else if (stage == 2f) StageTwoBossChooser(currentSiege);
+                else
+                {
+                    stage--;
+                    if (Rand.NextDouble() < stage) StageTwoBossChooser(currentSiege);
+                    else StageOneBossChooser(currentSiege);
+                }
+            }
+            var hp = ((int)currentSiege.Boss.Difficulty + 2) * 5;
+            foreach (var marble in currentSiege.Marbles)
+                marble.SetHP(hp);
+
+            var marbleOutput = new StringBuilder();
+            var mentionOutput = new StringBuilder();
+            foreach (var marble in currentSiege.Marbles)
+            {
+                var user = Context.Client.GetUser(marble.Id);
+                marbleOutput.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
+                if (GetUser(Context, marble.Id).SiegePing) mentionOutput.Append($"<@{marble.Id}> ");
+            }
+
+            // Siege Start
+            var countdownMessage = await ReplyAsync("**3**");
+            await Task.Delay(1000);
+            await countdownMessage.ModifyAsync(m => m.Content = "**2**");
+            await Task.Delay(1000);
+            await countdownMessage.ModifyAsync(m => m.Content = "**1**");
+            await Task.Delay(1000);
+            await countdownMessage.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
+            currentSiege.Actions = Task.Run(async () => { await currentSiege.BossActions(Context); });
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
+                .WithTitle("The Siege has begun!")
+                .WithThumbnailUrl(currentSiege.Boss.ImageUrl)
+                .AddField($"Marbles: **{currentSiege.Marbles.Count}**", marbleOutput.ToString())
+                .AddField($"Boss: **{currentSiege.Boss.Name}**", new StringBuilder()
+                    .AppendLine($"HP: **{currentSiege.Boss.HP}**")
+                    .AppendLine($"Attacks: **{currentSiege.Boss.Attacks.Count}**")
+                    .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), currentSiege.Boss.Difficulty)} {(int)currentSiege.Boss.Difficulty}**/10")
+                    .ToString())
+                .Build());
+            if (mentionOutput.Length != 0 || (Context.User.Id == OwnerId && !over.Contains("noping")))
+                await ReplyAsync(mentionOutput.ToString());
         }
 
         [Command("stop")]

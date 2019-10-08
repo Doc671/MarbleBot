@@ -45,97 +45,99 @@ namespace MarbleBot.Modules.Games
                     if (!string.IsNullOrEmpty(line)) marbleCount++;
                 }
             }
+
             if (marbleCount == 0)
-                await ReplyAsync("It doesn't look like anyone has signed up!");
-            else
             {
-                // Get marbles
-                var marbles = new List<(string, ulong)>();
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}race.csv"))
-                {
-                    while (!marbleList.EndOfStream)
-                    {
-                        var line = (await marbleList.ReadLineAsync()).Split(',');
-                        marbles.Add((line[0], ulong.Parse(line[1])));
-                    }
-                    marbleList.Close();
-                }
-
-                // Get the death messages
-                var messages = new List<string>();
-                using (var messageFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceDeathMessages.txt"))
-                {
-                    while (!messageFile.EndOfStream)
-                        messages.Add(await messageFile.ReadLineAsync());
-                }
-
-                // Race start
-                builder.WithTitle("The race has started!");
-                var msg = await ReplyAsync(embed: builder.Build());
-                await Task.Delay(1500);
-
-                for (int alive = marbleCount; alive > 1; alive--)
-                {
-                    int eliminated = 0;
-                    do eliminated = Rand.Next(0, marbleCount);
-                    while (string.Compare(marbles[eliminated].Item1, "///out", true) == 0);
-                    string deathMessage;
-                    deathMessage = messages[Rand.Next(0, messages.Count - 1)];
-                    string bold = marbles[eliminated].Item1.Contains('*') || marbles[eliminated].Item1.Contains('\\') ? "" : "**";
-                    builder.AddField($"{bold}{marbles[eliminated].Item1}{bold} is eliminated!", $"{marbles[eliminated].Item1} {deathMessage} and is now out of the competition!");
-
-                    // A special message may be displayed depending on the name of last place
-                    if (alive == marbleCount && marbleCount > 1)
-                    {
-                        string json;
-                        using (var messageList = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceSpecialMessages.json"))
-                            json = messageList.ReadToEnd();
-                        var messageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                        var marbleName = marbles[eliminated].Item1.ToLower().RemoveChar(' ');
-                        if (messageDict.ContainsKey(marbleName)) builder.WithDescription($"*{messageDict[marbleName]}*");
-                    }
-
-                    marbles[eliminated] = ("///out", marbles[eliminated].Item2);
-                    await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
-                    await Task.Delay(1500);
-                }
-
-                // Race finish
-                var winningMarble = marbles.Find(m => string.Compare(m.Item1, "///out") != 0);
-                string bold2 = winningMarble.Item1.Contains('*') || winningMarble.Item1.Contains('\\') ? "" : "**";
-                builder.AddField($"{bold2}{winningMarble.Item1}{bold2} wins!", winningMarble.Item1 + " is the winner!");
-                if (marbleCount > 1)
-                {
-                    using var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}RaceWinners.txt", true);
-                    await racers.WriteLineAsync(winningMarble.Item1);
-                }
-                await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
-                await ReplyAsync($"**{winningMarble.Item1}** won the race!");
-
-                // Reward winner
-                var obj = GetUsersObject();
-                var user = GetUser(Context, obj, winningMarble.Item2);
-                if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
-                {
-                    var noOfSameUser = 0;
-                    foreach (var marble in marbles) if (marble.Item2 == winningMarble.Item2) noOfSameUser++;
-                    var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(marbleCount) / noOfSameUser) - 1) * 100, 2));
-                    if (gift > 0)
-                    {
-                        if (user.Items.ContainsKey(83)) gift *= 3;
-                        user.Balance += gift;
-                        user.NetWorth += gift;
-                        user.LastRaceWin = DateTime.UtcNow;
-                        user.RaceWins++;
-                        obj.Remove(winningMarble.Item2.ToString());
-                        obj.Add(new JProperty(winningMarble.Item2.ToString(), JObject.FromObject(user)));
-                        WriteUsers(obj);
-                        await ReplyAsync($"**{user.Name}** won {UoM}**{gift:n2}** for winning the race!");
-                    }
-                }
-                using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}race.csv", false))
-                    await marbleList.WriteAsync("");
+                await SendErrorAsync("It doesn't look like anyone has signed up!");
+                return;
             }
+
+            // Get marbles
+            var marbles = new List<(string, ulong)>();
+            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}race.csv"))
+            {
+                while (!marbleList.EndOfStream)
+                {
+                    var line = (await marbleList.ReadLineAsync()).Split(',');
+                    marbles.Add((line[0], ulong.Parse(line[1])));
+                }
+                marbleList.Close();
+            }
+
+            // Get the death messages
+            var messages = new List<string>();
+            using (var messageFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceDeathMessages.txt"))
+            {
+                while (!messageFile.EndOfStream)
+                    messages.Add(await messageFile.ReadLineAsync());
+            }
+
+            // Race start
+            builder.WithTitle("The race has started!");
+            var msg = await ReplyAsync(embed: builder.Build());
+            await Task.Delay(1500);
+
+            for (int alive = marbleCount; alive > 1; alive--)
+            {
+                int eliminated = 0;
+                do eliminated = Rand.Next(0, marbleCount);
+                while (string.Compare(marbles[eliminated].Item1, "///out", true) == 0);
+                string deathMessage;
+                deathMessage = messages[Rand.Next(0, messages.Count - 1)];
+                string bold = marbles[eliminated].Item1.Contains('*') || marbles[eliminated].Item1.Contains('\\') ? "" : "**";
+                builder.AddField($"{bold}{marbles[eliminated].Item1}{bold} is eliminated!", $"{marbles[eliminated].Item1} {deathMessage} and is now out of the competition!");
+
+                // A special message may be displayed depending on the name of last place
+                if (alive == marbleCount && marbleCount > 1)
+                {
+                    string json;
+                    using (var messageList = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceSpecialMessages.json"))
+                        json = messageList.ReadToEnd();
+                    var messageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                    var marbleName = marbles[eliminated].Item1.ToLower().RemoveChar(' ');
+                    if (messageDict.ContainsKey(marbleName)) builder.WithDescription($"*{messageDict[marbleName]}*");
+                }
+
+                marbles[eliminated] = ("///out", marbles[eliminated].Item2);
+                await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
+                await Task.Delay(1500);
+            }
+
+            // Race finish
+            var winningMarble = marbles.Find(m => string.Compare(m.Item1, "///out") != 0);
+            string bold2 = winningMarble.Item1.Contains('*') || winningMarble.Item1.Contains('\\') ? "" : "**";
+            builder.AddField($"{bold2}{winningMarble.Item1}{bold2} wins!", winningMarble.Item1 + " is the winner!");
+            if (marbleCount > 1)
+            {
+                using var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}RaceWinners.txt", true);
+                await racers.WriteLineAsync(winningMarble.Item1);
+            }
+            await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
+            await ReplyAsync($"**{winningMarble.Item1}** won the race!");
+
+            // Reward winner
+            var obj = GetUsersObject();
+            var user = GetUser(Context, obj, winningMarble.Item2);
+            if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
+            {
+                var noOfSameUser = 0;
+                foreach (var marble in marbles) if (marble.Item2 == winningMarble.Item2) noOfSameUser++;
+                var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(marbleCount) / noOfSameUser) - 1) * 100, 2));
+                if (gift > 0)
+                {
+                    if (user.Items.ContainsKey(83)) gift *= 3;
+                    user.Balance += gift;
+                    user.NetWorth += gift;
+                    user.LastRaceWin = DateTime.UtcNow;
+                    user.RaceWins++;
+                    obj.Remove(winningMarble.Item2.ToString());
+                    obj.Add(new JProperty(winningMarble.Item2.ToString(), JObject.FromObject(user)));
+                    WriteUsers(obj);
+                    await ReplyAsync($"**{user.Name}** won {UoM}**{gift:n2}** for winning the race!");
+                }
+            }
+            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}race.csv", false))
+                await marbleList.WriteAsync("");
         }
 
         [Command("checkearn")]

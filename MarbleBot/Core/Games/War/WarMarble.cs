@@ -1,8 +1,13 @@
-﻿namespace MarbleBot.Core
+﻿using System;
+
+namespace MarbleBot.Core
 {
     /// <summary> Represents a marble during a war game. </summary>
     public class WarMarble : BaseMarble
     {
+        public bool Boosted { get; set; } = false;
+        public DateTime LastRage { get; set; } = DateTime.MinValue;
+        public bool Rage { get; set; } = false;
         public int Team { get; set; }
         public WeaponClass WarClass { get; }
         public Weapon Weapon { get; }

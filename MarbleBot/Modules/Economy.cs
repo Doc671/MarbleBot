@@ -321,9 +321,7 @@ namespace MarbleBot.Modules
         [Summary("Shows all the items a user has.")]
         public async Task InventoryCommand([Remainder] string rawSearchTerm = "")
         {
-            var user = new MarbleBotUser();
-            var id = Context.User.Id;
-            var searchTermParts = rawSearchTerm.Split(' ');
+            var searchTermParts = rawSearchTerm.Length == 0 ? Array.Empty<string>(): rawSearchTerm.Split(' ');
             int page = 1;
             var name = new StringBuilder();
 
@@ -342,7 +340,9 @@ namespace MarbleBot.Modules
                 return;
             }
 
+            ulong id = Context.User.Id;
             var searchTerm = name.ToString();
+            var user = new MarbleBotUser();
             if (string.IsNullOrEmpty(searchTerm))
             {
                 user = GetUser(Context);
@@ -530,18 +530,17 @@ namespace MarbleBot.Modules
                 id = ulong.Parse(foundUser.Key);
                 user = foundUser.Value;
             }
-
-            // Set each date-based property to N/A if the value is 2019-01-01
+            
             var lastDaily = user.LastDaily.ToString("yyyy-MM-dd HH:mm:ss");
-            if (user.LastDaily.Year == 2019 && user.LastDaily.DayOfYear == 1) lastDaily = "N/A";
+            if (user.LastDaily.Year == 1) lastDaily = "N/A";
             var lastRaceWin = user.LastRaceWin.ToString("yyyy-MM-dd HH:mm:ss");
-            if (user.LastRaceWin.Year == 2019 && user.LastRaceWin.DayOfYear == 1) lastRaceWin = "N/A";
+            if (user.LastRaceWin.Year == 1) lastRaceWin = "N/A";
             var lastScavenge = user.LastScavenge.ToString("yyyy-MM-dd HH:mm:ss");
-            if (user.LastScavenge.Year == 2019 && user.LastScavenge.DayOfYear == 1) lastScavenge = "N/A";
+            if (user.LastScavenge.Year == 1) lastScavenge = "N/A";
             var lastSiegeWin = user.LastSiegeWin.ToString("yyyy-MM-dd HH:mm:ss");
-            if (user.LastSiegeWin.Year == 2019 && user.LastSiegeWin.DayOfYear == 1) lastSiegeWin = "N/A";
+            if (user.LastSiegeWin.Year == 1) lastSiegeWin = "N/A";
             var lastWarWin = user.LastWarWin.ToString("yyyy-MM-dd HH:mm:ss");
-            if (user.LastWarWin.Year == 2019 && user.LastWarWin.DayOfYear == 1) lastWarWin = "N/A";
+            if (user.LastWarWin.Year == 1) lastWarWin = "N/A";
 
             var author = Context.Client.GetUser(id);
             var builder = new EmbedBuilder()

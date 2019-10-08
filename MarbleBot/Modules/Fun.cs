@@ -392,13 +392,13 @@ namespace MarbleBot.Modules
             string json;
             using (var specialMessages = new StreamReader($"Resources{Path.DirectorySeparatorChar}RateSpecialMessages.json"))
                 json = specialMessages.ReadToEnd();
-            Dictionary<string, RateInfo> messageDict = JsonConvert.DeserializeObject<Dictionary<string, RateInfo>>(json);
+            var messageDict = JsonConvert.DeserializeObject<Dictionary<string, (string input, string message, int rating)>>(json);
 
             if (messageDict.ContainsKey(lowerInput))
             {
-                if (messageDict[lowerInput].Input != null) input = messageDict[lowerInput].Input;
-                if (messageDict[lowerInput].Message != null) message = messageDict[lowerInput].Message;
-                if (messageDict[lowerInput].Rating != -3) rating = messageDict[lowerInput].Rating;
+                if (messageDict[lowerInput].input != null) input = messageDict[lowerInput].input;
+                if (messageDict[lowerInput].message != null) message = messageDict[lowerInput].message;
+                if (messageDict[lowerInput].rating != -3) rating = messageDict[lowerInput].rating;
             }
 
             string emoji = rating switch

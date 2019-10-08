@@ -19,19 +19,11 @@ namespace MarbleBot.Core
         /// <summary> The marble's status ailment. </summary>
         public StatusEffect StatusEffect { get; set; }
         /// <summary> The time at which the marble had been doomed. </summary>
-        public DateTime DoomStart { get; set; }
+        public DateTime DoomStart { get; set; } = DateTime.MinValue;
         /// <summary> The last time the marble was damaged by poison. </summary>
-        public DateTime LastPoisonTick { get; set; }
+        public DateTime LastPoisonTick { get; set; } = DateTime.MinValue;
         /// <summary> The last time the marble was stunned. </summary>
-        public DateTime LastStun { get; set; }
-
-        /// <summary> Represents a marble during a Siege game. </summary>
-        public SiegeMarble()
-        {
-            DoomStart = DateTime.Parse("2019-01-01 00:00:00");
-            LastStun = DateTime.Parse("2019-01-01 00:00:00");
-            LastPoisonTick = DateTime.Parse("2019-01-01 00:00:00");
-        }
+        public DateTime LastStun { get; set; } = DateTime.MinValue;
 
         /// <summary> Converts this marble into a string representation. </summary>
         public override string ToString() => $"{Name} HP: {HP}/20 [{Id}] BH: {DamageDealt} PH: {PowerUpHits} Cloned: {Cloned}";

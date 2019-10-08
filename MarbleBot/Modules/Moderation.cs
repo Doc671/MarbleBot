@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 namespace MarbleBot.Modules
 {
     /// <summary> Moderation commands. </summary>
+    [RequireContext(ContextType.Guild)]
+    [RequireUserPermission(GuildPermission.ManageChannels)]
     public class Moderation : MarbleBotModule
     {
         [Command("addrole")]
         [Summary("Adds a role to the role list.")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task AddRoleCommand([Remainder] string searchTerm)
         {
             if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0))
@@ -34,9 +34,8 @@ namespace MarbleBot.Modules
         }
 
         [Command("addwarningsheet")]
-        [Alias("addwsheet", "addsheet")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
+        [Alias("addwsheet", "addsheet", "setsheet", "setwsheet", "setwarningsheet")]
+        [Summary("Sets the server's warning sheet link.")]
         public async Task AddWarningSheetCommand(string link)
         {
             var guild = GetGuild(Context);
@@ -47,7 +46,6 @@ namespace MarbleBot.Modules
 
         [Command("clear")]
         [Summary("Deletes the specified amount of messages.")]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         public async Task ClearCommand(uint amount)
         {
@@ -61,8 +59,6 @@ namespace MarbleBot.Modules
 
         [Command("clearchannel")]
         [Summary("Clears channels.")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task ClearChannelCommand(string option)
         {
             var guild = GetGuild(Context);
@@ -81,8 +77,6 @@ namespace MarbleBot.Modules
         [Alias("clear-recent-spam")]
         [Summary("Clears recent empty messages")]
         [RequireBotPermission(ChannelPermission.ManageMessages)]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task ClearRecentSpamCommand(string rguild, string rchannel)
         {
             var guild = ulong.Parse(rguild);
@@ -384,8 +378,6 @@ namespace MarbleBot.Modules
 
         [Command("removerole")]
         [Summary("Removes a role from the role list.")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task RemoveRoleCommand([Remainder] string searchTerm)
         {
             var guild = GetGuild(Context);
@@ -403,8 +395,6 @@ namespace MarbleBot.Modules
 
         [Command("setchannel")]
         [Summary("Sets a channel.")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task SetChannelAsync(string option, string rawChannel)
         {
             if (!ulong.TryParse(rawChannel.RemoveChar('<').RemoveChar('>').RemoveChar('#'), out ulong channel))
@@ -427,8 +417,6 @@ namespace MarbleBot.Modules
         [Command("setcolor")]
         [Alias("setcolour", "setembedcolor", "setembedcolour")]
         [Summary("Sets the embed colour of the guild using a hexadecimal colour string.")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageChannels)]
         public async Task SetColorCommand(string input)
         {
             if (!uint.TryParse(input, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _))
@@ -442,17 +430,22 @@ namespace MarbleBot.Modules
             await ReplyAsync("Successfully updated.");
         }
 
+        [Command("setslowmode")]
+        [Summary("Sets the slowmode interval of a channel (in seconds).")]
+        [RequireBotPermission(ChannelPermission.ManageChannels)]
+        public async Task SetSlowmodeCommand(Discord.WebSocket.SocketTextChannel textChannel, int slowmodeInterval)
+        {
+            await textChannel.ModifyAsync(c => c.SlowModeInterval = slowmodeInterval);
+            await ReplyAsync($"Successfully updated the slowmode interval of <#{textChannel.Id}> to **{slowmodeInterval}** second{(slowmodeInterval == 1 ? "" : "s")}.");
+        }
+
         [Command("warn", RunMode = RunMode.Async)]
         [Summary("Warns a user.")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task WarnCommand(IGuildUser user, string warningCode, int warningsToGive)
             => await WarnUserAsync(Context, user, warningCode, warningsToGive);
 
         [Command("warn", RunMode = RunMode.Async)]
         [Summary("Warns a user.")]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task WarnCommand(ulong userId, string warningCode, int warningsToGive)
         {
             if (Context.Guild.Users.Any(u => u.Id == userId))
