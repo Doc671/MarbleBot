@@ -1,11 +1,11 @@
 # ignore Visual Studio solution settings
 .vs
 .vscode
-MarbleBot/.vscode
+src/.vscode
 
 # ignore NuGet packages
 packages
 
 # ignore build & object folders
-MarbleBot/bin
-MarbleBot/obj
+src/bin
+src/obj
