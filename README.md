@@ -34,3 +34,17 @@ Play in a Marble War battle!
 Attack the members of the opposing team! If there is an odd number of contestants, an AI marble joins the team with fewer fighters!
 
 ![mb/war](https://cdn.discordapp.com/attachments/296376584238137355/583228188260433920/unknown.png "A war battle")
+
+## Setup
+
+A file named `BotCredentials.json` will need to be present in the executable's working directory. Use the following template:
+```json
+{
+  "Token": "",
+  "GoogleApiKey": "",
+  "AdminIds": [ 224267581370925056 ],
+  "DebugChannel": 409655798730326016
+}
+```
+
+`GoogleApiKey` must be present to use the YouTube commands and the Google Sheets-based moderation system.

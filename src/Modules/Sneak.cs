@@ -98,6 +98,7 @@ namespace MarbleBot.Modules
 
         [Command("logs")]
         [Summary("Shows the contents of the current log file.")]
+        [RequireOwner]
         public async Task LogCommand()
         {
             string logs;
