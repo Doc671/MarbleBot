@@ -127,19 +127,21 @@ namespace MarbleBot.Modules
         }
 
         /// <summary> Returns an instance of a MarbleBotUser with the ID of the SocketGuildUser. </summary>
-        protected internal static MarbleBotUser GetUser(SocketCommandContext context)
+        protected internal static MarbleBotUser GetUser(ICommandContext context)
         {
             var obj = GetUsersObject();
             MarbleBotUser user;
             if (obj.ContainsKey(context.User.Id.ToString()))
             {
                 user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
+                user.Id = context.User.Id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {
                 user = new MarbleBotUser()
                 {
+                    Id = context.User.Id,
                     Name = context.User.Username,
                     Discriminator = context.User.Discriminator,
                 };
@@ -148,19 +150,21 @@ namespace MarbleBot.Modules
         }
 
         /// <summary> Returns an instance of a MarbleBotUser with the given ID. </summary>
-        protected internal static MarbleBotUser GetUser(SocketCommandContext context, ulong Id)
+        protected internal static MarbleBotUser GetUser(ICommandContext context, ulong id)
         {
             var obj = GetUsersObject();
             MarbleBotUser user;
-            if (obj.ContainsKey(Id.ToString()))
+            if (obj.ContainsKey(id.ToString()))
             {
-                user = obj[Id.ToString()].ToObject<MarbleBotUser>();
-                if (string.IsNullOrEmpty(obj[Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
+                user = obj[id.ToString()].ToObject<MarbleBotUser>();
+                user.Id = id;
+                if (string.IsNullOrEmpty(obj[id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {
                 user = new MarbleBotUser()
                 {
+                    Id = context.User.Id,
                     Name = context.User.Username,
                     Discriminator = context.User.Discriminator,
                 };
@@ -169,18 +173,20 @@ namespace MarbleBot.Modules
         }
 
         /// <summary> Returns an instance of a MarbleBotUser with the ID of the SocketGuildUser in the given JObject. </summary>
-        protected internal static MarbleBotUser GetUser(SocketCommandContext context, JObject obj)
+        protected internal static MarbleBotUser GetUser(ICommandContext context, JObject obj)
         {
             MarbleBotUser user;
             if (obj.ContainsKey(context.User.Id.ToString()))
             {
                 user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
+                user.Id = context.User.Id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {
                 user = new MarbleBotUser()
                 {
+                    Id = context.User.Id,
                     Name = context.User.Username,
                     Discriminator = context.User.Discriminator,
                 };
@@ -189,32 +195,23 @@ namespace MarbleBot.Modules
         }
 
         /// <summary> Returns an instance of a MarbleBotUser with the given ID in the given JObject. </summary>
-        protected internal static MarbleBotUser GetUser(SocketCommandContext context, JObject obj, ulong id)
+        protected internal static async Task<MarbleBotUser> GetUserAsync(ICommandContext context, JObject obj, ulong id)
         {
             MarbleBotUser user;
             if (obj.ContainsKey(id.ToString()))
             {
                 user = obj[id.ToString()].ToObject<MarbleBotUser>();
+                user.Id = id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
             }
             else
             {
-                if (context.IsPrivate)
+                user = new MarbleBotUser()
                 {
-                    user = new MarbleBotUser()
-                    {
-                        Name = context.User.Username,
-                        Discriminator = context.User.Discriminator,
-                    };
-                }
-                else
-                {
-                    user = new MarbleBotUser()
-                    {
-                        Name = context.Guild.GetUser(id).Username,
-                        Discriminator = context.Guild.GetUser(id).Discriminator,
-                    };
-                }
+                    Id = context.User.Id,
+                    Name = (await context.Client.GetUserAsync(id)).Username,
+                    Discriminator = (await context.Client.GetUserAsync(id)).Discriminator,
+                };
             }
             return user;
         }

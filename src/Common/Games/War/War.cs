@@ -81,7 +81,7 @@ namespace MarbleBot.Common
             var obj = GetUsersObject();
             foreach (var marble in winningTeam.Marbles)
             {
-                var user = GetUser(context, obj, marble.Id);
+                var user = await GetUserAsync(context, obj, marble.Id);
                 if (DateTime.UtcNow.Subtract(user.LastWarWin).TotalHours > 6)
                 {
                     var output = new StringBuilder();

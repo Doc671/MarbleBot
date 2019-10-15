@@ -21,30 +21,10 @@ namespace MarbleBot.Modules
         [Command("balance")]
         [Alias("credits", "money", "bal")]
         [Summary("Returns how much money you or someone else has.")]
-        public async Task BalanceCommand([Remainder] string searchTerm = "")
+        public async Task BalanceCommand([Remainder] MarbleBotUser user = null)
         {
-            var user = new MarbleBotUser();
-            var id = Context.User.Id;
-            if (string.IsNullOrEmpty(searchTerm)) user = GetUser(Context);
-            else
-            {
-                string json;
-                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
-                var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
-                || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
-                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
-
-                if (foundUser.Value == null)
-                {
-                    await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
-                    return;
-                }
-
-                id = ulong.Parse(foundUser.Key);
-                user = foundUser.Value;
-            }
-            var author = Context.Client.GetUser(id);
+            user ??= GetUser(Context);
+            var author = Context.Client.GetUser(user.Id);
             var builder = new EmbedBuilder()
                 .WithAuthor(author)
                 .WithCurrentTimestamp()
@@ -57,18 +37,11 @@ namespace MarbleBot.Modules
         [Command("buy")]
         [Alias("buyitem")]
         [Summary("Buys items.")]
-        public async Task BuyCommand(string rawId, string rawNoOfItems = "1")
+        public async Task BuyCommand(Item item, int noOfItems = 1)
         {
-            if (!int.TryParse(rawNoOfItems, out int noOfItems) && noOfItems > 0)
+            if (noOfItems < 1)
             {
-                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
-                return;
-            }
-
-            var item = GetItem<Item>(rawId);
-            if (item == null)
-            {
-                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
+                await SendErrorAsync($"**{Context.User.Username}**, invalid number of items! Use `mb/help buy` to see how the command works.");
                 return;
             }
 
@@ -108,7 +81,7 @@ namespace MarbleBot.Modules
 
         [Command("craft")]
         [Summary("Crafts an item out of other items.")]
-        public async Task CraftCommand(string searchTerm, string rawNoOfItems = "1")
+        public async Task CraftCommand(Item requestedItem, int noOfItems = 1)
         {
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
@@ -118,10 +91,6 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (!int.TryParse(rawNoOfItems, out int noOfItems))
-                searchTerm += rawNoOfItems;
-
-            var requestedItem = GetItem<Item>(searchTerm);
             if (requestedItem.CraftingStationRequired == 2 && !user.Items.ContainsKey(62))
             {
                 await SendErrorAsync($"**{Context.User.Username}**, your current Crafting Station cannot craft this item!");
@@ -242,15 +211,15 @@ namespace MarbleBot.Modules
             }
             else
             {
-                var ADayAgo = DateTime.UtcNow.AddDays(-1);
-                await ReplyAsync($"You need to wait for **{GetDateString(user.LastDaily.Subtract(ADayAgo))}** until you can get your daily gift again!");
+                var aDayAgo = DateTime.UtcNow.AddDays(-1);
+                await ReplyAsync($"You need to wait for **{GetDateString(user.LastDaily.Subtract(aDayAgo))}** until you can get your daily gift again!");
             }
         }
 
         [Command("dismantle")]
         [Alias("decraft", "disassemble", "dismantle")]
         [Summary("Turns a crafted item back into its ingredients.")]
-        public async Task DecraftCommand(string searchTerm, string rawNoOfItems = "1")
+        public async Task DecraftCommand(Item requestedItem, int noOfItems = 1)
         {
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
@@ -260,13 +229,10 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (!int.TryParse(rawNoOfItems, out int noOfItems))
-                searchTerm += rawNoOfItems;
-
-            var requestedItem = GetItem<Item>(searchTerm);
             if (requestedItem == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, invalid item ID!");
+                return;
             }
 
             if (requestedItem.CraftingProduced == 0)
@@ -401,64 +367,57 @@ namespace MarbleBot.Modules
         [Command("item")]
         [Alias("iteminfo")]
         [Summary("Returns information about an item.")]
-        public async Task ItemCommand([Remainder] string searchTerm)
+        public async Task ItemCommand([Remainder] Weapon weapon)
         {
-            var item = GetItem<Weapon>(searchTerm);
-            if (item == null)
-            {
-                await SendErrorAsync($"Invalid item ID and/or number of items! Use `mb/help buy` to see how the command works.");
-                return;
-            }
-
             var user = GetUser(Context);
-            if (item.Stage > user.Stage)
+            if (weapon.Stage > user.Stage)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
                     .WithDescription($"{StageTooHighString()}\n\nYou are unable to view information about this item!")
-                    .WithTitle(item.Name)
+                    .WithTitle(weapon.Name)
                     .Build());
                 return;
             }
 
-            var price = item.Price == -1 ? "N/A" : $"{UoM}{item.Price:n2}";
+            var price = weapon.Price == -1 ? "N/A" : $"{UoM}{weapon.Price:n2}";
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithDescription(item.Description)
-                .WithTitle(item.Name)
-                .AddField("ID", $"{item.Id:000}", true)
+                .WithDescription(weapon.Description)
+                .WithTitle(weapon.Name)
+                .AddField("ID", $"{weapon.Id:000}", true)
                 .AddField("Price", price, true)
-                .AddField("For Sale", item.OnSale ? "Yes" : "No", true)
-                .AddField("Scavenge Location", Enum.GetName(typeof(ScavengeLocation), item.ScavengeLocation), true);
+                .AddField("For Sale", weapon.OnSale ? "Yes" : "No", true)
+                .AddField("Scavenge Location", Enum.GetName(typeof(ScavengeLocation), weapon.ScavengeLocation), true);
 
-            if (user.Stage > 1) builder.AddField("Stage", item.Stage, true);
+            if (user.Stage > 1) builder.AddField("Stage", weapon.Stage, true);
 
-            if (item.WarClass > 0)
+            if (weapon.WarClass > 0)
             {
                 builder.AddField("Weapon Info", new StringBuilder()
-                    .AppendLine($"Class: **{Enum.GetName(typeof(WeaponClass), item.WarClass)}**")
-                    .AppendLine($"Accuracy: **{item.Accuracy}**%")
-                    .AppendLine($"Damage: **{item.Damage}**")
-                    .AppendLine($"Uses: **{item.Uses}**"), true);
-                if (item.Ammo != null)
+                    .AppendLine($"Class: **{Enum.GetName(typeof(WeaponClass), weapon.WarClass)}**")
+                    .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
+                    .AppendLine($"Damage: **{weapon.Damage}**")
+                    .AppendLine($"Uses: **{weapon.Uses}**"), true);
+                if (weapon.Ammo.Length > 0)
                 {
                     var output = new StringBuilder();
-                    foreach (var itemId in item.Ammo)
+                    foreach (var itemId in weapon.Ammo)
                         output.AppendLine($"`[{itemId:000}]` {GetItem<Item>(itemId.ToString("000")).Name}");
                     builder.AddField("Ammo", output.ToString(), true);
                 }
             }
-            else if (item.Damage > 0)
-                builder.AddField("Ammo Damage", item.Damage, true);
+            else if (weapon.Damage > 0)
+                builder.AddField("Ammo Damage", weapon.Damage, true);
 
-            if (item.CraftingRecipe.Count > 0)
+            if (weapon.CraftingRecipe.Count > 0)
             {
                 var output = new StringBuilder();
-                foreach (var rawItem in item.CraftingRecipe)
+                foreach (var rawItem in weapon.CraftingRecipe)
                     output.AppendLine($"`[{rawItem.Key}]` {GetItem<Item>(rawItem.Key).Name}: {rawItem.Value}");
-                builder.AddField($"Crafting Recipe (produces **{item.CraftingProduced}**)", output.ToString());
+                builder.AddField($"Crafting Recipe (produces **{weapon.CraftingProduced}**)", output.ToString());
             }
 
             await ReplyAsync(embed: builder.Build());
@@ -507,30 +466,9 @@ namespace MarbleBot.Modules
         [Command("profile")]
         [Alias("stats")]
         [Summary("Returns the profile of you or someone else.")]
-        public async Task ProfileCommand([Remainder] string searchTerm = "")
+        public async Task ProfileCommand([Remainder] MarbleBotUser user = null)
         {
-            var user = new MarbleBotUser();
-            var id = Context.User.Id;
-            if (string.IsNullOrEmpty(searchTerm)) user = GetUser(Context);
-            else
-            {
-                string json;
-                using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
-                var rawUsers = JsonConvert.DeserializeObject<Dictionary<string, MarbleBotUser>>(json);
-                var foundUser = rawUsers.Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
-                || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
-                || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
-
-                if (foundUser.Value == null)
-                {
-                    await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
-                    return;
-                }
-
-                id = ulong.Parse(foundUser.Key);
-                user = foundUser.Value;
-            }
-
+            user ??= GetUser(Context);
             var lastDaily = user.LastDaily.ToString("yyyy-MM-dd HH:mm:ss");
             if (user.LastDaily.Year == 1) lastDaily = "N/A";
             var lastRaceWin = user.LastRaceWin.ToString("yyyy-MM-dd HH:mm:ss");
@@ -542,7 +480,7 @@ namespace MarbleBot.Modules
             var lastWarWin = user.LastWarWin.ToString("yyyy-MM-dd HH:mm:ss");
             if (user.LastWarWin.Year == 1) lastWarWin = "N/A";
 
-            var author = Context.Client.GetUser(id);
+            var author = Context.Client.GetUser(user.Id);
             var builder = new EmbedBuilder()
                 .WithAuthor(author)
                 .WithCurrentTimestamp()
@@ -696,18 +634,11 @@ namespace MarbleBot.Modules
         [Command("sell")]
         [Alias("sellitem")]
         [Summary("Sells items.")]
-        public async Task SellCommand(string rawId, string rawNoOfItems = "1")
+        public async Task SellCommand(Item item, int noOfItems)
         {
-            if (!int.TryParse(rawNoOfItems, out int noOfItems) && noOfItems > 0)
+            if (noOfItems < 1)
             {
-                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
-                return;
-            }
-
-            var item = GetItem<Item>(rawId);
-            if (item == null)
-            {
-                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID and/or number of items! Use `mb/help sell` to see how the command works.");
+                await SendErrorAsync($"**{Context.User.Username}**, invalid number of items! Use `mb/help sell` to see how the command works.");
                 return;
             }
 

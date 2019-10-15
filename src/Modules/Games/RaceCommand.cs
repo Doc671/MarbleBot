@@ -117,7 +117,7 @@ namespace MarbleBot.Modules.Games
 
             // Reward winner
             var obj = GetUsersObject();
-            var user = GetUser(Context, obj, winningMarble.Item2);
+            var user = await GetUserAsync(Context, obj, winningMarble.Item2);
             if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
             {
                 var noOfSameUser = 0;

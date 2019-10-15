@@ -24,6 +24,8 @@ namespace MarbleBot.Common
         public Item Shield { get; set; }
         /// <summary> The marble's damage increase multiplier. </summary>
         public int DamageIncrease { get; set; }
+        /// <summary> The last time the marble attacked. </summary>
+        public DateTime LastMoveUsed { get; set; } = DateTime.MinValue;
 
 
         /// <summary> Deals damage to a marble. </summary>

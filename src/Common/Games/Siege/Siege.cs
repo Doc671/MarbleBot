@@ -338,7 +338,7 @@ namespace MarbleBot.Common
             for (int i = 0; i < Marbles.Count; i++)
             {
                 var marble = Marbles[i];
-                var user = GetUser(context, obj, marble.Id);
+                var user = await GetUserAsync(context, obj, marble.Id);
                 var output = new StringBuilder();
 
                 // Advance user's stage if necessary
@@ -445,7 +445,7 @@ namespace MarbleBot.Common
             var ammo = new Ammo();
             var user = GetUser(context);
 
-            if (weapon.Ammo != null)
+            if (weapon.Ammo.Length > 0)
             {
                 for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
                 {

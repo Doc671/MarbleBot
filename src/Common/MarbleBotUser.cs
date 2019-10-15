@@ -6,6 +6,8 @@ namespace MarbleBot.Common
     /// <summary> Represents a user when using money or item-based commands. </summary>
     public class MarbleBotUser
     {
+        /// <summary> The ID of the user. </summary>
+        public ulong Id { get; set; } = 0;
         /// <summary> The name of the user. </summary>
         public string Name { get; set; } = "";
         /// <summary> The discriminator of the user. </summary>

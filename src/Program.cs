@@ -37,7 +37,6 @@ namespace MarbleBot
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<GamesService>()
-                .AddTransient<LogRunner>()
                 .AddLogging(loggingBuilder =>
                 {
                     loggingBuilder.ClearProviders();
@@ -80,11 +79,11 @@ namespace MarbleBot
             await client.LoginAsync(TokenType.Bot, _botCredentials.Token).ConfigureAwait(false);
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
-            _logger.Info("Logged in at {0:yyyy-MM-dd HH:mm:ss}", DateTime.UtcNow);
+            _logger.Info("Logged in", DateTime.UtcNow);
 
             await client.StartAsync();
 
-            await services.GetRequiredService<CommandHandler>().InitializeAsync();
+            await services.GetRequiredService<CommandHandler>().InitialiseAsync();
 
             await Task.Delay(-1);
         }

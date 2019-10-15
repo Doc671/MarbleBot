@@ -1,6 +1,8 @@
-﻿using Discord.Commands;
+﻿using Discord;
+using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Common;
+using MarbleBot.Common.TypeReaders;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using System;
@@ -13,6 +15,7 @@ namespace MarbleBot.Services
 {
     public class CommandHandler
     {
+        private readonly BotCredentials _botCredentials;
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
         private readonly Logger _logger;
@@ -21,18 +24,27 @@ namespace MarbleBot.Services
         public CommandHandler(IServiceProvider services)
         {
             _services = services;
+            _botCredentials = _services.GetRequiredService<BotCredentials>();
             _client = _services.GetRequiredService<DiscordSocketClient>();
             _commands = _services.GetRequiredService<CommandService>();
             _logger = LogManager.GetCurrentClassLogger();
-            _client.MessageReceived += HandleCommand;
         }
 
-        public async Task InitializeAsync()
+        public async Task InitialiseAsync()
         {
+            _client.MessageReceived += HandleCommandAsync;
+            _commands.CommandExecuted += OnCommandExecutedAsync;
+
+            _commands.AddTypeReader<Item>(new ItemTypeReader());
+            _commands.AddTypeReader<MarbleBotUser>(new MarbleBotUserTypeReader());
+            _commands.AddTypeReader<Weapon>(new WeaponTypeReader());
+
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services).ConfigureAwait(false);
+            
+            await _client.SetGameAsync("for mb/help!", type: ActivityType.Watching);
         }
 
-        private async Task HandleCommand(SocketMessage msg)
+        private async Task HandleCommandAsync(SocketMessage msg)
         {
             if (msg.Author.IsBot)
                 return;
@@ -51,38 +63,14 @@ namespace MarbleBot.Services
             if (userMsg.HasStringPrefix(guild.Prefix, ref argPos) &&
 #if DEBUG
             // If debugging, run commands in a single channel only
-            context.Channel.Id == 409655798730326016)
+            context.Channel.Id == _botCredentials.DebugChannel)
 #else
             // Otherwise, run as usual
             (context.IsPrivate || guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
 #endif
             {
                 await context.Channel.TriggerTypingAsync();
-                var result = await _commands.ExecuteAsync(context, argPos, _services);
-
-                if (!result.IsSuccess)
-                {
-                    switch (result.Error)
-                    {
-                        case CommandError.BadArgCount:
-                            await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
-                            break;
-                        case CommandError.ParseFailed:
-                            await context.Channel.SendMessageAsync("Failed to parse the given arguments. Use `mb/help <command name>` to see what type each argument should be.");
-                            return;
-                        case CommandError.UnmetPrecondition:
-                            await context.Channel.SendMessageAsync("Insufficient permissions.");
-                            break;
-                        case CommandError.UnknownCommand:
-                            await context.Channel.SendMessageAsync("Unknown command. Use `mb/help` to see what commands there are.");
-                            break;
-                        default:
-                            await context.Channel.SendMessageAsync("An error has occured.");
-                            _logger.Error($"{result.Error.Value}: {result.ErrorReason}");
-                            break;
-                    }
-                }
-
+                await _commands.ExecuteAsync(context, argPos, _services);
             }
             else if (!context.IsPrivate && guild.AutoresponseChannel == context.Channel.Id)
             {
@@ -100,6 +88,32 @@ namespace MarbleBot.Services
             }
 
             if (context.IsPrivate) _logger.Info("{0}: {1}", context.User, context.Message);
+        }
+
+        private async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        {
+            if (!result.IsSuccess)
+            {
+                switch (result.Error)
+                {
+                    case CommandError.BadArgCount:
+                        await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
+                        break;
+                    case CommandError.ParseFailed:
+                        await context.Channel.SendMessageAsync("Failed to parse the given arguments. Use `mb/help <command name>` to see what type each argument should be.");
+                        break;
+                    case CommandError.UnmetPrecondition:
+                        await context.Channel.SendMessageAsync("Insufficient permissions.");
+                        break;
+                    case CommandError.UnknownCommand:
+                        await context.Channel.SendMessageAsync("Unknown command. Use `mb/help` to see what commands there are.");
+                        break;
+                    default:
+                        await context.Channel.SendMessageAsync("An error has occured.");
+                        _logger.Error($"{result.Error.Value}: {result.ErrorReason}");
+                        break;
+                }
+            }
         }
     }
 }
