@@ -113,7 +113,7 @@ namespace MarbleBot.Modules.Games
                 await racers.WriteLineAsync(winningMarble.Item1);
             }
             await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
-            await ReplyAsync($"**{winningMarble.Item1}** won the race!");
+            await ReplyAsync($"{bold2}{winningMarble.Item1}{bold2} won the race!");
 
             // Reward winner
             var obj = GetUsersObject();

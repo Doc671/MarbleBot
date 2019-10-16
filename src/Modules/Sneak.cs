@@ -141,8 +141,7 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task SeezunCommand(string seezun)
         {
-            var obj = GetItemsObject();
-            var items = obj.ToObject<Dictionary<string, Item>>();
+            var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
             switch (seezun)
             {
                 case "limited":
@@ -175,7 +174,7 @@ namespace MarbleBot.Modules
             using (var itemFile = new JsonTextWriter(new StreamWriter($"Resources{Path.DirectorySeparatorChar}Items.json")))
             {
                 var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                serialiser.Serialize(itemFile, obj);
+                serialiser.Serialize(itemFile, JObject.FromObject(items));
             }
             await ReplyAsync("Successfully updated.");
         }

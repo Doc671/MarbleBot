@@ -235,6 +235,7 @@ namespace MarbleBot.Common
             _service.SiegeInfo.TryRemove(Id, out _);
             if (disposing && Actions != null)
             {
+                Actions.Wait();
                 Actions.Dispose();
             }
         }

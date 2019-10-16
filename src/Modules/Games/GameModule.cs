@@ -113,11 +113,12 @@ namespace MarbleBot.Modules.Games
             // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
             int state = BotCredentials.AdminIds.Any(id => id == context.User.Id) ? 3 : 0;
             var wholeFile = new StringBuilder();
+            string line;
             using (var marbleList = new StreamReader(marbleListDirectory))
             {
                 while (!marbleList.EndOfStream)
                 {
-                    var line = await marbleList.ReadLineAsync();
+                    line = await marbleList.ReadLineAsync();
                     if (string.Compare(line.Split(',')[0], marbleToRemove, true) == 0)
                     {
                         if (ulong.Parse(line.Split(',')[1]) == context.User.Id)
@@ -131,16 +132,18 @@ namespace MarbleBot.Modules.Games
                     else wholeFile.AppendLine(line);
                 }
             }
+            
             switch (state)
             {
                 case 0: await context.Channel.SendMessageAsync($"**{context.User.Username}**, could not find the requested marble!"); break;
                 case 1: await context.Channel.SendMessageAsync($"**{context.User.Username}**, this is not your marble!"); break;
                 case 2:
                 case 3:
+                    string bold = marbleToRemove.Contains('*') || marbleToRemove.Contains('\\') ? "" : "**";
                     using (var marbleList = new StreamWriter(marbleListDirectory, false))
                     {
                         await marbleList.WriteAsync(wholeFile.ToString());
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, removed contestant **{marbleToRemove}**!");
+                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, removed contestant {bold}{marbleToRemove}{bold}!");
                     }
                     break;
             }

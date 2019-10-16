@@ -233,6 +233,7 @@ namespace MarbleBot.Modules.Games
                     }
                 }
                 await ReplyAsync($"**{currentMarble.Name}**, could not find the enemy!");
+                return;
             }
 
             if (enemyMarble.HP < 0)
@@ -343,6 +344,7 @@ namespace MarbleBot.Modules.Games
                     }
                 }
                 await ReplyAsync($"**{currentMarble.Name}**, could not find the enemy!");
+                return;
             }
 
             if (enemyMarble.HP < 0)
@@ -639,7 +641,7 @@ namespace MarbleBot.Modules.Games
                 .AddField("How to play", new StringBuilder()
                         .AppendLine("Use `mb/war signup <weapon ID> <marble name>` to sign up as a marble!")
                         .AppendLine("When everyone's done, use `mb/war start`! The war begins automatically if 20 marbles have signed up.")
-                        .Append("\nWhen the war begins, use `mb/war attack <marble name>` to attack an enemy with your weapon")
+                        .Append("\nWhen the war begins, use `mb/war attack <marble code>` to attack an enemy with your weapon")
                         .AppendLine($" and `mb/war bash <marble name>` to attack without.{(GetUser(Context).Stage > 1 ? "Spikes are twice as effective with `mb/war bash`." : "")}")
                         .Append("\nEveryone is split into two teams. If there is an odd number of contestants, an AI marble joins")
                         .AppendLine(" the team that has fewer members!")

@@ -12,7 +12,7 @@
     "Description": "A hole-y drink of Qefpedun origin that contains Poup, acid, lava, rotten flesh and 13 different lethal diseases. Approved by Orange.",
     "OnSale": true,
     "ScavengeLocation": 0,
-    "CraftingProduced": 0,
+    "CraftingProduced": 1,
     "CraftingRecipe": {
       "020": 1,
       "021": 1,
