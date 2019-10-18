@@ -137,48 +137,6 @@ namespace MarbleBot.Modules
             }
         }
 
-        [Command("seezun")]
-        [RequireOwner]
-        public async Task SeezunCommand(string seezun)
-        {
-            var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
-            switch (seezun)
-            {
-                case "limited":
-                    items["002"] = new Item(items["002"], onSale: true);
-                    items["009"] = new Item(items["009"], onSale: true);
-                    break;
-                case "frozen":
-                    items["003"] = new Item(items["003"], onSale: true);
-                    goto case "limited";
-                case "orange":
-                    items["004"] = new Item(items["004"], onSale: true);
-                    goto case "limited";
-                case "electric":
-                    items["005"] = new Item(items["005"], onSale: true);
-                    goto case "limited";
-                case "burning":
-                    items["006"] = new Item(items["006"], onSale: true);
-                    goto case "limited";
-                case "rotten":
-                    items["007"] = new Item(items["007"], onSale: true);
-                    goto case "limited";
-                case "ulteymut":
-                    items["008"] = new Item(items["008"], onSale: true);
-                    goto case "limited";
-                default:
-                    for (int i = 2; i < 10; i++)
-                        items[$"00{i}"] = new Item(items[$"00{i}"], onSale: false);
-                    break;
-            }
-            using (var itemFile = new JsonTextWriter(new StreamWriter($"Resources{Path.DirectorySeparatorChar}Items.json")))
-            {
-                var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
-                serialiser.Serialize(itemFile, JObject.FromObject(items));
-            }
-            await ReplyAsync("Successfully updated.");
-        }
-
         [Command("setgame")]
         [RequireOwner]
         public async Task SetGameCommand([Remainder] string game)

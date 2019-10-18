@@ -197,7 +197,7 @@ namespace MarbleBot.Modules.Games
                 var ammoId = 0u;
                 for (int i = currentMarble.Weapon.Ammo.Length - 1; i >= 0; i--)
                 {
-                    if (user.Items.ContainsKey(currentMarble.Weapon.Ammo[i]) && user.Items[currentMarble.Weapon.Ammo[i]] >= currentMarble.Weapon.Uses)
+                    if (user.Items.ContainsKey(currentMarble.Weapon.Ammo[i]) && user.Items[currentMarble.Weapon.Ammo[i]] >= currentMarble.Weapon.Hits)
                     {
                         ammoId = currentMarble.Weapon.Ammo[i];
                         break;
@@ -211,8 +211,8 @@ namespace MarbleBot.Modules.Games
 
                 ammo = GetItem<Ammo>(ammoId.ToString("000"));
                 var obj = GetUsersObject();
-                user.Items[ammo.Id] -= currentMarble.Weapon.Uses;
-                user.NetWorth -= ammo.Price * currentMarble.Weapon.Uses;
+                user.Items[ammo.Id] -= currentMarble.Weapon.Hits;
+                user.NetWorth -= ammo.Price * currentMarble.Weapon.Hits;
                 WriteUsers(obj, Context.User, user);
             }
 
@@ -247,7 +247,7 @@ namespace MarbleBot.Modules.Games
                 .WithCurrentTimestamp()
                 .WithTitle($"**{currentMarble.Name}** attacks!");
             currentMarble.LastMoveUsed = DateTime.UtcNow;
-            if (currentMarble.Weapon.Uses == 1)
+            if (currentMarble.Weapon.Hits == 1)
             {
                 if (Rand.Next(0, 100) < currentMarble.Weapon.Accuracy)
                 {
@@ -266,7 +266,7 @@ namespace MarbleBot.Modules.Games
             else
             {
                 var totalDamage = 0;
-                for (int i = 0; i < currentMarble.Weapon.Uses; i++)
+                for (int i = 0; i < currentMarble.Weapon.Hits; i++)
                 {
                     if (Rand.Next(0, 100) < currentMarble.Weapon.Accuracy)
                     {

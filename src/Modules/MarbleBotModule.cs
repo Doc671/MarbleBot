@@ -21,7 +21,7 @@ namespace MarbleBot.Modules
         protected internal const ulong CM = 223616088263491595; // Community Marble
         protected internal const ulong THS = 224277738608001024; // The Hat Stoar
 
-        protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+        protected Logger Logger => LogManager.GetCurrentClassLogger();
 
         /// <summary> Gets colour for embed depending on guild </summary>
         protected internal static Color GetColor(SocketCommandContext context)
@@ -84,7 +84,7 @@ namespace MarbleBot.Modules
                     item = objItemPair.Value.ToObject<T>();
                     if (item.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(item.Name.ToLower()))
                     {
-                        item.Id = itemId;
+                        item.Id = uint.Parse(objItemPair.Key);
                         return item;
                     }
                 }
@@ -235,7 +235,7 @@ namespace MarbleBot.Modules
         {
             0 => "*Your inexperience blinds you...*",
             1 => "*Your vision is blurry...*",
-            2 => "*Screams echo in your head...*",
+            2 => "*Incomprehensible noises rattle in your head...*",
             3 => "*You sense a desk restricting your path...*",
             4 => "*You feel as if there is more to be done...*",
             _ => "*Your mind is wracked with pain...*",

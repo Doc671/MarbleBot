@@ -450,7 +450,7 @@ namespace MarbleBot.Common
             {
                 for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
                 {
-                    if (user.Items.ContainsKey(weapon.Ammo[i]) && user.Items[weapon.Ammo[i]] >= weapon.Uses)
+                    if (user.Items.ContainsKey(weapon.Ammo[i]) && user.Items[weapon.Ammo[i]] >= weapon.Hits)
                     {
                         ammo = GetItem<Ammo>(weapon.Ammo[i].ToString("000"));
                         break;
@@ -464,8 +464,8 @@ namespace MarbleBot.Common
                 }
 
                 var obj = GetUsersObject();
-                user.Items[ammo.Id] -= weapon.Uses;
-                user.NetWorth -= ammo.Price * weapon.Uses;
+                user.Items[ammo.Id] -= weapon.Hits;
+                user.NetWorth -= ammo.Price * weapon.Hits;
                 WriteUsers(obj, context.User, user);
             }
 
@@ -475,7 +475,7 @@ namespace MarbleBot.Common
                 .WithCurrentTimestamp()
                 .WithTitle(weapon.Name);
 
-            if (weapon.Uses == 1)
+            if (weapon.Hits == 1)
             {
                 if (Global.Rand.Next(0, 100) < weapon.Accuracy)
                 {
@@ -490,7 +490,7 @@ namespace MarbleBot.Common
             else
             {
                 var totalDamage = 0;
-                for (int i = 0; i < weapon.Uses; i++)
+                for (int i = 0; i < weapon.Hits; i++)
                 {
                     if (Global.Rand.Next(0, 100) < weapon.Accuracy)
                     {

@@ -37,7 +37,7 @@
     "Name": "Limited Edition Poup Soop",
     "Price": 552387946.00,
     "Description": "A special edition of Poup Soop that contains extra Poup, extra acid, extra lava, rotten-er flesh, 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
-    "OnSale": false,
+    "OnSale": true,
     "ScavengeLocation": 0
   },
   "003": {
@@ -72,7 +72,7 @@
     "Name": "Rotten Edition Poup Soop",
     "Price": 303496572188.00,
     "Description": "A special edition of Poup Soop with 6.66 times as much rotten flesh, twice as much acid and 21.25 lethal diseases. Approved by Orange.",
-    "OnSale": false,
+    "OnSale": true,
     "ScavengeLocation": 0
   },
   "008": {
@@ -424,7 +424,7 @@
     "Accuracy": 50,
     "Ammo": [ 48 ],
     "Damage": 16,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -442,7 +442,7 @@
     "Accuracy": 50,
     "Ammo": [ 48 ],
     "Damage": 16,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -460,7 +460,7 @@
     "Accuracy": 50,
     "Ammo": [ 48 ],
     "Damage": 16,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -478,7 +478,7 @@
     "Accuracy": 50,
     "Ammo": [ 48 ],
     "Damage": 18,
-    "Uses": 3,
+    "Hits": 3,
     "WarClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -854,7 +854,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 80,
     "Damage": 15,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -873,7 +873,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 95,
     "Damage": 8,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -891,7 +891,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 90,
     "Damage": 10,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -911,7 +911,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 95,
     "Damage": 9,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 1
   },
   "089": {
@@ -923,7 +923,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 85,
     "Damage": 10,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 1
   },
   "090": {
@@ -976,7 +976,7 @@
     "Accuracy": 80,
     "Ammo": [ 92 ],
     "Damage": 10,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -994,7 +994,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 95,
     "Damage": 5,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1010,7 +1010,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 85,
     "Damage": 6,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1029,7 +1029,7 @@
     "Accuracy": 85,
     "Ammo": [ 98, 100, 101 ],
     "Damage": 4,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1047,7 +1047,7 @@
     "Accuracy": 80,
     "Ammo": [ 98, 100, 101 ],
     "Damage": 8,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
@@ -1123,7 +1123,7 @@
     "ScavengeLocation": 0,
     "Accuracy": 90,
     "Damage": 12,
-    "Uses": 1,
+    "Hits": 1,
     "WarClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {

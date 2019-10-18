@@ -400,7 +400,7 @@ namespace MarbleBot.Modules
                     .AppendLine($"Class: **{Enum.GetName(typeof(WeaponClass), weapon.WarClass)}**")
                     .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
                     .AppendLine($"Damage: **{weapon.Damage}**")
-                    .AppendLine($"Uses: **{weapon.Uses}**"), true);
+                    .AppendLine($"Uses: **{weapon.Hits}**"), true);
                 if (weapon.Ammo.Length > 0)
                 {
                     var output = new StringBuilder();
