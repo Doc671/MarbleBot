@@ -32,7 +32,7 @@ namespace MarbleBot.Common
         /// <summary> The ID of the user's DM or guild where the siege is being played. </summary>
         public ulong Id { get; }
         /// <summary> The last time a Morale Boost power-up was activated. </summary>
-        public DateTime LastMorale { get; set; } = new DateTime(2019, 1, 1);
+        public DateTime LastMorale { get; set; } = DateTime.MinValue;
         /// <summary> The marbles (player characters) fighting the boss. </summary>
         public List<SiegeMarble> Marbles { get; set; }
         /// <summary> The number of Morale Boost power-ups active. </summary>
@@ -229,7 +229,6 @@ namespace MarbleBot.Common
             if (_disposed) return;
             Active = false;
             _disposed = true;
-            Boss.ResetHP();
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
                 marbleList.Write("");
             _service.SiegeInfo.TryRemove(Id, out _);

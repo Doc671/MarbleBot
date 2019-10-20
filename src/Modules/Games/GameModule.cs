@@ -40,9 +40,17 @@ namespace MarbleBot.Modules.Games
                 _ => user.LastScavenge,
             };
             var nextEarn = DateTime.UtcNow.Subtract(lastWin);
+            string game = gameType switch
+            {
+                GameType.Race => "race",
+                GameType.Scavenge => "scavenge",
+                GameType.Siege => "siege",
+                GameType.War => "war",
+                _ => "none"
+            };
             var output = nextEarn.TotalHours < 6 ?
-                $"You can earn money from racing in **{GetDateString(lastWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
-                : "You can earn money from racing now!";
+                $"You can earn money from {game} in **{GetDateString(lastWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
+                : $"You can earn money from {game} now!";
             await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                 .WithAuthor(context.User)
                 .WithColor(GetColor(context))

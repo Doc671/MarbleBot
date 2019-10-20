@@ -61,11 +61,11 @@ namespace MarbleBot.Modules
             var timeUntilNextSiege = user.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6));
             var timeUntilNextWar = user.LastWarWin.Subtract(DateTime.UtcNow.AddHours(-6));
             await ReplyAsync(embed: new EmbedBuilder()
-                .AddField("Daily", timeUntilNextDaily.TotalHours < 0 ? "**Ready!**" : timeUntilNextDaily.ToString(@"hh\:mm\:ss\.fff"), true)
-                .AddField("Race", timeUntilNextRace.TotalHours < 0 ? "**Ready!**" : timeUntilNextRace.ToString(@"hh\:mm\:ss.fff"), true)
-                .AddField("Scavenge", timeUntilNextScavenge.TotalHours < 0 ? "**Ready!**" : timeUntilNextScavenge.ToString(@"hh\:mm\:ss\.fff"), true)
-                .AddField("Siege", timeUntilNextSiege.TotalHours < 0 ? "**Ready!**" : timeUntilNextSiege.ToString(@"hh\:mm\:ss\.fff"), true)
-                .AddField("War", timeUntilNextWar.TotalHours < 0 ? "**Ready!**" : timeUntilNextWar.ToString(@"hh\:mm\:ss\.fff"), true)
+                .AddField("Daily", timeUntilNextDaily.TotalHours < 0 ? "**Ready!**" : timeUntilNextDaily.ToString(@"hh\:mm\:ss"), true)
+                .AddField("Race", timeUntilNextRace.TotalHours < 0 ? "**Ready!**" : timeUntilNextRace.ToString(@"hh\:mm\:ss"), true)
+                .AddField("Scavenge", timeUntilNextScavenge.TotalHours < 0 ? "**Ready!**" : timeUntilNextScavenge.ToString(@"hh\:mm\:ss"), true)
+                .AddField("Siege", timeUntilNextSiege.TotalHours < 0 ? "**Ready!**" : timeUntilNextSiege.ToString(@"hh\:mm\:ss"), true)
+                .AddField("War", timeUntilNextWar.TotalHours < 0 ? "**Ready!**" : timeUntilNextWar.ToString(@"hh\:mm\:ss"), true)
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
