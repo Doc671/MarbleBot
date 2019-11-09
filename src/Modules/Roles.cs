@@ -86,8 +86,15 @@ namespace MarbleBot.Modules
             var output = new StringBuilder();
             var guild = GetGuild(Context);
             foreach (var role in guild.Roles)
+            {
                 output.AppendLine(Context.Guild.GetRole(role).Name);
-            if (guild.Roles.Count < 1) output.Append("There aren't any roles here!");
+            }
+
+            if (guild.Roles.Count < 1)
+            {
+                output.Append("There aren't any roles here!");
+            }
+
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()

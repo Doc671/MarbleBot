@@ -93,14 +93,22 @@ namespace MarbleBot.Modules
 
                     foreach (var res in searchListResponse.Items)
                     {
-                        if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0) channel = res.Snippet;
+                        if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0)
+                        {
+                            channel = res.Snippet;
+                        }
                     }
 
                     if (channel == null)
                     {
                         searchListRequest.Q = Context.User.Username;
                         foreach (var res in searchListResponse.Items)
-                            if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0) channel = res.Snippet;
+                        {
+                            if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0)
+                            {
+                                channel = res.Snippet;
+                            }
+                        }
                     }
 
                     searchListRequest.Q = url;
@@ -109,13 +117,18 @@ namespace MarbleBot.Modules
                     if (string.Compare(channel.Title, video.ChannelTitle, true) == 0)
                     {
                         if (DateTime.Now.Subtract((DateTime)video.PublishedAt).Days > 1)
+                        {
                             await ReplyAsync("The video cannot be more than two days old!");
+                        }
                         else
                         {
-                            if (desc.Length > 200) await ReplyAsync("Your description length is too long!");
+                            if (desc.Length > 200)
+                            {
+                                await ReplyAsync("Your description length is too long!");
+                            }
                             else
                             {
-                                var CV = (IMessageChannel)Context.Client.GetGuild(CM).GetChannel(442474624417005589);
+                                var CV = (IMessageChannel)Context.Client.GetGuild(CommunityMarble).GetChannel(442474624417005589);
                                 var msgs = await CV.GetMessagesAsync(100).FlattenAsync();
                                 var alreadyPosted = false;
 
@@ -128,18 +141,34 @@ namespace MarbleBot.Modules
                                     }
                                 }
 
-                                if (alreadyPosted) await ReplyAsync("This video has already been posted!");
-                                else await CV.SendMessageAsync($"{desc}\n{url}");
+                                if (alreadyPosted)
+                                {
+                                    await ReplyAsync("This video has already been posted!");
+                                }
+                                else
+                                {
+                                    await CV.SendMessageAsync($"{desc}\n{url}");
+                                }
                             }
                         }
                     }
-                    else await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
-                    if (!validUser) Logger.Error($"Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
+                    else
+                    {
+                        await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
+                    }
+
+                    if (!validUser)
+                    {
+                        Logger.Error($"Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
+                    }
                 }
-                else await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
+                else
+                {
+                    await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
                       .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
                       .Append("If you're an accepted user, please notify Doc671.")
                       .ToString());
+                }
             }
         }
 
@@ -177,17 +206,27 @@ namespace MarbleBot.Modules
                     channels.Add($"{searchResult.Snippet.Title} (<https://www.youtube.com/channel/{searchResult.Id.ChannelId}>)");
                     found = true;
                 }
-                else profaneCount++;
+                else
+                {
+                    profaneCount++;
+                }
             }
 
             if (found)
             {
                 if (profaneCount > 0)
+                {
                     await ReplyAsync($"**__Channels:__**\n{string.Join("\n", channels)}\n\n{profaneCount} results omitted (profanity detected)");
+                }
                 else
+                {
                     await ReplyAsync($"**__Channels:__**\n{string.Join("\n", channels)}\n");
+                }
             }
-            else await ReplyAsync("Couldn't seem to find anything...");
+            else
+            {
+                await ReplyAsync("Couldn't seem to find anything...");
+            }
         }
 
 
@@ -220,7 +259,9 @@ namespace MarbleBot.Modules
             foreach (var searchResult in searchListResponse.Items)
             {
                 if (string.Compare(searchResult.Id.Kind, "youtube#video", true) == 0 && (await Moderation.CheckSwearAsync(searchResult.Snippet.Title)))
+                {
                     profaneCount++;
+                }
                 else if (string.Compare(searchResult.Id.Kind, "youtube#video", true) == 0)
                 {
                     videos.Add($"{searchResult.Snippet.Title} (<https://youtu.be/{searchResult.Id.VideoId}>)");
@@ -231,11 +272,18 @@ namespace MarbleBot.Modules
             if (found)
             {
                 if (profaneCount > 0)
+                {
                     await ReplyAsync($"**__Videos__**:\n{string.Join("\n", videos)}\n\n{profaneCount} results omitted (profanity detected)");
+                }
                 else
+                {
                     await ReplyAsync($"**__Videos__**:\n{string.Join("\n", videos)}\n");
+                }
             }
-            else await ReplyAsync("Couldn't seem to find anything...");
+            else
+            {
+                await ReplyAsync("Couldn't seem to find anything...");
+            }
         }
     }
 }

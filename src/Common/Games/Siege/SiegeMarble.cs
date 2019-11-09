@@ -34,9 +34,13 @@ namespace MarbleBot.Common
         {
             var user = context.Client.GetUser(Id);
             if (HPShown)
+            {
                 return $"**{Name}** (HP: **{HP}**/{MaxHP}, DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
+            }
             else
+            {
                 return $"**{Name}** (DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
+            }
         }
     }
 }

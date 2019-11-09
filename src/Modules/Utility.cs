@@ -13,22 +13,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using static MarbleBot.Global;
-
 namespace MarbleBot.Modules
 {
     /// <summary> Utility commands. </summary>
     public class Utility : MarbleBotModule
     {
         private readonly BotCredentials _botCredentials;
+        private readonly DailyTimeoutService _dailyTimeoutService;
         private readonly CommandService _commandService;
         private readonly GamesService _gamesService;
+        private readonly StartTimeService _startTimeService;
 
-        public Utility(BotCredentials botCredentials, CommandService commandService, GamesService gamesService)
+        public Utility(BotCredentials botCredentials, CommandService commandService, DailyTimeoutService dailyTimeoutService, GamesService gamesService, StartTimeService startTimeService)
         {
             _botCredentials = botCredentials;
             _commandService = commandService;
+            _dailyTimeoutService = dailyTimeoutService;
             _gamesService = gamesService;
+            _startTimeService = startTimeService;
         }
 
         [Command("botinfo")]
@@ -36,13 +38,13 @@ namespace MarbleBot.Modules
         [Summary("Shows bot info.")]
         public async Task BotInfoCommand()
             => await ReplyAsync(embed: new EmbedBuilder()
-                .AddField("Daily Timeout", $"{DailyTimeout} hours", true)
+                .AddField("Daily Timeout", $"{_dailyTimeoutService.DailyTimeout} hours", true)
                 .AddField("Ongoing Scavenges", _gamesService.ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", _gamesService.SiegeInfo.Count, true)
                 .AddField("Ongoing Wars", _gamesService.WarInfo.Count, true)
                 .AddField("Servers", GetGuildsObject().Count, true)
-                .AddField("Start Time (UTC)", StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
-                .AddField("Uptime", DateTime.UtcNow.Subtract(StartTime).ToString(), true)
+                .AddField("Start Time (UTC)", _startTimeService.StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
+                .AddField("Uptime", DateTime.UtcNow.Subtract(_startTimeService.StartTime).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -95,11 +97,20 @@ namespace MarbleBot.Modules
 
                 IEnumerable<CommandInfo> commands = module.Commands.Where(c => owner ? true : !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
 
-                if (Context.Guild.Id != CM) commands = commands.Where(c => c.Remarks != "CM Only");
+                if (Context.Guild.Id != CommunityMarble)
+                {
+                    commands = commands.Where(c => c.Remarks != "CM Only");
+                }
 
-                if (Context.IsPrivate) commands = commands.Where(c => c.Preconditions != null && !c.Preconditions.Any(p => p is RequireContextAttribute));
+                if (Context.IsPrivate)
+                {
+                    commands = commands.Where(c => c.Preconditions != null && !c.Preconditions.Any(p => p is RequireContextAttribute));
+                }
 
-                if (GetUser(Context).Stage < 2) commands = commands.Where(c => c.Remarks != "Stage2");
+                if (GetUser(Context).Stage < 2)
+                {
+                    commands = commands.Where(c => c.Remarks != "Stage2");
+                }
 
                 await ReplyAsync(embed: builder
                     .AddField(
@@ -135,8 +146,13 @@ namespace MarbleBot.Modules
                 if (command == null)
                 {
                     if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
+                    {
                         builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
-                    else builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube");
+                    }
+                    else
+                    {
+                        builder.AddField("Modules", "Economy\nFun\nGames\nRoles\nUtility\nYouTube");
+                    }
 
                     await ReplyAsync(embed: builder
                         .WithDescription("*by Doc671#1965*\n\nUse `mb/help` followed by the name of a module or a command for more info.")
@@ -151,7 +167,10 @@ namespace MarbleBot.Modules
                 // Gets extra command info (e.g. an example of the command's usage) if present
                 string json;
                 using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}ExtraCommandInfo.json"))
+                {
                     json = itemFile.ReadToEnd();
+                }
+
                 var commandDict = JObject.Parse(json).ToObject<Dictionary<string, Dictionary<string, string>>>();
                 if (commandDict.ContainsKey(command.Name) || command.Aliases.Any(alias => commandDict.ContainsKey(alias)))
                 {
@@ -163,30 +182,39 @@ namespace MarbleBot.Modules
                     .AddField("Usage", $"`{usage}`")
                     .WithTitle($"MarbleBot Help: **{command.Name.CamelToTitleCase()}**");
 
-                if (!string.IsNullOrEmpty(example)) builder.AddField("Example", $"`{example}`", true);
+                if (!string.IsNullOrEmpty(example))
+                {
+                    builder.AddField("Example", $"`{example}`", true);
+                }
 
                 builder.AddField("Module", $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command.Module.Name)}", true);
 
                 if (command.Aliases.Count() != 0)
+                {
                     builder.AddField("Aliases", command.Aliases.Aggregate(new StringBuilder(), (builder, alias) =>
                     {
                         builder.AppendLine($"`mb/{alias}`");
                         return builder;
                     }).ToString(), true);
+                }
 
                 if (command.Parameters.Count() != 0)
+                {
                     builder.AddField("Parameters", command.Parameters.Aggregate(new StringBuilder(), (builder, param) =>
                     {
                         builder.AppendLine($"{param.Name.CamelToTitleCase()} ({(param.IsOptional ? "optional " : "")}{(param.IsRemainder ? "remainder " : "")}{param.Type.Name})");
                         return builder;
                     }).ToString(), true);
+                }
 
                 if (command.Preconditions.Count() != 0)
+                {
                     builder.AddField("Preconditions", command.Preconditions.Aggregate(new StringBuilder(), (builder, precondition) =>
                     {
                         builder.AppendLine((precondition.TypeId as Type).Name.CamelToTitleCase());
                         return builder;
                     }).ToString(), true);
+                }
 
                 await ReplyAsync(embed: builder.Build());
             }
@@ -215,8 +243,15 @@ namespace MarbleBot.Modules
             SocketGuildUser[] users = Context.Guild.Users.ToArray();
             for (int i = 0; i < Context.Guild.Users.Count - 1; i++)
             {
-                if (users[i].IsBot) botUsers++;
-                if (users[i].Status.ToString().ToLower() == "online") onlineUsers++;
+                if (users[i].IsBot)
+                {
+                    botUsers++;
+                }
+
+                if (users[i].Status.ToString().ToLower() == "online")
+                {
+                    onlineUsers++;
+                }
             }
 
             var owner = Context.Guild.GetUser(Context.Guild.OwnerId);
@@ -239,16 +274,23 @@ namespace MarbleBot.Modules
                 .WithFooter(Context.Guild.Id.ToString());
 
             if (mbServer.AnnouncementChannel != 0)
+            {
                 builder.AddField("Announcement Channel", $"<#{mbServer.AnnouncementChannel}>", true);
+            }
 
             if (mbServer.AutoresponseChannel != 0)
+            {
                 builder.AddField("Autoresponse Channel", $"<#{mbServer.AutoresponseChannel}>", true);
+            }
 
             if (mbServer.UsableChannels.Count != 0)
             {
                 var output = new StringBuilder();
                 foreach (var channel in mbServer.UsableChannels)
+                {
                     output.AppendLine($"<#{channel}>");
+                }
+
                 builder.AddField("Usable Channels", output.ToString(), true);
             }
 
@@ -263,7 +305,7 @@ namespace MarbleBot.Modules
             var output = new StringBuilder();
             foreach (var user in Context.Guild.Users)
             {
-                if (user.GuildPermissions.ManageMessages)
+                if (user.GuildPermissions.ManageMessages && !user.IsBot)
                 {
                     var status = user.Status switch
                     {
@@ -274,9 +316,13 @@ namespace MarbleBot.Modules
                         _ => "Offline"
                     };
                     if (string.IsNullOrEmpty(user.Nickname))
+                    {
                         output.AppendLine($"{user.Username}#{user.Discriminator}: **{status}**");
+                    }
                     else
+                    {
                         output.AppendLine($"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
+                    }
                 }
             }
             await ReplyAsync(output.ToString());
@@ -285,7 +331,7 @@ namespace MarbleBot.Modules
         [Command("uptime")]
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommand()
-        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(StartTime))}**.");
+        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(_startTimeService.StartTime))}**.");
 
         [Command("userinfo")]
         [Summary("Displays information about a user.")]
@@ -343,7 +389,9 @@ namespace MarbleBot.Modules
                     string nickname = string.IsNullOrEmpty(user.Nickname) ? "None" : user.Nickname;
                     var roles = new StringBuilder();
                     foreach (var role in user.Roles)
+                    {
                         roles.AppendLine(role.Name);
+                    }
 
                     builder.WithAuthor(user)
                         .AddField("Status", status, true)

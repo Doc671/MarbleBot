@@ -18,6 +18,7 @@ namespace MarbleBot.Modules.Games
     {
         public BotCredentials BotCredentials { get; set; }
         public GamesService GamesService { get; set; }
+        public RandomService RandomService { get; set; }
 
         /// <summary> Gets the string representation of the game. </summary>
         /// <param name="gameType"> The type of game. </param>
@@ -71,7 +72,10 @@ namespace MarbleBot.Modules.Games
                 await marbleList.WriteAsync("");
                 await context.Channel.SendMessageAsync("Contestant list successfully cleared!");
             }
-            else await context.Channel.SendMessageAsync($"**{context.User.Username}**, you cannot do this!");
+            else
+            {
+                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you cannot do this!");
+            }
         }
 
         /// <summary> Shows leaderboards. </summary>
@@ -85,23 +89,38 @@ namespace MarbleBot.Modules.Games
             foreach (var (elementName, value) in orderedData)
             {
                 if (value != lastValue)
+                {
                     displayedPlace++;
+                }
+
                 dataList.Add((displayedPlace, elementName, value));
                 lastValue = value;
             }
             if (no > dataList.Last().place / 10)
+            {
                 return $"There are no entries in page **{no}**!";
+            }
             // This displays in groups of ten (i.e. if no is 1, first 10 displayed;
             // no = 2, next 10, etc.
             int minValue = (no - 1) * 10 + 1, maxValue = no * 10;
             var output = new StringBuilder();
             foreach (var (place, elementName, value) in dataList)
             {
-                if (place > maxValue) break;
+                if (place > maxValue)
+                {
+                    break;
+                }
+
                 if (place < maxValue + 1 && place >= minValue)
+                {
                     output.AppendLine($"{place}{place.Ordinal()}: {elementName} {value}");
+                }
             }
-            if (output.Length > 2048) return string.Concat(output.ToString().Take(2048));
+            if (output.Length > 2048)
+            {
+                return string.Concat(output.ToString().Take(2048));
+            }
+
             return output.ToString();
         }
 
@@ -130,17 +149,25 @@ namespace MarbleBot.Modules.Games
                     if (string.Compare(line.Split(',')[0], marbleToRemove, true) == 0)
                     {
                         if (ulong.Parse(line.Split(',')[1]) == context.User.Id)
+                        {
                             state = 2;
+                        }
                         else
                         {
                             wholeFile.AppendLine(line);
-                            if (!(state == 2)) state = 1;
+                            if (!(state == 2))
+                            {
+                                state = 1;
+                            }
                         }
                     }
-                    else wholeFile.AppendLine(line);
+                    else
+                    {
+                        wholeFile.AppendLine(line);
+                    }
                 }
             }
-            
+
             switch (state)
             {
                 case 0: await context.Channel.SendMessageAsync($"**{context.User.Username}**, could not find the requested marble!"); break;
@@ -183,22 +210,18 @@ namespace MarbleBot.Modules.Games
                         var marbleInfo = marble.Split(',');
                         string bold = marbleInfo[0].Contains('*') || marbleInfo[0].Contains('\\') ? "" : "**";
                         var user = context.Client.GetUser(ulong.Parse(marbleInfo[1]));
-
-                        if (user == null)
-                        {
-                            marbles.AppendLine($"{bold}{marbleInfo[0]}{bold}");
-                            continue;
-                        }
-
-                        marbles.AppendLine($"{bold}{marbleInfo[0]}{bold} {(context.IsPrivate ? "" : $"[{user.Username}#{user.Discriminator}]")}");
+                        marbles.AppendLine($"{bold}{marbleInfo[0]}{bold} {(context.IsPrivate ? "" : $"[{user?.Username ?? "Unknown"}#{user.Discriminator ?? "0000"}]")}");
                     }
                 }
             }
 
             var output = marbles.ToString();
             if (string.IsNullOrEmpty(output))
+            {
                 await context.Channel.SendMessageAsync("No-one is signed up!");
+            }
             else
+            {
                 await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(context))
                     .WithCurrentTimestamp()
@@ -206,6 +229,7 @@ namespace MarbleBot.Modules.Games
                     .WithTitle($"Marble {GameName(gameType)}: Contestants")
                     .AddField("Contestants", output)
                     .Build());
+            }
         }
 
         /// <summary> Removes a contestant from the contestant list of a game. </summary>
@@ -220,7 +244,10 @@ namespace MarbleBot.Modules.Games
         {
             ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
             string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
-            if (!File.Exists(marbleListDirectory)) File.Create(marbleListDirectory).Close();
+            if (!File.Exists(marbleListDirectory))
+            {
+                File.Create(marbleListDirectory).Close();
+            }
 
             var weapon = new Weapon();
 
@@ -269,13 +296,19 @@ namespace MarbleBot.Modules.Games
                 }
             }
 
-            if (string.IsNullOrEmpty(marbleName) || marbleName.StartsWith("<@")) marbleName = context.User.Username;
+            if (string.IsNullOrEmpty(marbleName) || marbleName.StartsWith("<@"))
+            {
+                marbleName = context.User.Username;
+            }
             else if (marbleName.Length > 100)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, your entry exceeds the 100 character limit.");
                 return;
             }
-            else marbleName = marbleName.Replace('\n', ' ').Replace(',', ';');
+            else
+            {
+                marbleName = marbleName.Replace('\n', ' ').Replace(',', ';');
+            }
 
             string bold = marbleName.Contains('*') || marbleName.Contains('\\') ? "" : "**";
             var builder = new EmbedBuilder()
@@ -284,17 +317,28 @@ namespace MarbleBot.Modules.Games
                 .AddField($"Marble {GameName(gameType)}: Signed up!",
                     $"**{context.User.Username}** has successfully signed up as {bold}{marbleName}{bold}{(gameType == GameType.War ? $" with the weapon **{weapon.Name}**" : "")}!");
             using (var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
+            {
                 await racers.WriteLineAsync(marbleName);
+            }
 
             using (var marbleList = new StreamWriter(marbleListDirectory, true))
             {
-                if (gameType == GameType.War) await marbleList.WriteLineAsync($"{marbleName},{context.User.Id},{itemId}");
-                else await marbleList.WriteLineAsync($"{marbleName},{context.User.Id}");
+                if (gameType == GameType.War)
+                {
+                    await marbleList.WriteLineAsync($"{marbleName},{context.User.Id},{itemId}");
+                }
+                else
+                {
+                    await marbleList.WriteLineAsync($"{marbleName},{context.User.Id}");
+                }
             }
 
             int marbleNo;
             using (var marbleList = new StreamReader(marbleListDirectory, true))
+            {
                 marbleNo = (await marbleList.ReadToEndAsync()).Split('\n').Length;
+            }
+
             await context.Channel.SendMessageAsync(embed: builder.Build());
 
             if (marbleNo > marbleLimit)
@@ -322,8 +366,15 @@ namespace MarbleBot.Modules.Games
 
             void UpdateUser(Item itm, int noOfItems)
             {
-                if (user.Items.ContainsKey(itm.Id)) user.Items[itm.Id] += noOfItems;
-                else user.Items.Add(itm.Id, noOfItems);
+                if (user.Items.ContainsKey(itm.Id))
+                {
+                    user.Items[itm.Id] += noOfItems;
+                }
+                else
+                {
+                    user.Items.Add(itm.Id, noOfItems);
+                }
+
                 user.NetWorth += item.Price * noOfItems;
                 WriteUsers(obj, Context.User, user);
             }
@@ -366,25 +417,41 @@ namespace MarbleBot.Modules.Games
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else
+                            {
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     case 10:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            {
                                 await GamesService.SiegeInfo[fileId].ItemAttack(Context, obj, item.Id,
-                                    (int)Math.Round(90 + GamesService.SiegeInfo[fileId].Boss.MaxHP * 0.05 * (Global.Rand.NextDouble() * 0.12 + 0.94)));
-                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                                    (int)Math.Round(90 + GamesService.SiegeInfo[fileId].Boss.MaxHP * 0.05 * RandomService.Rand.NextDouble() * 0.12 + 0.94));
+                            }
+                            else
+                            {
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     case 14:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            {
                                 await GamesService.SiegeInfo[fileId].ItemAttack(Context, obj, 14,
                                     70 + 10 * (int)GamesService.SiegeInfo[fileId].Boss.Difficulty, true);
-                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+                            else
+                            {
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     case 17:
@@ -405,13 +472,24 @@ namespace MarbleBot.Modules.Games
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the lava, turning it into a **Lava Bucket**!");
                             }
                         }
-                        else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        else
+                        {
+                            await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                        }
+
                         break;
                     case 19:
                     case 20:
                         user.Items[item.Id]--;
-                        if (user.Items.ContainsKey(19)) user.Items[18]++;
-                        else user.Items.Add(18, 1);
+                        if (user.Items.ContainsKey(19))
+                        {
+                            user.Items[18]++;
+                        }
+                        else
+                        {
+                            user.Items.Add(18, 1);
+                        }
+
                         await ReplyAsync($"**{Context.User.Username}** poured all the water out from a **{item.Name}**, turning it into a **Steel Bucket**!");
                         break;
                     case 22:
@@ -419,12 +497,16 @@ namespace MarbleBot.Modules.Games
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (GamesService.SiegeInfo.ContainsKey(fileId) && string.Compare(GamesService.SiegeInfo[fileId].Boss.Name, "Help Me the Tree", true) == 0)
                             {
-                                var randDish = 22 + Global.Rand.Next(0, 13);
+                                var randDish = 22 + RandomService.Rand.Next(0, 13);
                                 UpdateUser(item, -1);
                                 UpdateUser(GetItem<Item>(randDish.ToString("000")), 1);
                                 await ReplyAsync($"**{Context.User.Username}** used their **{item.Name}**! It somehow picked up a disease and is now a **{GetItem<Item>(randDish.ToString("000")).Name}**!");
                             }
-                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else
+                            {
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     case 23:
@@ -447,7 +529,10 @@ namespace MarbleBot.Modules.Games
                                 var output = new StringBuilder();
                                 var userMarble = GamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 foreach (var marble in GamesService.SiegeInfo[fileId].Marbles)
+                                {
                                     marble.StatusEffect = StatusEffect.Poison;
+                                }
+
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .WithColor(GetColor(Context))
                                     .WithCurrentTimestamp()
@@ -456,7 +541,11 @@ namespace MarbleBot.Modules.Games
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else
+                            {
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     case 38:
@@ -466,7 +555,10 @@ namespace MarbleBot.Modules.Games
                             {
                                 var userMarble = GamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
                                 foreach (var marble in GamesService.SiegeInfo[fileId].Marbles)
+                                {
                                     marble.StatusEffect = StatusEffect.Doom;
+                                }
+
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .WithColor(GetColor(Context))
                                     .WithCurrentTimestamp()
@@ -475,7 +567,11 @@ namespace MarbleBot.Modules.Games
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else
+                            {
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     case 39:
@@ -493,7 +589,11 @@ namespace MarbleBot.Modules.Games
                                     .Build());
                                 UpdateUser(item, -1);
                             }
-                            else await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            else
+                            {
+                                await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     case 57:
@@ -518,7 +618,7 @@ namespace MarbleBot.Modules.Games
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (!GamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                GamesService.SiegeInfo.GetOrAdd(fileId, new Siege(GamesService, Context, new List<SiegeMarble>())
+                                GamesService.SiegeInfo.GetOrAdd(fileId, new Siege(GamesService, RandomService, Context, new List<SiegeMarble>())
                                 {
                                     Active = false,
                                     Boss = Siege.GetBoss("Destroyer")
@@ -526,7 +626,10 @@ namespace MarbleBot.Modules.Games
                                 await ReplyAsync("*You hear the whirring of machinery...*");
                             }
                             else
+                            {
                                 await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
+                            }
+
                             break;
                         }
                     default:
@@ -534,7 +637,10 @@ namespace MarbleBot.Modules.Games
                         break;
                 }
             }
-            else await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");
+            else
+            {
+                await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");
+            }
         }
     }
 }

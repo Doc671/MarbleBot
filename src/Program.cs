@@ -19,6 +19,7 @@ namespace MarbleBot
     {
         private readonly BotCredentials _botCredentials;
         private readonly NLog.Logger _logger;
+        private StartTimeService _startTimeService;
 
         public static void Main()
             => new Program().StartAsync().GetAwaiter().GetResult();
@@ -33,10 +34,13 @@ namespace MarbleBot
         private ServiceProvider ConfigureServices()
             => new ServiceCollection()
                 .AddSingleton(_botCredentials)
+                .AddSingleton(_startTimeService)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<GamesService>()
+                .AddSingleton<DailyTimeoutService>()
+                .AddSingleton<RandomService>()
                 .AddLogging(loggingBuilder =>
                 {
                     loggingBuilder.ClearProviders();
@@ -49,7 +53,10 @@ namespace MarbleBot
         {
             string json;
             using (var botCredentialFile = new StreamReader("BotCredentials.json"))
+            {
                 json = botCredentialFile.ReadToEnd();
+            }
+
             return JObject.Parse(json).ToObject<BotCredentials>();
         }
 
@@ -71,7 +78,7 @@ namespace MarbleBot
         public async Task StartAsync()
         {
             Console.Title = "MarbleBot";
-            Global.StartTime = DateTime.UtcNow;
+            _startTimeService = new StartTimeService(DateTime.UtcNow);
 
             using var services = ConfigureServices();
 

@@ -63,7 +63,11 @@ namespace MarbleBot.Modules
         public async Task ClearCommand(uint amount)
         {
             var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).FlattenAsync();
-            foreach (var msg in messages) await Context.Channel.DeleteMessageAsync(msg);
+            foreach (var msg in messages)
+            {
+                await Context.Channel.DeleteMessageAsync(msg);
+            }
+
             const int delay = 5000;
             var m = await ReplyAsync($"{amount} message(s) have been deleted. This message will be deleted in {delay / 1000} seconds.");
             await Task.Delay(delay);
@@ -100,15 +104,15 @@ namespace MarbleBot.Modules
             var channel = ulong.Parse(rchannel);
             var msgs = await Context.Client.GetGuild(guild).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
             var srvr = new EmbedAuthorBuilder();
-            if (guild == THS)
+            if (guild == TheHatStoar)
             {
-                var _THS = Context.Client.GetGuild(THS);
+                var _THS = Context.Client.GetGuild(TheHatStoar);
                 srvr.WithName(_THS.Name);
                 srvr.WithIconUrl(_THS.IconUrl);
             }
-            else if (guild == CM)
+            else if (guild == CommunityMarble)
             {
-                var _CM = Context.Client.GetGuild(CM);
+                var _CM = Context.Client.GetGuild(CommunityMarble);
                 srvr.WithName(_CM.Name);
                 srvr.WithIconUrl(_CM.IconUrl);
             }
@@ -122,21 +126,25 @@ namespace MarbleBot.Modules
             foreach (var msg in msgs)
             {
                 var IsLett = !(char.TryParse(msg.Content.Trim('`'), out char e));
-                if (!IsLett) IsLett = (char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e));
+                if (!IsLett)
+                {
+                    IsLett = (char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e));
+                }
+
                 if (!(IsLett) && channel != 252481530130202624)
                 {
                     builder.AddField(msg.Author.Mention, msg.Content);
                     await msg.DeleteAsync();
                 }
             }
-            if (guild == THS)
+            if (guild == TheHatStoar)
             {
-                var logs = Context.Client.GetGuild(THS).GetTextChannel(327132239257272327);
+                var logs = Context.Client.GetGuild(TheHatStoar).GetTextChannel(327132239257272327);
                 await logs.SendMessageAsync("", false, builder.Build());
             }
-            else if (guild == CM)
+            else if (guild == CommunityMarble)
             {
-                var logs = Context.Client.GetGuild(CM).GetTextChannel(387306347936350213);
+                var logs = Context.Client.GetGuild(CommunityMarble).GetTextChannel(387306347936350213);
                 await logs.SendMessageAsync("", false, builder.Build());
             }
         }
@@ -146,7 +154,11 @@ namespace MarbleBot.Modules
         public static async Task<bool> CheckSwearAsync(string msg)
         {
             string swears;
-            using (var FS = new StreamReader($"Keys{Path.DirectorySeparatorChar}ListOfBand.txt")) swears = await FS.ReadLineAsync();
+            using (var FS = new StreamReader($"Keys{Path.DirectorySeparatorChar}ListOfBand.txt"))
+            {
+                swears = await FS.ReadLineAsync();
+            }
+
             string[] swearList = swears.Split(',');
             var swearPresent = false;
             foreach (var swear in swearList)
@@ -157,7 +169,11 @@ namespace MarbleBot.Modules
                     break;
                 }
             }
-            if (swearPresent) LogManager.GetCurrentClassLogger().Warn($"Profanity detected, violation: {msg}");
+            if (swearPresent)
+            {
+                LogManager.GetCurrentClassLogger().Warn($"Profanity detected, violation: {msg}");
+            }
+
             return swearPresent;
         }
 
@@ -218,9 +234,13 @@ namespace MarbleBot.Modules
 
                     // If the cell is a number, write it as a number rather than a string
                     if (int.TryParse(cell, out cellNumber))
+                    {
                         cellContents.NumberValue = cellNumber;
+                    }
                     else
+                    {
                         cellContents.StringValue = cell;
+                    }
 
                     rowData.Values.Add(new CellData()
                     {
@@ -490,9 +510,13 @@ namespace MarbleBot.Modules
         public async Task WarnCommand(ulong userId, string warningCode, int warningsToGive)
         {
             if (Context.Guild.Users.Any(u => u.Id == userId))
+            {
                 await WarnUserAsync(Context, Context.Guild.GetUser(userId), warningCode, warningsToGive);
+            }
             else
+            {
                 await SendErrorAsync("Could not find a user to warn!");
+            }
         }
 
         public async Task WarnUserAsync(SocketCommandContext context, IGuildUser user, string warningCode, int warningsToGive)

@@ -40,17 +40,21 @@ namespace MarbleBot.Services
             _commands.AddTypeReader<Weapon>(new WeaponTypeReader());
 
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services).ConfigureAwait(false);
-            
+
             await _client.SetGameAsync("for mb/help!", type: ActivityType.Watching);
         }
 
         private async Task HandleCommandAsync(SocketMessage msg)
         {
             if (msg.Author.IsBot)
+            {
                 return;
+            }
 
             if (!(msg is SocketUserMessage userMsg))
+            {
                 return;
+            }
 
             var context = new SocketCommandContext(_client, userMsg);
 
@@ -84,10 +88,15 @@ namespace MarbleBot.Services
                     }
                 }
                 if (autoresponses.ContainsKey(context.Message.Content))
+                {
                     await context.Channel.SendMessageAsync(autoresponses[context.Message.Content]);
+                }
             }
 
-            if (context.IsPrivate) _logger.Info("{0}: {1}", context.User, context.Message);
+            if (context.IsPrivate)
+            {
+                _logger.Info("{0}: {1}", context.User, context.Message);
+            }
         }
 
         private async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)

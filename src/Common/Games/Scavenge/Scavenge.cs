@@ -3,6 +3,7 @@ using Discord.Commands;
 using MarbleBot.Extensions;
 using MarbleBot.Modules;
 using MarbleBot.Modules.Games.Services;
+using MarbleBot.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,8 @@ namespace MarbleBot.Common
         private bool _itemHasAppeared = false;
         private bool _oreHasAppeared = false;
         private readonly IUserMessage _originalMessage;
-        private readonly GamesService _service;
+        private readonly GamesService _gamesService;
+        private readonly RandomService _randomService;
 
         public void Dispose()
         {
@@ -43,9 +45,13 @@ namespace MarbleBot.Common
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
+
             _disposed = true;
-            _service.ScavengeInfo.TryRemove(Id, out _);
+            _gamesService.ScavengeInfo.TryRemove(Id, out _);
             if (disposing && Actions != null)
             {
                 Actions.Wait();
@@ -53,9 +59,10 @@ namespace MarbleBot.Common
             }
         }
 
-        public Scavenge(GamesService service, SocketCommandContext context, ScavengeLocation location, IUserMessage message)
+        public Scavenge(GamesService gamesService, RandomService randomService, SocketCommandContext context, ScavengeLocation location, IUserMessage message)
         {
-            _service = service;
+            _gamesService = gamesService;
+            _randomService = randomService;
             Actions = Task.Run(async () => { await Session(context); });
             Id = context.User.Id;
             Location = location;
@@ -81,9 +88,9 @@ namespace MarbleBot.Common
             do
             {
                 await Task.Delay(8000);
-                if (Global.Rand.Next(0, 5) < 4)
+                if (_randomService.Rand.Next(0, 5) < 4)
                 {
-                    var item = collectableItems[Global.Rand.Next(0, collectableItems.Count)];
+                    var item = collectableItems[_randomService.Rand.Next(0, collectableItems.Count)];
                     if (item.Name.Contains("Ore"))
                     {
                         Ores.Enqueue(item);
@@ -104,9 +111,19 @@ namespace MarbleBot.Common
             user.LastScavenge = DateTime.UtcNow;
             foreach (var item in Items)
             {
-                if (item.Name.Contains("Ore")) continue;
-                if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
-                else user.Items.Add(item.Id, 1);
+                if (item.Name.Contains("Ore"))
+                {
+                    continue;
+                }
+
+                if (user.Items.ContainsKey(item.Id))
+                {
+                    user.Items[item.Id]++;
+                }
+                else
+                {
+                    user.Items.Add(item.Id, 1);
+                }
             }
             MarbleBotModule.WriteUsers(usersObject, context.User, user);
 
@@ -123,7 +140,10 @@ namespace MarbleBot.Common
             bool first = false;
             var itemOutput = new StringBuilder();
             foreach (var item in UsedItems)
+            {
                 itemOutput.AppendLine($"~~{item.Name}~~");
+            }
+
             foreach (var item in Items)
             {
                 itemOutput.AppendLine(first || gameEnded ? item.Name : $"**{item.Name}**");
@@ -133,7 +153,10 @@ namespace MarbleBot.Common
             first = false;
             var oreOutput = new StringBuilder();
             foreach (var ore in UsedOres)
+            {
                 oreOutput.AppendLine($"~~{ore.Name}~~");
+            }
+
             foreach (var ore in Ores)
             {
                 oreOutput.AppendLine(first || gameEnded ? ore.Name : $"**{ore.Name}**");
@@ -143,14 +166,18 @@ namespace MarbleBot.Common
             var fields = new List<EmbedFieldBuilder>();
 
             if (_itemHasAppeared)
+            {
                 fields.Add(new EmbedFieldBuilder()
                     .WithName("Items")
                     .WithValue($"{itemOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"));
+            }
 
             if (_oreHasAppeared)
+            {
                 fields.Add(new EmbedFieldBuilder()
                     .WithName("Ores")
                     .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}"));
+            }
 
             var embed = _originalMessage.Embeds.First();
             await _originalMessage.ModifyAsync(m => m.Embed = new EmbedBuilder()

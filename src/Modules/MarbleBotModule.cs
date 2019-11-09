@@ -18,42 +18,89 @@ namespace MarbleBot.Modules
     public abstract class MarbleBotModule : ModuleBase<SocketCommandContext>
     {
         // Server IDs
-        protected internal const ulong CM = 223616088263491595; // Community Marble
-        protected internal const ulong THS = 224277738608001024; // The Hat Stoar
+        protected internal const ulong CommunityMarble = 223616088263491595;
+        protected internal const ulong TheHatStoar = 224277738608001024;
 
-        protected Logger Logger => LogManager.GetCurrentClassLogger();
+        protected internal const string UnitOfMoney = "<:unitofmoney:372385317581488128>";
+
+        protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         /// <summary> Gets colour for embed depending on guild </summary>
         protected internal static Color GetColor(SocketCommandContext context)
         {
-            if (context.IsPrivate) return Color.DarkerGrey;
-            else return new Color(uint.Parse(GetGuild(context).Color, System.Globalization.NumberStyles.HexNumber));
+            if (context.IsPrivate)
+            {
+                return Color.DarkerGrey;
+            }
+            else
+            {
+                return new Color(uint.Parse(GetGuild(context).Color, System.Globalization.NumberStyles.HexNumber));
+            }
         }
 
         /// <summary> Gets a date string </summary>
         protected internal static string GetDateString(TimeSpan dateTime)
         {
             var output = new StringBuilder();
-            if (dateTime.Days > 1) output.Append(dateTime.Days + " days, ");
-            else if (dateTime.Days > 0) output.Append(dateTime.Days + " day, ");
-            if (dateTime.Hours > 1) output.Append(dateTime.Hours + " hours, ");
-            else if (dateTime.Hours > 0) output.Append(dateTime.Hours + " hour, ");
-            if (dateTime.Minutes > 1) output.Append(dateTime.Minutes + " minutes ");
-            else if (dateTime.Minutes > 0) output.Append(dateTime.Minutes + " minute ");
+            if (dateTime.Days > 1)
+            {
+                output.Append(dateTime.Days + " days, ");
+            }
+            else if (dateTime.Days > 0)
+            {
+                output.Append(dateTime.Days + " day, ");
+            }
+
+            if (dateTime.Hours > 1)
+            {
+                output.Append(dateTime.Hours + " hours, ");
+            }
+            else if (dateTime.Hours > 0)
+            {
+                output.Append(dateTime.Hours + " hour, ");
+            }
+
+            if (dateTime.Minutes > 1)
+            {
+                output.Append(dateTime.Minutes + " minutes ");
+            }
+            else if (dateTime.Minutes > 0)
+            {
+                output.Append(dateTime.Minutes + " minute ");
+            }
+
             if (dateTime.Seconds > 1)
             {
-                if (dateTime.Minutes > 0) output.Append("and " + dateTime.Seconds + " seconds");
-                else output.Append(dateTime.Seconds + " seconds");
+                if (dateTime.Minutes > 0)
+                {
+                    output.Append("and " + dateTime.Seconds + " seconds");
+                }
+                else
+                {
+                    output.Append(dateTime.Seconds + " seconds");
+                }
             }
             else if (dateTime.Seconds > 0)
             {
-                if (dateTime.Minutes > 0) output.Append("and " + dateTime.Seconds + " second");
-                else output.Append(dateTime.Seconds + " second");
+                if (dateTime.Minutes > 0)
+                {
+                    output.Append("and " + dateTime.Seconds + " second");
+                }
+                else
+                {
+                    output.Append(dateTime.Seconds + " second");
+                }
             }
             else if (dateTime.TotalSeconds < 1)
             {
-                if (dateTime.Minutes > 0) output.Append("and <1 second");
-                else output.Append("<1 second");
+                if (dateTime.Minutes > 0)
+                {
+                    output.Append("and <1 second");
+                }
+                else
+                {
+                    output.Append("<1 second");
+                }
             }
             return output.ToString();
         }
@@ -71,13 +118,20 @@ namespace MarbleBot.Modules
                     item.Id = itemId;
                     return item;
                 }
-                else return null;
+                else
+                {
+                    return null;
+                }
             }
             else
             {
                 var newSearchTerm = searchTerm.ToLower().RemoveChar(' ');
                 string json;
-                using (var userFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = userFile.ReadToEnd();
+                using (var userFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json"))
+                {
+                    json = userFile.ReadToEnd();
+                }
+
                 var obj = JObject.Parse(json);
                 foreach (var objItemPair in obj)
                 {
@@ -97,7 +151,10 @@ namespace MarbleBot.Modules
         {
             string json;
             using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json"))
+            {
                 json = itemFile.ReadToEnd();
+            }
+
             return JObject.Parse(json);
         }
 
@@ -122,7 +179,10 @@ namespace MarbleBot.Modules
         {
             string json;
             using (var itemFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
+            {
                 json = itemFile.ReadToEnd();
+            }
+
             return JObject.Parse(json);
         }
 
@@ -135,7 +195,10 @@ namespace MarbleBot.Modules
             {
                 user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
                 user.Id = context.User.Id;
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
+                {
+                    user.Items = new SortedDictionary<uint, int>();
+                }
             }
             else
             {
@@ -158,7 +221,10 @@ namespace MarbleBot.Modules
             {
                 user = obj[id.ToString()].ToObject<MarbleBotUser>();
                 user.Id = id;
-                if (string.IsNullOrEmpty(obj[id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
+                if (string.IsNullOrEmpty(obj[id.ToString()]?.ToString()))
+                {
+                    user.Items = new SortedDictionary<uint, int>();
+                }
             }
             else
             {
@@ -180,7 +246,10 @@ namespace MarbleBot.Modules
             {
                 user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
                 user.Id = context.User.Id;
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
+                {
+                    user.Items = new SortedDictionary<uint, int>();
+                }
             }
             else
             {
@@ -202,7 +271,10 @@ namespace MarbleBot.Modules
             {
                 user = obj[id.ToString()].ToObject<MarbleBotUser>();
                 user.Id = id;
-                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString())) user.Items = new SortedDictionary<uint, int>();
+                if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
+                {
+                    user.Items = new SortedDictionary<uint, int>();
+                }
             }
             else
             {
@@ -220,7 +292,11 @@ namespace MarbleBot.Modules
         protected internal static JObject GetUsersObject()
         {
             string json;
-            using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json")) json = users.ReadToEnd();
+            using (var users = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json"))
+            {
+                json = users.ReadToEnd();
+            }
+
             return JObject.Parse(json);
         }
 
@@ -231,7 +307,7 @@ namespace MarbleBot.Modules
 
         /// <summary> Returns a string that indicates the user's Stage is too low. </summary>
         protected internal static string StageTooHighString()
-        => (Global.Rand.Next(0, 6)) switch
+        => (new Random().Next(0, 6)) switch
         {
             0 => "*Your inexperience blinds you...*",
             1 => "*Your vision is blurry...*",
@@ -245,7 +321,10 @@ namespace MarbleBot.Modules
         protected internal static void WriteGuilds(JObject obj, SocketGuild socketGuild, MarbleBotGuild mbGuild)
         {
             if (obj.ContainsKey(socketGuild.Id.ToString()))
+            {
                 obj.Remove(socketGuild.Id.ToString());
+            }
+
             obj.Add(new JProperty(socketGuild.Id.ToString(), JObject.FromObject(mbGuild)));
             using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json"));
             var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };

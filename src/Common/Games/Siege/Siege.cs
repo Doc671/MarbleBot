@@ -2,6 +2,7 @@
 using Discord.Commands;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
+using MarbleBot.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,15 @@ namespace MarbleBot.Common
         /// <summary> The boss that the marbles are fighting. </summary>
         public Boss Boss { get; set; } = Boss.Empty;
         /// <summary> The number which marble damage is multiplied by. </summary>
-        public double DamageMultiplier => (1.0 + (Marbles.Aggregate(0, (totalDeaths, m) =>
+        public float DamageMultiplier => (1f + (Marbles.Aggregate(0f, (totalDeaths, m) =>
                                                         {
-                                                            if (m.HP < 1) totalDeaths++;
+                                                            if (m.HP < 1)
+                                                            {
+                                                                totalDeaths++;
+                                                            }
+
                                                             return totalDeaths;
-                                                        }) * 0.2)) * (Morales + 1);
+                                                        }) * 0.2f)) * (Morales + 1);
         /// <summary> The ID of the user's DM or guild where the siege is being played. </summary>
         public ulong Id { get; }
         /// <summary> The last time a Morale Boost power-up was activated. </summary>
@@ -41,7 +46,8 @@ namespace MarbleBot.Common
         public PowerUp PowerUp { get; set; }
 
         private bool _disposed = false;
-        private readonly GamesService _service;
+        private readonly GamesService _gamesService;
+        private readonly RandomService _randomService;
         private bool _victoryCalled = false;
 
         // Separate task dealing with time-based boss responses
@@ -53,11 +59,18 @@ namespace MarbleBot.Common
             {
                 await Task.Delay(15000);
 
-                if (_disposed) return;
+                if (_disposed)
+                {
+                    return;
+                }
 
                 if (Boss.HP < 1)
                 {
-                    if (!_victoryCalled) await Victory(context);
+                    if (!_victoryCalled)
+                    {
+                        await Victory(context);
+                    }
+
                     break;
                 }
 
@@ -68,7 +81,7 @@ namespace MarbleBot.Common
                 }
 
                 // Attack marbles
-                var atk = Boss.Attacks.ElementAt(Global.Rand.Next(0, Boss.Attacks.Count));
+                var atk = Boss.Attacks.ElementAt(_randomService.Rand.Next(0, Boss.Attacks.Count));
                 var builder = new EmbedBuilder()
                     .WithAuthor(Boss.Name, Boss.ImageUrl)
                     .WithColor(GetColor(context))
@@ -81,7 +94,7 @@ namespace MarbleBot.Common
                 {
                     if (marble.HP > 0)
                     {
-                        if (!(Global.Rand.Next(0, 100) > atk.Accuracy))
+                        if (!(_randomService.Rand.Next(0, 100) > atk.Accuracy))
                         {
                             marble.DealDamage(atk.Damage);
                             attackMissed = false;
@@ -130,8 +143,12 @@ namespace MarbleBot.Common
                             case StatusEffect.Poison:
                                 if (DateTime.UtcNow.Subtract(marble.LastPoisonTick).TotalSeconds > 15)
                                 {
-                                    if (marble.HP < 1) break;
-                                    marble.HP -= (int)Math.Round((double)marble.MaxHP / 10);
+                                    if (marble.HP < 1)
+                                    {
+                                        break;
+                                    }
+
+                                    marble.HP -= (int)Math.Round(marble.MaxHP / 10d);
                                     marble.LastPoisonTick = DateTime.UtcNow;
                                     if (marble.HP < 2)
                                     {
@@ -145,7 +162,10 @@ namespace MarbleBot.Common
                         }
                     }
                 }
-                if (attackMissed) builder.AddField("Missed!", "No-one got hurt!");
+                if (attackMissed)
+                {
+                    builder.AddField("Missed!", "No-one got hurt!");
+                }
 
                 // Wear off Morale Boost
                 if (Morales > 0 && DateTime.UtcNow.Subtract(LastMorale).TotalSeconds > 20)
@@ -158,7 +178,7 @@ namespace MarbleBot.Common
                 // Cause new power-up to appear
                 if (PowerUp == PowerUp.None)
                 {
-                    switch (Global.Rand.Next(0, 8))
+                    switch (_randomService.Rand.Next(0, 8))
                     {
                         case 1:
                             PowerUp = PowerUp.Clone;
@@ -192,12 +212,18 @@ namespace MarbleBot.Common
 
             if (Boss.HP > 0 && !_disposed)
             {
-                if (timeout) await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
+                if (timeout)
+                {
+                    await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
+                }
                 else
                 {
                     var marbles = new StringBuilder();
                     foreach (var marble in Marbles)
+                    {
                         marbles.AppendLine(marble.ToString(context, false));
+                    }
+
                     await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         .WithAuthor(Boss.Name, Boss.ImageUrl)
                         .WithColor(GetColor(context))
@@ -215,7 +241,10 @@ namespace MarbleBot.Common
         public async Task DealDamage(SocketCommandContext context, int dmg)
         {
             Boss.HP -= dmg;
-            if (Boss.HP < 1) await Victory(context);
+            if (Boss.HP < 1)
+            {
+                await Victory(context);
+            }
         }
 
         public void Dispose()
@@ -226,12 +255,19 @@ namespace MarbleBot.Common
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
+
             Active = false;
             _disposed = true;
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
+            {
                 marbleList.Write("");
-            _service.SiegeInfo.TryRemove(Id, out _);
+            }
+
+            _gamesService.SiegeInfo.TryRemove(Id, out _);
             if (disposing && Actions != null)
             {
                 Actions.Wait();
@@ -244,13 +280,24 @@ namespace MarbleBot.Common
         public static Boss GetBoss(string searchTerm)
         {
             string json;
-            using (var bosses = new StreamReader($"Resources{Path.DirectorySeparatorChar}Bosses.json")) json = bosses.ReadToEnd();
+            using (var bosses = new StreamReader($"Resources{Path.DirectorySeparatorChar}Bosses.json"))
+            {
+                json = bosses.ReadToEnd();
+            }
+
             var obj = new Dictionary<string, JObject>(JObject.Parse(json).ToObject<IDictionary<string, JObject>>(),
                 StringComparer.InvariantCultureIgnoreCase);
             var boss = Boss.Empty;
             if (searchTerm.Contains(' ') || (string.Compare(searchTerm[0].ToString(), searchTerm[0].ToString(), true) == 0))
+            {
                 searchTerm = searchTerm.ToPascalCase();
-            if (obj.ContainsKey(searchTerm)) boss = obj[searchTerm].ToObject<Boss>();
+            }
+
+            if (obj.ContainsKey(searchTerm))
+            {
+                boss = obj[searchTerm].ToObject<Boss>();
+            }
+
             return boss;
         }
 
@@ -319,14 +366,21 @@ namespace MarbleBot.Common
                 user.NetWorth -= item.Price;
                 WriteUsers(obj, context.User, user);
             }
-            if (item.Id == 10) marble.QefpedunCharmUsed = true;
+            if (item.Id == 10)
+            {
+                marble.QefpedunCharmUsed = true;
+            }
         }
 
         public override string ToString() => $"[{Id}] {Boss.Name}: {Marbles.Count}";
 
         public async Task Victory(SocketCommandContext context)
         {
-            if (_victoryCalled) return;
+            if (_victoryCalled)
+            {
+                return;
+            }
+
             _victoryCalled = true;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
@@ -357,16 +411,23 @@ namespace MarbleBot.Common
                 if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6)
                 {
                     if (marble.DamageDealt > 0)
-                        output.AppendLine($"Damage dealt: {Global.UoM}**{marble.DamageDealt:n2}**");
-                    else break;
+                    {
+                        output.AppendLine($"Damage dealt: {UnitOfMoney}**{marble.DamageDealt:n2}**");
+                    }
+                    else
+                    {
+                        break;
+                    }
 
                     if (marble.PowerUpHits > 0)
-                        output.AppendLine($"Power-ups grabbed (x50): {Global.UoM}**{marble.PowerUpHits * 50:n2}**");
+                    {
+                        output.AppendLine($"Power-ups grabbed (x50): {UnitOfMoney}**{marble.PowerUpHits * 50:n2}**");
+                    }
 
                     if (marble.HP > 0)
                     {
                         earnings += 200;
-                        output.AppendLine($"Alive bonus: {Global.UoM}**{200:n2}**");
+                        output.AppendLine($"Alive bonus: {UnitOfMoney}**{200:n2}**");
                         user.SiegeWins++;
                     }
 
@@ -378,33 +439,53 @@ namespace MarbleBot.Common
 
                     if (output.Length > 0)
                     {
-                        if (marble.HP > 0) user.LastSiegeWin = DateTime.UtcNow;
-                        if (Boss.Drops.Count > 0) output.AppendLine("**Item Drops:**");
+                        if (marble.HP > 0)
+                        {
+                            user.LastSiegeWin = DateTime.UtcNow;
+                        }
+
+                        if (Boss.Drops.Count > 0)
+                        {
+                            output.AppendLine("**Item Drops:**");
+                        }
+
                         var dropPresent = false;
                         foreach (var itemDrops in Boss.Drops)
                         {
-                            if (Global.Rand.Next(0, 100) < itemDrops.Chance)
+                            if (_randomService.Rand.Next(0, 100) < itemDrops.Chance)
                             {
                                 dropPresent = true;
 
                                 int noOfDrops;
                                 if (itemDrops.MinCount == itemDrops.MaxCount)
+                                {
                                     noOfDrops = itemDrops.MinCount;
+                                }
                                 else
-                                    noOfDrops = Global.Rand.Next(itemDrops.MinCount, itemDrops.MaxCount + 1);
+                                {
+                                    noOfDrops = _randomService.Rand.Next(itemDrops.MinCount, itemDrops.MaxCount + 1);
+                                }
 
                                 if (user.Items.ContainsKey(itemDrops.ItemId))
+                                {
                                     user.Items[itemDrops.ItemId] += noOfDrops;
+                                }
                                 else
+                                {
                                     user.Items.Add(itemDrops.ItemId, noOfDrops);
+                                }
 
                                 var item = GetItem<Item>(itemDrops.ItemId.ToString("000"));
                                 user.NetWorth += item.Price * noOfDrops;
                                 output.AppendLine($"`[{itemDrops.ItemId.ToString("000")}]` {item.Name} x{noOfDrops}");
                             }
                         }
-                        if (!dropPresent) output.AppendLine("None");
-                        output.AppendLine($"__**Total: {Global.UoM}{earnings:n2}**__");
+                        if (!dropPresent)
+                        {
+                            output.AppendLine("None");
+                        }
+
+                        output.AppendLine($"__**Total: {UnitOfMoney}{earnings:n2}**__");
                         user.Balance += earnings;
                         user.NetWorth += earnings;
                         builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
@@ -476,30 +557,37 @@ namespace MarbleBot.Common
 
             if (weapon.Hits == 1)
             {
-                if (Global.Rand.Next(0, 100) < weapon.Accuracy)
+                if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                 {
                     var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
-                        * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                        * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                     await DealDamage(context, damage);
                     marble.DamageDealt += damage;
                     builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{damage}** damage to **{Boss.Name}**!");
                 }
-                else builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**! It missed!");
+                else
+                {
+                    builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**! It missed!");
+                }
             }
             else
             {
                 var totalDamage = 0;
                 for (int i = 0; i < weapon.Hits; i++)
                 {
-                    if (Global.Rand.Next(0, 100) < weapon.Accuracy)
+                    if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                     {
                         var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
-                            * (Global.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                            * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                         await DealDamage(context, damage);
                         totalDamage += damage;
                         builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss.Name}**.");
                     }
-                    else builder.AddField($"Attack {i + 1}", "Missed!");
+                    else
+                    {
+                        builder.AddField($"Attack {i + 1}", "Missed!");
+                    }
+
                     await Task.Delay(1);
                 }
                 marble.DamageDealt += totalDamage;
@@ -510,9 +598,10 @@ namespace MarbleBot.Common
                         .Build());
         }
 
-        public Siege(GamesService service, SocketCommandContext context, IEnumerable<SiegeMarble> marbles)
+        public Siege(GamesService gamesService, RandomService randomService, SocketCommandContext context, IEnumerable<SiegeMarble> marbles)
         {
-            _service = service;
+            _gamesService = gamesService;
+            _randomService = randomService;
             Id = context.IsPrivate ? context.User.Id : context.Guild.Id;
             Marbles = marbles.ToList();
         }

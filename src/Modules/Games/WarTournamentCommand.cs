@@ -21,11 +21,16 @@ namespace MarbleBot.Modules.Games
 
         private static Dictionary<ulong, WarTournamentInfo> GetTournamentsInfo()
         {
-            if (!File.Exists(_warFilePath)) File.Create(_warFilePath).Close();
+            if (!File.Exists(_warFilePath))
+            {
+                File.Create(_warFilePath).Close();
+            }
 
             string json;
             using (var tournamentFile = new StreamReader(_warFilePath))
+            {
                 json = tournamentFile.ReadToEnd();
+            }
 
             return JObject.Parse(json).ToObject<Dictionary<ulong, WarTournamentInfo>>();
         }
@@ -63,9 +68,13 @@ namespace MarbleBot.Modules.Games
                 }
 
                 if (tournamentsInfo[Context.Guild.Id].Marbles.ContainsKey(teamName))
+                {
                     tournamentsInfo[Context.Guild.Id].Marbles[teamName].Add(Context.User.Id);
+                }
                 else
+                {
                     tournamentsInfo[Context.Guild.Id].Marbles.Add(teamName, new List<ulong> { Context.User.Id });
+                }
             }
 
             WriteTournamentsInfo(tournamentsInfo);

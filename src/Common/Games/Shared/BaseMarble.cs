@@ -31,7 +31,11 @@ namespace MarbleBot.Common
         /// <summary> Deals damage to a marble. </summary>
         public void DealDamage(int damage)
         {
-            if (Shield != null && Shield.Id == 63) damage = (int)Math.Round(damage * 0.8);
+            if (Shield != null && Shield.Id == 63)
+            {
+                damage = (int)Math.Round(damage * 0.8);
+            }
+
             HP -= damage;
         }
 

@@ -9,8 +9,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-using static MarbleBot.Global;
-
 namespace MarbleBot.Modules.Games
 {
     [Group("scavenge")]
@@ -29,7 +27,9 @@ namespace MarbleBot.Modules.Games
             else
             {
                 if (GamesService.ScavengeInfo.ContainsKey(Context.User.Id))
+                {
                     await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
+                }
                 else
                 {
                     var scavengeMessage = await ReplyAsync(embed: new EmbedBuilder()
@@ -37,7 +37,7 @@ namespace MarbleBot.Modules.Games
                         .WithCurrentTimestamp()
                         .WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location).CamelToTitleCase()}**!")
                         .WithTitle("Item Scavenge Begin!").Build());
-                    GamesService.ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(GamesService, Context, location, scavengeMessage));
+                    GamesService.ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(GamesService, RandomService, Context, location, scavengeMessage));
                 }
             }
         }
@@ -54,13 +54,19 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Destroyer's Remains.")]
         public async Task ScavengeDestroyerCommand()
         {
-            if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+            if (GetUser(Context).Stage < 2)
+            {
+                await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                 .WithTitle("Scavenge: Destroyer's Remains")
                 .Build());
-            else await ScavengeStartAsync(GetUser(Context), ScavengeLocation.DestroyersRemains);
+            }
+            else
+            {
+                await ScavengeStartAsync(GetUser(Context), ScavengeLocation.DestroyersRemains);
+            }
         }
 
         [Command("treewurld")]
@@ -75,13 +81,19 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in the Violet Volcanoes.")]
         public async Task ScavengeVolcanoCommand()
         {
-            if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+            if (GetUser(Context).Stage < 2)
+            {
+                await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                 .WithTitle("Scavenge: Violet Volcanoes")
                 .Build());
-            else await ScavengeStartAsync(GetUser(Context), ScavengeLocation.VioletVolcanoes);
+            }
+            else
+            {
+                await ScavengeStartAsync(GetUser(Context), ScavengeLocation.VioletVolcanoes);
+            }
         }
 
         [Command("grab")]
@@ -108,8 +120,14 @@ namespace MarbleBot.Modules.Games
             GamesService.ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
             if (user.Items != null)
             {
-                if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
-                else user.Items.Add(item.Id, 1);
+                if (user.Items.ContainsKey(item.Id))
+                {
+                    user.Items[item.Id]++;
+                }
+                else
+                {
+                    user.Items.Add(item.Id, 1);
+                }
             }
             else
             {
@@ -161,8 +179,14 @@ namespace MarbleBot.Modules.Games
             GamesService.ScavengeInfo[Context.User.Id].UsedOres.Enqueue(item);
             if (user.Items != null)
             {
-                if (user.Items.ContainsKey(item.Id)) user.Items[item.Id]++;
-                else user.Items.Add(item.Id, 1);
+                if (user.Items.ContainsKey(item.Id))
+                {
+                    user.Items[item.Id]++;
+                }
+                else
+                {
+                    user.Items.Add(item.Id, 1);
+                }
             }
             else
             {
@@ -208,7 +232,7 @@ namespace MarbleBot.Modules.Games
             user.NetWorth += item.Price;
             WriteUsers(obj, Context.User, user);
             await GamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
-            var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UoM}**{item.Price:n2}**!");
+            var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UnitOfMoney}**{item.Price:n2}**!");
 
             // Clean up the messages created if the bot can delete messages
             if (!Context.IsPrivate && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.ManageMessages)
@@ -243,13 +267,19 @@ namespace MarbleBot.Modules.Games
         {
             var output = new StringBuilder();
             string json;
-            using (var users = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json")) json = users.ReadToEnd();
+            using (var users = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json"))
+            {
+                json = users.ReadToEnd();
+            }
+
             var obj = JObject.Parse(json);
             var items = obj.ToObject<Dictionary<string, Item>>();
             foreach (var itemPair in items)
             {
                 if (itemPair.Value.ScavengeLocation == location)
+                {
                     output.AppendLine($"`[{int.Parse(itemPair.Key).ToString("000")}]` {itemPair.Value.Name}");
+                }
             }
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -271,13 +301,19 @@ namespace MarbleBot.Modules.Games
         [Summary("Shows scavenge location info for Destroyer's Remains")]
         public async Task ScavengeLocationDestroyerCommand()
         {
-            if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+            if (GetUser(Context).Stage < 2)
+            {
+                await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                 .WithTitle("Scavenge Location Info: Destroyer's Remains")
                 .Build());
-            else await ScavengeInfoAsync(ScavengeLocation.DestroyersRemains);
+            }
+            else
+            {
+                await ScavengeInfoAsync(ScavengeLocation.DestroyersRemains);
+            }
         }
 
         [Command("location treewurld")]
@@ -292,13 +328,19 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Destroyer's Remains")]
         public async Task ScavengeLocationVolcanoCommand()
         {
-            if (GetUser(Context).Stage < 2) await ReplyAsync(embed: new EmbedBuilder()
+            if (GetUser(Context).Stage < 2)
+            {
+                await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                 .WithTitle("Scavenge Location Info: Violet Volcanoes")
                 .Build());
-            else await ScavengeInfoAsync(ScavengeLocation.VioletVolcanoes);
+            }
+            else
+            {
+                await ScavengeInfoAsync(ScavengeLocation.VioletVolcanoes);
+            }
         }
 
         [Command("help")]

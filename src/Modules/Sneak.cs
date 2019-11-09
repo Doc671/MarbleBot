@@ -4,7 +4,7 @@ using Discord.WebSocket;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
-using Newtonsoft.Json;
+using MarbleBot.Services;
 using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Targets;
@@ -16,17 +16,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using static MarbleBot.Global;
-
 namespace MarbleBot.Modules
 {
     /// <summary> Owner-only commands. >:) </summary>
     public class Sneak : MarbleBotModule
     {
+        private readonly DailyTimeoutService _dailyTimeoutService;
         private readonly GamesService _gamesService;
 
-        public Sneak(GamesService gamesService)
+        public Sneak(DailyTimeoutService dailyTimeoutService, GamesService gamesService)
         {
+            _dailyTimeoutService = dailyTimeoutService;
             _gamesService = gamesService;
         }
 
@@ -45,13 +45,22 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task ClearMemoryCommand()
         {
-            DailyTimeout = 48;
+            _dailyTimeoutService.DailyTimeout = 48;
             foreach (var pair in _gamesService.ScavengeInfo)
+            {
                 pair.Value.Dispose();
+            }
+
             foreach (var pair in _gamesService.SiegeInfo)
+            {
                 pair.Value.Dispose();
+            }
+
             foreach (var pair in _gamesService.WarInfo)
+            {
                 pair.Value.Dispose();
+            }
+
             _gamesService.ScavengeInfo = new ConcurrentDictionary<ulong, Scavenge>();
             _gamesService.SiegeInfo = new ConcurrentDictionary<ulong, Siege>();
             _gamesService.WarInfo = new ConcurrentDictionary<ulong, War>();
@@ -67,10 +76,13 @@ namespace MarbleBot.Modules
         {
             if (ushort.TryParse(rawHours, out ushort hours))
             {
-                DailyTimeout = hours;
+                _dailyTimeoutService.DailyTimeout = hours;
                 await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");
             }
-            else await ReplyAsync("Invalid number of hours!");
+            else
+            {
+                await ReplyAsync("Invalid number of hours!");
+            }
         }
 
         [Command("fixbalance")]
@@ -117,13 +129,13 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task MelmonCommand(string melmon, [Remainder] string msg)
         {
-            SocketGuild srvr = Context.Client.GetGuild(THS);
-            ISocketMessageChannel chnl = srvr.GetTextChannel(THS);
+            SocketGuild srvr = Context.Client.GetGuild(TheHatStoar);
+            ISocketMessageChannel chnl = srvr.GetTextChannel(TheHatStoar);
             switch (melmon)
             {
                 case "desk": await chnl.SendMessageAsync(msg); break;
                 case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
-                case "ken": srvr = Context.Client.GetGuild(CM); chnl = srvr.GetTextChannel(CM); await chnl.SendMessageAsync(msg); break;
+                case "ken": srvr = Context.Client.GetGuild(CommunityMarble); chnl = srvr.GetTextChannel(CommunityMarble); await chnl.SendMessageAsync(msg); break;
                 case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
                 case "brady": chnl = srvr.GetTextChannel(237158048282443776); await chnl.SendMessageAsync(msg); break;
                 default:
@@ -165,7 +177,10 @@ namespace MarbleBot.Modules
         {
             var output = new StringBuilder();
             foreach (var siegePair in _gamesService.SiegeInfo)
+            {
                 output.AppendLine($"**{siegePair.Key}** - {siegePair.Value}");
+            }
+
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -194,7 +209,10 @@ namespace MarbleBot.Modules
                 {
                     var channel = Context.Client.GetGuild(guildPair.Key).GetTextChannel(guildPair.Value.AnnouncementChannel);
                     var msg = await channel.SendMessageAsync(embed: builder.Build());
-                    if (major) await msg.PinAsync();
+                    if (major)
+                    {
+                        await msg.PinAsync();
+                    }
                 }
             }
         }

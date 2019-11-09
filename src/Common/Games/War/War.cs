@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using MarbleBot.Modules.Games.Services;
+using MarbleBot.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,8 @@ namespace MarbleBot.Common
         private readonly bool _aiMarblePresent = false;
         private bool _disposed = false;
         private bool _endCalled = false;
-        private readonly GamesService _service;
+        private readonly GamesService _gamesService;
+        private readonly RandomService _randomService;
 
         public void Dispose()
         {
@@ -37,11 +39,18 @@ namespace MarbleBot.Common
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
+
             _disposed = true;
-            _service.WarInfo.TryRemove(Id, out _);
+            _gamesService.WarInfo.TryRemove(Id, out _);
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}war.csv", false))
+            {
                 marbleList.Write("");
+            }
+
             if (disposing && Actions != null)
             {
                 Actions.Wait();
@@ -51,7 +60,11 @@ namespace MarbleBot.Common
 
         public async Task End(SocketCommandContext context)
         {
-            if (_endCalled) return;
+            if (_endCalled)
+            {
+                return;
+            }
+
             _endCalled = true;
             var t1Total = Team1.Marbles.Sum(m => m.HP);
             var t2Total = Team2.Marbles.Sum(m => m.HP);
@@ -89,15 +102,18 @@ namespace MarbleBot.Common
                     if (marble.DamageDealt > 0)
                     {
                         earnings = marble.DamageDealt * 5;
-                        output.AppendLine($"Damage dealt (x5): {Global.UoM}**{earnings:n2}**");
+                        output.AppendLine($"Damage dealt (x5): {UnitOfMoney}**{earnings:n2}**");
                         user.WarWins++;
                     }
-                    else break;
+                    else
+                    {
+                        break;
+                    }
 
                     if (marble.HP > 0)
                     {
                         earnings += 200;
-                        output.AppendLine($"Alive bonus: {Global.UoM}**{200:n2}**");
+                        output.AppendLine($"Alive bonus: {UnitOfMoney}**{200:n2}**");
                     }
 
                     if (user.Items.ContainsKey(83))
@@ -111,7 +127,7 @@ namespace MarbleBot.Common
                         user.LastWarWin = DateTime.UtcNow;
                         user.Balance += earnings;
                         user.NetWorth += earnings;
-                        output.AppendLine($"__**Total: {Global.UoM}{earnings:n2}**__");
+                        output.AppendLine($"__**Total: {UnitOfMoney}{earnings:n2}**__");
                         builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
                         obj.Remove(marble.Id.ToString());
                         obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
@@ -130,7 +146,10 @@ namespace MarbleBot.Common
             do
             {
                 await Task.Delay(7000);
-                if (_disposed) return;
+                if (_disposed)
+                {
+                    return;
+                }
                 else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
                 {
                     timeout = true;
@@ -139,10 +158,10 @@ namespace MarbleBot.Common
                 else if (_aiMarblePresent && _aiMarble.HP > 0)
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
-                    var randMarble = enemyTeam.Marbles.ElementAt(Global.Rand.Next(0, enemyTeam.Marbles.Count));
-                    if (Global.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
+                    var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
+                    if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
-                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + Global.Rand.NextDouble())));
+                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + _randomService.Rand.NextDouble())));
                         randMarble.HP -= dmg;
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                             .AddField("Remaining HP", $"**{randMarble.HP}**/{randMarble.MaxHP}")
@@ -152,22 +171,32 @@ namespace MarbleBot.Common
                             .WithTitle($"**{_aiMarble.Name}** attacks!")
                             .Build());
                     }
-                    else await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    else
+                    {
+                        await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                           .WithColor(GetColor(context))
                           .WithCurrentTimestamp()
                           .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
                           .WithTitle($"**{_aiMarble.Name}** attacks!")
                           .Build());
+                    }
                 }
             }
             while (!timeout && !_disposed && !Team1.Marbles.All(m => m.HP == 0) && !Team2.Marbles.All(m => m.HP == 0));
-            if (!timeout) await End(context);
-            else Dispose(true);
+            if (!timeout)
+            {
+                await End(context);
+            }
+            else
+            {
+                Dispose(true);
+            }
         }
 
-        public War(GamesService service, ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble aiMarble, WarBoost team1Boost, WarBoost team2Boost)
+        public War(GamesService gamesService, RandomService randomService, ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble aiMarble, WarBoost team1Boost, WarBoost team2Boost)
         {
-            _service = service;
+            _gamesService = gamesService;
+            _randomService = randomService;
 
             Id = id;
             _aiMarble = aiMarble;
@@ -178,12 +207,17 @@ namespace MarbleBot.Common
             using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
             {
                 while (!teamNames.EndOfStream)
+                {
                     nameList.Add(teamNames.ReadLine());
+                }
             }
 
             string team2Name;
-            var team1Name = nameList[Global.Rand.Next(0, nameList.Count)];
-            do team2Name = nameList[Global.Rand.Next(0, nameList.Count)];
+            var team1Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
+            do
+            {
+                team2Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
+            }
             while (string.Compare(team1Name, team2Name, false) == 0);
 
             Team1 = new WarTeam(team1Name, team1Marbles, team1Boost);

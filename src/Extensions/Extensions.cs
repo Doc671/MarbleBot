@@ -14,13 +14,19 @@ namespace MarbleBot.Extensions
             for (int i = 0; i < str.Length; i++)
             {
                 if (i == 0)
+                {
                     output.Append(char.ToUpper(str[i]));
+                }
                 else
+                {
                     output.Append(str[i]);
+                }
 
                 // Add a space if the next character is a capital letter (indicating a new word)
                 if (i != 0 && i < str.Length - 1 && char.IsUpper(str[i + 1]))
+                {
                     output.Append(" ");
+                }
             }
             return output.ToString();
         }
@@ -37,7 +43,11 @@ namespace MarbleBot.Extensions
 
         public static string Ordinal(this int no)
         {
-            if (no > 20) no %= 10;
+            if (no > 20)
+            {
+                no %= 10;
+            }
+
             return no switch
             {
                 1 => "st",
@@ -53,7 +63,9 @@ namespace MarbleBot.Extensions
             for (int i = 0; i < str.Length; i++)
             {
                 if (str[i] != charToRemove)
+                {
                     output.Append(str[i]);
+                }
             }
             return output.ToString();
         }
