@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace MarbleBot.Modules.Games
         [Alias("join")]
         [Summary("Sign up to the marble race!")]
         public async Task RaceSignupCommand([Remainder] string marbleName = "")
-        => await Signup(Context, Type, marbleName, 10, async () => { await RaceStartCommand(); });
+        => await Signup(Type, marbleName, 10, async () => { await RaceStartCommand(); });
 
         [Command("start", RunMode = RunMode.Async)]
         [Alias("begin")]
@@ -31,38 +32,35 @@ namespace MarbleBot.Modules.Games
         public async Task RaceStartCommand()
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+
+            if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}.race"))
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                return;
+            }
+
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp();
             int marbleCount = 0;
-            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}race.csv"))
+            var marbles = new List<(ulong id, string name)>();
+            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.race"))
             {
-                while (!marbleList.EndOfStream)
+                if (marbleList.BaseStream.Length == 0)
                 {
-                    var line = await marbleList.ReadLineAsync();
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        marbleCount++;
-                    }
+                    await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                    return;
                 }
-            }
-            
-            if (marbleCount == 0)
-            {
-                await SendErrorAsync("It doesn't look like anyone has signed up!");
-                return;
+
+                var formatter = new BinaryFormatter();
+                marbles = (List<(ulong, string)>)formatter.Deserialize(marbleList.BaseStream);
+                marbleCount = marbles.Count;
             }
 
-            // Get marbles
-            var marbles = new List<(string, ulong)>();
-            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}race.csv"))
+            if (marbleCount == 0)
             {
-                while (!marbleList.EndOfStream)
-                {
-                    var line = (await marbleList.ReadLineAsync()).Split(',');
-                    marbles.Add((line[0], ulong.Parse(line[1])));
-                }
-                marbleList.Close();
+                await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                return;
             }
 
             // Get the death messages
@@ -87,11 +85,11 @@ namespace MarbleBot.Modules.Games
                 {
                     eliminated = RandomService.Rand.Next(0, marbleCount);
                 }
-                while (string.Compare(marbles[eliminated].Item1, "///out", true) == 0);
+                while (string.Compare(marbles[eliminated].name, "///out", true) == 0);
                 string deathMessage;
                 deathMessage = messages[RandomService.Rand.Next(0, messages.Count - 1)];
-                string bold = marbles[eliminated].Item1.Contains('*') || marbles[eliminated].Item1.Contains('\\') ? "" : "**";
-                builder.AddField($"{bold}{marbles[eliminated].Item1}{bold} is eliminated!", $"{marbles[eliminated].Item1} {deathMessage} and is now out of the competition!");
+                string bold = marbles[eliminated].name.Contains('*') || marbles[eliminated].name.Contains('\\') ? "" : "**";
+                builder.AddField($"{bold}{marbles[eliminated].name}{bold} is eliminated!", $"{marbles[eliminated].name} {deathMessage} and is now out of the competition!");
 
                 // A special message may be displayed depending on the name of last place
                 if (alive == marbleCount && marbleCount > 1)
@@ -103,39 +101,39 @@ namespace MarbleBot.Modules.Games
                     }
 
                     var messageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                    var marbleName = marbles[eliminated].Item1.ToLower().RemoveChar(' ');
+                    var marbleName = marbles[eliminated].name.ToLower().RemoveChar(' ');
                     if (messageDict.ContainsKey(marbleName))
                     {
                         builder.WithDescription($"*{messageDict[marbleName]}*");
                     }
                 }
 
-                marbles[eliminated] = ("///out", marbles[eliminated].Item2);
+                marbles[eliminated] = (marbles[eliminated].id, "///out");
                 await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
                 await Task.Delay(1500);
             }
 
             // Race finish
-            var winningMarble = marbles.Find(m => string.Compare(m.Item1, "///out") != 0);
-            string bold2 = winningMarble.Item1.Contains('*') || winningMarble.Item1.Contains('\\') ? "" : "**";
-            builder.AddField($"{bold2}{winningMarble.Item1}{bold2} wins!", winningMarble.Item1 + " is the winner!");
+            var winningMarble = marbles.Find(m => string.Compare(m.name, "///out") != 0);
+            string bold2 = winningMarble.name.Contains('*') || winningMarble.name.Contains('\\') ? "" : "**";
+            builder.AddField($"{bold2}{winningMarble.name}{bold2} wins!", winningMarble.name + " is the winner!");
             if (marbleCount > 1)
             {
                 using var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}RaceWinners.txt", true);
-                await racers.WriteLineAsync(winningMarble.Item1);
+                await racers.WriteLineAsync(winningMarble.name);
             }
             await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
-            await ReplyAsync($"{bold2}{winningMarble.Item1}{bold2} won the race!");
+            await ReplyAsync($"{bold2}{winningMarble.name}{bold2} won the race!");
 
             // Reward winner
             var obj = GetUsersObject();
-            var user = await GetUserAsync(Context, obj, winningMarble.Item2);
+            var user = await GetUserAsync(Context, obj, winningMarble.id);
             if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
             {
                 var noOfSameUser = 0;
-                foreach (var marble in marbles)
+                foreach (var (id, name) in marbles)
                 {
-                    if (marble.Item2 == winningMarble.Item2)
+                    if (id == winningMarble.id)
                     {
                         noOfSameUser++;
                     }
@@ -153,13 +151,13 @@ namespace MarbleBot.Modules.Games
                     user.NetWorth += gift;
                     user.LastRaceWin = DateTime.UtcNow;
                     user.RaceWins++;
-                    obj.Remove(winningMarble.Item2.ToString());
-                    obj.Add(new JProperty(winningMarble.Item2.ToString(), JObject.FromObject(user)));
+                    obj.Remove(winningMarble.id.ToString());
+                    obj.Add(new JProperty(winningMarble.id.ToString(), JObject.FromObject(user)));
                     WriteUsers(obj);
                     await ReplyAsync($"**{user.Name}** won {UnitOfMoney}**{gift:n2}** for winning the race!");
                 }
             }
-            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}race.csv", false))
+            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}.race", false))
             {
                 await marbleList.WriteAsync("");
             }
@@ -168,18 +166,18 @@ namespace MarbleBot.Modules.Games
         [Command("checkearn")]
         [Summary("Shows whether you can earn money from racing and if not, when.")]
         public async Task RaceCheckearnCommand()
-        => await Checkearn(Context, Type);
+        => await Checkearn(Type);
 
         [Command("clear")]
         [Summary("Clears the list of racers.")]
         public async Task RaceClearCommand()
-        => await Clear(Context, Type);
+        => await Clear(Type);
 
         [Command("contestants")]
         [Alias("marbles", "participants")]
         [Summary("Shows a list of all the contestants in the race.")]
         public async Task RaceContestantsCommand()
-        => await ShowContestants(Context, Type);
+        => await ShowContestants(Type);
 
         [Command("leaderboard")]
         [Summary("Shows a leaderboard of most used marbles or winning marbles.")]
@@ -259,7 +257,7 @@ namespace MarbleBot.Modules.Games
         [Command("remove")]
         [Summary("Removes a contestant from the contestant list.")]
         public async Task RaceRemoveCommand([Remainder] string marbleToRemove)
-        => await RemoveContestant(Context, Type, marbleToRemove);
+        => await RemoveContestant(Type, marbleToRemove);
 
         [Command("help")]
         [Alias("")]

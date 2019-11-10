@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace MarbleBot.Modules.Games
         [Alias("join")]
         [Summary("Sign up to the Marble War!")]
         public async Task WarSignupCommand(string itemId, [Remainder] string marbleName = "")
-        => await Signup(Context, Type, marbleName, 20, async () => { await WarStartCommand(); }, itemId);
+        => await Signup(Type, marbleName, 20, async () => { await WarStartCommand(); }, itemId);
 
         [Command("start")]
         [Alias("commence")]
@@ -33,25 +34,37 @@ namespace MarbleBot.Modules.Games
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
             var marbles = new List<WarMarble>();
-            bool marblesPresent = false;
-            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
+
+            if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}.war"))
             {
-                while (!marbleList.EndOfStream)
+                await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                return;
+            }
+
+            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.war"))
+            {
+                if (marbleList.BaseStream.Length == 0)
                 {
-                    marblesPresent = true;
-                    var line = (await marbleList.ReadLineAsync()).RemoveChar('\n').Split(',');
-                    var userId = ulong.Parse(line[1]);
-                    var user = GetUser(Context, userId);
-                    marbles.Add(new WarMarble(userId, 40, line[0], GetItem<Weapon>(line[2]),
+                    await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                    return;
+                }
+
+                var formatter = new BinaryFormatter();
+                var rawMarbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleList.BaseStream);
+                if (rawMarbles.Count == 0)
+                {
+                    await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                    return;
+                }
+
+                MarbleBotUser user;
+                foreach (var (id, name, itemId) in rawMarbles)
+                {
+                    user = GetUser(Context, id);
+                    marbles.Add(new WarMarble(id, 40, name, GetItem<Weapon>(itemId.ToString()),
                         user.Items.ContainsKey(63) && user.Items[63] > 1 ? GetItem<Item>("063") : GetItem<Item>("000"),
                         user.Items.Where(i => GetItem<Item>(i.Key.ToString("000")).Name.Contains("Spikes")).LastOrDefault().Key));
                 }
-            }
-
-            if (!marblesPresent)
-            {
-                await SendErrorAsync("It doesn't look like anyone has signed up!");
-                return;
             }
 
             // Shuffles marble list
@@ -351,7 +364,7 @@ namespace MarbleBot.Modules.Games
             var user = GetUser(Context);
             var enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
             WarMarble enemyMarble = null;
-            if (int.TryParse(target, out int index) && enemyTeam.Marbles.Count >= index + 1)
+            if (int.TryParse(target, out int index) && enemyTeam.Marbles.Count >= index)
             {
                 enemyMarble = enemyTeam.Marbles.ElementAt(index - 1);
             }
@@ -510,18 +523,18 @@ namespace MarbleBot.Modules.Games
         [Command("checkearn")]
         [Summary("Shows whether you can earn money from wars and if not, when.")]
         public async Task WarCheckearnCommand()
-        => await Checkearn(Context, Type);
+        => await Checkearn(Type);
 
         [Command("clear")]
         [Summary("Clears the list of contestants.")]
         public async Task WarClearCommand()
-        => await Clear(Context, Type);
+        => await Clear(Type);
 
         [Command("contestants")]
         [Alias("marbles", "participants")]
         [Summary("Shows a list of all the contestants in the war.")]
         public async Task WarContestantsCommand()
-        => await ShowContestants(Context, Type);
+        => await ShowContestants(Type);
 
         [Command("info")]
         [Summary("Shows information about the war.")]
@@ -552,36 +565,42 @@ namespace MarbleBot.Modules.Games
             }
             else
             {
-                var marbles = new StringBuilder();
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}war.csv"))
+                if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}.war"))
                 {
-                    var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                    if (allMarbles.Length > 1)
+                    await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                    return;
+                }
+
+                var marbleOutput = new StringBuilder();
+                using (var marbleListFile = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.war"))
+                {
+                    if (marbleListFile.BaseStream.Length == 0)
                     {
-                        foreach (string marble in allMarbles)
-                        {
-                            if (marble.Length > 16)
-                            {
-                                var mSplit = marble.Split(',');
-                                var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
-                                var item = GetItem<Item>(int.Parse(mSplit[2]).ToString("000"));
-                                if (Context.IsPrivate)
-                                {
-                                    marbles.AppendLine($"**{mSplit[0]} (Weapon: **{item.Name}**)**");
-                                }
-                                else
-                                {
-                                    marbles.AppendLine($"**{mSplit[0]}** (Weapon: **{item.Name}**) [{user.Username}#{user.Discriminator}]");
-                                }
-                            }
-                        }
+                        marbleOutput.Append("No-one is signed up!");
                     }
                     else
                     {
-                        marbles.Append("No contestants have signed up!");
+                        var formatter = new BinaryFormatter();
+                        var marbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
+
+                        if (marbles.Count == 0)
+                        {
+                            marbleOutput.Append("No-one is signed up!");
+                        }
+                        else
+                        {
+                            string bold;
+                            SocketUser user;
+                            foreach (var (id, name, itemId) in marbles)
+                            {
+                                bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
+                                user = Context.Client.GetUser(id);
+                                marbleOutput.AppendLine($"{bold}{name}{bold} (Weapon: **{GetItem<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
+                            }
+                        }
                     }
                 }
-                builder.AddField("Marbles", marbles.ToString());
+                builder.AddField("Marbles", marbleOutput.ToString());
                 builder.WithDescription("War not started yet.");
             }
             await ReplyAsync(embed: builder.Build());
@@ -662,7 +681,7 @@ namespace MarbleBot.Modules.Games
         [Command("remove")]
         [Summary("Removes a contestant from the contestant list.")]
         public async Task WarRemoveCommand([Remainder] string marbleToRemove)
-        => await RemoveContestant(Context, Type, marbleToRemove);
+        => await RemoveContestant(Type, marbleToRemove);
 
         [Command("valid")]
         [Alias("validweapons")]
@@ -698,7 +717,7 @@ namespace MarbleBot.Modules.Games
                         .AppendLine("Use `mb/war signup <weapon ID> <marble name>` to sign up as a marble!")
                         .AppendLine("When everyone's done, use `mb/war start`! The war begins automatically if 20 marbles have signed up.")
                         .Append("\nWhen the war begins, use `mb/war attack <marble code>` to attack an enemy with your weapon")
-                        .AppendLine($" and `mb/war bash <marble name>` to attack without.{(GetUser(Context).Stage > 1 ? "Spikes are twice as effective with `mb/war bash`." : "")}")
+                        .AppendLine($" and `mb/war bash <marble code>` to attack without.{(GetUser(Context).Stage > 1 ? "Spikes are twice as effective with `mb/war bash`." : "")}")
                         .Append("\nEveryone is split into two teams. If there is an odd number of contestants, an AI marble joins")
                         .AppendLine(" the team that has fewer members!")
                         .ToString())

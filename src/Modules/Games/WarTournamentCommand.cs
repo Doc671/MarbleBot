@@ -1,10 +1,9 @@
 ﻿using Discord.Commands;
 using MarbleBot.Common;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules.Games
@@ -17,29 +16,25 @@ namespace MarbleBot.Modules.Games
     [RequireOwner]
     public class WarTournamentCommand : GameModule
     {
-        private static readonly string _warFilePath = $"Data{Path.DirectorySeparatorChar}WarTournament.json";
+        private static readonly string _warFilePath = $"Data{Path.DirectorySeparatorChar}WarTournament.wt";
 
-        private static Dictionary<ulong, WarTournamentInfo> GetTournamentsInfo()
+        private static List<WarTournamentInfo> GetTournamentsInfo()
         {
             if (!File.Exists(_warFilePath))
             {
                 File.Create(_warFilePath).Close();
             }
 
-            string json;
-            using (var tournamentFile = new StreamReader(_warFilePath))
-            {
-                json = tournamentFile.ReadToEnd();
-            }
-
-            return JObject.Parse(json).ToObject<Dictionary<ulong, WarTournamentInfo>>();
+            using var tournamentFile = new StreamReader(_warFilePath);
+            var serialiser = new BinaryFormatter();
+            return (List<WarTournamentInfo>)serialiser.Deserialize(tournamentFile.BaseStream);
         }
 
-        private static void WriteTournamentsInfo(Dictionary<ulong, WarTournamentInfo> tournamentsInfo)
+        private static void WriteTournamentsInfo(List<WarTournamentInfo> tournamentsInfo)
         {
-            using var tournamentFile = new JsonTextWriter(new StreamWriter(_warFilePath));
-            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
-            serialiser.Serialize(tournamentFile, tournamentsInfo);
+            using var tournamentFile = new StreamWriter(_warFilePath);
+            var serialiser = new BinaryFormatter();
+            serialiser.Serialize(tournamentFile.BaseStream, tournamentsInfo);
         }
 
         [Command("setup")]
@@ -48,7 +43,7 @@ namespace MarbleBot.Modules.Games
         public async Task WarTournamentSetupCommand(uint spaces, uint teamSize)
         {
             var tournamentsInfo = GetTournamentsInfo();
-            tournamentsInfo.Add(Context.Guild.Id, new WarTournamentInfo(Context.Guild.Id, spaces, teamSize, null));
+            tournamentsInfo.Add(new WarTournamentInfo(Context.Guild.Id, spaces, teamSize, null));
             WriteTournamentsInfo(tournamentsInfo);
             await ReplyAsync($"Successfully created war tournament with **{spaces}** spaces and team sizes of **{teamSize}**.");
         }
@@ -59,21 +54,22 @@ namespace MarbleBot.Modules.Games
         public async Task WarTournamentSignupCommand(string teamName)
         {
             var tournamentsInfo = GetTournamentsInfo();
-            if (tournamentsInfo.ContainsKey(Context.Guild.Id))
+            if (tournamentsInfo.Any(tInfo => tInfo.GuildId == Context.Guild.Id))
             {
-                if (tournamentsInfo[Context.Guild.Id].Marbles.Any(teamPair => teamPair.Value.Contains(Context.Guild.Id)))
+                var tournamentInfo = tournamentsInfo.Find(tInfo => tInfo.GuildId == Context.Guild.Id);
+                if (tournamentInfo.Marbles.Any(teamPair => teamPair.Value.Contains(Context.Guild.Id)))
                 {
                     await SendErrorAsync($"**{Context.User.Username}**, you have already signed up!");
                     return;
                 }
 
-                if (tournamentsInfo[Context.Guild.Id].Marbles.ContainsKey(teamName))
+                if (tournamentInfo.Marbles.ContainsKey(teamName))
                 {
-                    tournamentsInfo[Context.Guild.Id].Marbles[teamName].Add(Context.User.Id);
+                    tournamentInfo.Marbles[teamName].Add(Context.User.Id);
                 }
                 else
                 {
-                    tournamentsInfo[Context.Guild.Id].Marbles.Add(teamName, new List<ulong> { Context.User.Id });
+                    tournamentInfo.Marbles.Add(teamName, new List<ulong> { Context.User.Id });
                 }
             }
 

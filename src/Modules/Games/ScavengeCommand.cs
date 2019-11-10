@@ -261,7 +261,7 @@ namespace MarbleBot.Modules.Games
         [Alias("checkearn")]
         [Summary("Shows whether you can scavenge and if not, when you will be able to.")]
         public async Task ScavengeCheckearnAsync()
-        => await Checkearn(Context, Type);
+        => await Checkearn(Type);
 
         public async Task ScavengeInfoAsync(ScavengeLocation location)
         {

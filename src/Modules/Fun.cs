@@ -17,7 +17,7 @@ namespace MarbleBot.Modules
     public class Fun : MarbleBotModule
     {
         private readonly RandomService _randomService;
-        
+
         public Fun(RandomService randomService)
         {
             _randomService = randomService;

@@ -46,7 +46,7 @@ namespace MarbleBot.Common
 
             _disposed = true;
             _gamesService.WarInfo.TryRemove(Id, out _);
-            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}war.csv", false))
+            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.war"))
             {
                 marbleList.Write("");
             }

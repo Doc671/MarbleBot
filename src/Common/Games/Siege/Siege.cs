@@ -262,7 +262,7 @@ namespace MarbleBot.Common
 
             Active = false;
             _disposed = true;
-            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}siege.csv", false))
+            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.siege"))
             {
                 marbleList.Write("");
             }
@@ -324,20 +324,26 @@ namespace MarbleBot.Common
         {
             if (_disposed)
             {
-                await context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
+                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, there is no currently ongoing Siege!");
                 return;
             }
 
             if (!Marbles.Any(m => m.Id == context.User.Id))
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you aren't in this Siege!");
+                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you aren't in this Siege!");
                 return;
             }
 
             var marble = Marbles.Find(m => m.Id == context.User.Id);
             if (marble.HP == 0)
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you are out and can no longer attack!");
+                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you are out and can no longer attack!");
+                return;
+            }
+
+            if (DateTime.UtcNow.Subtract(marble.LastMoveUsed).TotalSeconds < 5)
+            {
+                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you must wait for {GetDateString(marble.LastMoveUsed.Subtract(DateTime.UtcNow.AddSeconds(-5)))} until you can attack again!");
                 return;
             }
 

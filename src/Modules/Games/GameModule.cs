@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
@@ -8,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,9 +32,9 @@ namespace MarbleBot.Modules.Games
         /// <summary> Sends a message showing whether a user can earn from a game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        protected static async Task Checkearn(SocketCommandContext context, GameType gameType)
+        protected async Task Checkearn(GameType gameType)
         {
-            var user = GetUser(context);
+            var user = GetUser(Context);
             var lastWin = gameType switch
             {
                 GameType.Race => user.LastRaceWin,
@@ -52,9 +54,9 @@ namespace MarbleBot.Modules.Games
             var output = nextEarn.TotalHours < 6 ?
                 $"You can earn money from {game} in **{GetDateString(lastWin.Subtract(DateTime.UtcNow.AddHours(-6)))}**!"
                 : $"You can earn money from {game} now!";
-            await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                .WithAuthor(context.User)
-                .WithColor(GetColor(context))
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithAuthor(Context.User)
+                .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription(output)
                 .Build());
@@ -63,18 +65,18 @@ namespace MarbleBot.Modules.Games
         /// <summary> Clears the contestant list. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        protected async Task Clear(SocketCommandContext context, GameType gameType)
+        protected async Task Clear(GameType gameType)
         {
-            ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
-            if (BotCredentials.AdminIds.Any(id => id == context.User.Id) || context.IsPrivate)
+            ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+            if (BotCredentials.AdminIds.Any(id => id == Context.User.Id) || Context.IsPrivate)
             {
-                using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv", false);
+                using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}.{GameName(gameType, false)}", false);
                 await marbleList.WriteAsync("");
-                await context.Channel.SendMessageAsync("Contestant list successfully cleared!");
+                await ReplyAsync("Contestant list successfully cleared!");
             }
             else
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you cannot do this!");
+                await ReplyAsync($"**{Context.User.Username}**, you cannot do this!");
             }
         }
 
@@ -128,57 +130,95 @@ namespace MarbleBot.Modules.Games
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
         /// <param name="marbleToRemove"> The name of the marble to remove. </param>
-        protected async Task RemoveContestant(SocketCommandContext context, GameType gameType, string marbleToRemove)
+        protected async Task RemoveContestant(GameType gameType, string marbleToRemove)
         {
-            ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
-            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
+            ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}.{GameName(gameType, false)}";
             if (!File.Exists(marbleListDirectory))
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "guild")}! There are no marbles signed up to remove!");
+                await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
                 return;
             }
-            // 0 - Not found, 1 - Found but not yours, 2 - Found & yours, 3 - Found & overridden
-            int state = BotCredentials.AdminIds.Any(id => id == context.User.Id) ? 3 : 0;
+
+            // 0 - Not found, 1 - Found but not yours, 2 - Found & removed
+            int state = BotCredentials.AdminIds.Any(id => id == Context.User.Id) ? 3 : 0;
             var wholeFile = new StringBuilder();
-            string line;
-            using (var marbleList = new StreamReader(marbleListDirectory))
+            var formatter = new BinaryFormatter();
+            if (gameType == GameType.War)
             {
-                while (!marbleList.EndOfStream)
+                List<(ulong id, string name, uint itemId)> marbles;
+                using (var marbleListFile = new StreamReader(marbleListDirectory))
                 {
-                    line = await marbleList.ReadLineAsync();
-                    if (string.Compare(line.Split(',')[0], marbleToRemove, true) == 0)
+                    if (marbleListFile.BaseStream.Length == 0)
                     {
-                        if (ulong.Parse(line.Split(',')[1]) == context.User.Id)
-                        {
-                            state = 2;
-                        }
-                        else
-                        {
-                            wholeFile.AppendLine(line);
-                            if (!(state == 2))
-                            {
-                                state = 1;
-                            }
-                        }
+                        await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                        return;
+                    }
+                    marbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
+                }
+
+                if (marbles.Any(info => string.Compare(marbleToRemove, info.name, true) == 0))
+                {
+                    var (id, name, itemId) = marbles.Find(info => string.Compare(marbleToRemove, info.name, true) == 0);
+                    if (state == 2 || id == Context.User.Id)
+                    {
+                        state = 2;
+                        marbles.Remove((id, name, itemId));
                     }
                     else
                     {
-                        wholeFile.AppendLine(line);
+                        state = 1;
                     }
+                }
+
+                using (var marbleListFile = new StreamWriter(marbleListDirectory))
+                {
+                    if (marbleListFile.BaseStream.Length == 0)
+                    {
+                        await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                        return;
+                    }
+                    formatter.Serialize(marbleListFile.BaseStream, marbles);
+                }
+            }
+            else
+            {
+                List<(ulong id, string name)> marbles;
+                using (var marbleListFile = new StreamReader(marbleListDirectory))
+                {
+                    marbles = (List<(ulong id, string name)>)formatter.Deserialize(marbleListFile.BaseStream);
+                }
+
+                if (marbles.Any(info => string.Compare(marbleToRemove, info.name, true) == 0))
+                {
+                    var (id, name) = marbles.Find(info => string.Compare(marbleToRemove, info.name, true) == 0);
+                    if (state == 2 || id == Context.User.Id)
+                    {
+                        state = 2;
+                        marbles.Remove((id, name));
+                    }
+                    else
+                    {
+                        state = 1;
+                    }
+                }
+
+                using (var marbleListFile = new StreamWriter(marbleListDirectory))
+                {
+                    formatter.Serialize(marbleListFile.BaseStream, marbles);
                 }
             }
 
             switch (state)
             {
-                case 0: await context.Channel.SendMessageAsync($"**{context.User.Username}**, could not find the requested marble!"); break;
-                case 1: await context.Channel.SendMessageAsync($"**{context.User.Username}**, this is not your marble!"); break;
+                case 0: await ReplyAsync($"**{Context.User.Username}**, could not find the requested marble!"); break;
+                case 1: await ReplyAsync($"**{Context.User.Username}**, this is not your marble!"); break;
                 case 2:
-                case 3:
                     string bold = marbleToRemove.Contains('*') || marbleToRemove.Contains('\\') ? "" : "**";
                     using (var marbleList = new StreamWriter(marbleListDirectory, false))
                     {
                         await marbleList.WriteAsync(wholeFile.ToString());
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, removed contestant {bold}{marbleToRemove}{bold}!");
+                        await ReplyAsync($"**{Context.User.Username}**, removed contestant {bold}{marbleToRemove}{bold}!");
                     }
                     break;
             }
@@ -187,49 +227,70 @@ namespace MarbleBot.Modules.Games
         /// <summary> Returns a message showing the contestants currently signed up to the game. </summary>
         /// <param name="context"> The context of the command. </param>
         /// <param name="gameType"> The type of game. </param>
-        protected async Task ShowContestants(SocketCommandContext context, GameType gameType)
+        protected async Task ShowContestants(GameType gameType)
         {
-            ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
-            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
+            ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}.{GameName(gameType, false)}";
             if (!File.Exists(marbleListDirectory))
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, no data exists for this {(context.IsPrivate ? "DM" : "guild")}! No-one is signed up!");
+                await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
                 return;
             }
 
-            var marbles = new StringBuilder();
+            var marbleOutput = new StringBuilder();
             int count = 0;
-            using (var marbleList = new StreamReader(marbleListDirectory))
+            using (var marbleListFile = new StreamReader(marbleListDirectory))
             {
-                var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                for (count = 0; count < allMarbles.Length; count++)
+                if (marbleListFile.BaseStream.Length == 0)
                 {
-                    string marble = allMarbles[count];
-                    if (marble.Length > 16)
+                    await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                    return;
+                }
+
+                var formatter = new BinaryFormatter();
+                string bold;
+                SocketUser user;
+                if (gameType == GameType.War)
+                {
+                    var marbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
+                    count = marbles.Count;
+                    if (count == 0)
                     {
-                        var marbleInfo = marble.Split(',');
-                        string bold = marbleInfo[0].Contains('*') || marbleInfo[0].Contains('\\') ? "" : "**";
-                        var user = context.Client.GetUser(ulong.Parse(marbleInfo[1]));
-                        marbles.AppendLine($"{bold}{marbleInfo[0]}{bold} {(context.IsPrivate ? "" : $"[{user?.Username ?? "Unknown"}#{user.Discriminator ?? "0000"}]")}");
+                        await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                        return;
+                    }
+                    foreach (var (id, name, itemId) in marbles)
+                    {
+                        bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
+                        user = Context.Client.GetUser(id);
+                        marbleOutput.AppendLine($"{bold}{name}{bold} (Weapon: **{GetItem<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
+                    }
+                }
+                else
+                {
+                    var marbles = (List<(ulong id, string name)>)formatter.Deserialize(marbleListFile.BaseStream);
+                    count = marbles.Count;
+                    if (count == 0)
+                    {
+                        await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                        return;
+                    }
+                    foreach (var (id, name) in marbles)
+                    {
+                        bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
+                        user = Context.Client.GetUser(id);
+                        marbleOutput.AppendLine($"{bold}{name}{bold} [{user.Username}#{user.Discriminator}]");
                     }
                 }
             }
 
-            var output = marbles.ToString();
-            if (string.IsNullOrEmpty(output))
-            {
-                await context.Channel.SendMessageAsync("No-one is signed up!");
-            }
-            else
-            {
-                await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                    .WithColor(GetColor(context))
-                    .WithCurrentTimestamp()
-                    .WithFooter($"Contestant count: {count - 1}")
-                    .WithTitle($"Marble {GameName(gameType)}: Contestants")
-                    .AddField("Contestants", output)
-                    .Build());
-            }
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithFooter($"Contestant count: {count}")
+                .WithTitle($"Marble {GameName(gameType)}: Contestants")
+                .AddField("Contestants", marbleOutput.ToString())
+                .Build());
         }
 
         /// <summary> Removes a contestant from the contestant list of a game. </summary>
@@ -239,111 +300,143 @@ namespace MarbleBot.Modules.Games
         /// <param name="marbleLimit"> The maximum number of marbles that can be signed up. </param>
         /// <param name="startCommand"> The command to execute if the marble limit has been met. </param>
         /// <param name="itemId"> (War only) The ID of the weapon the marble is joining with. </param>
-        protected async Task Signup(SocketCommandContext context, GameType gameType, string marbleName, int marbleLimit,
+        protected async Task Signup(GameType gameType, string marbleName, int marbleLimit,
             Func<Task> startCommand, string itemId = "")
         {
-            ulong fileId = context.IsPrivate ? context.User.Id : context.Guild.Id;
-            string marbleListDirectory = $"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv";
-            if (!File.Exists(marbleListDirectory))
+            ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
+            string marbleListFilePath = $"Data{Path.DirectorySeparatorChar}{fileId}.{GameName(gameType, false)}";
+            if (!File.Exists(marbleListFilePath))
             {
-                File.Create(marbleListDirectory).Close();
+                File.Create(marbleListFilePath).Close();
             }
 
             var weapon = new Weapon();
-
-            if (gameType == GameType.Siege || gameType == GameType.War)
+            var binaryFormatter = new BinaryFormatter();
+            if (gameType == GameType.Siege)
             {
-                if (gameType == GameType.Siege)
+                if (GamesService.SiegeInfo.ContainsKey(fileId) && GamesService.SiegeInfo[fileId].Active)
                 {
-                    if (GamesService.SiegeInfo.ContainsKey(fileId) && GamesService.SiegeInfo[fileId].Active)
-                    {
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, a battle is currently ongoing!");
-                        return;
-                    }
+                    await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
+                    return;
                 }
-                else if (gameType == GameType.War)
+
+                using var marbleList = new StreamReader(marbleListFilePath);
+                if (marbleList.BaseStream.Length != 0 && ((List<(ulong id, string name)>)binaryFormatter.Deserialize(marbleList.BaseStream)).Any(info => info.id == Context.User.Id))
                 {
-                    if (GamesService.WarInfo.ContainsKey(fileId))
-                    {
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, a battle is currently ongoing!");
-                        return;
-                    }
-
-                    weapon = GetItem<Weapon>(itemId);
-                    if (weapon == null)
-                    {
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, this is not a valid item!");
-                    }
-
-                    if (weapon.WarClass == WeaponClass.None || weapon.WarClass == WeaponClass.Artillery)
-                    {
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, this item cannot be used as a weapon!");
-                        return;
-                    }
-
-                    var user = GetUser(context);
-                    if (!user.Items.ContainsKey(weapon.Id) || user.Items[weapon.Id] < 1)
-                    {
-                        await context.Channel.SendMessageAsync($"**{context.User.Username}**, you don't have this item!");
-                        return;
-                    }
+                    await ReplyAsync($"**{Context.User.Username}**, you've already joined!");
+                    return;
                 }
-                using var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}{GameName(gameType, false)}.csv");
-                if ((await marbleList.ReadToEndAsync()).Contains(context.User.Id.ToString()))
+            }
+            else if (gameType == GameType.War)
+            {
+                if (GamesService.WarInfo.ContainsKey(fileId))
                 {
-                    await context.Channel.SendMessageAsync($"**{context.User.Username}**, you've already joined!");
+                    await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
+                    return;
+                }
+
+                weapon = GetItem<Weapon>(itemId);
+                if (weapon == null)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, this is not a valid item!");
+                    return;
+                }
+
+                if (weapon.WarClass == WeaponClass.None || weapon.WarClass == WeaponClass.Artillery)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, this item cannot be used as a weapon!");
+                    return;
+                }
+
+                var user = GetUser(Context);
+                if (!user.Items.ContainsKey(weapon.Id) || user.Items[weapon.Id] < 1)
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");
+                    return;
+                }
+
+                using var marbleList = new StreamReader(marbleListFilePath);
+                if (marbleList.BaseStream.Length != 0 && ((List<(ulong id, string name, uint itemId)>)binaryFormatter.Deserialize(marbleList.BaseStream)).Any(info => info.id == Context.User.Id))
+                {
+                    await ReplyAsync($"**{Context.User.Username}**, you've already joined!");
                     return;
                 }
             }
 
             if (string.IsNullOrEmpty(marbleName) || marbleName.StartsWith("<@"))
             {
-                marbleName = context.User.Username;
+                marbleName = Context.User.Username;
             }
             else if (marbleName.Length > 100)
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, your entry exceeds the 100 character limit.");
+                await ReplyAsync($"**{Context.User.Username}**, your entry exceeds the 100 character limit.");
                 return;
-            }
-            else
-            {
-                marbleName = marbleName.Replace('\n', ' ').Replace(',', ';');
             }
 
             string bold = marbleName.Contains('*') || marbleName.Contains('\\') ? "" : "**";
             var builder = new EmbedBuilder()
-                .WithColor(GetColor(context))
+                .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .AddField($"Marble {GameName(gameType)}: Signed up!",
-                    $"**{context.User.Username}** has successfully signed up as {bold}{marbleName}{bold}{(gameType == GameType.War ? $" with the weapon **{weapon.Name}**" : "")}!");
-            using (var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
+                    $"**{Context.User.Username}** has successfully signed up as {bold}{marbleName}{bold}{(gameType == GameType.War ? $" with the weapon **{weapon.Name}**" : "")}!");
+            using (var mostUsedFile = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
             {
-                await racers.WriteLineAsync(marbleName);
-            }
-
-            using (var marbleList = new StreamWriter(marbleListDirectory, true))
-            {
-                if (gameType == GameType.War)
-                {
-                    await marbleList.WriteLineAsync($"{marbleName},{context.User.Id},{itemId}");
-                }
-                else
-                {
-                    await marbleList.WriteLineAsync($"{marbleName},{context.User.Id}");
-                }
+                await mostUsedFile.WriteLineAsync(marbleName);
             }
 
             int marbleNo;
-            using (var marbleList = new StreamReader(marbleListDirectory, true))
+            if (gameType == GameType.War)
             {
-                marbleNo = (await marbleList.ReadToEndAsync()).Split('\n').Length;
+                var marbles = new List<(ulong id, string name, uint itemId)>();
+                using (var marbleFile = new StreamReader(marbleListFilePath))
+                {
+                    if (marbleFile.BaseStream.Length == 0)
+                    {
+                        marbleNo = 0;
+                    }
+                    else
+                    {
+                        marbles = (List<(ulong id, string name, uint itemId)>)binaryFormatter.Deserialize(marbleFile.BaseStream);
+                        marbleNo = marbles.Count;
+                    }
+                }
+
+                marbles.Add((Context.User.Id, marbleName, weapon.Id));
+
+                using (var marbleFile = new StreamWriter(marbleListFilePath))
+                {
+                    binaryFormatter.Serialize(marbleFile.BaseStream, marbles);
+                }
+            }
+            else
+            {
+                var marbles = new List<(ulong id, string name)>();
+                using (var marbleFile = new StreamReader(marbleListFilePath))
+                {
+                    if (marbleFile.BaseStream.Length == 0)
+                    {
+                        marbleNo = 0;
+                    }
+                    else
+                    {
+                        marbles = (List<(ulong id, string name)>)binaryFormatter.Deserialize(marbleFile.BaseStream);
+                        marbleNo = marbles.Count + 1;
+                    }
+                }
+
+                marbles.Add((Context.User.Id, marbleName));
+
+                using (var marbleFile = new StreamWriter(marbleListFilePath))
+                {
+                    binaryFormatter.Serialize(marbleFile.BaseStream, marbles);
+                }
             }
 
-            await context.Channel.SendMessageAsync(embed: builder.Build());
+            await ReplyAsync(embed: builder.Build());
 
             if (marbleNo > marbleLimit)
             {
-                await context.Channel.SendMessageAsync($"The limit of {marbleLimit} contestants has been reached!");
+                await ReplyAsync($"The limit of {marbleLimit} contestants has been reached!");
                 await startCommand();
             }
         }

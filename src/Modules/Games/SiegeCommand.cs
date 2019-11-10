@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
 using Newtonsoft.Json.Linq;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,7 +25,7 @@ namespace MarbleBot.Modules.Games
         [Alias("join")]
         [Summary("Sign up to the Marble Siege!")]
         public async Task SiegeSignupCommand([Remainder] string marbleName = "")
-        => await Signup(Context, Type, marbleName, 20, async () => { await SiegeStartCommand(); });
+        => await Signup(Type, marbleName, 20, async () => { await SiegeStartCommand(); });
 
         [Command("start")]
         [Alias("begin")]
@@ -38,68 +40,78 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
+            if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}.siege"))
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                return;
+            }
+
             // Get marbles
             int marbleCount = 0;
-            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
+            var rawMarbles = new List<(ulong id, string name)>();
+            var formatter = new BinaryFormatter();
+            using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.siege"))
             {
-                string line;
-                string[] sLine;
-                SiegeMarble marble;
-                MarbleBotUser user;
-                var marbles = new List<SiegeMarble>();
-                while (!marbleList.EndOfStream)
+                if (marbleList.BaseStream.Length == 0)
                 {
-                    line = (await marbleList.ReadLineAsync()).RemoveChar('\n');
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        marbleCount++;
-                    }
-
-                    sLine = line.Split(',');
-                    marble = new SiegeMarble()
-                    {
-                        Id = ulong.Parse(sLine[1]),
-                        Name = sLine[0]
-                    };
-                    user = GetUser(Context, marble.Id);
-
-                    if (user.Items.ContainsKey(63) && user.Items[63] >= 1)
-                    {
-                        marble.Shield = GetItem<Item>("063");
-                    }
-
-                    if (user.Items.ContainsKey(80))
-                    {
-                        marble.DamageIncrease = 110;
-                    }
-                    else if (user.Items.ContainsKey(74))
-                    {
-                        marble.DamageIncrease = 95;
-                    }
-                    else if (user.Items.ContainsKey(71))
-                    {
-                        marble.DamageIncrease = 60;
-                    }
-                    else if (user.Items.ContainsKey(66))
-                    {
-                        marble.DamageIncrease = 40;
-                    }
-
-                    marbles.Add(marble);
+                    await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
+                    return;
                 }
-                if (GamesService.SiegeInfo.ContainsKey(fileId))
+                rawMarbles = (List<(ulong id, string name)>)formatter.Deserialize(marbleList.BaseStream);
+                marbleCount = rawMarbles.Count;
+            }
+
+            SiegeMarble marble;
+            MarbleBotUser user;
+            var marbles = new List<SiegeMarble>();
+            int stageTotal = 0;
+            foreach (var (id, name) in rawMarbles)
+            {
+                marble = new SiegeMarble()
                 {
-                    GamesService.SiegeInfo[fileId].Marbles = marbles;
-                }
-                else
+                    Id = id,
+                    Name = name,
+                };
+
+                user = GetUser(Context, id);
+                stageTotal += user.Stage;
+
+                if (user.Items.ContainsKey(63) && user.Items[63] >= 1)
                 {
-                    GamesService.SiegeInfo.GetOrAdd(fileId, new Siege(GamesService, RandomService, Context, marbles));
+                    marble.Shield = GetItem<Item>("063");
                 }
+
+                if (user.Items.ContainsKey(80))
+                {
+                    marble.DamageIncrease = 110;
+                }
+                else if (user.Items.ContainsKey(74))
+                {
+                    marble.DamageIncrease = 95;
+                }
+                else if (user.Items.ContainsKey(71))
+                {
+                    marble.DamageIncrease = 60;
+                }
+                else if (user.Items.ContainsKey(66))
+                {
+                    marble.DamageIncrease = 40;
+                }
+
+                marbles.Add(marble);
+            }
+            if (GamesService.SiegeInfo.ContainsKey(fileId))
+            {
+                GamesService.SiegeInfo[fileId].Marbles = marbles;
+            }
+            else
+            {
+                GamesService.SiegeInfo.GetOrAdd(fileId, new Siege(GamesService, RandomService, Context, marbles));
             }
 
             if (marbleCount == 0)
             {
-                await SendErrorAsync("It doesn't look like anyone has signed up!");
+                await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
                 return;
             }
 
@@ -113,12 +125,6 @@ namespace MarbleBot.Modules.Games
             }
             else if (string.Compare(currentSiege.Boss.Name, "", true) == 0)
             {
-                int stageTotal = 0;
-                foreach (var marble in currentSiege.Marbles)
-                {
-                    var user = GetUser(Context, marble.Id);
-                    stageTotal += user.Stage;
-                }
                 // Choose a stage 1 or stage 2 boss depending on the stage of each participant
                 float stage = stageTotal / (float)currentSiege.Marbles.Count;
                 if (stage == 1f)
@@ -142,18 +148,17 @@ namespace MarbleBot.Modules.Games
                     }
                 }
             }
-            var hp = ((int)currentSiege.Boss.Difficulty + 2) * 5;
-            foreach (var marble in currentSiege.Marbles)
-            {
-                marble.SetHP(hp);
-            }
 
+            var hp = ((int)currentSiege.Boss.Difficulty + 2) * 5;
             var marbleOutput = new StringBuilder();
             var mentionOutput = new StringBuilder();
-            foreach (var marble in currentSiege.Marbles)
+            SocketUser socketUser;
+            for (int i = 0; i < currentSiege.Marbles.Count; i++)
             {
-                var user = Context.Client.GetUser(marble.Id);
-                marbleOutput.AppendLine($"**{marble.Name}** [{user.Username}#{user.Discriminator}]");
+                marble = currentSiege.Marbles[i];
+                marble.SetHP(hp);
+                socketUser = Context.Client.GetUser(marble.Id);
+                marbleOutput.AppendLine($"**{marble.Name}** [{socketUser.Username}#{socketUser.Discriminator}]");
                 if (GetUser(Context, marble.Id).SiegePing)
                 {
                     mentionOutput.Append($"<@{marble.Id}> ");
@@ -406,30 +411,30 @@ namespace MarbleBot.Modules.Games
         [Command("checkearn")]
         [Summary("Shows whether you can earn money from Sieges and if not, when.")]
         public async Task SiegeCheckearnCommand()
-        => await Checkearn(Context, Type);
+        => await Checkearn(Type);
 
         [Command("clear")]
         [Summary("Clears the list of contestants.")]
         public async Task SiegeClearCommand()
-        => await Clear(Context, Type);
+        => await Clear(Type);
 
         [Command("contestants")]
         [Alias("marbles", "participants")]
         [Summary("Shows a list of all the contestants in the Siege.")]
         public async Task SiegeContestantsCommand()
-        => await ShowContestants(Context, Type);
+        => await ShowContestants(Type);
 
         [Command("remove")]
         [Summary("Removes a contestant from the contestant list.")]
         public async Task SiegeRemoveCommand([Remainder] string marbleToRemove)
-        => await RemoveContestant(Context, Type, marbleToRemove);
+        => await RemoveContestant(Type, marbleToRemove);
 
         [Command("info")]
         [Summary("Shows information about the Siege.")]
         public async Task SiegeInfoCommand()
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-            var marbles = new StringBuilder();
+            var marbleOutput = new StringBuilder();
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -439,23 +444,23 @@ namespace MarbleBot.Modules.Games
                 var siege = GamesService.SiegeInfo[fileId];
                 foreach (var marble in siege.Marbles)
                 {
-                    marbles.AppendLine(marble.ToString(Context));
+                    marbleOutput.AppendLine(marble.ToString(Context));
                 }
 
                 builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHP: **{siege.Boss.HP}**/{siege.Boss.MaxHP}\nAttacks: **{siege.Boss.Attacks.Count}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**");
 
-                if (marbles.Length > 1024)
+                if (marbleOutput.Length > 1024)
                 {
-                    builder.AddField($"Marbles: **{siege.Marbles.Count}**", string.Concat(marbles.ToString().Take(1024)));
+                    builder.AddField($"Marbles: **{siege.Marbles.Count}**", string.Concat(marbleOutput.ToString().Take(1024)));
 
-                    for (int i = 1024; i < marbles.Length; i += 1024)
+                    for (int i = 1024; i < marbleOutput.Length; i += 1024)
                     {
-                        builder.AddField("Marbles (cont.)", string.Concat(marbles.ToString().Skip(i)));
+                        builder.AddField("Marbles (cont.)", string.Concat(marbleOutput.ToString().Skip(i)));
                     }
                 }
                 else
                 {
-                    builder.AddField($"Marbles: **{siege.Marbles.Count}**", marbles.ToString());
+                    builder.AddField($"Marbles: **{siege.Marbles.Count}**", marbleOutput.ToString());
                 }
 
                 builder.WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{Enum.GetName(typeof(PowerUp), siege.PowerUp).CamelToTitleCase()}**")
@@ -470,27 +475,40 @@ namespace MarbleBot.Modules.Games
                         .WithThumbnailUrl(siege.Boss.ImageUrl);
                 }
 
-                using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}siege.csv"))
+                if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}.siege"))
                 {
-                    var allMarbles = (await marbleList.ReadToEndAsync()).Split('\n');
-                    if (allMarbles.Length > 1)
+                    marbleOutput.Append("No-one is signed up!");
+                }
+
+                using (var marbleListFile = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.siege"))
+                {
+                    if (marbleListFile.BaseStream.Length == 0)
                     {
-                        foreach (string marble in allMarbles)
-                        {
-                            if (marble.Length > 16)
-                            {
-                                var mSplit = marble.Split(',');
-                                var user = Context.Client.GetUser(ulong.Parse(mSplit[1]));
-                                marbles.AppendLine($"**{mSplit[0]}** [{user?.Username ?? "Unknown"}#{user?.Discriminator ?? "0000"}]");
-                            }
-                        }
+                        marbleOutput.Append("No-one is signed up!");
                     }
                     else
                     {
-                        marbles.Append("No contestants have signed up!");
+                        var formatter = new BinaryFormatter();
+                        var marbles = (List<(ulong id, string name)>)formatter.Deserialize(marbleListFile.BaseStream);
+
+                        if (marbles.Count == 0)
+                        {
+                            marbleOutput.Append("No-one is signed up!");
+                        }
+                        else
+                        {
+                            string bold;
+                            SocketUser user;
+                            foreach (var (id, name) in marbles)
+                            {
+                                bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
+                                user = Context.Client.GetUser(id);
+                                marbleOutput.AppendLine($"{bold}{name}{bold} [{user.Username}#{user.Discriminator}]");
+                            }
+                        }
                     }
                 }
-                builder.AddField("Marbles", marbles.ToString());
+                builder.AddField("Marbles", marbleOutput.ToString());
                 builder.WithDescription("Siege not started yet.");
             }
             await ReplyAsync(embed: builder.Build());
