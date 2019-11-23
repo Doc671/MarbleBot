@@ -182,7 +182,8 @@ namespace MarbleBot.Modules
             using var service = new SheetsService(new BaseClientService.Initializer()
             {
                 ApiKey = _botCredentials.GoogleApiKey,
-                ApplicationName = GetType().ToString()
+                ApplicationName = GetType().ToString(),
+                HttpClientInitializer = _botCredentials.GoogleUserCredential
             });
 
             string spreadsheetId = GetGuild(Context).WarningSheetLink;

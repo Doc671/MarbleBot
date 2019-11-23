@@ -1,6 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Sheets.v4;
+using Google.Apis.Util.Store;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +14,7 @@ using NLog.Extensions.Logging;
 using NLog.Targets;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MarbleBot
@@ -57,7 +61,18 @@ namespace MarbleBot
                 json = botCredentialFile.ReadToEnd();
             }
 
-            return JObject.Parse(json).ToObject<BotCredentials>();
+            var returnValue = JObject.Parse(json).ToObject<BotCredentials>();
+            using (var stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
+            {
+                returnValue.GoogleUserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    new string[] { SheetsService.Scope.Spreadsheets },
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore($"Keys{Path.DirectorySeparatorChar}token.json", true)
+                ).Result;
+            }
+            return returnValue;
         }
 
         private void SetLogConfig()

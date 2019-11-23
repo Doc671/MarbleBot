@@ -118,7 +118,7 @@ namespace MarbleBot.Services
                         await context.Channel.SendMessageAsync("Unknown command. Use `mb/help` to see what commands there are.");
                         break;
                     default:
-                        await context.Channel.SendMessageAsync($"An error has occured ({result.ErrorReason}).");
+                        await context.Channel.SendMessageAsync($"An error has occured. ```{result.ErrorReason}```");
                         _logger.Error($"{result.Error.Value}: {result.ErrorReason}");
                         break;
                 }
