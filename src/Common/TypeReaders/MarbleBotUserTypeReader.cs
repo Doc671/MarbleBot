@@ -19,7 +19,9 @@ namespace MarbleBot.Common.TypeReaders
             var usersDict = usersObj.ToObject<Dictionary<ulong, MarbleBotUser>>();
             foreach (var user in usersDict)
             {
-                if (string.Compare(input, user.Value.Name, true) == 0)
+                if (string.Compare(input, user.Value.Name, true) == 0
+                    || input.Contains(user.Value.Name, StringComparison.OrdinalIgnoreCase)
+                    || user.Value.Name.Contains(input, StringComparison.OrdinalIgnoreCase))
                 {
                     return Task.FromResult(TypeReaderResult.FromSuccess(MarbleBotModule.GetUserAsync(context, usersObj, user.Key).Result));
                 }
