@@ -145,7 +145,7 @@ namespace MarbleBot.Modules
                 // If neither a command nor a module could be found, show a list of modules
                 if (command == null)
                 {
-                    if ((Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
+                    if (!Context.IsPrivate && (Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
                     {
                         builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
                     }

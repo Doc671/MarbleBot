@@ -8,6 +8,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -67,7 +68,7 @@ namespace MarbleBot.Services
             if (userMsg.HasStringPrefix(guild.Prefix, ref argPos) &&
 #if DEBUG
             // If debugging, run commands in a single channel only
-            context.Channel.Id == _botCredentials.DebugChannel)
+            context.Channel.Id == _botCredentials.DebugChannel || context.IsPrivate && _botCredentials.AdminIds.Any(id => id == (context.Channel as IDMChannel).Recipient.Id))
 #else
             // Otherwise, run as usual
             (context.IsPrivate || guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
