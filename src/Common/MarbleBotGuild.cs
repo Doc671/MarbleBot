@@ -11,6 +11,8 @@ namespace MarbleBot.Common
         public ulong Id { get; set; } = 0;
         /// <summary> The channel where update announcements are posted. </summary>
         public ulong AnnouncementChannel { get; set; }
+        /// <summary> The link to the appeal form, where users can appeal to be unbanned. </summary>
+        public string AppealFormLink { get; set; }
         /// <summary> The channel where autoresponses can be used. </summary>
         public ulong AutoresponseChannel { get; set; }
         /// <summary> The colour displayed in embeds. </summary>

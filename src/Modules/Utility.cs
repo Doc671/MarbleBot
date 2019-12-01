@@ -191,7 +191,7 @@ namespace MarbleBot.Modules
 
                 if (command.Aliases.Count() != 0)
                 {
-                    builder.AddField("Aliases", command.Aliases.Aggregate(new StringBuilder(), (builder, alias) =>
+                    builder.AddField("Aliases", command.Aliases.Skip(1).Aggregate(new StringBuilder(), (builder, alias) =>
                     {
                         builder.AppendLine($"`mb/{alias}`");
                         return builder;

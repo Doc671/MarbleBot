@@ -16,10 +16,12 @@ namespace MarbleBot.Modules
     /// <summary> Fun non-game commands. </summary>
     public class Fun : MarbleBotModule
     {
+        private readonly BotCredentials _botCredentials;
         private readonly RandomService _randomService;
 
-        public Fun(RandomService randomService)
+        public Fun(BotCredentials botCredentials, RandomService randomService)
         {
+            _botCredentials = botCredentials;
             _randomService = randomService;
         }
 
@@ -557,6 +559,15 @@ namespace MarbleBot.Modules
             if (!(await Moderation.CheckSwearAsync(input) || await Moderation.CheckSwearAsync(reverse.ToString())))
             {
                 await ReplyAsync(reverse.ToString());
+            }
+        }
+
+        [Command("submit")]
+        public async Task SubmitCommand([Remainder] string message)
+        {
+            foreach (var adminId in _botCredentials.AdminIds)
+            {
+                await Context.Client.GetUser(adminId).SendMessageAsync($"{message} {Context.Message.Attachments.First().Url}");
             }
         }
 

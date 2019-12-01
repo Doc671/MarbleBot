@@ -85,6 +85,15 @@ namespace MarbleBot.Modules
             }
         }
 
+        [Command("directmessage")]
+        [Summary("Sends a direct message to the given user.")]
+        [Alias("dm")]
+        [RequireOwner]
+        public async Task DirectMessageCommand(ulong userId, [Remainder] string message)
+        {
+            await Context.Client.GetUser(userId).SendMessageAsync(message);
+        }
+
         [Command("fixbalance")]
         [Summary("Fixes the balance of each user.")]
         [Alias("fixbal")]

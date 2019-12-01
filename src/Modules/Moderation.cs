@@ -24,6 +24,18 @@ namespace MarbleBot.Modules
             _botCredentials = botCredentials;
         }
 
+        [Command("addappealform")]
+        [Summary("Sets the server's appeal form link.")]
+        [RequireContext(ContextType.Guild)]
+        [RequireUserPermission(GuildPermission.ManageMessages)]
+        public async Task AddAppealFormCommand(string link)
+        {
+            var guild = GetGuild(Context);
+            guild.AppealFormLink = link;
+            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            await ReplyAsync("Success.");
+        }
+
         [Command("addrole")]
         [Summary("Adds a role to the role list.")]
         [RequireContext(ContextType.Guild)]

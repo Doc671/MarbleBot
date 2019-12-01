@@ -107,19 +107,19 @@ namespace MarbleBot.Services
                 switch (result.Error)
                 {
                     case CommandError.BadArgCount:
-                        await context.Channel.SendMessageAsync("Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
+                        await context.Channel.SendMessageAsync(":warning: | Wrong number of arguments. Use `mb/help <command name>` to see how to use the command.");
                         break;
                     case CommandError.ParseFailed:
-                        await context.Channel.SendMessageAsync("Failed to parse the given arguments. Use `mb/help <command name>` to see what type each argument should be.");
+                        await context.Channel.SendMessageAsync(":warning: | Failed to parse the given arguments. Use `mb/help <command name>` to see what type each argument should be.");
                         break;
                     case CommandError.UnmetPrecondition:
-                        await context.Channel.SendMessageAsync("Insufficient permissions.");
+                        await context.Channel.SendMessageAsync(":warning: | Insufficient permissions.");
                         break;
                     case CommandError.UnknownCommand:
-                        await context.Channel.SendMessageAsync("Unknown command. Use `mb/help` to see what commands there are.");
+                        await context.Channel.SendMessageAsync(":warning: | Unknown command. Use `mb/help` to see what commands there are.");
                         break;
                     default:
-                        await context.Channel.SendMessageAsync($"An error has occured. ```{result.ErrorReason}```");
+                        await context.Channel.SendMessageAsync($":warning: | An error has occured. ```{result.ErrorReason}```");
                         _logger.Error($"{result.Error.Value}: {result.ErrorReason}");
                         break;
                 }

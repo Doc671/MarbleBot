@@ -4,6 +4,8 @@ using Discord.WebSocket;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
+using MarbleBot.Common;
+using MarbleBot.Modules;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -101,6 +103,7 @@ namespace MarbleBot
             await client.LoginAsync(TokenType.Bot, _botCredentials.Token).ConfigureAwait(false);
             client.JoinedGuild += Client_JoinedGuild;
             client.LeftGuild += Client_LeftGuild;
+            client.UserBanned += Client_UserBanned;
             _logger.Info("Logged in", DateTime.UtcNow);
 
             await client.StartAsync();
@@ -110,15 +113,34 @@ namespace MarbleBot
             await Task.Delay(-1);
         }
 
-        private Task Client_LeftGuild(SocketGuild arg)
+        private Task Client_UserBanned(SocketUser user, SocketGuild socketGuild)
         {
-            _logger.Info("Left guild {0} [{1}]", arg?.Name, arg?.Id);
+            var obj = MarbleBotModule.GetGuildsObject();
+            MarbleBotGuild marbleBotGuild;
+            if (!obj.ContainsKey(socketGuild.Id.ToString()))
+            {
+                return Task.CompletedTask;
+            }
+
+            marbleBotGuild = obj[socketGuild.Id.ToString()].ToObject<MarbleBotGuild>();
+            if (string.IsNullOrEmpty(marbleBotGuild.AppealFormLink))
+            {
+                return Task.CompletedTask;
+            }
+
+            user.SendMessageAsync($"You have been banned from {socketGuild.Name}. Use this appeal form if you would like to make an appeal: {marbleBotGuild.AppealFormLink}");
             return Task.CompletedTask;
         }
 
-        private Task Client_JoinedGuild(SocketGuild arg)
+        private Task Client_LeftGuild(SocketGuild guild)
         {
-            _logger.Info("Joined guild {0} [{1}]", arg?.Name, arg?.Id);
+            _logger.Info("Left guild {0} [{1}]", guild?.Name, guild?.Id);
+            return Task.CompletedTask;
+        }
+
+        private Task Client_JoinedGuild(SocketGuild guild)
+        {
+            _logger.Info("Joined guild {0} [{1}]", guild?.Name, guild?.Id);
             return Task.CompletedTask;
         }
     }
