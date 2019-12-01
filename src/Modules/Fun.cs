@@ -567,7 +567,7 @@ namespace MarbleBot.Modules
         {
             foreach (var adminId in _botCredentials.AdminIds)
             {
-                await Context.Client.GetUser(adminId).SendMessageAsync($"{message} {Context.Message.Attachments.First().Url}");
+                await Context.Client.GetUser(adminId).SendMessageAsync($"{Context.User.Id} {message} {Context.Message.Attachments.First().Url}");
             }
         }
 
