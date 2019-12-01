@@ -567,7 +567,14 @@ namespace MarbleBot.Modules
         {
             foreach (var adminId in _botCredentials.AdminIds)
             {
-                await Context.Client.GetUser(adminId).SendMessageAsync($"{Context.User.Id} {message} {Context.Message.Attachments.First().Url}");
+                if (Context.Message.Attachments.Count == 0)
+                {
+                    await Context.Client.GetUser(adminId).SendMessageAsync($"{Context.User.Id} {message}");
+                }
+                else
+                {
+                    await Context.Client.GetUser(adminId).SendMessageAsync($"{Context.User.Id} {message} {Context.Message.Attachments.First().Url}");
+                }
             }
             await ReplyAsync("Your submission has been received and will now be reviewed. Expect up to 48 hours for a reply.");
         }
