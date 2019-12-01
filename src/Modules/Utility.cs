@@ -88,8 +88,8 @@ namespace MarbleBot.Modules
             {
                 bool owner = _botCredentials.AdminIds.Any(id => id == Context.User.Id);
 
-                if ((module.Name == "Moderation" && !(Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
-                    || (module.Name == "Sneak" && !owner))
+                if (!owner && module.Name == "Moderation" && !Context.IsPrivate && !(Context.User as SocketGuildUser).GuildPermissions.ManageMessages
+                    || module.Name == "Sneak")
                 {
                     await SendErrorAsync("You cannot access this module!");
                     return;
@@ -97,19 +97,26 @@ namespace MarbleBot.Modules
 
                 IEnumerable<CommandInfo> commands = module.Commands.Where(c => owner ? true : !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
 
-                if (Context.Guild.Id != CommunityMarble)
+                if (Context.IsPrivate)
+                {
+                    if (!owner)
+                    {
+                        commands = commands.Where(c => c.Preconditions != null && !c.Preconditions.Any(p => p is RequireContextAttribute));
+                    }
+                }
+                else if (Context.Guild.Id != CommunityMarble)
                 {
                     commands = commands.Where(c => c.Remarks != "CM Only");
                 }
 
-                if (Context.IsPrivate)
-                {
-                    commands = commands.Where(c => c.Preconditions != null && !c.Preconditions.Any(p => p is RequireContextAttribute));
-                }
-
-                if (GetUser(Context).Stage < 2)
+                if (GetUser(Context)?.Stage < 2)
                 {
                     commands = commands.Where(c => c.Remarks != "Stage2");
+                }
+
+                if (commands.Count() == 0)
+                {
+                    await SendErrorAsync("No applicable commands in this module could be found!");
                 }
 
                 await ReplyAsync(embed: builder
