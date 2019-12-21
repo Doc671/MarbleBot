@@ -114,13 +114,13 @@ namespace MarbleBot.Modules
                 var obj = GetItemsObject();
                 if (obj[itemId.ToString("000")] != null)
                 {
-                    item = obj[itemId.ToString("000")].ToObject<T>();
+                    item = obj[itemId.ToString("000")]!.ToObject<T>()!;
                     item.Id = itemId;
                     return item;
                 }
                 else
                 {
-                    return null;
+                    throw new Exception("The requested item could not be found.");
                 }
             }
             else
@@ -135,14 +135,14 @@ namespace MarbleBot.Modules
                 var obj = JObject.Parse(json);
                 foreach (var objItemPair in obj)
                 {
-                    item = objItemPair.Value.ToObject<T>();
+                    item = objItemPair.Value!.ToObject<T>()!;
                     if (item.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(item.Name.ToLower()))
                     {
                         item.Id = uint.Parse(objItemPair.Key);
                         return item;
                     }
                 }
-                return null;
+                throw new Exception("The requested item could not be found.");
             }
         }
 
@@ -165,7 +165,7 @@ namespace MarbleBot.Modules
             MarbleBotGuild guild;
             if (obj.ContainsKey(context.Guild.Id.ToString()))
             {
-                guild = obj[context.Guild.Id.ToString()].ToObject<MarbleBotGuild>();
+                guild = obj[context.Guild.Id.ToString()]!.ToObject<MarbleBotGuild>()!;
                 guild.Id = context.Guild.Id;
             }
             else
@@ -193,7 +193,7 @@ namespace MarbleBot.Modules
             MarbleBotUser user;
             if (obj.ContainsKey(context.User.Id.ToString()))
             {
-                user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
+                user = obj[context.User.Id.ToString()]!.ToObject<MarbleBotUser>()!;
                 user.Id = context.User.Id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
                 {
@@ -219,7 +219,7 @@ namespace MarbleBot.Modules
             MarbleBotUser user;
             if (obj.ContainsKey(id.ToString()))
             {
-                user = obj[id.ToString()].ToObject<MarbleBotUser>();
+                user = obj[id.ToString()]!.ToObject<MarbleBotUser>()!;
                 user.Id = id;
                 if (string.IsNullOrEmpty(obj[id.ToString()]?.ToString()))
                 {
@@ -244,7 +244,7 @@ namespace MarbleBot.Modules
             MarbleBotUser user;
             if (obj.ContainsKey(context.User.Id.ToString()))
             {
-                user = obj[context.User.Id.ToString()].ToObject<MarbleBotUser>();
+                user = obj[context.User.Id.ToString()]!.ToObject<MarbleBotUser>()!;
                 user.Id = context.User.Id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
                 {
@@ -269,7 +269,7 @@ namespace MarbleBot.Modules
             MarbleBotUser user;
             if (obj.ContainsKey(id.ToString()))
             {
-                user = obj[id.ToString()].ToObject<MarbleBotUser>();
+                user = obj[id.ToString()]!.ToObject<MarbleBotUser>()!;
                 user.Id = id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
                 {

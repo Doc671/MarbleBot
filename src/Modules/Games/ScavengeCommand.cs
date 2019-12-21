@@ -2,6 +2,8 @@
 using Discord.Commands;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
+using MarbleBot.Modules.Games.Services;
+using MarbleBot.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,6 +19,10 @@ namespace MarbleBot.Modules.Games
     {
         private const GameType Type = GameType.Race;
 
+        public ScavengeCommand(BotCredentials botCredentials, GamesService gamesService, RandomService randomService) : base(botCredentials, gamesService, randomService)
+        {
+        }
+
         public async Task ScavengeStartAsync(MarbleBotUser user, ScavengeLocation location)
         {
             if (DateTime.UtcNow.Subtract(user.LastScavenge).TotalHours < 6)
@@ -26,7 +32,7 @@ namespace MarbleBot.Modules.Games
             }
             else
             {
-                if (GamesService.ScavengeInfo.ContainsKey(Context.User.Id))
+                if (_gamesService.ScavengeInfo.ContainsKey(Context.User.Id))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you are already scavenging!");
                 }
@@ -35,9 +41,9 @@ namespace MarbleBot.Modules.Games
                     var scavengeMessage = await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
-                        .WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location).CamelToTitleCase()}**!")
+                        .WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)!.CamelToTitleCase()}**!")
                         .WithTitle("Item Scavenge Begin!").Build());
-                    GamesService.ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(GamesService, RandomService, Context, location, scavengeMessage));
+                    _gamesService.ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(_gamesService, _randomService, Context, location, scavengeMessage));
                 }
             }
         }
@@ -104,20 +110,20 @@ namespace MarbleBot.Modules.Games
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
 
-            if (!GamesService.ScavengeInfo.ContainsKey(Context.User.Id) || GamesService.ScavengeInfo[Context.User.Id] == null)
+            if (!_gamesService.ScavengeInfo.ContainsKey(Context.User.Id) || _gamesService.ScavengeInfo[Context.User.Id] == null)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                 return;
             }
 
-            if (GamesService.ScavengeInfo[Context.User.Id].Items.Count == 0)
+            if (_gamesService.ScavengeInfo[Context.User.Id].Items.Count == 0)
             {
                 await ReplyAsync($"**{Context.User.Username}**, there is no item to grab!");
                 return;
             }
 
-            var item = GamesService.ScavengeInfo[Context.User.Id].Items.Dequeue();
-            GamesService.ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
+            var item = _gamesService.ScavengeInfo[Context.User.Id].Items.Dequeue();
+            _gamesService.ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
             if (user.Items != null)
             {
                 if (user.Items.ContainsKey(item.Id))
@@ -137,7 +143,7 @@ namespace MarbleBot.Modules.Games
             }
             user.NetWorth += item.Price;
             WriteUsers(obj, Context.User, user);
-            await GamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
+            await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
 
             // Clean up the messages created if the bot can delete messages
@@ -155,13 +161,13 @@ namespace MarbleBot.Modules.Games
         [Summary("Extracts an ore found in a scavenge session.")]
         public async Task ScavengeDrillCommand()
         {
-            if (!GamesService.ScavengeInfo.ContainsKey(Context.User.Id) || GamesService.ScavengeInfo[Context.User.Id] == null)
+            if (!_gamesService.ScavengeInfo.ContainsKey(Context.User.Id) || _gamesService.ScavengeInfo[Context.User.Id] == null)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                 return;
             }
 
-            if (GamesService.ScavengeInfo[Context.User.Id].Ores.Count == 0)
+            if (_gamesService.ScavengeInfo[Context.User.Id].Ores.Count == 0)
             {
                 await ReplyAsync($"**{Context.User.Username}**, there is nothing to drill!");
                 return;
@@ -175,8 +181,8 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var item = GamesService.ScavengeInfo[Context.User.Id].Ores.Dequeue();
-            GamesService.ScavengeInfo[Context.User.Id].UsedOres.Enqueue(item);
+            var item = _gamesService.ScavengeInfo[Context.User.Id].Ores.Dequeue();
+            _gamesService.ScavengeInfo[Context.User.Id].UsedOres.Enqueue(item);
             if (user.Items != null)
             {
                 if (user.Items.ContainsKey(item.Id))
@@ -196,7 +202,7 @@ namespace MarbleBot.Modules.Games
             }
             user.NetWorth += item.Price;
             WriteUsers(obj, Context.User, user);
-            await GamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
+            await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
 
             // Clean up the messages created if the bot can delete messages
@@ -215,23 +221,23 @@ namespace MarbleBot.Modules.Games
             var obj = GetUsersObject();
             var user = GetUser(Context, obj);
 
-            if (!GamesService.ScavengeInfo.ContainsKey(Context.User.Id) || GamesService.ScavengeInfo[Context.User.Id] == null)
+            if (!_gamesService.ScavengeInfo.ContainsKey(Context.User.Id) || _gamesService.ScavengeInfo[Context.User.Id] == null)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you are not scavenging!");
                 return;
             }
 
-            if (GamesService.ScavengeInfo[Context.User.Id].Items.Count == 0)
+            if (_gamesService.ScavengeInfo[Context.User.Id].Items.Count == 0)
             {
                 await ReplyAsync($"**{Context.User.Username}**, there is nothing to sell!");
             }
 
-            var item = GamesService.ScavengeInfo[Context.User.Id].Items.Dequeue();
-            GamesService.ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
+            var item = _gamesService.ScavengeInfo[Context.User.Id].Items.Dequeue();
+            _gamesService.ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
             user.Balance += item.Price;
             user.NetWorth += item.Price;
             WriteUsers(obj, Context.User, user);
-            await GamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
+            await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UnitOfMoney}**{item.Price:n2}**!");
 
             // Clean up the messages created if the bot can delete messages
@@ -273,7 +279,7 @@ namespace MarbleBot.Modules.Games
             }
 
             var obj = JObject.Parse(json);
-            var items = obj.ToObject<Dictionary<string, Item>>();
+            var items = obj.ToObject<Dictionary<string, Item>>()!;
             foreach (var itemPair in items)
             {
                 if (itemPair.Value.ScavengeLocation == location)

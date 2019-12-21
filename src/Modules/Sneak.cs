@@ -103,12 +103,12 @@ namespace MarbleBot.Modules
             var itemsObj = GetItemsObject();
             var usersDict = GetUsersObject().ToObject<Dictionary<string, MarbleBotUser>>();
             var newUsersDict = new Dictionary<string, MarbleBotUser>();
-            foreach (var userPair in usersDict)
+            foreach (var userPair in usersDict!)
             {
                 var user = userPair.Value;
                 user.Balance = user.NetWorth - (user.Items == null ? 0 : user.Items.Aggregate(0m, (total, itemPair) =>
                 {
-                    total += itemsObj[itemPair.Key.ToString("000")].ToObject<Item>().Price * itemPair.Value;
+                    total += itemsObj[itemPair.Key.ToString("000")]!.ToObject<Item>()!.Price * itemPair.Value;
                     return total;
                 }));
                 newUsersDict.Add(userPair.Key, user);
@@ -123,7 +123,7 @@ namespace MarbleBot.Modules
         public async Task LogCommand()
         {
             string logs;
-            using (var logFile = new StreamReader((LogManager.Configuration.FindTargetByName("logfile") as FileTarget).FileName.ToString().RemoveChar('\'')))
+            using (var logFile = new StreamReader((LogManager.Configuration.FindTargetByName("logfile") as FileTarget)!.FileName.ToString()!.RemoveChar('\'')))
             {
                 logs = logFile.ReadToEnd();
             }
@@ -212,7 +212,7 @@ namespace MarbleBot.Modules
                 .WithTitle("MarbleBot Update");
 
             var guildDict = GetGuildsObject().ToObject<Dictionary<ulong, MarbleBotGuild>>();
-            foreach (var guildPair in guildDict)
+            foreach (var guildPair in guildDict!)
             {
                 if (guildPair.Value.AnnouncementChannel != 0)
                 {

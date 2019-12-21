@@ -21,7 +21,7 @@ namespace MarbleBot.Common
         /// <summary> The amount of damage that has been dealt by the marble. </summary>
         public int DamageDealt { get; set; }
         /// <summary> The marble's shield. </summary>
-        public Item Shield { get; set; }
+        public Item? Shield { get; set; }
         /// <summary> The marble's damage increase multiplier. </summary>
         public int DamageIncrease { get; set; }
         /// <summary> The last time the marble attacked. </summary>

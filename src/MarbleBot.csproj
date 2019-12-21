@@ -2,17 +2,20 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon>MBIcon.ico</ApplicationIcon>
     <StartupObject>MarbleBot.Program</StartupObject>
-    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
-    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.42.0.1769" />
+    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.42.0.1791" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.42.0.1758" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.6.8" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.6.1" />

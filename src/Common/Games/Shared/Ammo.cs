@@ -12,7 +12,7 @@ namespace MarbleBot.Common
         [JsonConstructor]
         public Ammo(uint id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
                       int stage = 1, ScavengeLocation scavengeLocation = ScavengeLocation.None,
-                      uint craftingProduced = 0u, Dictionary<string, int> craftingRecipe = null,
+                      uint craftingProduced = 0u, Dictionary<string, int>? craftingRecipe = null,
                       int craftingStationRequired = 0, int damage = 0) : base(id, name, price, description, onSale, stage,
                                                                       scavengeLocation, craftingProduced, craftingRecipe,
                                                                       craftingStationRequired)

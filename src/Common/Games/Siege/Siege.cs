@@ -16,10 +16,10 @@ using static MarbleBot.Modules.MarbleBotModule;
 namespace MarbleBot.Common
 {
     /// <summary> Represents a siege game. </summary>
-    public class Siege : IDisposable
+    public class Siege : IMarbleBotGame
     {
         /// <summary> The siege game. </summary>
-        public Task Actions { get; set; }
+        public Task? Actions { get; set; }
         /// <summary> Whether the siege is active. </summary>
         public bool Active { get; set; } = true;
         /// <summary> The boss that the marbles are fighting. </summary>
@@ -285,7 +285,7 @@ namespace MarbleBot.Common
                 json = bosses.ReadToEnd();
             }
 
-            var obj = new Dictionary<string, JObject>(JObject.Parse(json).ToObject<IDictionary<string, JObject>>(),
+            var obj = new Dictionary<string, JObject>(JObject.Parse(json).ToObject<IDictionary<string, JObject>>()!,
                 StringComparer.InvariantCultureIgnoreCase);
             var boss = Boss.Empty;
             if (searchTerm.Contains(' ') || (string.Compare(searchTerm[0].ToString(), searchTerm[0].ToString(), true) == 0))
@@ -295,7 +295,7 @@ namespace MarbleBot.Common
 
             if (obj.ContainsKey(searchTerm))
             {
-                boss = obj[searchTerm].ToObject<Boss>();
+                boss = obj[searchTerm].ToObject<Boss>()!;
             }
 
             return boss;
@@ -328,13 +328,13 @@ namespace MarbleBot.Common
                 return;
             }
 
-            if (!Marbles.Any(m => m.Id == context.User.Id))
+            var marble = Marbles.Find(m => m.Id == context.User.Id);
+            if (marble == null)
             {
                 await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you aren't in this Siege!");
                 return;
             }
 
-            var marble = Marbles.Find(m => m.Id == context.User.Id);
             if (marble.HP == 0)
             {
                 await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you are out and can no longer attack!");
@@ -516,13 +516,13 @@ namespace MarbleBot.Common
                 return;
             }
 
-            if (!Marbles.Any(m => m.Id == context.User.Id))
+            var marble = Marbles.Find(m => m.Id == context.User.Id);
+            if (marble == null)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, you aren't in this Siege!");
                 return;
             }
 
-            var marble = Marbles.Find(m => m.Id == context.User.Id);
             if (marble.HP == 0)
             {
                 await context.Channel.SendMessageAsync($"**{context.User.Username}**, you are out and can no longer attack!");
@@ -532,13 +532,13 @@ namespace MarbleBot.Common
             var ammo = new Ammo();
             var user = GetUser(context);
 
-            if (weapon.Ammo.Length > 0)
+            if (weapon.Ammo != null)
             {
-                for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
+                for (int i = weapon.Ammo.Value.Length - 1; i >= 0; i--)
                 {
-                    if (user.Items.ContainsKey(weapon.Ammo[i]) && user.Items[weapon.Ammo[i]] >= weapon.Hits)
+                    if (user.Items.ContainsKey(weapon.Ammo.Value[i]) && user.Items[weapon.Ammo.Value[i]] >= weapon.Hits)
                     {
-                        ammo = GetItem<Ammo>(weapon.Ammo[i].ToString("000"));
+                        ammo = GetItem<Ammo>(weapon.Ammo.Value[i].ToString("000"));
                         break;
                     }
                 }

@@ -47,12 +47,7 @@ namespace MarbleBot.Services
 
         private async Task HandleCommandAsync(SocketMessage msg)
         {
-            if (msg.Author.IsBot)
-            {
-                return;
-            }
-
-            if (!(msg is SocketUserMessage userMsg))
+            if (msg.Author.IsBot || !(msg is SocketUserMessage userMsg))
             {
                 return;
             }
@@ -68,7 +63,7 @@ namespace MarbleBot.Services
             if (userMsg.HasStringPrefix(guild.Prefix, ref argPos) &&
 #if DEBUG
             // If debugging, run commands in a single channel only
-            context.Channel.Id == _botCredentials.DebugChannel || context.IsPrivate && _botCredentials.AdminIds.Any(id => id == (context.Channel as IDMChannel).Recipient.Id))
+            context.Channel.Id == _botCredentials.DebugChannel || context.IsPrivate && _botCredentials.AdminIds.Any(id => id == (context.Channel as IDMChannel)!.Recipient.Id))
 #else
             // Otherwise, run as usual
             (context.IsPrivate || guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
@@ -84,8 +79,11 @@ namespace MarbleBot.Services
                 {
                     while (!autoresponseFile.EndOfStream)
                     {
-                        var autoresponsePair = (await autoresponseFile.ReadLineAsync()).Split(';');
-                        autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
+                        var autoresponsePair = (await autoresponseFile.ReadLineAsync())!.Split(';');
+                        if (autoresponsePair != null)
+                        {
+                            autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
+                        }
                     }
                 }
                 if (autoresponses.ContainsKey(context.Message.Content))
@@ -120,7 +118,7 @@ namespace MarbleBot.Services
                         break;
                     default:
                         await context.Channel.SendMessageAsync($":warning: | An error has occured. ```{result.ErrorReason}```");
-                        _logger.Error($"{result.Error.Value}: {result.ErrorReason}");
+                        _logger.Error($"{result.Error!.Value}: {result.ErrorReason}");
                         break;
                 }
             }

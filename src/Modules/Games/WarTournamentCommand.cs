@@ -1,5 +1,7 @@
 ﻿using Discord.Commands;
 using MarbleBot.Common;
+using MarbleBot.Modules.Games.Services;
+using MarbleBot.Services;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +19,10 @@ namespace MarbleBot.Modules.Games
     public class WarTournamentCommand : GameModule
     {
         private static readonly string _warFilePath = $"Data{Path.DirectorySeparatorChar}WarTournament.wt";
+
+        public WarTournamentCommand(BotCredentials botCredentials, GamesService gamesService, RandomService randomService) : base(botCredentials, gamesService, randomService)
+        {
+        }
 
         private static List<WarTournamentInfo> GetTournamentsInfo()
         {
@@ -43,7 +49,7 @@ namespace MarbleBot.Modules.Games
         public async Task WarTournamentSetupCommand(uint spaces, uint teamSize)
         {
             var tournamentsInfo = GetTournamentsInfo();
-            tournamentsInfo.Add(new WarTournamentInfo(Context.Guild.Id, spaces, teamSize, null));
+            tournamentsInfo.Add(new WarTournamentInfo(Context.Guild.Id, spaces, teamSize, new Dictionary<string, List<ulong>>()));
             WriteTournamentsInfo(tournamentsInfo);
             await ReplyAsync($"Successfully created war tournament with **{spaces}** spaces and team sizes of **{teamSize}**.");
         }
@@ -54,23 +60,27 @@ namespace MarbleBot.Modules.Games
         public async Task WarTournamentSignupCommand(string teamName)
         {
             var tournamentsInfo = GetTournamentsInfo();
-            if (tournamentsInfo.Any(tInfo => tInfo.GuildId == Context.Guild.Id))
-            {
-                var tournamentInfo = tournamentsInfo.Find(tInfo => tInfo.GuildId == Context.Guild.Id);
-                if (tournamentInfo.Marbles.Any(teamPair => teamPair.Value.Contains(Context.Guild.Id)))
-                {
-                    await SendErrorAsync($"**{Context.User.Username}**, you have already signed up!");
-                    return;
-                }
 
-                if (tournamentInfo.Marbles.ContainsKey(teamName))
-                {
-                    tournamentInfo.Marbles[teamName].Add(Context.User.Id);
-                }
-                else
-                {
-                    tournamentInfo.Marbles.Add(teamName, new List<ulong> { Context.User.Id });
-                }
+            var tournamentInfo = tournamentsInfo.Find(tInfo => tInfo.GuildId == Context.Guild.Id);
+
+            if (tournamentInfo == null)
+            {
+                return;
+            }
+
+            if (tournamentInfo.Marbles.Any(teamPair => teamPair.Value.Contains(Context.Guild.Id)))
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, you have already signed up!");
+                return;
+            }
+
+            if (tournamentInfo.Marbles.ContainsKey(teamName))
+            {
+                tournamentInfo.Marbles[teamName].Add(Context.User.Id);
+            }
+            else
+            {
+                tournamentInfo.Marbles.Add(teamName, new List<ulong> { Context.User.Id });
             }
 
             WriteTournamentsInfo(tournamentsInfo);

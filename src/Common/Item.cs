@@ -23,14 +23,14 @@ namespace MarbleBot.Common
         /// <summary> The quantity produced of this item upon being crafted. </summary>
         public uint CraftingProduced { get; }
         /// <summary> The crafting recipe - a key value pair of item IDs and their necessary quantities. </summary>
-        public Dictionary<string, int> CraftingRecipe { get; }
+        public Dictionary<string, int>? CraftingRecipe { get; }
         /// <summary> Which crafting station is required to craft the item. </summary>
         public int CraftingStationRequired { get; }
 
         [JsonConstructor]
         public Item(uint id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
             int stage = 1, ScavengeLocation scavengeLocation = ScavengeLocation.None, uint craftingProduced = 0u,
-            Dictionary<string, int> craftingRecipe = null, int craftingStationRequired = 0)
+            Dictionary<string, int>? craftingRecipe = null, int craftingStationRequired = 0)
         {
             Id = id;
             Name = name;

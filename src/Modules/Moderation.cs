@@ -6,6 +6,7 @@ using Google.Apis.Sheets.v4.Data;
 using MarbleBot.Extensions;
 using MarbleBot.Services;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -168,7 +169,7 @@ namespace MarbleBot.Modules
             string swears;
             using (var FS = new StreamReader($"Keys{Path.DirectorySeparatorChar}ListOfBand.txt"))
             {
-                swears = await FS.ReadLineAsync();
+                swears = (await FS.ReadLineAsync())!;
             }
 
             string[] swearList = swears.Split(',');
@@ -198,17 +199,21 @@ namespace MarbleBot.Modules
                 HttpClientInitializer = _botCredentials.GoogleUserCredential
             });
 
-            string spreadsheetId = GetGuild(Context).WarningSheetLink;
+            string? spreadsheetId = GetGuild(Context).WarningSheetLink;
             const string range = "Warnings!A3:J";
 
             var result = await service.Spreadsheets.Values.Get(spreadsheetId, range).ExecuteAsync();
 
             // Get the warning sheet
-            int? sheetId = (await service.Spreadsheets.Get(spreadsheetId).ExecuteAsync()).Sheets.ToList()
-                .Find(sheet => sheet.Properties.Title == "Warnings").Properties.SheetId;
-
-            if (sheetId == null)
+            int sheetId;
+            try
             {
+                sheetId = (int)(await service.Spreadsheets.Get(spreadsheetId).ExecuteAsync()).Sheets.ToList()
+                    .Find(sheet => sheet.Properties.Title == "Warnings")!.Properties.SheetId!;
+            }
+            catch (NullReferenceException exception)
+            {
+                Logger.Error(exception, $"Could not find warning sheet: {exception.Message}");
                 await SendErrorAsync("Could not find the warning sheet!");
                 return;
             }
@@ -218,60 +223,68 @@ namespace MarbleBot.Modules
             int rowIndex = 3;
 
             // Find the row corresponding to the user to be warned
-            for (rowIndex = 3; rowIndex < result.Values.Count + 3; rowIndex++)
-            {
-                var row = result.Values[rowIndex - 3];
-                if ((row.First() as string).Contains(user.ToString()))
-                {
-                    userToWarnRow = row.Select(cell => cell.ToString()).ToArray();
-                    break;
-                }
-            }
-
             var requests = new List<Request>();
-
-            // If the user could not be found, add a new row with the user's details
-            if (userToWarnRow[0] == null)
+            try
             {
-                userToWarnRow = new string[] { user.ToString(), "", "", "", "", "", "", "Normal", "0", "0" };
-                var rowData = new RowData()
+                for (rowIndex = 3; rowIndex < result.Values.Count + 3; rowIndex++)
                 {
-                    Values = new List<CellData>()
-                };
-
-                int cellNumber = 0;
-                ExtendedValue cellContents;
-                foreach (var cell in userToWarnRow)
-                {
-                    cellContents = new ExtendedValue();
-
-                    // If the cell is a number, write it as a number rather than a string
-                    if (int.TryParse(cell, out cellNumber))
+                    var row = result.Values[rowIndex - 3];
+                    if ((row.First() as string)!.Contains(user.ToString()!))
                     {
-                        cellContents.NumberValue = cellNumber;
+                        userToWarnRow = row.Select(cell => cell.ToString()!).ToArray();
+                        break;
                     }
-                    else
-                    {
-                        cellContents.StringValue = cell;
-                    }
-
-                    rowData.Values.Add(new CellData()
-                    {
-                        UserEnteredValue = cellContents
-                    });
                 }
 
-                requests.Add(new Request()
+                // If the user could not be found, add a new row with the user's details
+                if (userToWarnRow[0] == null)
                 {
-                    AppendCells = new AppendCellsRequest()
+                    userToWarnRow = new string[] { user.ToString()!, "", "", "", "", "", "", "Normal", "0", "0" };
+                    var rowData = new RowData()
                     {
-                        SheetId = sheetId,
-                        Rows = new List<RowData>() {
+                        Values = new List<CellData>()
+                    };
+
+                    int cellNumber = 0;
+                    ExtendedValue cellContents;
+                    foreach (var cell in userToWarnRow)
+                    {
+                        cellContents = new ExtendedValue();
+
+                        // If the cell is a number, write it as a number rather than a string
+                        if (int.TryParse(cell, out cellNumber))
+                        {
+                            cellContents.NumberValue = cellNumber;
+                        }
+                        else
+                        {
+                            cellContents.StringValue = cell;
+                        }
+
+                        rowData.Values.Add(new CellData()
+                        {
+                            UserEnteredValue = cellContents
+                        });
+                    }
+
+                    requests.Add(new Request()
+                    {
+                        AppendCells = new AppendCellsRequest()
+                        {
+                            SheetId = sheetId,
+                            Rows = new List<RowData>() {
                             rowData
                         },
-                        Fields = "*"
-                    }
-                });
+                            Fields = "*"
+                        }
+                    });
+                }
+            }
+            catch (NullReferenceException exception)
+            {
+                Logger.Error(exception, $"Warning sheet was in the incorrect format: {exception.Message}");
+                await SendErrorAsync("The warning sheet was in the incorrect format.");
+                return;
             }
 
             int expiredWarnings = int.Parse(userToWarnRow[8]);

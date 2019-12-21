@@ -6,6 +6,7 @@ using MarbleBot.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -177,7 +178,7 @@ namespace MarbleBot.Modules
                 int a = 0;
                 while (!stream.EndOfStream)
                 {
-                    string[] row = stream.ReadLine().Split(',');
+                    string[] row = stream.ReadLine()!.Split(',');
                     for (int b = 0; b < row.Length - 1; b++)
                     {
                         marbles[a, b] = row[b];
@@ -307,9 +308,9 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (!int.TryParse(hexCode[0..2], System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture, out int red)
-                || !int.TryParse(hexCode[2..4], System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture, out int green)
-                || !int.TryParse(hexCode[4..6], System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture, out int blue))
+            if (!int.TryParse(hexCode[0..2], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out int red)
+                || !int.TryParse(hexCode[2..4], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out int green)
+                || !int.TryParse(hexCode[4..6], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out int blue))
             {
                 await SendErrorAsync("Could not parse the given hex code!");
                 return;
@@ -337,7 +338,7 @@ namespace MarbleBot.Modules
 
             if (colorEnumerable.Count() > 0)
             {
-                builder.WithTitle(Enum.GetName(typeof(System.Drawing.KnownColor), colorEnumerable.First()).CamelToTitleCase());
+                builder.WithTitle(Enum.GetName(typeof(System.Drawing.KnownColor), colorEnumerable.First())!.CamelToTitleCase());
             }
 
             await ReplyAsync(embed: builder.Build());
@@ -563,7 +564,7 @@ namespace MarbleBot.Modules
         }
 
         [Command("submit")]
-        public async Task SubmitCommand([Remainder] string message)
+        public async Task SubmitCommand([Remainder] string message = "")
         {
             foreach (var adminId in _botCredentials.AdminIds)
             {
@@ -593,7 +594,7 @@ namespace MarbleBot.Modules
                 {
                     while (!stream.EndOfStream)
                     {
-                        string list = stream.ReadLine();
+                        string list = stream.ReadLine()!;
                         string[] wordInfo = list.Split(',');
                         wordList.Add((wordInfo[0], wordInfo[1], wordInfo[2]));
                         noOfWords++;
@@ -607,7 +608,7 @@ namespace MarbleBot.Modules
                 {
                     while (!stream.EndOfStream)
                     {
-                        string list = stream.ReadLine();
+                        string list = stream.ReadLine()!;
                         string[] wordInfo = list.Split(',');
                         wordList.Add((wordInfo[0], wordInfo[1], wordInfo[2]));
                         if (wordList[noOfWords].word.ToLower() == word.ToLower())

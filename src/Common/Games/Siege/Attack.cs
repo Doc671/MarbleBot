@@ -30,7 +30,7 @@ namespace MarbleBot.Common
             StatusEffect = statusEffect;
         }
 
-        public override bool Equals(object obj) => obj.GetHashCode() == GetHashCode();
+        public override bool Equals(object? obj) => obj?.GetHashCode() == GetHashCode();
 
         public override int GetHashCode() => Name.Sum(c => c) + Damage + Accuracy + (int)StatusEffect;
 

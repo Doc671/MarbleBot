@@ -18,16 +18,23 @@ namespace MarbleBot.Modules.Games
     /// <summary> A module for game commands. </summary>
     public class GameModule : MarbleBotModule
     {
-        public BotCredentials BotCredentials { get; set; }
-        public GamesService GamesService { get; set; }
-        public RandomService RandomService { get; set; }
+        protected BotCredentials _botCredentials;
+        protected GamesService _gamesService;
+        protected RandomService _randomService;
+
+        public GameModule(BotCredentials botCredentials, GamesService gamesService, RandomService randomService)
+        {
+            _botCredentials = botCredentials;
+            _gamesService = gamesService;
+            _randomService = randomService;
+        }
 
         /// <summary> Gets the string representation of the game. </summary>
         /// <param name="gameType"> The type of game. </param>
         /// <param name="capitalised"> Whether or not the name being returned is capitalised. </param>
         /// <returns> The string representation of the game. </returns>
         private string GameName(GameType gameType, bool capitalised = true)
-        => capitalised ? Enum.GetName(typeof(GameType), gameType) : Enum.GetName(typeof(GameType), gameType).ToLower();
+        => capitalised ? Enum.GetName(typeof(GameType), gameType)! : Enum.GetName(typeof(GameType), gameType)!.ToLower();
 
         /// <summary> Sends a message showing whether a user can earn from a game. </summary>
         /// <param name="context"> The context of the command. </param>
@@ -68,7 +75,7 @@ namespace MarbleBot.Modules.Games
         protected async Task Clear(GameType gameType)
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-            if (BotCredentials.AdminIds.Any(id => id == Context.User.Id) || Context.IsPrivate)
+            if (_botCredentials.AdminIds.Any(id => id == Context.User.Id) || Context.IsPrivate)
             {
                 using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{fileId}.{GameName(gameType, false)}", false);
                 await marbleList.WriteAsync("");
@@ -141,7 +148,7 @@ namespace MarbleBot.Modules.Games
             }
 
             // 0 - Not found, 1 - Found but not yours, 2 - Found & removed
-            int state = BotCredentials.AdminIds.Any(id => id == Context.User.Id) ? 3 : 0;
+            int state = _botCredentials.AdminIds.Any(id => id == Context.User.Id) ? 3 : 0;
             var wholeFile = new StringBuilder();
             var formatter = new BinaryFormatter();
             if (gameType == GameType.War)
@@ -314,7 +321,7 @@ namespace MarbleBot.Modules.Games
             var binaryFormatter = new BinaryFormatter();
             if (gameType == GameType.Siege)
             {
-                if (GamesService.SiegeInfo.ContainsKey(fileId) && GamesService.SiegeInfo[fileId].Active)
+                if (_gamesService.SiegeInfo.ContainsKey(fileId) && _gamesService.SiegeInfo[fileId].Active)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
                     return;
@@ -329,7 +336,7 @@ namespace MarbleBot.Modules.Games
             }
             else if (gameType == GameType.War)
             {
-                if (GamesService.WarInfo.ContainsKey(fileId))
+                if (_gamesService.WarInfo.ContainsKey(fileId))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
                     return;
@@ -477,13 +484,13 @@ namespace MarbleBot.Modules.Games
                 if (item.WarClass != WeaponClass.None)
                 {
                     ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                    if (!GamesService.SiegeInfo.ContainsKey(fileId))
+                    if (!_gamesService.SiegeInfo.ContainsKey(fileId))
                     {
                         await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                         return;
                     }
 
-                    await GamesService.SiegeInfo[fileId].WeaponAttack(Context, item);
+                    await _gamesService.SiegeInfo[fileId].WeaponAttack(Context, item);
                     return;
                 }
 
@@ -492,11 +499,11 @@ namespace MarbleBot.Modules.Games
                     case 1:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = GamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
-                                foreach (var marble in GamesService.SiegeInfo[fileId].Marbles)
+                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                foreach (var marble in _gamesService.SiegeInfo[fileId].Marbles)
                                 {
                                     marble.HP = marble.MaxHP;
                                     output.AppendLine($"**{marble.Name}** (HP: **{marble.HP}**/{marble.MaxHP}, DMG: **{marble.DamageDealt}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
@@ -520,10 +527,10 @@ namespace MarbleBot.Modules.Games
                     case 10:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                await GamesService.SiegeInfo[fileId].ItemAttack(Context, obj, item.Id,
-                                    (int)Math.Round(90 + GamesService.SiegeInfo[fileId].Boss.MaxHP * 0.05 * RandomService.Rand.NextDouble() * 0.12 + 0.94));
+                                await _gamesService.SiegeInfo[fileId].ItemAttack(Context, obj, item.Id,
+                                    (int)Math.Round(90 + _gamesService.SiegeInfo[fileId].Boss.MaxHP * 0.05 * _randomService.Rand.NextDouble() * 0.12 + 0.94));
                             }
                             else
                             {
@@ -535,10 +542,10 @@ namespace MarbleBot.Modules.Games
                     case 14:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                await GamesService.SiegeInfo[fileId].ItemAttack(Context, obj, 14,
-                                    70 + 10 * (int)GamesService.SiegeInfo[fileId].Boss.Difficulty, true);
+                                await _gamesService.SiegeInfo[fileId].ItemAttack(Context, obj, 14,
+                                    70 + 10 * (int)_gamesService.SiegeInfo[fileId].Boss.Difficulty, true);
                             }
                             else
                             {
@@ -551,15 +558,15 @@ namespace MarbleBot.Modules.Games
                         await ReplyAsync("Er... why aren't you using `mb/craft`?");
                         break;
                     case 18:
-                        if (GamesService.ScavengeInfo.ContainsKey(Context.User.Id))
+                        if (_gamesService.ScavengeInfo.ContainsKey(Context.User.Id))
                         {
                             UpdateUser(item, -1);
-                            if (GamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.CanaryBeach)
+                            if (_gamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.CanaryBeach)
                             {
                                 UpdateUser(GetItem<Item>("019"), 1);
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the water, turning it into a **Water Bucket**!");
                             }
-                            else if (GamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.VioletVolcanoes)
+                            else if (_gamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.VioletVolcanoes)
                             {
                                 UpdateUser(GetItem<Item>("020"), 1);
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the lava, turning it into a **Lava Bucket**!");
@@ -588,9 +595,9 @@ namespace MarbleBot.Modules.Games
                     case 22:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId) && string.Compare(GamesService.SiegeInfo[fileId].Boss.Name, "Help Me the Tree", true) == 0)
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId) && string.Compare(_gamesService.SiegeInfo[fileId].Boss.Name, "Help Me the Tree", true) == 0)
                             {
-                                var randDish = 22 + RandomService.Rand.Next(0, 13);
+                                var randDish = 22 + _randomService.Rand.Next(0, 13);
                                 UpdateUser(item, -1);
                                 UpdateUser(GetItem<Item>(randDish.ToString("000")), 1);
                                 await ReplyAsync($"**{Context.User.Username}** used their **{item.Name}**! It somehow picked up a disease and is now a **{GetItem<Item>(randDish.ToString("000")).Name}**!");
@@ -617,11 +624,11 @@ namespace MarbleBot.Modules.Games
                     case 35:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = GamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
-                                foreach (var marble in GamesService.SiegeInfo[fileId].Marbles)
+                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                foreach (var marble in _gamesService.SiegeInfo[fileId].Marbles)
                                 {
                                     marble.StatusEffect = StatusEffect.Poison;
                                 }
@@ -644,10 +651,10 @@ namespace MarbleBot.Modules.Games
                     case 38:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = GamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
-                                foreach (var marble in GamesService.SiegeInfo[fileId].Marbles)
+                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                foreach (var marble in _gamesService.SiegeInfo[fileId].Marbles)
                                 {
                                     marble.StatusEffect = StatusEffect.Doom;
                                 }
@@ -670,9 +677,9 @@ namespace MarbleBot.Modules.Games
                     case 39:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = GamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
                                 userMarble.StatusEffect = StatusEffect.None;
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .WithColor(GetColor(Context))
@@ -692,9 +699,9 @@ namespace MarbleBot.Modules.Games
                     case 57:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                var userMarble = GamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id);
+                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
                                 userMarble.Evade = 50;
                                 userMarble.BootsUsed = true;
                                 await ReplyAsync(embed: new EmbedBuilder()
@@ -709,9 +716,9 @@ namespace MarbleBot.Modules.Games
                     case 91:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (!GamesService.SiegeInfo.ContainsKey(fileId))
+                            if (!_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                GamesService.SiegeInfo.GetOrAdd(fileId, new Siege(GamesService, RandomService, Context, new List<SiegeMarble>())
+                                _gamesService.SiegeInfo.GetOrAdd(fileId, new Siege(_gamesService, _randomService, Context, new List<SiegeMarble>())
                                 {
                                     Active = false,
                                     Boss = Siege.GetBoss("Destroyer")

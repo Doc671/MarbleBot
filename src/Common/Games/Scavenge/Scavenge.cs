@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 namespace MarbleBot.Common
 {
     /// <summary> Represents a scavenge game. </summary>
-    public class Scavenge : IDisposable
+    public class Scavenge : IMarbleBotGame
     {
         /// <summary> The scavenge session. </summary>
-        public Task Actions { get; set; }
+        public Task? Actions { get; set; }
         /// <summary> The ID of the user performing the command. </summary>
         public ulong Id { get; set; }
         /// <summary> The items currently available during the game. </summary>
@@ -70,12 +70,12 @@ namespace MarbleBot.Common
         }
 
         /// <summary> The scavenge session. </summary>
-        public async Task Session(SocketCommandContext context)
+        private async Task Session(SocketCommandContext context)
         {
             var startTime = DateTime.UtcNow;
             var collectableItems = new List<Item>();
             var itemObject = MarbleBotModule.GetItemsObject();
-            var items = itemObject.ToObject<Dictionary<string, Item>>();
+            var items = itemObject.ToObject<Dictionary<string, Item>>()!;
             foreach (var itemPair in items)
             {
                 if (itemPair.Value.ScavengeLocation == Location)
@@ -188,7 +188,7 @@ namespace MarbleBot.Common
                     : "Scavenge session ongoing.",
                 Fields = fields,
                 Timestamp = embed.Timestamp,
-                Title = $"Item Scavenge: {Enum.GetName(typeof(ScavengeLocation), Location).CamelToTitleCase()}"
+                Title = $"Item Scavenge: {Enum.GetName(typeof(ScavengeLocation), Location)!.CamelToTitleCase()}"
             }.Build());
         }
 

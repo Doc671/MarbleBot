@@ -15,17 +15,16 @@ using static MarbleBot.Modules.MarbleBotModule;
 namespace MarbleBot.Common
 {
     /// <summary> Represents a game of war. </summary>
-    public partial class War : IDisposable
+    public partial class War : IMarbleBotGame
     {
-        public Task Actions { get; set; }
+        public Task? Actions { get; set; }
         public IEnumerable<WarMarble> AllMarbles => Team1.Marbles.Union(Team2.Marbles);
         public ulong Id { get; set; }
 
         public WarTeam Team1 { get; set; }
         public WarTeam Team2 { get; set; }
 
-        private readonly WarMarble _aiMarble;
-        private readonly bool _aiMarblePresent = false;
+        private readonly WarMarble? _aiMarble;
         private bool _disposed = false;
         private bool _endCalled = false;
         private readonly GamesService _gamesService;
@@ -155,13 +154,13 @@ namespace MarbleBot.Common
                     timeout = true;
                     break;
                 }
-                else if (_aiMarblePresent && _aiMarble.HP > 0)
+                else if (_aiMarble != null && _aiMarble.HP > 0)
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
                     var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
                     if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
-                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * Convert.ToDouble(randMarble.Shield.Id == 63) * (0.5 + _randomService.Rand.NextDouble())));
+                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * (randMarble.Shield == null ? Convert.ToDouble(randMarble.Shield!.Id == 63) : 1) * (0.5 + _randomService.Rand.NextDouble())));
                         randMarble.HP -= dmg;
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                             .AddField("Remaining HP", $"**{randMarble.HP}**/{randMarble.MaxHP}")
@@ -174,11 +173,11 @@ namespace MarbleBot.Common
                     else
                     {
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                          .WithColor(GetColor(context))
-                          .WithCurrentTimestamp()
-                          .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
-                          .WithTitle($"**{_aiMarble.Name}** attacks!")
-                          .Build());
+                            .WithColor(GetColor(context))
+                            .WithCurrentTimestamp()
+                            .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
+                            .WithTitle($"**{_aiMarble.Name}** attacks!")
+                            .Build());
                     }
                 }
             }
@@ -193,14 +192,13 @@ namespace MarbleBot.Common
             }
         }
 
-        public War(GamesService gamesService, RandomService randomService, ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble aiMarble, WarBoost team1Boost, WarBoost team2Boost)
+        public War(GamesService gamesService, RandomService randomService, ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble? aiMarble, WarBoost team1Boost, WarBoost team2Boost)
         {
             _gamesService = gamesService;
             _randomService = randomService;
 
             Id = id;
             _aiMarble = aiMarble;
-            _aiMarblePresent = aiMarble != null;
 
             // Decide team names
             var nameList = new List<string>();
@@ -208,7 +206,7 @@ namespace MarbleBot.Common
             {
                 while (!teamNames.EndOfStream)
                 {
-                    nameList.Add(teamNames.ReadLine());
+                    nameList.Add(teamNames.ReadLine()!);
                 }
             }
 

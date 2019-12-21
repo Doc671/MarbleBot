@@ -25,7 +25,7 @@ namespace MarbleBot
     {
         private readonly BotCredentials _botCredentials;
         private readonly NLog.Logger _logger;
-        private StartTimeService _startTimeService;
+        private readonly StartTimeService _startTimeService = new StartTimeService(DateTime.UtcNow);
 
         public static void Main()
             => new Program().StartAsync().GetAwaiter().GetResult();
@@ -66,13 +66,20 @@ namespace MarbleBot
             var returnValue = JObject.Parse(json).ToObject<BotCredentials>();
             using (var stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
             {
-                returnValue.GoogleUserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    new string[] { SheetsService.Scope.Spreadsheets },
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore($"Keys{Path.DirectorySeparatorChar}token.json", true)
-                ).Result;
+                if (returnValue == null)
+                {
+                    throw new Exception("Bot credentials not detected.");
+                }
+                else
+                {
+                    returnValue.GoogleUserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                        GoogleClientSecrets.Load(stream).Secrets,
+                        new string[] { SheetsService.Scope.Spreadsheets },
+                        "user",
+                        CancellationToken.None,
+                        new FileDataStore($"Keys{Path.DirectorySeparatorChar}token.json", true)
+                    ).Result;
+                }
             }
             return returnValue;
         }
@@ -95,7 +102,6 @@ namespace MarbleBot
         public async Task StartAsync()
         {
             Console.Title = "MarbleBot";
-            _startTimeService = new StartTimeService(DateTime.UtcNow);
 
             using var services = ConfigureServices();
 
@@ -116,14 +122,14 @@ namespace MarbleBot
         private Task Client_UserBanned(SocketUser user, SocketGuild socketGuild)
         {
             var obj = MarbleBotModule.GetGuildsObject();
-            MarbleBotGuild marbleBotGuild;
+            MarbleBotGuild? marbleBotGuild;
             if (!obj.ContainsKey(socketGuild.Id.ToString()))
             {
                 return Task.CompletedTask;
             }
 
-            marbleBotGuild = obj[socketGuild.Id.ToString()].ToObject<MarbleBotGuild>();
-            if (string.IsNullOrEmpty(marbleBotGuild.AppealFormLink))
+            marbleBotGuild = obj[socketGuild.Id.ToString()]?.ToObject<MarbleBotGuild>();
+            if (string.IsNullOrEmpty(marbleBotGuild?.AppealFormLink))
             {
                 return Task.CompletedTask;
             }

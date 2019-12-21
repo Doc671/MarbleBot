@@ -22,7 +22,7 @@ namespace MarbleBot.Modules
                 var guild = GetGuild(Context);
                 if (guild.Roles.Any(r => r == role.Id))
                 {
-                    await (Context.User as IGuildUser).AddRoleAsync(role);
+                    await (Context.User as IGuildUser)!.AddRoleAsync(role);
                     await ReplyAsync($"Success. The **{role.Name}** role has been given to you.");
                     return;
                 }
@@ -42,7 +42,7 @@ namespace MarbleBot.Modules
                 var guild = GetGuild(Context);
                 if (guild.Roles.Any(r => r == role.Id))
                 {
-                    await (Context.User as IGuildUser).RemoveRoleAsync(role);
+                    await (Context.User as IGuildUser)!.RemoveRoleAsync(role);
                     await ReplyAsync($"Success. The **{role.Name}** role has been taken from you.");
                     return;
                 }
@@ -60,16 +60,17 @@ namespace MarbleBot.Modules
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
                 var guild = GetGuild(Context);
+                var socketGuildUser = Context.User as SocketGuildUser;
                 if (guild.Roles.Any(r => r == role.Id))
                 {
-                    if ((Context.User as SocketGuildUser).Roles.Any(r => r.Id == role.Id))
+                    if (socketGuildUser!.Roles.Any(r => r.Id == role.Id))
                     {
-                        await (Context.User as IGuildUser).RemoveRoleAsync(role);
+                        await socketGuildUser!.RemoveRoleAsync(role);
                         await ReplyAsync($"Success. The **{role.Name}** role has been taken from you.");
                     }
                     else
                     {
-                        await (Context.User as IGuildUser).AddRoleAsync(role);
+                        await socketGuildUser!.AddRoleAsync(role);
                         await ReplyAsync($"Success. The **{role.Name}** role has been given to you.");
                     }
                     return;

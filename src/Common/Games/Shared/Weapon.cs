@@ -10,7 +10,7 @@ namespace MarbleBot.Common
         /// <summary> The damage dealt by the weapon. </summary>
         public int Accuracy { get; }
         /// <summary> The ID of the ammo used by the ranged weapon. </summary>
-        public ImmutableArray<uint> Ammo { get; }
+        public ImmutableArray<uint>? Ammo { get; }
         /// <summary> The damage dealt by the weapon. </summary>
         public int Damage { get; }
         /// <summmary> The number of times the weapon attacks. </summmary>
@@ -21,8 +21,8 @@ namespace MarbleBot.Common
         [JsonConstructor]
         public Weapon(uint id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
                       int stage = 1, ScavengeLocation scavengeLocation = ScavengeLocation.None,
-                      uint craftingProduced = 0u, Dictionary<string, int> craftingRecipe = null,
-                      int craftingStationRequired = 0, int accuracy = 0, uint[] ammo = null, int damage = 0, int hits = 1,
+                      uint craftingProduced = 0u, Dictionary<string, int>? craftingRecipe = null,
+                      int craftingStationRequired = 0, int accuracy = 0, uint[]? ammo = null, int damage = 0, int hits = 1,
                       WeaponClass warClass = WeaponClass.None) : base(id, name, price, description, onSale, stage,
                                                                       scavengeLocation, craftingProduced, craftingRecipe,
                                                                       craftingStationRequired)

@@ -16,7 +16,7 @@ namespace MarbleBot.Common.TypeReaders
             }
 
             var usersObj = MarbleBotModule.GetUsersObject();
-            var usersDict = usersObj.ToObject<Dictionary<ulong, MarbleBotUser>>();
+            var usersDict = usersObj.ToObject<Dictionary<ulong, MarbleBotUser>>()!;
             foreach (var user in usersDict)
             {
                 if (string.Compare(input, user.Value.Name, true) == 0

@@ -11,12 +11,12 @@ namespace MarbleBot.Common
         public Dictionary<string, List<ulong>> Marbles { get; set; }
 
         [JsonConstructor]
-        public WarTournamentInfo(ulong guildId, uint spaces, uint teamSize, IDictionary<string, IEnumerable<ulong>> marbles)
+        public WarTournamentInfo(ulong guildId, uint spaces, uint teamSize, Dictionary<string, List<ulong>> marbles)
         {
             GuildId = guildId;
             Spaces = spaces;
             TeamSize = teamSize;
-            Marbles = (Dictionary<string, List<ulong>>)marbles;
+            Marbles = marbles;
         }
     }
 }

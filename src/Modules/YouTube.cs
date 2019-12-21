@@ -67,7 +67,7 @@ namespace MarbleBot.Modules
                 {
                     while (!CVID.EndOfStream)
                     {
-                        var person = (await CVID.ReadLineAsync()).Split(',');
+                        var person = (await CVID.ReadLineAsync())!.Split(',');
                         if (Context.User.Id == Convert.ToUInt64(person[0]))
                         {
                             validUser = true;
@@ -111,12 +111,18 @@ namespace MarbleBot.Modules
                         }
                     }
 
+                    if (channel == null)
+                    {
+                        await SendErrorAsync("Could not find the channel!");
+                        return;
+                    }
+
                     searchListRequest.Q = url;
                     searchListResponse = await searchListRequest.ExecuteAsync();
                     var video = searchListResponse.Items[0].Snippet;
                     if (string.Compare(channel.Title, video.ChannelTitle, true) == 0)
                     {
-                        if (DateTime.Now.Subtract((DateTime)video.PublishedAt).Days > 1)
+                        if (DateTime.Now.Subtract((DateTime)video.PublishedAt!).Days > 1)
                         {
                             await ReplyAsync("The video cannot be more than two days old!");
                         }

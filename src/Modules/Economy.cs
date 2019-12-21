@@ -27,7 +27,7 @@ namespace MarbleBot.Modules
         [Command("balance")]
         [Alias("credits", "money", "bal")]
         [Summary("Returns how much money you or someone else has.")]
-        public async Task BalanceCommand([Remainder] MarbleBotUser user = null)
+        public async Task BalanceCommand([Remainder] MarbleBotUser? user = null)
         {
             user ??= GetUser(Context);
             var author = Context.Client.GetUser(user.Id);
@@ -112,7 +112,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (requestedItem.CraftingRecipe.Count < 1)
+            if (requestedItem.CraftingRecipe == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, the item **{requestedItem.Name}** cannot be crafted!");
                 return;
@@ -172,10 +172,10 @@ namespace MarbleBot.Modules
         {
             var user = GetUser(Context);
             var output = new StringBuilder();
-            var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
+            var items = GetItemsObject().ToObject<Dictionary<string, Item>>()!;
             foreach (var itemPair in items)
             {
-                if (itemPair.Value.CraftingProduced != 0)
+                if (itemPair.Value.CraftingRecipe != null)
                 {
                     var craftable = true;
                     var noCraftable = 0;
@@ -291,7 +291,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (requestedItem.CraftingRecipe.Count < 1)
+            if (requestedItem.CraftingRecipe == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, the item **{requestedItem.Name}** cannot be decrafted!");
                 return;
@@ -468,7 +468,7 @@ namespace MarbleBot.Modules
                     .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
                     .AppendLine($"Damage: **{weapon.Damage}**")
                     .AppendLine($"Uses: **{weapon.Hits}**"), true);
-                if (weapon.Ammo.Length > 0)
+                if (weapon.Ammo?.Length > 0)
                 {
                     var output = new StringBuilder();
                     foreach (var itemId in weapon.Ammo)
@@ -484,7 +484,7 @@ namespace MarbleBot.Modules
                 builder.AddField("Ammo Damage", weapon.Damage, true);
             }
 
-            if (weapon.CraftingRecipe.Count > 0)
+            if (weapon.CraftingRecipe != null)
             {
                 var output = new StringBuilder();
                 foreach (var rawItem in weapon.CraftingRecipe)
@@ -541,7 +541,7 @@ namespace MarbleBot.Modules
         [Command("profile")]
         [Alias("stats")]
         [Summary("Returns the profile of you or someone else.")]
-        public async Task ProfileCommand([Remainder] MarbleBotUser user = null)
+        public async Task ProfileCommand([Remainder] MarbleBotUser? user = null)
         {
             user ??= GetUser(Context);
             var lastDaily = user.LastDaily.ToString("yyyy-MM-dd HH:mm:ss");
@@ -637,7 +637,7 @@ namespace MarbleBot.Modules
             var embed = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp();
-            var items = GetItemsObject().ToObject<Dictionary<string, Item>>();
+            var items = GetItemsObject().ToObject<Dictionary<string, Item>>()!;
             if (!int.TryParse(rawPage, out int page))
             {
                 await ReplyAsync("Invalid number! Use `mb/help recipes` for more info.");
@@ -655,7 +655,7 @@ namespace MarbleBot.Modules
             embed.WithTitle($"Recipes in IDs `{minValue:000}`-`{maxValue:000}`");
             foreach (var itemPair in items)
             {
-                if (itemPair.Value.CraftingProduced != 0)
+                if (itemPair.Value.CraftingRecipe != null)
                 {
                     var itemId = int.Parse(itemPair.Key);
                     if (itemId >= minValue && itemId <= maxValue)
@@ -808,7 +808,7 @@ namespace MarbleBot.Modules
             }
 
             var obj = JObject.Parse(json);
-            var items = obj.ToObject<Dictionary<string, Item>>();
+            var items = obj.ToObject<Dictionary<string, Item>>()!;
             foreach (var item in items)
             {
                 if (item.Value.OnSale)

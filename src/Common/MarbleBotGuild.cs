@@ -12,7 +12,7 @@ namespace MarbleBot.Common
         /// <summary> The channel where update announcements are posted. </summary>
         public ulong AnnouncementChannel { get; set; }
         /// <summary> The link to the appeal form, where users can appeal to be unbanned. </summary>
-        public string AppealFormLink { get; set; }
+        public string? AppealFormLink { get; set; }
         /// <summary> The channel where autoresponses can be used. </summary>
         public ulong AutoresponseChannel { get; set; }
         /// <summary> The colour displayed in embeds. </summary>
@@ -24,7 +24,7 @@ namespace MarbleBot.Common
         /// <summary> The channels where commands can be used. If empty, commands can be used anywhere in the guild. </summary>
         public List<ulong> UsableChannels { get; set; } = new List<ulong>();
         /// <summary> The link to the warning sheet on Google Sheets. </summary>
-        public string WarningSheetLink { get; set; }
+        public string? WarningSheetLink { get; set; }
 
         /// <summary> Represents a guild. </summary>
         /// <param name="id"> The ID of the guild. </param>
@@ -40,7 +40,7 @@ namespace MarbleBot.Common
         [JsonConstructor]
         public MarbleBotGuild(ulong id, ulong announcementChannel, ulong autoresponseChannel, string color,
                                IEnumerable<ulong> roles, IEnumerable<ulong> usableChannels,
-                               string warningSheetLink = null)
+                               string? warningSheetLink = null)
         {
             Id = id;
             AnnouncementChannel = announcementChannel;

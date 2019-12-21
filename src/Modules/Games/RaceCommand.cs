@@ -2,6 +2,8 @@
 using Discord.Commands;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
+using MarbleBot.Modules.Games.Services;
+using MarbleBot.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -19,6 +21,10 @@ namespace MarbleBot.Modules.Games
     public class RaceCommand : GameModule
     {
         private const GameType Type = GameType.Race;
+
+        public RaceCommand(BotCredentials botCredentials, GamesService gamesService, RandomService randomService) : base(botCredentials, gamesService, randomService)
+        {
+        }
 
         [Command("signup")]
         [Alias("join")]
@@ -69,7 +75,7 @@ namespace MarbleBot.Modules.Games
             {
                 while (!messageFile.EndOfStream)
                 {
-                    messages.Add(await messageFile.ReadLineAsync());
+                    messages.Add((await messageFile.ReadLineAsync())!);
                 }
             }
 
@@ -83,11 +89,11 @@ namespace MarbleBot.Modules.Games
                 int eliminated = 0;
                 do
                 {
-                    eliminated = RandomService.Rand.Next(0, marbleCount);
+                    eliminated = _randomService.Rand.Next(0, marbleCount);
                 }
                 while (string.Compare(marbles[eliminated].name, "///out", true) == 0);
                 string deathMessage;
-                deathMessage = messages[RandomService.Rand.Next(0, messages.Count - 1)];
+                deathMessage = messages[_randomService.Rand.Next(0, messages.Count - 1)];
                 string bold = marbles[eliminated].name.Contains('*') || marbles[eliminated].name.Contains('\\') ? "" : "**";
                 builder.AddField($"{bold}{marbles[eliminated].name}{bold} is eliminated!", $"{marbles[eliminated].name} {deathMessage} and is now out of the competition!");
 
@@ -192,11 +198,11 @@ namespace MarbleBot.Modules.Games
                 if (string.Compare(option.RemoveChar(' '), "winners", true) == 0)
                 {
                     var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader($"Data{Path.DirectorySeparatorChar}RaceWinners.txt"))
+                    using (var winnerFile = new StreamReader($"Data{Path.DirectorySeparatorChar}RaceWinners.txt"))
                     {
-                        while (!win.EndOfStream)
+                        while (!winnerFile.EndOfStream)
                         {
-                            var racerInfo = await win.ReadLineAsync();
+                            var racerInfo = (await winnerFile.ReadLineAsync())!;
                             if (winners.ContainsKey(racerInfo))
                             {
                                 winners[racerInfo]++;
@@ -221,11 +227,11 @@ namespace MarbleBot.Modules.Games
                 else
                 {
                     var winners = new SortedDictionary<string, int>();
-                    using (var win = new StreamReader($"Data{Path.DirectorySeparatorChar}RaceMostUsed.txt"))
+                    using (var winnerFile = new StreamReader($"Data{Path.DirectorySeparatorChar}RaceMostUsed.txt"))
                     {
-                        while (!win.EndOfStream)
+                        while (!winnerFile.EndOfStream)
                         {
-                            var racerInfo = await win.ReadLineAsync();
+                            var racerInfo = (await winnerFile.ReadLineAsync())!;
                             if (winners.ContainsKey(racerInfo))
                             {
                                 winners[racerInfo]++;

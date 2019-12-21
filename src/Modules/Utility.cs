@@ -88,7 +88,7 @@ namespace MarbleBot.Modules
             {
                 bool owner = _botCredentials.AdminIds.Any(id => id == Context.User.Id);
 
-                if (!owner && module.Name == "Moderation" && !Context.IsPrivate && !(Context.User as SocketGuildUser).GuildPermissions.ManageMessages
+                if (!owner && module.Name == "Moderation" && !Context.IsPrivate && !(Context.User as SocketGuildUser)!.GuildPermissions.ManageMessages
                     || module.Name == "Sneak")
                 {
                     await SendErrorAsync("You cannot access this module!");
@@ -152,7 +152,7 @@ namespace MarbleBot.Modules
                 // If neither a command nor a module could be found, show a list of modules
                 if (command == null)
                 {
-                    if (!Context.IsPrivate && (Context.User as SocketGuildUser).GuildPermissions.ManageMessages)
+                    if (!Context.IsPrivate && (Context.User as SocketGuildUser)!.GuildPermissions.ManageMessages)
                     {
                         builder.AddField("Modules", "Economy\nFun\nGames\nModeration\nRoles\nUtility\nYouTube");
                     }
@@ -179,7 +179,7 @@ namespace MarbleBot.Modules
                 }
 
                 var commandDict = JObject.Parse(json).ToObject<Dictionary<string, Dictionary<string, string>>>();
-                if (commandDict.ContainsKey(command.Name) || command.Aliases.Any(alias => commandDict.ContainsKey(alias)))
+                if (commandDict!.ContainsKey(command.Name) || command.Aliases.Any(alias => commandDict.ContainsKey(alias)))
                 {
                     example = commandDict[command.Name].ContainsKey("Example") ? commandDict[command.Name]["Example"] : "";
                     usage = commandDict[command.Name].ContainsKey("Usage") ? commandDict[command.Name]["Usage"] : "";
@@ -218,7 +218,7 @@ namespace MarbleBot.Modules
                 {
                     builder.AddField("Preconditions", command.Preconditions.Aggregate(new StringBuilder(), (builder, precondition) =>
                     {
-                        builder.AppendLine((precondition.TypeId as Type).Name.CamelToTitleCase());
+                        builder.AppendLine((precondition.TypeId as Type)!.Name.CamelToTitleCase());
                         return builder;
                     }).ToString(), true);
                 }
@@ -404,7 +404,7 @@ namespace MarbleBot.Modules
                         .AddField("Status", status, true)
                         .AddField("Nickname", nickname, true)
                         .AddField("Registered", user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"), true)
-                        .AddField("Joined", ((DateTimeOffset)user.JoinedAt).ToString("yyyy-MM-dd HH:mm:ss"), true)
+                        .AddField("Joined", ((DateTimeOffset)user.JoinedAt!).ToString("yyyy-MM-dd HH:mm:ss"), true)
                         .AddField("Roles", roles.ToString(), true)
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
