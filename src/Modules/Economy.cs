@@ -468,7 +468,7 @@ namespace MarbleBot.Modules
                     .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
                     .AppendLine($"Damage: **{weapon.Damage}**")
                     .AppendLine($"Uses: **{weapon.Hits}**"), true);
-                if (weapon.Ammo?.Length > 0)
+                if (weapon.Ammo.Length != 0)
                 {
                     var output = new StringBuilder();
                     foreach (var itemId in weapon.Ammo)

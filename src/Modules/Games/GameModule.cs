@@ -529,7 +529,7 @@ namespace MarbleBot.Modules.Games
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                await _gamesService.SiegeInfo[fileId].ItemAttack(Context, obj, item.Id,
+                                await _gamesService.SiegeInfo[fileId].ItemAttack(obj, item.Id,
                                     (int)Math.Round(90 + _gamesService.SiegeInfo[fileId].Boss.MaxHP * 0.05 * _randomService.Rand.NextDouble() * 0.12 + 0.94));
                             }
                             else
@@ -544,7 +544,7 @@ namespace MarbleBot.Modules.Games
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                await _gamesService.SiegeInfo[fileId].ItemAttack(Context, obj, 14,
+                                await _gamesService.SiegeInfo[fileId].ItemAttack(obj, 14,
                                     70 + 10 * (int)_gamesService.SiegeInfo[fileId].Boss.Difficulty, true);
                             }
                             else
@@ -718,7 +718,7 @@ namespace MarbleBot.Modules.Games
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (!_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                _gamesService.SiegeInfo.GetOrAdd(fileId, new Siege(_gamesService, _randomService, Context, new List<SiegeMarble>())
+                                _gamesService.SiegeInfo.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, new List<SiegeMarble>())
                                 {
                                     Active = false,
                                     Boss = Siege.GetBoss("Destroyer")

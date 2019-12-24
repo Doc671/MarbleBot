@@ -43,7 +43,7 @@ namespace MarbleBot.Modules.Games
                         .WithCurrentTimestamp()
                         .WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)!.CamelToTitleCase()}**!")
                         .WithTitle("Item Scavenge Begin!").Build());
-                    _gamesService.ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(_gamesService, _randomService, Context, location, scavengeMessage));
+                    _gamesService.ScavengeInfo.GetOrAdd(Context.User.Id, new Scavenge(Context, _gamesService, _randomService, location, scavengeMessage));
                 }
             }
         }

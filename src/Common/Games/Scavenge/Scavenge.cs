@@ -6,6 +6,7 @@ using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace MarbleBot.Common
         private bool _disposed = false;
         private bool _itemHasAppeared = false;
         private bool _oreHasAppeared = false;
+        private readonly SocketCommandContext _context;
         private readonly IUserMessage _originalMessage;
         private readonly GamesService _gamesService;
         private readonly RandomService _randomService;
@@ -59,20 +61,21 @@ namespace MarbleBot.Common
             }
         }
 
-        public Scavenge(GamesService gamesService, RandomService randomService, SocketCommandContext context, ScavengeLocation location, IUserMessage message)
+        public Scavenge(SocketCommandContext context, GamesService gamesService, RandomService randomService, ScavengeLocation location, IUserMessage message)
         {
+            _context = context;
             _gamesService = gamesService;
             _randomService = randomService;
-            Actions = Task.Run(async () => { await Session(context); });
+            Actions = Task.Run(async () => { await Session(); });
             Id = context.User.Id;
             Location = location;
             _originalMessage = message;
         }
 
         /// <summary> The scavenge session. </summary>
-        private async Task Session(SocketCommandContext context)
+        private async Task Session()
         {
-            var startTime = DateTime.UtcNow;
+            var stopwatch = new Stopwatch();
             var collectableItems = new List<Item>();
             var itemObject = MarbleBotModule.GetItemsObject();
             var items = itemObject.ToObject<Dictionary<string, Item>>()!;
@@ -85,6 +88,8 @@ namespace MarbleBot.Common
                     collectableItems.Add(outputItem);
                 }
             }
+
+            stopwatch.Start();
             do
             {
                 await Task.Delay(8000);
@@ -104,10 +109,16 @@ namespace MarbleBot.Common
 
                     await UpdateEmbed();
                 }
-            } while (!(DateTime.UtcNow.Subtract(startTime).TotalSeconds > 63));
+            } while (stopwatch.Elapsed.TotalSeconds < 63);
+            stopwatch.Stop();
 
+            await OnGameEnd();
+        }
+
+        public async Task OnGameEnd()
+        {
             var usersObject = MarbleBotModule.GetUsersObject();
-            var user = MarbleBotModule.GetUser(context, usersObject);
+            var user = MarbleBotModule.GetUser(_context, usersObject);
             user.LastScavenge = DateTime.UtcNow;
             foreach (var item in Items)
             {
@@ -125,7 +136,7 @@ namespace MarbleBot.Common
                     user.Items.Add(item.Id, 1);
                 }
             }
-            MarbleBotModule.WriteUsers(usersObject, context.User, user);
+            MarbleBotModule.WriteUsers(usersObject, _context.User, user);
 
             await UpdateEmbed(true, user.Stage);
 
@@ -134,8 +145,8 @@ namespace MarbleBot.Common
 
         /// <summary> Updates the original message with the current items and ores available. </summary>
         /// <param name="gameEnded"> Whether the game has ended. </param>
-        /// <param name="stage"> The stage of the user (see MarbleBot.Core.MBUser.Stage). </param>
-        internal async Task UpdateEmbed(bool gameEnded = false, int stage = 1)
+        /// <param name="stage"> The stage of the user. </param>
+        public async Task UpdateEmbed(bool gameEnded = false, int stage = 1)
         {
             bool first = false;
             var itemOutput = new StringBuilder();

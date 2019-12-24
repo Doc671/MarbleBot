@@ -45,58 +45,38 @@ namespace MarbleBot.Common
         /// <summary> The current power-up that can be grabbed. </summary>
         public PowerUp PowerUp { get; set; }
 
+        private readonly SocketCommandContext _context;
         private bool _disposed = false;
         private readonly GamesService _gamesService;
         private readonly RandomService _randomService;
         private bool _victoryCalled = false;
 
         // Separate task dealing with time-based boss responses
-        public async Task BossActions(SocketCommandContext context)
+        public async Task BossActions()
         {
             var startTime = DateTime.UtcNow;
-            var timeout = false;
-            do
+            bool timeout = false;
+
+            await Task.Delay(15000);
+            while (Boss.HP > 0 && !timeout && !Marbles.All(m => m.HP == 0) && !_disposed)
             {
-                await Task.Delay(15000);
-
-                if (_disposed)
-                {
-                    return;
-                }
-
-                if (Boss.HP < 1)
-                {
-                    if (!_victoryCalled)
-                    {
-                        await Victory(context);
-                    }
-
-                    break;
-                }
-
-                if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 20)
-                {
-                    timeout = true;
-                    break;
-                }
-
                 // Attack marbles
-                var atk = Boss.Attacks.ElementAt(_randomService.Rand.Next(0, Boss.Attacks.Count));
+                var attack = Boss.Attacks.ElementAt(_randomService.Rand.Next(0, Boss.Attacks.Count));
                 var builder = new EmbedBuilder()
                     .WithAuthor(Boss.Name, Boss.ImageUrl)
-                    .WithColor(GetColor(context))
+                    .WithColor(GetColor(_context))
                     .WithCurrentTimestamp()
-                    .WithDescription($"**{Boss.Name}** used **{atk.Name}**!")
-                    .WithTitle($"WARNING: {atk.Name.ToUpper()} INBOUND!");
+                    .WithDescription($"**{Boss.Name}** used **{attack.Name}**!")
+                    .WithTitle($"WARNING: {attack.Name.ToUpper()} INBOUND!");
 
                 var attackMissed = true;
                 foreach (var marble in Marbles)
                 {
                     if (marble.HP > 0)
                     {
-                        if (!(_randomService.Rand.Next(0, 100) > atk.Accuracy))
+                        if (!(_randomService.Rand.Next(0, 100) > attack.Accuracy))
                         {
-                            marble.DealDamage(atk.Damage);
+                            marble.DealDamage(attack.Damage);
                             attackMissed = false;
                             if (marble.HP < 1)
                             {
@@ -105,7 +85,7 @@ namespace MarbleBot.Common
                             }
                             else
                             {
-                                switch (atk.StatusEffect == marble.StatusEffect ? StatusEffect.None : atk.StatusEffect)
+                                switch (attack.StatusEffect == marble.StatusEffect ? StatusEffect.None : attack.StatusEffect)
                                 {
                                     case StatusEffect.Chill:
                                         marble.StatusEffect = StatusEffect.Chill;
@@ -162,6 +142,7 @@ namespace MarbleBot.Common
                         }
                     }
                 }
+
                 if (attackMissed)
                 {
                     builder.AddField("Missed!", "No-one got hurt!");
@@ -206,27 +187,30 @@ namespace MarbleBot.Common
                     }
                 }
 
-                await context.Channel.SendMessageAsync(embed: builder.Build());
+                await _context.Channel.SendMessageAsync(embed: builder.Build());
 
-            } while (Boss.HP > 0 && !timeout && !Marbles.All(m => m.HP == 0) && !_disposed);
+                await Task.Delay(15000);
+
+                timeout = DateTime.UtcNow.Subtract(startTime).TotalMinutes > 20;
+            }
 
             if (Boss.HP > 0 && !_disposed)
             {
                 if (timeout)
                 {
-                    await context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
+                    await _context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
                 }
                 else
                 {
                     var marbles = new StringBuilder();
                     foreach (var marble in Marbles)
                     {
-                        marbles.AppendLine(marble.ToString(context, false));
+                        marbles.AppendLine(marble.ToString(_context, false));
                     }
 
-                    await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                    await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         .WithAuthor(Boss.Name, Boss.ImageUrl)
-                        .WithColor(GetColor(context))
+                        .WithColor(GetColor(_context))
                         .WithCurrentTimestamp()
                         .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal HP: **{Boss.HP}**/{Boss.MaxHP}")
                         .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
@@ -238,12 +222,12 @@ namespace MarbleBot.Common
             }
         }
 
-        public async Task DealDamage(SocketCommandContext context, int dmg)
+        public async Task DealDamage(int damageToDeal)
         {
-            Boss.HP -= dmg;
+            Boss.HP -= damageToDeal;
             if (Boss.HP < 1)
             {
-                await Victory(context);
+                await OnVictory();
             }
         }
 
@@ -314,64 +298,67 @@ namespace MarbleBot.Common
             };
 
         /// <summary> Attacks the boss with a non-weapon item. </summary>
-        /// <param name="context"> The context of the command. </param>
+        /// <param name="_context"> The _context of the command. </param>
         /// <param name="obj"> The JSON object storing the users. </param>
         /// <param name="itemId"> The ID of the item. </param>
         /// <param name="damage"> The damage being dealt by the item. </param>
         /// <param name="consumable"> Whether or not the item is consumed upon use. </param>
-        public async Task ItemAttack(SocketCommandContext context, JObject obj, uint itemId,
+        public async Task ItemAttack(JObject obj, uint itemId,
                                      int damage, bool consumable = false)
         {
             if (_disposed)
             {
-                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, there is no currently ongoing Siege!");
+                await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, there is no currently ongoing Siege!");
                 return;
             }
 
-            var marble = Marbles.Find(m => m.Id == context.User.Id);
+            var marble = Marbles.Find(m => m.Id == _context.User.Id);
             if (marble == null)
             {
-                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you aren't in this Siege!");
+                await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you aren't in this Siege!");
                 return;
             }
 
             if (marble.HP == 0)
             {
-                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you are out and can no longer attack!");
+                await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you are out and can no longer attack!");
                 return;
             }
 
             if (DateTime.UtcNow.Subtract(marble.LastMoveUsed).TotalSeconds < 5)
             {
-                await context.Channel.SendMessageAsync($":warning: | **{context.User.Username}**, you must wait for {GetDateString(marble.LastMoveUsed.Subtract(DateTime.UtcNow.AddSeconds(-5)))} until you can attack again!");
+                await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you must wait for {GetDateString(marble.LastMoveUsed.Subtract(DateTime.UtcNow.AddSeconds(-5)))} until you can attack again!");
                 return;
             }
 
-            var user = GetUser(context);
+            var user = GetUser(_context);
             var item = GetItem<Item>(itemId.ToString("000"));
             if (item.Id == 10 && marble.QefpedunCharmUsed)
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you can only use the **{item.Name}** once per battle!");
+                await _context.Channel.SendMessageAsync($"**{_context.User.Username}**, you can only use the **{item.Name}** once per battle!");
                 return;
             }
 
             damage = (int)Math.Round(damage * DamageMultiplier);
-            await DealDamage(context, damage);
-            await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+            Boss.HP -= damage;
+            await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                 .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
-                .WithAuthor(context.User)
-                .WithColor(GetColor(context))
+                .WithAuthor(_context.User)
+                .WithColor(GetColor(_context))
                 .WithCurrentTimestamp()
                 .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
                 .WithTitle(item.Name)
                 .Build());
+
             marble.DamageDealt += damage;
+
             if (consumable)
             {
                 user.Items[item.Id]--;
                 user.NetWorth -= item.Price;
-                WriteUsers(obj, context.User, user);
+                WriteUsers(obj, _context.User, user);
             }
+
             if (item.Id == 10)
             {
                 marble.QefpedunCharmUsed = true;
@@ -379,8 +366,8 @@ namespace MarbleBot.Common
         }
 
         public override string ToString() => $"[{Id}] {Boss.Name}: {Marbles.Count}";
-
-        public async Task Victory(SocketCommandContext context)
+        
+        private async Task OnVictory()
         {
             if (_victoryCalled)
             {
@@ -389,7 +376,7 @@ namespace MarbleBot.Common
 
             _victoryCalled = true;
             var builder = new EmbedBuilder()
-                .WithColor(GetColor(context))
+                .WithColor(GetColor(_context))
                 .WithCurrentTimestamp()
                 .WithTitle("Siege Victory!")
                 .WithDescription($"**{Boss.Name}** has been defeated!");
@@ -398,32 +385,25 @@ namespace MarbleBot.Common
             for (int i = 0; i < Marbles.Count; i++)
             {
                 var marble = Marbles[i];
-                var user = await GetUserAsync(context, obj, marble.Id);
+                var user = await GetUserAsync(_context, obj, marble.Id);
                 var output = new StringBuilder();
 
                 // Advance user's stage if necessary
-                if (user.Stage == 1 && string.Compare(Boss.Name, "Destroyer", true) == 0 && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149))
+                if (user.Stage == 1 && Boss.Name == "Destroyer" && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149))
                 {
                     user.Stage = 2;
                     output.AppendLine($"**You have entered Stage II!** Much new content has been unlocked - see `mb/advice` for more info!");
                 }
-                else if (user.Stage == 2 && string.Compare(Boss.Name, "Overlord", true) == 0 && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149))
+                else if (user.Stage == 2 && Boss.Name == "Overlord" && ((marble.DamageDealt > 0 && marble.HP > 0) || marble.DamageDealt > 149))
                 {
                     user.Stage = 3;
                     output.AppendLine($"**You have entered Stage III!**");
                 }
 
                 int earnings = marble.DamageDealt + (marble.PowerUpHits * 50);
-                if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6)
+                if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6 && marble.DamageDealt > 0)
                 {
-                    if (marble.DamageDealt > 0)
-                    {
-                        output.AppendLine($"Damage dealt: {UnitOfMoney}**{marble.DamageDealt:n2}**");
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    output.AppendLine($"Damage dealt: {UnitOfMoney}**{marble.DamageDealt:n2}**");
 
                     if (marble.PowerUpHits > 0)
                     {
@@ -494,70 +474,70 @@ namespace MarbleBot.Common
                         output.AppendLine($"__**Total: {UnitOfMoney}{earnings:n2}**__");
                         user.Balance += earnings;
                         user.NetWorth += earnings;
-                        builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
+                        builder.AddField($"**{_context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
                         obj.Remove(marble.Id.ToString());
                         obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
                     }
                 }
             }
-            await context.Channel.SendMessageAsync(embed: builder.Build());
+            await _context.Channel.SendMessageAsync(embed: builder.Build());
             WriteUsers(obj);
             Dispose(true);
         }
 
         /// <summary> Attacks the boss with a weapon. </summary>
-        /// <param name="context"> The context of the command. </param>
+        /// <param name="_context"> The _context of the command. </param>
         /// <param name="weapon"> The weapon used to attack. </param>
-        public async Task WeaponAttack(SocketCommandContext context, Weapon weapon)
+        public async Task WeaponAttack(SocketCommandContext _context, Weapon weapon)
         {
             if (_disposed)
             {
-                await context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
+                await _context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
                 return;
             }
 
-            var marble = Marbles.Find(m => m.Id == context.User.Id);
+            var marble = Marbles.Find(m => m.Id == _context.User.Id);
             if (marble == null)
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you aren't in this Siege!");
+                await _context.Channel.SendMessageAsync($"**{_context.User.Username}**, you aren't in this Siege!");
                 return;
             }
 
             if (marble.HP == 0)
             {
-                await context.Channel.SendMessageAsync($"**{context.User.Username}**, you are out and can no longer attack!");
+                await _context.Channel.SendMessageAsync($"**{_context.User.Username}**, you are out and can no longer attack!");
                 return;
             }
 
             var ammo = new Ammo();
-            var user = GetUser(context);
+            var user = GetUser(_context);
 
-            if (weapon.Ammo != null)
+            if (weapon.Ammo.Length != 0)
             {
-                for (int i = weapon.Ammo.Value.Length - 1; i >= 0; i--)
+                for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
                 {
-                    if (user.Items.ContainsKey(weapon.Ammo.Value[i]) && user.Items[weapon.Ammo.Value[i]] >= weapon.Hits)
+                    if (user.Items.ContainsKey(weapon.Ammo[i]) && user.Items[weapon.Ammo[i]] >= weapon.Hits)
                     {
-                        ammo = GetItem<Ammo>(weapon.Ammo.Value[i].ToString("000"));
+                        ammo = GetItem<Ammo>(weapon.Ammo[i].ToString("000"));
                         break;
                     }
                 }
 
                 if (ammo.Id == 0)
                 {
-                    await context.Channel.SendMessageAsync($"**{context.User.Username}**, you do not have enough ammo for this item!");
+                    await _context.Channel.SendMessageAsync($"**{_context.User.Username}**, you do not have enough ammo for this item!");
                     return;
                 }
 
                 var obj = GetUsersObject();
                 user.Items[ammo.Id] -= weapon.Hits;
                 user.NetWorth -= ammo.Price * weapon.Hits;
-                WriteUsers(obj, context.User, user);
+                WriteUsers(obj, _context.User, user);
             }
 
             var builder = new EmbedBuilder()
-                .WithAuthor(context.User)
-                .WithColor(GetColor(context))
+                .WithAuthor(_context.User)
+                .WithColor(GetColor(_context))
                 .WithCurrentTimestamp()
                 .WithTitle(weapon.Name);
 
@@ -567,7 +547,7 @@ namespace MarbleBot.Common
                 {
                     var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
                         * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
-                    await DealDamage(context, damage);
+                    await DealDamage(damage);
                     marble.DamageDealt += damage;
                     builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{damage}** damage to **{Boss.Name}**!");
                 }
@@ -585,7 +565,7 @@ namespace MarbleBot.Common
                     {
                         var damage = (int)Math.Round((weapon.Damage + (weapon.WarClass == WeaponClass.Ranged || weapon.WarClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
                             * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
-                        await DealDamage(context, damage);
+                        await DealDamage(damage);
                         totalDamage += damage;
                         builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss.Name}**.");
                     }
@@ -599,16 +579,17 @@ namespace MarbleBot.Common
                 marble.DamageDealt += totalDamage;
                 builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing a total of **{totalDamage}** damage to **{Boss.Name}**!");
             }
-            await context.Channel.SendMessageAsync(embed: builder
+            await _context.Channel.SendMessageAsync(embed: builder
                         .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")
                         .Build());
         }
 
-        public Siege(GamesService gamesService, RandomService randomService, SocketCommandContext context, IEnumerable<SiegeMarble> marbles)
+        public Siege(SocketCommandContext context, GamesService gamesService, RandomService randomService, IEnumerable<SiegeMarble> marbles)
         {
+            _context = context;
             _gamesService = gamesService;
             _randomService = randomService;
-            Id = context.IsPrivate ? context.User.Id : context.Guild.Id;
+            Id = _context.IsPrivate ? _context.User.Id : _context.Guild.Id;
             Marbles = marbles.ToList();
         }
 

@@ -10,7 +10,7 @@ namespace MarbleBot.Common
         /// <summary> The damage dealt by the weapon. </summary>
         public int Accuracy { get; }
         /// <summary> The ID of the ammo used by the ranged weapon. </summary>
-        public ImmutableArray<uint>? Ammo { get; }
+        public ImmutableArray<uint> Ammo { get; }
         /// <summary> The damage dealt by the weapon. </summary>
         public int Damage { get; }
         /// <summmary> The number of times the weapon attacks. </summmary>

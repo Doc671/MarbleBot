@@ -15,7 +15,7 @@ using static MarbleBot.Modules.MarbleBotModule;
 namespace MarbleBot.Common
 {
     /// <summary> Represents a game of war. </summary>
-    public partial class War : IMarbleBotGame
+    public class War : IMarbleBotGame
     {
         public Task? Actions { get; set; }
         public IEnumerable<WarMarble> AllMarbles => Team1.Marbles.Union(Team2.Marbles);
@@ -57,7 +57,7 @@ namespace MarbleBot.Common
             }
         }
 
-        public async Task End(SocketCommandContext context)
+        public async Task OnGameEnd(SocketCommandContext context)
         {
             if (_endCalled)
             {
@@ -94,20 +94,12 @@ namespace MarbleBot.Common
             foreach (var marble in winningTeam.Marbles)
             {
                 var user = await GetUserAsync(context, obj, marble.Id);
-                if (DateTime.UtcNow.Subtract(user.LastWarWin).TotalHours > 6)
+                if (DateTime.UtcNow.Subtract(user.LastWarWin).TotalHours > 6 && marble.DamageDealt > 0)
                 {
                     var output = new StringBuilder();
-                    var earnings = 0;
-                    if (marble.DamageDealt > 0)
-                    {
-                        earnings = marble.DamageDealt * 5;
-                        output.AppendLine($"Damage dealt (x5): {UnitOfMoney}**{earnings:n2}**");
-                        user.WarWins++;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    var earnings = marble.DamageDealt * 5;
+                    output.AppendLine($"Damage dealt (x5): {UnitOfMoney}**{earnings:n2}**");
+                    user.WarWins++;
 
                     if (marble.HP > 0)
                     {
@@ -182,9 +174,10 @@ namespace MarbleBot.Common
                 }
             }
             while (!timeout && !_disposed && !Team1.Marbles.All(m => m.HP == 0) && !Team2.Marbles.All(m => m.HP == 0));
+            
             if (!timeout)
             {
-                await End(context);
+                await OnGameEnd(context);
             }
             else
             {

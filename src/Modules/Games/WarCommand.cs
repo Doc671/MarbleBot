@@ -228,11 +228,11 @@ namespace MarbleBot.Modules.Games
             if (currentMarble.Weapon.Ammo != null)
             {
                 var ammoId = 0u;
-                for (int i = currentMarble.Weapon.Ammo.Value.Length - 1; i >= 0; i--)
+                for (int i = currentMarble.Weapon.Ammo.Length - 1; i >= 0; i--)
                 {
-                    if (user.Items.ContainsKey(currentMarble.Weapon.Ammo.Value[i]) && user.Items[currentMarble.Weapon.Ammo.Value[i]] >= currentMarble.Weapon.Hits)
+                    if (user.Items.ContainsKey(currentMarble.Weapon.Ammo[i]) && user.Items[currentMarble.Weapon.Ammo[i]] >= currentMarble.Weapon.Hits)
                     {
-                        ammoId = currentMarble.Weapon.Ammo.Value[i];
+                        ammoId = currentMarble.Weapon.Ammo[i];
                         break;
                     }
                 }
@@ -332,7 +332,7 @@ namespace MarbleBot.Modules.Games
 
             if (war.Team1.Marbles.Sum(m => m.HP) < 1 || war.Team2.Marbles.Sum(m => m.HP) < 1)
             {
-                await war.End(Context);
+                await war.OnGameEnd(Context);
             }
         }
 
@@ -418,7 +418,7 @@ namespace MarbleBot.Modules.Games
 
             if (war.Team1.Marbles.Sum(m => m.HP) < 1 || war.Team2.Marbles.Sum(m => m.HP) < 1)
             {
-                await war.End(Context);
+                await war.OnGameEnd(Context);
             }
         }
 

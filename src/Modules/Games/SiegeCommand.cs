@@ -112,7 +112,7 @@ namespace MarbleBot.Modules.Games
             }
             else
             {
-                _gamesService.SiegeInfo.GetOrAdd(fileId, new Siege(_gamesService, _randomService, Context, marbles));
+                _gamesService.SiegeInfo.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, marbles));
             }
 
             if (marbleCount == 0)
@@ -192,7 +192,7 @@ namespace MarbleBot.Modules.Games
             await countdownMessage.ModifyAsync(m => m.Content = "**1**");
             await Task.Delay(1000);
             await countdownMessage.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
-            currentSiege.Actions = Task.Run(async () => { await currentSiege.BossActions(Context); });
+            currentSiege.Actions = Task.Run(async () => { await currentSiege.BossActions(); });
             await ReplyAsync(embed: builder.Build());
             if (mentionOutput.Length != 0 || (_botCredentials.AdminIds.Any(id => id == Context.User.Id) && !over.Contains("noping")))
             {
@@ -298,24 +298,19 @@ namespace MarbleBot.Modules.Games
 
             if (currentMarble.Cloned)
             {
-                await currentSiege.DealDamage(Context, marbleDamage * 5);
                 builder.AddField("Clones attack!", $"Each of the clones dealt **{marbleDamage}** damage to the boss! The clones then disappeared!");
                 currentMarble.Cloned = false;
+                await currentSiege.DealDamage(marbleDamage * 5);
             }
 
-            await currentSiege.DealDamage(Context, marbleDamage);
             currentMarble.DamageDealt += marbleDamage;
+            await currentSiege.DealDamage(marbleDamage);
             builder.WithTitle(title)
                 .WithThumbnailUrl(url)
                 .WithDescription($"**{currentMarble.Name}** dealt **{marbleDamage}** damage to **{currentSiege.Boss.Name}**!")
                 .AddField("Boss HP", $"**{currentSiege.Boss.HP}**/{currentSiege.Boss.MaxHP}");
 
             await ReplyAsync(embed: builder.Build());
-
-            if (currentSiege.Boss.HP < 1)
-            {
-                await currentSiege.Victory(Context);
-            }
         }
 
         [Command("grab", RunMode = RunMode.Async)]

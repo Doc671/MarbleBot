@@ -536,11 +536,7 @@ namespace MarbleBot.Modules
         [Summary("Repeats the given message.")]
         public async Task RepeatCommand([Remainder] string repeat)
         {
-            if (repeat == "Am Melmon")
-            {
-                await ReplyAsync("No U");
-            }
-            else if (!await Moderation.CheckSwearAsync(repeat))
+            if (!await Moderation.CheckSwearAsync(repeat))
             {
                 await ReplyAsync(repeat);
             }
@@ -566,6 +562,12 @@ namespace MarbleBot.Modules
         [Command("submit")]
         public async Task SubmitCommand([Remainder] string message = "")
         {
+            if (string.IsNullOrEmpty(message) && Context.Message.Attachments.Count == 0)
+            {
+                await SendErrorAsync("You must submit a file!");
+                return;
+            }
+
             foreach (var adminId in _botCredentials.AdminIds)
             {
                 if (Context.Message.Attachments.Count == 0)
