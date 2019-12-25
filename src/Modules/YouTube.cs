@@ -57,124 +57,90 @@ namespace MarbleBot.Modules
         [Command("cv")]
         [Summary("Allows verified users to send a video in Community Marble channel #community-videos.")]
         [Remarks("CM Only")]
+        [RequireContext(ContextType.DM)]
         public async Task CommunityVideosCommand(string url, [Remainder] string desc = "")
         {
-            if (Context.IsPrivate)
+            var validUser = false;
+            var channelId = "";
+            using (var CVID = new StreamReader($"Resources{Path.DirectorySeparatorChar}CVID.csv"))
             {
-                var validUser = false;
-                var channelLink = "";
-                using (var CVID = new StreamReader($"Resources{Path.DirectorySeparatorChar}CVID.csv"))
+                while (!CVID.EndOfStream && !validUser)
                 {
-                    while (!CVID.EndOfStream)
+                    var person = (await CVID.ReadLineAsync())!.Split(',');
+                    if (Context.User.Id == Convert.ToUInt64(person[0]))
                     {
-                        var person = (await CVID.ReadLineAsync())!.Split(',');
-                        if (Context.User.Id == Convert.ToUInt64(person[0]))
-                        {
-                            validUser = true;
-                            channelLink = person[1];
-                            break;
-                        }
+                        validUser = true;
+                        channelId = person[1];
                     }
                 }
-                if (validUser)
+            }
+
+            if (validUser)
+            {
+                using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                 {
-                    SearchResource.ListRequest searchListRequest;
-                    using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+                    ApiKey = _botCredentials.GoogleApiKey,
+                    ApplicationName = GetType().ToString()
+                });
+
+                string videoId = url.Contains("https://www.youtube.com/watch?v=")
+                    ? url.Remove(0, 32)     // removes "https://www.youtube.com/watch?v="
+                    : url.Remove(0, 17);    // removes "https://youtu.be/"
+                
+                var videoListRequest = youtubeService.Videos.List("snippet");
+                videoListRequest.Id = videoId;
+                var videoListResponse = await videoListRequest.ExecuteAsync();
+                var video = videoListResponse.Items.First();
+
+                if (video.Snippet.ChannelId == channelId)
+                {
+                    if (DateTime.Now.Subtract((DateTime)video.Snippet.PublishedAt!).Days > 1)
                     {
-                        ApiKey = _botCredentials.GoogleApiKey,
-                        ApplicationName = GetType().ToString()
-                    });
-
-                    searchListRequest = youtubeService.Search.List("snippet");
-                    searchListRequest.Q = channelLink;
-                    searchListRequest.MaxResults = 10;
-                    var searchListResponse = await searchListRequest.ExecuteAsync();
-                    var channel = new SearchResultSnippet();
-
-                    foreach (var res in searchListResponse.Items)
-                    {
-                        if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0)
-                        {
-                            channel = res.Snippet;
-                        }
-                    }
-
-                    if (channel == null)
-                    {
-                        searchListRequest.Q = Context.User.Username;
-                        foreach (var res in searchListResponse.Items)
-                        {
-                            if (string.Compare(res.Id.Kind, "youtube#channel", true) == 0)
-                            {
-                                channel = res.Snippet;
-                            }
-                        }
-                    }
-
-                    if (channel == null)
-                    {
-                        await SendErrorAsync("Could not find the channel!");
-                        return;
-                    }
-
-                    searchListRequest.Q = url;
-                    searchListResponse = await searchListRequest.ExecuteAsync();
-                    var video = searchListResponse.Items[0].Snippet;
-                    if (string.Compare(channel.Title, video.ChannelTitle, true) == 0)
-                    {
-                        if (DateTime.Now.Subtract((DateTime)video.PublishedAt!).Days > 1)
-                        {
-                            await ReplyAsync("The video cannot be more than two days old!");
-                        }
-                        else
-                        {
-                            if (desc.Length > 200)
-                            {
-                                await ReplyAsync("Your description length is too long!");
-                            }
-                            else
-                            {
-                                var CV = (IMessageChannel)Context.Client.GetGuild(CommunityMarble).GetChannel(442474624417005589);
-                                var msgs = await CV.GetMessagesAsync(100).FlattenAsync();
-                                var alreadyPosted = false;
-
-                                foreach (var msg in msgs)
-                                {
-                                    if (msg.Content.Contains(url))
-                                    {
-                                        alreadyPosted = true;
-                                        break;
-                                    }
-                                }
-
-                                if (alreadyPosted)
-                                {
-                                    await ReplyAsync("This video has already been posted!");
-                                }
-                                else
-                                {
-                                    await CV.SendMessageAsync($"{desc}\n{url}");
-                                }
-                            }
-                        }
+                        await ReplyAsync("The video cannot be more than two days old!");
                     }
                     else
                     {
-                        await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n- Your channel could not be found.\n- The wrong channel was found.\n\nPlease notify Doc671 of this.");
-                    }
+                        if (desc.Length > 200)
+                        {
+                            await ReplyAsync("Your description length is too long!");
+                        }
+                        else
+                        {
+                            var communityVideoChannel = (IMessageChannel)Context.Client.GetChannel(442474624417005589);
+                            var msgs = await communityVideoChannel.GetMessagesAsync(100).FlattenAsync();
+                            var alreadyPosted = false;
 
-                    if (!validUser)
-                    {
-                        Logger.Error($"Failed operation of mb/cv. Channel Title: {channel.Title}; Video Channel Title: {video.ChannelTitle}.");
+                            foreach (var msg in msgs)
+                            {
+                                if (msg.Content.Contains(url))
+                                {
+                                    alreadyPosted = true;
+                                    break;
+                                }
+                            }
+
+                            if (alreadyPosted)
+                            {
+                                await ReplyAsync("This video has already been posted!");
+                            }
+                            else
+                            {
+                                await communityVideoChannel.SendMessageAsync($"{desc}\n{url}");
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
-                      .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
-                      .Append("If you're an accepted user, please notify Doc671.")
-                      .ToString());
+                    await ReplyAsync("One of the following occured:\n\n- This isn't your video.\n- Your video could not be found.\n\nPlease notify Doc671 of this.");
                 }
+            }
+            else
+            {
+                await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
+                  .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
+                  .Append("If you're an accepted user, please notify Doc671.")
+                  .ToString());
             }
         }
 
