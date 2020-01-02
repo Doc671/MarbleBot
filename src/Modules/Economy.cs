@@ -484,7 +484,7 @@ namespace MarbleBot.Modules
                 builder.AddField("Ammo Damage", weapon.Damage, true);
             }
 
-            if (weapon.CraftingRecipe != null)
+            if (weapon.CraftingRecipe != null && weapon.CraftingRecipe.Count != 0)
             {
                 var output = new StringBuilder();
                 foreach (var rawItem in weapon.CraftingRecipe)
