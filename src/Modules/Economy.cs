@@ -170,12 +170,14 @@ namespace MarbleBot.Modules
         [Summary("Returns a list of all items that can be crafted with the user's inventory.")]
         public async Task CraftableCommand()
         {
+            var embed = new EmbedBuilder();
+            int currentPart = 0;
             var user = GetUser(Context);
             var output = new StringBuilder();
             var items = GetItemsObject().ToObject<Dictionary<string, Item>>()!;
             foreach (var itemPair in items)
             {
-                if (itemPair.Value.CraftingRecipe != null)
+                if (itemPair.Value.CraftingRecipe != null && itemPair.Value.CraftingRecipe.Count != 0)
                 {
                     var craftable = true;
                     var noCraftable = 0;
@@ -189,22 +191,43 @@ namespace MarbleBot.Modules
                         }
                         noCraftable = noCraftable == 0 ? user.Items[id] / ingredient.Value : Math.Min(user.Items[id] / ingredient.Value, noCraftable);
                     }
+
                     if (craftable)
                     {
-                        output.AppendLine($"`[{itemPair.Key}]` {itemPair.Value.Name}: {noCraftable}");
+                        string itemInfo = $"`[{itemPair.Key}]` {itemPair.Value.Name}: {noCraftable}";
+                        if (output.Length + itemInfo.Length > 2048)
+                        {
+                            currentPart++;
+                            embed.AddField($"Part {currentPart}", output.ToString());
+                            output = new StringBuilder(itemInfo);
+                        }
+                        else
+                        {
+                            output.AppendLine(itemInfo);
+                        }
                     }
                 }
             }
+
             if (output.Length < 1)
             {
                 output.Append("There are no items you can craft!");
             }
 
-            await ReplyAsync(embed: new EmbedBuilder()
+            if (embed.Fields.Count == 0)
+            {
+                embed.WithDescription(output.ToString());
+            }
+            else
+            {
+                currentPart++;
+                embed.AddField($"Part {currentPart}", output.ToString());
+            }
+
+            await ReplyAsync(embed: embed
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithDescription(output.ToString())
                 .WithTitle("Craftable items")
                 .Build());
         }
