@@ -194,7 +194,7 @@ namespace MarbleBot.Modules.Games
             await countdownMessage.ModifyAsync(m => m.Content = "**BEGIN THE SIEGE!**");
             currentSiege.Actions = Task.Run(async () => { await currentSiege.BossActions(); });
             await ReplyAsync(embed: builder.Build());
-            if (mentionOutput.Length != 0 || (_botCredentials.AdminIds.Any(id => id == Context.User.Id) && !over.Contains("noping")))
+            if (mentionOutput.Length != 0 && (_botCredentials.AdminIds.Any(id => id == Context.User.Id) && !over.Contains("noping")))
             {
                 await ReplyAsync(mentionOutput.ToString());
             }
