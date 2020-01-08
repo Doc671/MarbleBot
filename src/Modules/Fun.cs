@@ -400,13 +400,9 @@ namespace MarbleBot.Modules
 
             foreach (IMessage msg in msgs)
             {
-                if (msg != null && msg.Content == "mb/rank" && msg.Author == Context.Message.Author)
+                if (msg.Content == "mb/rank" && msg.Author == Context.Message.Author)
                 {
                     ranks++;
-                }
-                else if (msg == null)
-                {
-                    break;
                 }
             }
 
@@ -463,12 +459,12 @@ namespace MarbleBot.Modules
 
             if (messageDict.ContainsKey(lowerInput))
             {
-                if (messageDict[lowerInput].input != null)
+                if (messageDict[lowerInput].input.Length != 0)
                 {
                     input = messageDict[lowerInput].input;
                 }
 
-                if (messageDict[lowerInput].message != null)
+                if (messageDict[lowerInput].message.Length != 0)
                 {
                     message = messageDict[lowerInput].message;
                 }

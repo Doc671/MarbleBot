@@ -30,8 +30,8 @@ namespace MarbleBot.Modules.Games
         [Command("signup")]
         [Alias("join")]
         [Summary("Sign up to the Marble War!")]
-        public async Task WarSignupCommand(string itemId, [Remainder] string marbleName = "")
-        => await Signup(Type, marbleName, 20, async () => { await WarStartCommand(); }, itemId);
+        public async Task WarSignupCommand(Weapon weapon, [Remainder] string marbleName = "")
+        => await Signup(Type, marbleName, 20, async () => { await WarStartCommand(); }, weapon);
 
         [Command("start")]
         [Alias("commence")]
@@ -225,7 +225,7 @@ namespace MarbleBot.Modules.Games
 
             var user = GetUser(Context);
             var ammo = new Ammo();
-            if (currentMarble.Weapon.Ammo != null)
+            if (currentMarble.Weapon.Ammo != null && currentMarble.Weapon.Ammo.Length != 0)
             {
                 var ammoId = 0u;
                 for (int i = currentMarble.Weapon.Ammo.Length - 1; i >= 0; i--)
@@ -236,6 +236,7 @@ namespace MarbleBot.Modules.Games
                         break;
                     }
                 }
+
                 if (ammoId == 0)
                 {
                     await SendErrorAsync($"{Context.User.Username}, you do not have enough ammo to use the weapon {currentMarble.Weapon.Name}!");
@@ -265,8 +266,12 @@ namespace MarbleBot.Modules.Games
                         break;
                     }
                 }
-                await ReplyAsync($"**{currentMarble.Name}**, could not find the enemy!");
-                return;
+
+                if (enemyMarble == null)
+                {
+                    await ReplyAsync($"**{currentMarble.Name}**, could not find the enemy!");
+                    return;
+                }
             }
 
             if (enemyMarble.HP < 0)

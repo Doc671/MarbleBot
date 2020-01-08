@@ -469,7 +469,7 @@ namespace MarbleBot.Modules.Games
             }
             else
             {
-                if (_gamesService.SiegeInfo.ContainsKey(fileId) && _gamesService.SiegeInfo[fileId].Boss != null)
+                if (_gamesService.SiegeInfo.ContainsKey(fileId) && _gamesService.SiegeInfo[fileId].Boss.Name != Boss.Empty.Name)
                 {
                     var siege = _gamesService.SiegeInfo[fileId];
                     builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHP: **{siege.Boss.MaxHP}**\nAttacks: **{siege.Boss.Attacks.Count}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**")

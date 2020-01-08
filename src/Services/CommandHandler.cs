@@ -79,8 +79,8 @@ namespace MarbleBot.Services
                 {
                     while (!autoresponseFile.EndOfStream)
                     {
-                        var autoresponsePair = (await autoresponseFile.ReadLineAsync())!.Split(';');
-                        if (autoresponsePair != null)
+                        string[] autoresponsePair = (await autoresponseFile.ReadLineAsync())!.Split(';');
+                        if (autoresponsePair.Length > 1)
                         {
                             autoresponses.Add(autoresponsePair[0], autoresponsePair[1]);
                         }

@@ -308,7 +308,7 @@ namespace MarbleBot.Modules.Games
         /// <param name="startCommand"> The command to execute if the marble limit has been met. </param>
         /// <param name="itemId"> (War only) The ID of the weapon the marble is joining with. </param>
         protected async Task Signup(GameType gameType, string marbleName, int marbleLimit,
-            Func<Task> startCommand, string itemId = "")
+            Func<Task> startCommand, Weapon? weapon = null)
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
             string marbleListFilePath = $"Data{Path.DirectorySeparatorChar}{fileId}.{GameName(gameType, false)}";
@@ -317,7 +317,6 @@ namespace MarbleBot.Modules.Games
                 File.Create(marbleListFilePath).Close();
             }
 
-            var weapon = new Weapon();
             var binaryFormatter = new BinaryFormatter();
             if (gameType == GameType.Siege)
             {
@@ -342,14 +341,7 @@ namespace MarbleBot.Modules.Games
                     return;
                 }
 
-                weapon = GetItem<Weapon>(itemId);
-                if (weapon == null)
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, this is not a valid item!");
-                    return;
-                }
-
-                if (weapon.WarClass == WeaponClass.None || weapon.WarClass == WeaponClass.Artillery)
+                if (weapon!.WarClass == WeaponClass.None || weapon.WarClass == WeaponClass.Artillery)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, this item cannot be used as a weapon!");
                     return;
@@ -385,7 +377,7 @@ namespace MarbleBot.Modules.Games
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .AddField($"Marble {GameName(gameType)}: Signed up!",
-                    $"**{Context.User.Username}** has successfully signed up as {bold}{marbleName}{bold}{(gameType == GameType.War ? $" with the weapon **{weapon.Name}**" : "")}!");
+                    $"**{Context.User.Username}** has successfully signed up as {bold}{marbleName}{bold}{(gameType == GameType.War ? $" with the weapon **{weapon!.Name}**" : "")}!");
             using (var mostUsedFile = new StreamWriter($"Data{Path.DirectorySeparatorChar}{GameName(gameType)}MostUsed.txt", true))
             {
                 await mostUsedFile.WriteLineAsync(marbleName);

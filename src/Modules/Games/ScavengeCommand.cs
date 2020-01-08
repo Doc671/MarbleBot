@@ -124,23 +124,15 @@ namespace MarbleBot.Modules.Games
 
             var item = _gamesService.ScavengeInfo[Context.User.Id].Items.Dequeue();
             _gamesService.ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
-            if (user.Items != null)
+            if (user.Items.ContainsKey(item.Id))
             {
-                if (user.Items.ContainsKey(item.Id))
-                {
-                    user.Items[item.Id]++;
-                }
-                else
-                {
-                    user.Items.Add(item.Id, 1);
-                }
+                user.Items[item.Id]++;
             }
             else
             {
-                user.Items = new SortedDictionary<uint, int> {
-                    { item.Id, 1 }
-                };
+                user.Items.Add(item.Id, 1);
             }
+
             user.NetWorth += item.Price;
             WriteUsers(obj, Context.User, user);
             await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
@@ -183,23 +175,15 @@ namespace MarbleBot.Modules.Games
 
             var item = _gamesService.ScavengeInfo[Context.User.Id].Ores.Dequeue();
             _gamesService.ScavengeInfo[Context.User.Id].UsedOres.Enqueue(item);
-            if (user.Items != null)
+            if (user.Items.ContainsKey(item.Id))
             {
-                if (user.Items.ContainsKey(item.Id))
-                {
-                    user.Items[item.Id]++;
-                }
-                else
-                {
-                    user.Items.Add(item.Id, 1);
-                }
+                user.Items[item.Id]++;
             }
             else
             {
-                user.Items = new SortedDictionary<uint, int> {
-                    { item.Id, 1 }
-                };
+                user.Items.Add(item.Id, 1);
             }
+
             user.NetWorth += item.Price;
             WriteUsers(obj, Context.User, user);
             await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();

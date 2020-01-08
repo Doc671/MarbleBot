@@ -67,22 +67,13 @@ namespace MarbleBot.Modules
             var user = GetUser(Context, obj);
             if (user.Balance >= item.Price * noOfItems)
             {
-                if (user.Items != null)
+                if (user.Items.ContainsKey(item.Id))
                 {
-                    if (user.Items.ContainsKey(item.Id))
-                    {
-                        user.Items[item.Id] += noOfItems;
-                    }
-                    else
-                    {
-                        user.Items.Add(item.Id, noOfItems);
-                    }
+                    user.Items[item.Id] += noOfItems;
                 }
                 else
                 {
-                    user.Items = new SortedDictionary<uint, int> {
-                        { item.Id, noOfItems }
-                    };
+                    user.Items.Add(item.Id, noOfItems);
                 }
                 user.Balance -= item.Price * noOfItems;
                 WriteUsers(obj, Context.User, user);
@@ -678,7 +669,7 @@ namespace MarbleBot.Modules
             embed.WithTitle($"Recipes in IDs `{minValue:000}`-`{maxValue:000}`");
             foreach (var itemPair in items)
             {
-                if (itemPair.Value.CraftingRecipe != null)
+                if (itemPair.Value.CraftingRecipe != null && itemPair.Value.CraftingRecipe.Count != 0)
                 {
                     var itemId = int.Parse(itemPair.Key);
                     if (itemId >= minValue && itemId <= maxValue)

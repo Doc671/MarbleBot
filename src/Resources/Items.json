@@ -37,56 +37,56 @@
     "Name": "Limited Edition Poup Soop",
     "Price": 552387946.00,
     "Description": "A special edition of Poup Soop that contains extra Poup, extra acid, extra lava, rotten-er flesh, 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "003": {
     "Name": "Frozen Edition Poup Soop",
     "Price": 140732609585.00,
     "Description": "A special edition of Poup Soop with all the ingredients of regular Poup Soop frozen with solid chunks of ice. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "004": {
     "Name": "Orange Edition Poup Soop",
     "Price": 180269042735.00,
     "Description": "A special edition of Poup Soop with twice the ingredients of regular Poup Soop and the essence of Orange. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "005": {
     "Name": "Electric Edition Poup Soop",
     "Price": 221548933670.00,
     "Description": "A special edition of Poup Soop with 20% more lava, 20% more acid and electricity generators inside the barrel. Very good conductor of electricity. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "006": {
     "Name": "Burning Edition Poup Soop",
     "Price": 262310854791.00,
     "Description": "A special edition of Poup Soop with three times as much lava. Everything including the barrel is flammable and on fire. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "007": {
     "Name": "Rotten Edition Poup Soop",
     "Price": 303496572188.00,
     "Description": "A special edition of Poup Soop with 6.66 times as much rotten flesh, twice as much acid and 21.25 lethal diseases. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "008": {
     "Name": "Ulteymut Edition Poup Soop",
     "Price": 1802201667100.00,
     "Description": "The final edition of Poup Soop with three times as much Poup, lava and acid, 47.41394 lethal diseases and several classified ingredients. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "009": {
     "Name": "Poup Soop Variety Pack",
     "Price": 374180952623987.00,
     "Description": "Contains 50 of each Poup Soop version currently on sale + Poup Bwedd + Poup Stoo + Poup Joos + HATT MANN action figure. Approved by Orange.",
-    "OnSale": true,
+    "OnSale": false,
     "ScavengeLocation": 0
   },
   "010": {
