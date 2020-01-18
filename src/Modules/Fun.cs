@@ -445,35 +445,7 @@ namespace MarbleBot.Modules
         [Summary("Rates something out of 10.")]
         public async Task RateCommand([Remainder] string input)
         {
-            string lowerInput = input.ToLower();
-            string message = "";
             int rating = _randomService.Rand.Next(0, 11);
-
-            string json;
-            using (var specialMessages = new StreamReader($"Resources{Path.DirectorySeparatorChar}RateSpecialMessages.json"))
-            {
-                json = specialMessages.ReadToEnd();
-            }
-
-            var messageDict = JsonConvert.DeserializeObject<Dictionary<string, (string input, string message, int rating)>>(json);
-
-            if (messageDict.ContainsKey(lowerInput))
-            {
-                if (messageDict[lowerInput].input.Length != 0)
-                {
-                    input = messageDict[lowerInput].input;
-                }
-
-                if (messageDict[lowerInput].message.Length != 0)
-                {
-                    message = messageDict[lowerInput].message;
-                }
-
-                if (messageDict[lowerInput].rating != -3)
-                {
-                    rating = messageDict[lowerInput].rating;
-                }
-            }
 
             string emoji = rating switch
             {
@@ -495,25 +467,21 @@ namespace MarbleBot.Modules
                 _ => ":thinking:",
             };
 
-            if (message.Length == 0)
+            string message = rating switch
             {
-                message = rating switch
-                {
-                    // If there isn't already a custom message, pick one depending on rating:
-                    0 => "Excuse me, kind user, please cease your current course of action immediately.",
-                    1 => "Immediate desistance required.",
-                    2 => "I don't like it...",
-                    3 => ">:(",
-                    4 => "ehhh...",
-                    5 => "not bad... but not good either",
-                    6 => "slightly above average... I guess...",
-                    7 => "pretty cool, don't you think?",
-                    8 => "yes",
-                    9 => "approaching perfection",
-                    10 => "PERFECT!!",
-                    _ => "Uhhhhhhhh\nNot",
-                };
-            }
+                0 => "Excuse me, kind user, please cease your current course of action immediately.",
+                1 => "Immediate desistance required.",
+                2 => "I don't like it...",
+                3 => ">:(",
+                4 => "ehhh...",
+                5 => "not bad... but not good either",
+                6 => "slightly above average... I guess...",
+                7 => "pretty cool, don't you think?",
+                8 => "yes",
+                9 => "approaching perfection",
+                10 => "PERFECT!!",
+                _ => "Uhhhhhhhh\nNot",
+            };
 
             if (rating == -2)
             {
