@@ -30,7 +30,7 @@ namespace MarbleBot.Modules
         [Summary("Predicts the outcome to a user-defined event.")]
         public async Task SevenBallCommand([Remainder] string _)
         {
-            string outcome = _randomService.Rand.Next(0, 13) switch
+            string outcome = _randomService.Rand.Next(0, 14) switch
             {
                 0 => "no.",
                 1 => "looking negative.",
@@ -45,6 +45,7 @@ namespace MarbleBot.Modules
                 10 => "it is certain.",
                 11 => "and the sign points to... yes!",
                 12 => "and the sign points to... no!",
+                13 => "Joe Rance is the best",
                 _ => "probably not, but there is still a chance..."
             };
             await ReplyAsync($":seven: |  **{Context.User.Username}**, {outcome}");
