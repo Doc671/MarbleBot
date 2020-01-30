@@ -2,6 +2,6 @@
 {
     public class DailyTimeoutService
     {
-        public ushort DailyTimeout { get; set; } = 48;
+        public int DailyTimeout { get; set; } = 48;
     }
 }

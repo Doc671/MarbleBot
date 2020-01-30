@@ -1,28 +1,42 @@
 ﻿namespace MarbleBot.Common
 {
-    /// <summary> Object containing information about an item a boss drops. </summary>
     public readonly struct BossDrops
     {
-        /// <summary> The ID of the item that is dropped. </summary>
-        public uint ItemId { get; }
-        /// <summary> The minimum possible number of this item that the boss can drop. </summary>
-        public ushort MinCount { get; }
-        /// <summary> The maximum possible number of this item that the boss can drop. </summary>
-        public ushort MaxCount { get; }
-        /// <summary> The chance as a percentage that these items will drop. </summary>
+        public int ItemId { get; }
+        public int MinCount { get; }
+        public int MaxCount { get; }
         public int Chance { get; }
 
-        /// <summary> Object containing information about an item a boss drops. </summary>
-        /// <param name="itemId">The ID of the item that is dropped.</param>
-        /// <param name="minCount">The minimum possible number of this item that the boss can drop.</param>
-        /// <param name="maxCount">The maximum possible number of this item that the boss can drop.</param>
-        /// <param name="chance">The chance as a percentage that these items will drop.</param>
-        public BossDrops(uint itemId, ushort minCount, ushort maxCount, int chance)
+        public BossDrops(int itemId, int minCount, int maxCount, int chance)
         {
             ItemId = itemId;
             MinCount = minCount;
             MaxCount = maxCount;
             Chance = chance;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is BossDrops drops &&
+                   ItemId == drops.ItemId &&
+                   MinCount == drops.MinCount &&
+                   MaxCount == drops.MaxCount &&
+                   Chance == drops.Chance;
+        }
+
+        public override int GetHashCode()
+        {
+            return 17 * (ItemId + MinCount + MaxCount + Chance);
+        }
+
+        public static bool operator ==(BossDrops left, BossDrops right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(BossDrops left, BossDrops right)
+        {
+            return !(left == right);
         }
     }
 }

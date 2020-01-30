@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
-using Google.Apis.YouTube.v3.Data;
 using MarbleBot.Services;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> YouTube API-related commands. </summary>
+    [Summary("YouTube API-related commands.")]
     public class YouTube : MarbleBotModule
     {
         private readonly BotCredentials _botCredentials;
@@ -86,7 +85,7 @@ namespace MarbleBot.Modules
                 string videoId = url.Contains("https://www.youtube.com/watch?v=")
                     ? url.Remove(0, 32)     // removes "https://www.youtube.com/watch?v="
                     : url.Remove(0, 17);    // removes "https://youtu.be/"
-                
+
                 var videoListRequest = youtubeService.Videos.List("snippet");
                 videoListRequest.Id = videoId;
                 var videoListResponse = await videoListRequest.ExecuteAsync();

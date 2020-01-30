@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> Owner-only commands. >:) </summary>
+    [Summary("Owner-only commands.")]
     public class Sneak : MarbleBotModule
     {
         private readonly DailyTimeoutService _dailyTimeoutService;
@@ -74,7 +74,7 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task DailyTimeoutCommand(string rawHours)
         {
-            if (ushort.TryParse(rawHours, out ushort hours))
+            if (int.TryParse(rawHours, out int hours))
             {
                 _dailyTimeoutService.DailyTimeout = hours;
                 await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");

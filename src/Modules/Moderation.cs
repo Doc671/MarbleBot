@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> Moderation commands. </summary>
+    [Summary("Moderation commands")]
     public class Moderation : MarbleBotModule
     {
         private readonly BotCredentials _botCredentials;
@@ -73,7 +73,7 @@ namespace MarbleBot.Modules
         [RequireBotPermission(ChannelPermission.ManageMessages)]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        public async Task ClearCommand(uint amount)
+        public async Task ClearCommand(int amount)
         {
             var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).FlattenAsync();
             foreach (var msg in messages)
@@ -488,7 +488,7 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task SetColorCommand(string input)
         {
-            if (!uint.TryParse(input, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _))
+            if (!int.TryParse(input, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _))
             {
                 await ReplyAsync("Invalid hexadecimal colour string.");
                 return;

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> Utility commands. </summary>
+    [Summary("Utility commands.")]
     public class Utility : MarbleBotModule
     {
         private readonly BotCredentials _botCredentials;

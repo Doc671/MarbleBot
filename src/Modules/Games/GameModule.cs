@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules.Games
 {
-    /// <summary> A module for game commands. </summary>
     public class GameModule : MarbleBotModule
     {
         protected BotCredentials _botCredentials;
@@ -29,16 +28,9 @@ namespace MarbleBot.Modules.Games
             _randomService = randomService;
         }
 
-        /// <summary> Gets the string representation of the game. </summary>
-        /// <param name="gameType"> The type of game. </param>
-        /// <param name="capitalised"> Whether or not the name being returned is capitalised. </param>
-        /// <returns> The string representation of the game. </returns>
         private string GameName(GameType gameType, bool capitalised = true)
         => capitalised ? Enum.GetName(typeof(GameType), gameType)! : Enum.GetName(typeof(GameType), gameType)!.ToLower();
 
-        /// <summary> Sends a message showing whether a user can earn from a game. </summary>
-        /// <param name="context"> The context of the command. </param>
-        /// <param name="gameType"> The type of game. </param>
         protected async Task Checkearn(GameType gameType)
         {
             var user = GetUser(Context);
@@ -69,9 +61,6 @@ namespace MarbleBot.Modules.Games
                 .Build());
         }
 
-        /// <summary> Clears the contestant list. </summary>
-        /// <param name="context"> The context of the command. </param>
-        /// <param name="gameType"> The type of game. </param>
         protected async Task Clear(GameType gameType)
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
@@ -87,10 +76,6 @@ namespace MarbleBot.Modules.Games
             }
         }
 
-        /// <summary> Shows leaderboards. </summary>
-        /// <param name="orderedData"> The data to be made into a leaderboard. </param>
-        /// <param name="no"> The part of the leaderboard that will be displayed. </param>
-        /// <returns> A leaderboard string ready to be printed. </returns>
         protected static string Leaderboard(IEnumerable<(string elementName, int value)> orderedData, int no)
         {
             var dataList = new List<(int place, string elementName, int value)>();
@@ -133,10 +118,6 @@ namespace MarbleBot.Modules.Games
             return output.ToString();
         }
 
-        /// <summary> Removes a contestant from the contestant list of a game. </summary>
-        /// <param name="context"> The context of the command. </param>
-        /// <param name="gameType"> The type of game. </param>
-        /// <param name="marbleToRemove"> The name of the marble to remove. </param>
         protected async Task RemoveContestant(GameType gameType, string marbleToRemove)
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
@@ -153,7 +134,7 @@ namespace MarbleBot.Modules.Games
             var formatter = new BinaryFormatter();
             if (gameType == GameType.War)
             {
-                List<(ulong id, string name, uint itemId)> marbles;
+                List<(ulong id, string name, int itemId)> marbles;
                 using (var marbleListFile = new StreamReader(marbleListDirectory))
                 {
                     if (marbleListFile.BaseStream.Length == 0)
@@ -161,7 +142,7 @@ namespace MarbleBot.Modules.Games
                         await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
                         return;
                     }
-                    marbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
+                    marbles = (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
                 }
 
                 if (marbles.Any(info => string.Compare(marbleToRemove, info.name, true) == 0))
@@ -231,9 +212,6 @@ namespace MarbleBot.Modules.Games
             }
         }
 
-        /// <summary> Returns a message showing the contestants currently signed up to the game. </summary>
-        /// <param name="context"> The context of the command. </param>
-        /// <param name="gameType"> The type of game. </param>
         protected async Task ShowContestants(GameType gameType)
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
@@ -259,7 +237,7 @@ namespace MarbleBot.Modules.Games
                 SocketUser user;
                 if (gameType == GameType.War)
                 {
-                    var marbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
+                    var marbles = (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
                     count = marbles.Count;
                     if (count == 0)
                     {
@@ -300,15 +278,8 @@ namespace MarbleBot.Modules.Games
                 .Build());
         }
 
-        /// <summary> Removes a contestant from the contestant list of a game. </summary>
-        /// <param name="context"> The context of the command. </param>
-        /// <param name="gameType"> The type of game. </param>
-        /// <param name="marbleName"> The name of the contestant signing up. </param>
-        /// <param name="marbleLimit"> The maximum number of marbles that can be signed up. </param>
-        /// <param name="startCommand"> The command to execute if the marble limit has been met. </param>
-        /// <param name="itemId"> (War only) The ID of the weapon the marble is joining with. </param>
         protected async Task Signup(GameType gameType, string marbleName, int marbleLimit,
-            Func<Task> startCommand, Weapon? weapon = null)
+Func<Task> startCommand, Weapon? weapon = null)
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
             string marbleListFilePath = $"Data{Path.DirectorySeparatorChar}{fileId}.{GameName(gameType, false)}";
@@ -355,7 +326,7 @@ namespace MarbleBot.Modules.Games
                 }
 
                 using var marbleList = new StreamReader(marbleListFilePath);
-                if (marbleList.BaseStream.Length != 0 && ((List<(ulong id, string name, uint itemId)>)binaryFormatter.Deserialize(marbleList.BaseStream)).Any(info => info.id == Context.User.Id))
+                if (marbleList.BaseStream.Length != 0 && ((List<(ulong id, string name, int itemId)>)binaryFormatter.Deserialize(marbleList.BaseStream)).Any(info => info.id == Context.User.Id))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you've already joined!");
                     return;
@@ -386,7 +357,7 @@ namespace MarbleBot.Modules.Games
             int marbleNo;
             if (gameType == GameType.War)
             {
-                var marbles = new List<(ulong id, string name, uint itemId)>();
+                var marbles = new List<(ulong id, string name, int itemId)>();
                 using (var marbleFile = new StreamReader(marbleListFilePath))
                 {
                     if (marbleFile.BaseStream.Length == 0)
@@ -395,7 +366,7 @@ namespace MarbleBot.Modules.Games
                     }
                     else
                     {
-                        marbles = (List<(ulong id, string name, uint itemId)>)binaryFormatter.Deserialize(marbleFile.BaseStream);
+                        marbles = (List<(ulong id, string name, int itemId)>)binaryFormatter.Deserialize(marbleFile.BaseStream);
                         marbleNo = marbles.Count;
                     }
                 }
@@ -546,6 +517,7 @@ namespace MarbleBot.Modules.Games
 
                             break;
                         }
+                    case 62:
                     case 17:
                         await ReplyAsync("Er... why aren't you using `mb/craft`?");
                         break;
@@ -704,7 +676,6 @@ namespace MarbleBot.Modules.Games
                             }
                             break;
                         }
-                    case 62: goto case 17;
                     case 91:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;

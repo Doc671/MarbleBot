@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> Commands related to currency. </summary>
+    [Summary("Commands relating to currency and items.")]
     public class Economy : MarbleBotModule
     {
         private readonly DailyTimeoutService _dailyTimeoutService;
@@ -112,7 +112,7 @@ namespace MarbleBot.Modules
             var sufficientMaterials = true;
             foreach (var item in requestedItem.CraftingRecipe)
             {
-                if (!user.Items.ContainsKey(uint.Parse(item.Key)) || item.Value * noOfItems > user.Items[uint.Parse(item.Key)])
+                if (!user.Items.ContainsKey(int.Parse(item.Key)) || item.Value * noOfItems > user.Items[int.Parse(item.Key)])
                 {
                     sufficientMaterials = false;
                     break;
@@ -138,7 +138,7 @@ namespace MarbleBot.Modules
                 var item = GetItem<Item>(rawItem.Key);
                 var noLost = rawItem.Value * noOfItems;
                 output.AppendLine($"`[{item.Id:000}]` {item.Name}: {noLost}");
-                user.Items[uint.Parse(rawItem.Key)] -= noLost;
+                user.Items[int.Parse(rawItem.Key)] -= noLost;
                 user.NetWorth -= item.Price * noOfItems;
             }
             if (!user.Items.ContainsKey(requestedItem.Id))
@@ -174,7 +174,7 @@ namespace MarbleBot.Modules
                     var noCraftable = 0;
                     foreach (var ingredient in itemPair.Value.CraftingRecipe)
                     {
-                        var id = uint.Parse(ingredient.Key);
+                        var id = int.Parse(ingredient.Key);
                         if (!user.Items.ContainsKey(id) || user.Items[id] < ingredient.Value)
                         {
                             craftable = false;
@@ -328,7 +328,7 @@ namespace MarbleBot.Modules
                     output.AppendLine($"`[{item.Id:000}]` {item.Name}: {noGained}");
                     if (user.Items.ContainsKey(item.Id))
                     {
-                        user.Items[uint.Parse(rawItem.Key)] += noGained;
+                        user.Items[int.Parse(rawItem.Key)] += noGained;
                     }
                     else
                     {

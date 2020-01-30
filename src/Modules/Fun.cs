@@ -3,7 +3,6 @@ using Discord.Commands;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Services;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> Fun non-game commands. </summary>
+    [Summary("Fun, non-game commands.")]
     public class Fun : MarbleBotModule
     {
         private readonly BotCredentials _botCredentials;
@@ -258,34 +257,15 @@ namespace MarbleBot.Modules
             int p = Convert.ToInt32(v * (1 - saturation));
             int q = Convert.ToInt32(v * (1 - f * saturation));
             int t = Convert.ToInt32(v * (1 - (1 - f) * saturation));
-
-            System.Drawing.Color color;
-
-            if (hi == 0)
+            var color = hi switch
             {
-                color = System.Drawing.Color.FromArgb(v, t, p);
-            }
-            else if (hi == 1)
-            {
-                color = System.Drawing.Color.FromArgb(q, v, p);
-            }
-            else if (hi == 2)
-            {
-                color = System.Drawing.Color.FromArgb(p, v, t);
-            }
-            else if (hi == 3)
-            {
-                color = System.Drawing.Color.FromArgb(p, q, v);
-            }
-            else if (hi == 4)
-            {
-                color = System.Drawing.Color.FromArgb(t, p, v);
-            }
-            else
-            {
-                color = System.Drawing.Color.FromArgb(v, p, q);
-            }
-
+                0 => System.Drawing.Color.FromArgb(v, t, p),
+                1 => System.Drawing.Color.FromArgb(q, v, p),
+                2 => System.Drawing.Color.FromArgb(p, v, t),
+                3 => System.Drawing.Color.FromArgb(p, q, v),
+                4 => System.Drawing.Color.FromArgb(t, p, v),
+                _ => System.Drawing.Color.FromArgb(v, p, q),
+            };
             var builder = new EmbedBuilder()
                 .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
                 .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)

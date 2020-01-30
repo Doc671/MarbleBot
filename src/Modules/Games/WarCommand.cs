@@ -56,7 +56,7 @@ namespace MarbleBot.Modules.Games
                 }
 
                 var formatter = new BinaryFormatter();
-                var rawMarbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleList.BaseStream);
+                var rawMarbles = (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleList.BaseStream);
                 if (rawMarbles.Count == 0)
                 {
                     await SendErrorAsync($"**{Context.User.Username}**, no-one is signed up!");
@@ -137,7 +137,7 @@ namespace MarbleBot.Modules.Games
                         0 => 66u,
                         1 => 71u,
                         2 => 74u,
-                        _ => 80u
+                        _ => 80
                     });
                 }
                 else
@@ -227,7 +227,7 @@ namespace MarbleBot.Modules.Games
             var ammo = new Ammo();
             if (currentMarble.Weapon.Ammo != null && currentMarble.Weapon.Ammo.Length != 0)
             {
-                var ammoId = 0u;
+                var ammoId = 0;
                 for (int i = currentMarble.Weapon.Ammo.Length - 1; i >= 0; i--)
                 {
                     if (user.Items.ContainsKey(currentMarble.Weapon.Ammo[i]) && user.Items[currentMarble.Weapon.Ammo[i]] >= currentMarble.Weapon.Hits)
@@ -289,10 +289,10 @@ namespace MarbleBot.Modules.Games
             {
                 if (_randomService.Rand.Next(0, 100) < currentMarble.Weapon.Accuracy)
                 {
-                    var damage = (int)Math.Round((currentMarble.Weapon.Damage + 
-                        (currentMarble.WarClass == WeaponClass.Ranged ? ammo.Damage : 0)) * 
-                        (1 + currentMarble.DamageIncrease / 100d) * 
-                        (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0) * 
+                    var damage = (int)Math.Round((currentMarble.Weapon.Damage +
+                        (currentMarble.WarClass == WeaponClass.Ranged ? ammo.Damage : 0)) *
+                        (1 + currentMarble.DamageIncrease / 100d) *
+                        (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0) *
                         (0.5 + _randomService.Rand.NextDouble())));
                     enemyMarble.HP -= damage;
                     currentMarble.DamageDealt += damage;
@@ -315,10 +315,10 @@ namespace MarbleBot.Modules.Games
                 {
                     if (_randomService.Rand.Next(0, 100) < currentMarble.Weapon.Accuracy)
                     {
-                        var damage = (int)Math.Round(currentMarble.Weapon.Damage + 
-                            (currentMarble.WarClass == WeaponClass.Ranged ? ammo.Damage : 0) * 
-                            (1 + currentMarble.DamageIncrease / 100d) * 
-                            (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0)* 
+                        var damage = (int)Math.Round(currentMarble.Weapon.Damage +
+                            (currentMarble.WarClass == WeaponClass.Ranged ? ammo.Damage : 0) *
+                            (1 + currentMarble.DamageIncrease / 100d) *
+                            (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0) *
                             (0.5 + _randomService.Rand.NextDouble())));
                         enemyMarble.HP -= damage;
                         totalDamage += damage;
@@ -408,8 +408,8 @@ namespace MarbleBot.Modules.Games
             }
 
             currentMarble.LastMoveUsed = DateTime.UtcNow;
-            var dmg = (int)Math.Round(3 * (1 + currentMarble.DamageIncrease / 50d) * 
-                (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0)* 
+            var dmg = (int)Math.Round(3 * (1 + currentMarble.DamageIncrease / 50d) *
+                (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0) *
                 (1 + 0.5 * _randomService.Rand.NextDouble())));
             enemyMarble.HP -= dmg;
             currentMarble.DamageDealt += dmg;
@@ -602,7 +602,7 @@ namespace MarbleBot.Modules.Games
                     else
                     {
                         var formatter = new BinaryFormatter();
-                        var marbles = (List<(ulong id, string name, uint itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
+                        var marbles = (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
 
                         if (marbles.Count == 0)
                         {
@@ -714,7 +714,7 @@ namespace MarbleBot.Modules.Games
             foreach (var itemPair in items)
             {
                 var item = itemPair.Value;
-                item.Id = uint.Parse(itemPair.Key);
+                item.Id = int.Parse(itemPair.Key);
                 if (item.WarClass != 0 && item.WarClass != WeaponClass.Artillery && item.Stage <= GetUser(Context).Stage)
                 {
                     output.AppendLine($"{item} ({Enum.GetName(typeof(WeaponClass), item.WarClass)})");

@@ -5,7 +5,6 @@ using System.Threading;
 
 namespace MarbleBot.Extensions
 {
-    /// <summary> Extension methods </summary>
     public static class Extensions
     {
         public static string CamelToTitleCase(this string str)

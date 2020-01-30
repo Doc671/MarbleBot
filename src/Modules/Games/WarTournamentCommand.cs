@@ -46,7 +46,7 @@ namespace MarbleBot.Modules.Games
         [Command("setup")]
         [Summary("Sets up a Marble War Tournament.")]
         [RequireUserPermission(Discord.ChannelPermission.ManageMessages)]
-        public async Task WarTournamentSetupCommand(uint spaces, uint teamSize)
+        public async Task WarTournamentSetupCommand(int spaces, int teamSize)
         {
             var tournamentsInfo = GetTournamentsInfo();
             tournamentsInfo.Add(new WarTournamentInfo(Context.Guild.Id, spaces, teamSize, new Dictionary<string, List<ulong>>()));

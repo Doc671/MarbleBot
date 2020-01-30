@@ -13,22 +13,14 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Common
 {
-    /// <summary> Represents a scavenge game. </summary>
     public class Scavenge : IMarbleBotGame
     {
-        /// <summary> The scavenge session. </summary>
         public Task? Actions { get; set; }
-        /// <summary> The ID of the user performing the command. </summary>
         public ulong Id { get; set; }
-        /// <summary> The items currently available during the game. </summary>
         public Queue<Item> Items { get; set; } = new Queue<Item>();
-        /// <summary> The location of the scavenge. </summary>
         public ScavengeLocation Location { get; set; }
-        /// <summary> The ores currently available during the game. </summary>
         public Queue<Item> Ores { get; set; } = new Queue<Item>();
-        /// <summary> The items that have already been grabbed/sold. </summary>
         public Queue<Item> UsedItems { get; set; } = new Queue<Item>();
-        /// <summary> The ores that have already been drilled. </summary>
         public Queue<Item> UsedOres { get; set; } = new Queue<Item>();
 
         private bool _disposed = false;
@@ -72,7 +64,6 @@ namespace MarbleBot.Common
             _originalMessage = message;
         }
 
-        /// <summary> The scavenge session. </summary>
         private async Task Session()
         {
             var stopwatch = new Stopwatch();
@@ -84,7 +75,7 @@ namespace MarbleBot.Common
                 if (itemPair.Value.ScavengeLocation == Location)
                 {
                     var outputItem = itemPair.Value;
-                    outputItem = new Item(outputItem, uint.Parse(itemPair.Key));
+                    outputItem = new Item(outputItem, int.Parse(itemPair.Key));
                     collectableItems.Add(outputItem);
                 }
             }
@@ -143,9 +134,6 @@ namespace MarbleBot.Common
             Dispose(true);
         }
 
-        /// <summary> Updates the original message with the current items and ores available. </summary>
-        /// <param name="gameEnded"> Whether the game has ended. </param>
-        /// <param name="stage"> The stage of the user. </param>
         public async Task UpdateEmbed(bool gameEnded = false, int stage = 1)
         {
             bool first = false;

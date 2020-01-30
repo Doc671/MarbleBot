@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> Role-handling commands. </summary>
+    [Summary("Role-handling commands.")]
     public class Roles : MarbleBotModule
     {
         [Command("give")]

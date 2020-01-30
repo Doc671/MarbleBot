@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
 {
-    /// <summary> Represents a command module for MarbleBot. </summary>
     public abstract class MarbleBotModule : ModuleBase<SocketCommandContext>
     {
         // Server IDs
@@ -25,7 +24,6 @@ namespace MarbleBot.Modules
 
         protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
-        /// <summary> Gets colour for embed depending on guild </summary>
         protected internal static Color GetColor(SocketCommandContext context)
         {
             if (context.IsPrivate)
@@ -38,7 +36,6 @@ namespace MarbleBot.Modules
             }
         }
 
-        /// <summary> Gets a date string </summary>
         protected internal static string GetDateString(TimeSpan dateTime)
         {
             var output = new StringBuilder();
@@ -105,11 +102,10 @@ namespace MarbleBot.Modules
             return output.ToString();
         }
 
-        /// <summary> Returns an item using its ID </summary> 
         protected internal static T GetItem<T>(string searchTerm) where T : Item
         {
             T item;
-            if (uint.TryParse(searchTerm, out uint itemId))
+            if (int.TryParse(searchTerm, out int itemId))
             {
                 var obj = GetItemsObject();
                 if (obj[itemId.ToString("000")] != null)
@@ -138,7 +134,7 @@ namespace MarbleBot.Modules
                     item = objItemPair.Value!.ToObject<T>()!;
                     if (item.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(item.Name.ToLower()))
                     {
-                        item.Id = uint.Parse(objItemPair.Key);
+                        item.Id = int.Parse(objItemPair.Key);
                         return item;
                     }
                 }
@@ -146,7 +142,6 @@ namespace MarbleBot.Modules
             }
         }
 
-        /// <summary> Returns a JObject containing all the items. </summary>
         protected internal static JObject GetItemsObject()
         {
             string json;
@@ -158,7 +153,6 @@ namespace MarbleBot.Modules
             return JObject.Parse(json);
         }
 
-        /// <summary> Returns a MarbleBotUser object with the ID of the current guild. </summary>
         protected internal static MarbleBotGuild GetGuild(SocketCommandContext context)
         {
             var obj = GetGuildsObject();
@@ -186,7 +180,6 @@ namespace MarbleBot.Modules
             return JObject.Parse(json);
         }
 
-        /// <summary> Returns an instance of a MarbleBotUser with the ID of the SocketGuildUser. </summary>
         protected internal static MarbleBotUser GetUser(ICommandContext context)
         {
             var obj = GetUsersObject();
@@ -197,7 +190,7 @@ namespace MarbleBot.Modules
                 user.Id = context.User.Id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
                 {
-                    user.Items = new SortedDictionary<uint, int>();
+                    user.Items = new SortedDictionary<int, int>();
                 }
             }
             else
@@ -212,7 +205,6 @@ namespace MarbleBot.Modules
             return user;
         }
 
-        /// <summary> Returns an instance of a MarbleBotUser with the given ID. </summary>
         protected internal static MarbleBotUser GetUser(ICommandContext context, ulong id)
         {
             var obj = GetUsersObject();
@@ -223,7 +215,7 @@ namespace MarbleBot.Modules
                 user.Id = id;
                 if (string.IsNullOrEmpty(obj[id.ToString()]?.ToString()))
                 {
-                    user.Items = new SortedDictionary<uint, int>();
+                    user.Items = new SortedDictionary<int, int>();
                 }
             }
             else
@@ -238,7 +230,6 @@ namespace MarbleBot.Modules
             return user;
         }
 
-        /// <summary> Returns an instance of a MarbleBotUser with the ID of the SocketGuildUser in the given JObject. </summary>
         protected internal static MarbleBotUser GetUser(ICommandContext context, JObject obj)
         {
             MarbleBotUser user;
@@ -248,7 +239,7 @@ namespace MarbleBot.Modules
                 user.Id = context.User.Id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
                 {
-                    user.Items = new SortedDictionary<uint, int>();
+                    user.Items = new SortedDictionary<int, int>();
                 }
             }
             else
@@ -263,7 +254,6 @@ namespace MarbleBot.Modules
             return user;
         }
 
-        /// <summary> Returns an instance of a MarbleBotUser with the given ID in the given JObject. </summary>
         protected internal static async Task<MarbleBotUser> GetUserAsync(ICommandContext context, JObject obj, ulong id)
         {
             MarbleBotUser user;
@@ -273,7 +263,7 @@ namespace MarbleBot.Modules
                 user.Id = id;
                 if (string.IsNullOrEmpty(obj[context.User.Id.ToString()]?.ToString()))
                 {
-                    user.Items = new SortedDictionary<uint, int>();
+                    user.Items = new SortedDictionary<int, int>();
                 }
             }
             else
@@ -288,7 +278,6 @@ namespace MarbleBot.Modules
             return user;
         }
 
-        /// <summary> Returns a JObject containing all the users. </summary>
         protected internal static JObject GetUsersObject()
         {
             string json;
@@ -300,24 +289,20 @@ namespace MarbleBot.Modules
             return JObject.Parse(json);
         }
 
-        /// <summary> Sends a message preceeded by the warning emoji. </summary>
-        /// <param name="messageContent"> The text to display. </param>
         protected internal async Task<IUserMessage> SendErrorAsync(string messageContent)
             => await ReplyAsync($":warning: | {messageContent}");
 
-        /// <summary> Returns a string that indicates the user's Stage is too low. </summary>
         protected internal static string StageTooHighString()
-        => (new Random().Next(0, 6)) switch
-        {
-            0 => "*Your inexperience blinds you...*",
-            1 => "*Your vision is blurry...*",
-            2 => "*Incomprehensible noises rattle in your head...*",
-            3 => "*You sense a desk restricting your path...*",
-            4 => "*You feel as if there is more to be done...*",
-            _ => "*Your mind is wracked with pain...*",
-        };
+            => (new Random().Next(0, 6)) switch
+            {
+                0 => "*Your inexperience blinds you...*",
+                1 => "*Your vision is blurry...*",
+                2 => "*Incomprehensible noises rattle in your head...*",
+                3 => "*You sense a desk restricting your path...*",
+                4 => "*You feel as if there is more to be done...*",
+                _ => "*Your mind is wracked with pain...*",
+            };
 
-        /// <summary> Writes guilds to the appropriate file. </summary>
         protected internal static void WriteGuilds(JObject obj, SocketGuild socketGuild, MarbleBotGuild mbGuild)
         {
             if (obj.ContainsKey(socketGuild.Id.ToString()))
@@ -331,7 +316,6 @@ namespace MarbleBot.Modules
             serialiser.Serialize(guilds, obj);
         }
 
-        /// <summary> Writes users to the appropriate JSON file. </summary>
         protected internal static void WriteUsers(JObject obj)
         {
             using var users = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));

@@ -15,34 +15,24 @@ using static MarbleBot.Modules.MarbleBotModule;
 
 namespace MarbleBot.Common
 {
-    /// <summary> Represents a siege game. </summary>
     public class Siege : IMarbleBotGame
     {
-        /// <summary> The siege game. </summary>
         public Task? Actions { get; set; }
-        /// <summary> Whether the siege is active. </summary>
         public bool Active { get; set; } = true;
-        /// <summary> The boss that the marbles are fighting. </summary>
         public Boss Boss { get; set; } = Boss.Empty;
-        /// <summary> The number which marble damage is multiplied by. </summary>
         public float DamageMultiplier => (1f + (Marbles.Aggregate(0f, (totalDeaths, m) =>
-                                                        {
-                                                            if (m.HP < 1)
-                                                            {
-                                                                totalDeaths++;
-                                                            }
+                                                {
+                                                    if (m.HP < 1)
+                                                    {
+                                                        totalDeaths++;
+                                                    }
 
-                                                            return totalDeaths;
-                                                        }) * 0.2f)) * (Morales + 1);
-        /// <summary> The ID of the user's DM or guild where the siege is being played. </summary>
+                                                    return totalDeaths;
+                                                }) * 0.2f)) * (Morales + 1);
         public ulong Id { get; }
-        /// <summary> The last time a Morale Boost power-up was activated. </summary>
         public DateTime LastMorale { get; set; } = DateTime.MinValue;
-        /// <summary> The marbles (player characters) fighting the boss. </summary>
         public List<SiegeMarble> Marbles { get; set; }
-        /// <summary> The number of Morale Boost power-ups active. </summary>
         public int Morales { get; set; }
-        /// <summary> The current power-up that can be grabbed. </summary>
         public PowerUp PowerUp { get; set; }
 
         private readonly SocketCommandContext _context;
@@ -259,8 +249,6 @@ namespace MarbleBot.Common
             }
         }
 
-        /// <summary> Gets a boss using a string. </summary>
-        /// <param name="searchTerm"> The string to search with. </param>
         public static Boss GetBoss(string searchTerm)
         {
             string json;
@@ -297,14 +285,8 @@ namespace MarbleBot.Common
                 _ => ""
             };
 
-        /// <summary> Attacks the boss with a non-weapon item. </summary>
-        /// <param name="_context"> The _context of the command. </param>
-        /// <param name="obj"> The JSON object storing the users. </param>
-        /// <param name="itemId"> The ID of the item. </param>
-        /// <param name="damage"> The damage being dealt by the item. </param>
-        /// <param name="consumable"> Whether or not the item is consumed upon use. </param>
-        public async Task ItemAttack(JObject obj, uint itemId,
-                                     int damage, bool consumable = false)
+        public async Task ItemAttack(JObject obj, int itemId,
+int damage, bool consumable = false)
         {
             if (_disposed)
             {
@@ -366,7 +348,7 @@ namespace MarbleBot.Common
         }
 
         public override string ToString() => $"[{Id}] {Boss.Name}: {Marbles.Count}";
-        
+
         private async Task OnVictory()
         {
             if (_victoryCalled)
@@ -485,9 +467,6 @@ namespace MarbleBot.Common
             Dispose(true);
         }
 
-        /// <summary> Attacks the boss with a weapon. </summary>
-        /// <param name="_context"> The _context of the command. </param>
-        /// <param name="weapon"> The weapon used to attack. </param>
         public async Task WeaponAttack(SocketCommandContext _context, Weapon weapon)
         {
             if (_disposed)

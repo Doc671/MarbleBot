@@ -14,7 +14,6 @@ using static MarbleBot.Modules.MarbleBotModule;
 
 namespace MarbleBot.Common
 {
-    /// <summary> Represents a game of war. </summary>
     public class War : IMarbleBotGame
     {
         public Task? Actions { get; set; }
@@ -174,7 +173,7 @@ namespace MarbleBot.Common
                 }
             }
             while (!timeout && !_disposed && !Team1.Marbles.All(m => m.HP == 0) && !Team2.Marbles.All(m => m.HP == 0));
-            
+
             if (!timeout)
             {
                 await OnGameEnd(context);

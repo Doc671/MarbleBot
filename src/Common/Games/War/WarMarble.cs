@@ -2,7 +2,6 @@
 
 namespace MarbleBot.Common
 {
-    /// <summary> Represents a marble during a war game. </summary>
     public class WarMarble : BaseMarble
     {
         public bool Boosted { get; set; } = false;
@@ -12,7 +11,7 @@ namespace MarbleBot.Common
         public WeaponClass WarClass { get; }
         public Weapon Weapon { get; }
 
-        public WarMarble(ulong id, int HP, string name, Weapon weapon, Item shield, uint spikeId = 0)
+        public WarMarble(ulong id, int HP, string name, Weapon weapon, Item shield, int spikeId = 0)
         {
             Id = id;
             SetHP(HP);
