@@ -134,9 +134,9 @@ namespace MarbleBot.Modules.Games
                         _ => "097"
                     }), GetItem<Item>("063"), _randomService.Rand.Next(0, 4) switch
                     {
-                        0 => 66u,
-                        1 => 71u,
-                        2 => 74u,
+                        0 => 66,
+                        1 => 71,
+                        2 => 74,
                         _ => 80
                     });
                 }

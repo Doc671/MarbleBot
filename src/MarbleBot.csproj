@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
-    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.43.0.1832" />
+    <PackageReference Include="Google.Apis.Sheets.v4" Version="1.43.0.1848" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.43.0.1834" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
