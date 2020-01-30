@@ -26,7 +26,10 @@
 
         public override int GetHashCode()
         {
-            return 17 * (ItemId + MinCount + MaxCount + Chance);
+            unchecked
+            {
+                return 17 * ItemId.GetHashCode() + MinCount.GetHashCode() + MaxCount.GetHashCode() + Chance.GetHashCode();
+            }
         }
 
         public static bool operator ==(BossDrops left, BossDrops right)

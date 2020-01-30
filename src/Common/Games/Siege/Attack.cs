@@ -19,9 +19,22 @@ namespace MarbleBot.Common
             StatusEffect = statusEffect;
         }
 
-        public override bool Equals(object? obj) => obj?.GetHashCode() == GetHashCode();
+        public override bool Equals(object? obj)
+        {
+            return obj is Attack attack &&
+                   Name == attack.Name &&
+                   Damage == attack.Damage &&
+                   Accuracy == attack.Accuracy &&
+                   StatusEffect == attack.StatusEffect;
+        }
 
-        public override int GetHashCode() => Name.Sum(c => c) + Damage + Accuracy + (int)StatusEffect;
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return 17 * Name.GetHashCode() + Damage.GetHashCode() + Accuracy.GetHashCode() + StatusEffect.GetHashCode();
+            }
+        }
 
         public static bool operator ==(Attack left, Attack right)
         {
