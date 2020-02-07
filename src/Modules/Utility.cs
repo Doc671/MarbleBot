@@ -196,7 +196,7 @@ namespace MarbleBot.Modules
 
                 builder.AddField("Module", $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command.Module.Name)}", true);
 
-                if (command.Aliases.Count() != 0)
+                if (command.Aliases.Count() > 1)
                 {
                     builder.AddField("Aliases", command.Aliases.Skip(1).Aggregate(new StringBuilder(), (builder, alias) =>
                     {
