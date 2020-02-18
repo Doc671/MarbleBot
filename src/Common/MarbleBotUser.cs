@@ -26,7 +26,7 @@ namespace MarbleBot.Common
         public SortedDictionary<int, int> Items { get; set; } = new SortedDictionary<int, int>();
 
         public MarbleBotUser()
-        { 
+        {
         }
 
         [JsonConstructor]

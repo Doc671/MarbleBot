@@ -38,7 +38,7 @@
     "Price": 552387946.00,
     "Description": "A special edition of Poup Soop that contains extra Poup, extra acid, extra lava, rotten-er flesh, 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
     "OnSale": false,
-    "ScavengeLocation": 0
+    "ScavengeLocation": 1
   },
   "003": {
     "Name": "Frozen Edition Poup Soop",
@@ -52,7 +52,7 @@
     "Price": 180269042735.00,
     "Description": "A special edition of Poup Soop with twice the ingredients of regular Poup Soop and the essence of Orange. Approved by Orange.",
     "OnSale": false,
-    "ScavengeLocation": 0
+    "ScavengeLocation": 1
   },
   "005": {
     "Name": "Electric Edition Poup Soop",

@@ -125,7 +125,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            var noCrafted = (int)requestedItem.CraftingProduced * noOfItems;
+            var noCrafted = requestedItem.CraftingProduced * noOfItems;
             var embed = new EmbedBuilder()
                     .WithCurrentTimestamp()
                     .WithColor(GetColor(Context))
@@ -313,7 +313,7 @@ namespace MarbleBot.Modules
 
             if (user.Items.ContainsKey(requestedItem.Id) && user.Items[requestedItem.Id] >= noOfItems)
             {
-                var noCrafted = (int)requestedItem.CraftingProduced * noOfItems;
+                var noCrafted = requestedItem.CraftingProduced * noOfItems;
                 var embed = new EmbedBuilder()
                         .WithCurrentTimestamp()
                         .WithColor(GetColor(Context))

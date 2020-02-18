@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace MarbleBot.Common
 {
     public readonly struct Attack

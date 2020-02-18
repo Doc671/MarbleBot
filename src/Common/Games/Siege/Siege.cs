@@ -59,7 +59,7 @@ namespace MarbleBot.Common
                     .WithDescription($"**{Boss.Name}** used **{attack.Name}**!")
                     .WithTitle($"WARNING: {attack.Name.ToUpper()} INBOUND!");
 
-                var attackMissed = true;
+                bool attackMissed = true;
                 foreach (var marble in Marbles)
                 {
                     if (marble.HP > 0)
@@ -285,8 +285,7 @@ namespace MarbleBot.Common
                 _ => ""
             };
 
-        public async Task ItemAttack(JObject obj, int itemId,
-int damage, bool consumable = false)
+        public async Task ItemAttack(JObject obj, int itemId, int damage, bool consumable = false)
         {
             if (_disposed)
             {
@@ -309,7 +308,7 @@ int damage, bool consumable = false)
 
             if (DateTime.UtcNow.Subtract(marble.LastMoveUsed).TotalSeconds < 5)
             {
-                await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you must wait for {GetDateString(marble.LastMoveUsed.Subtract(DateTime.UtcNow.AddSeconds(-5)))} until you can attack again!");
+                await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you must wait for {GetDateString(marble.LastMoveUsed.Subtract(DateTime.UtcNow.AddSeconds(-5)))} until you can act again!");
                 return;
             }
 
@@ -333,6 +332,7 @@ int damage, bool consumable = false)
                 .Build());
 
             marble.DamageDealt += damage;
+            marble.LastMoveUsed = DateTime.UtcNow;
 
             if (consumable)
             {
@@ -488,6 +488,12 @@ int damage, bool consumable = false)
                 return;
             }
 
+            if (DateTime.UtcNow.Subtract(marble.LastMoveUsed).TotalSeconds < 5)
+            {
+                await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you must wait for {GetDateString(marble.LastMoveUsed.Subtract(DateTime.UtcNow.AddSeconds(-5)))} until you can act again!");
+                return;
+            }
+
             var ammo = new Ammo();
             var user = GetUser(_context);
 
@@ -528,6 +534,7 @@ int damage, bool consumable = false)
                         * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                     await DealDamage(damage);
                     marble.DamageDealt += damage;
+                    marble.LastMoveUsed = DateTime.UtcNow;
                     builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{damage}** damage to **{Boss.Name}**!");
                 }
                 else
@@ -537,7 +544,7 @@ int damage, bool consumable = false)
             }
             else
             {
-                var totalDamage = 0;
+                int totalDamage = 0;
                 for (int i = 0; i < weapon.Hits; i++)
                 {
                     if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
@@ -557,6 +564,11 @@ int damage, bool consumable = false)
                 }
                 marble.DamageDealt += totalDamage;
                 builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing a total of **{totalDamage}** damage to **{Boss.Name}**!");
+
+                if (totalDamage != 0)
+                {
+                    marble.LastMoveUsed = DateTime.UtcNow;
+                }
             }
             await _context.Channel.SendMessageAsync(embed: builder
                         .AddField("Boss HP", $"**{Boss.HP}**/{Boss.MaxHP}")

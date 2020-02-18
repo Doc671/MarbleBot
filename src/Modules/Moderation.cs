@@ -75,7 +75,7 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task ClearCommand(int amount)
         {
-            var messages = await Context.Channel.GetMessagesAsync((int)amount + 1).FlattenAsync();
+            var messages = await Context.Channel.GetMessagesAsync(amount + 1).FlattenAsync();
             foreach (var msg in messages)
             {
                 await Context.Channel.DeleteMessageAsync(msg);
