@@ -219,7 +219,7 @@ namespace MarbleBot.Modules
                 {
                     builder.AddField("Preconditions", command.Preconditions.Aggregate(new StringBuilder(), (builder, precondition) =>
                     {
-                        builder.AppendLine((precondition.TypeId as Type)!.Name[8..^10].CamelToTitleCase());
+                        builder.AppendLine((precondition.TypeId as Type)!.Name[7..^9].CamelToTitleCase());
                         return builder;
                     }).ToString(), true);
                 }
