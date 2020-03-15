@@ -2,7 +2,6 @@
 using Discord.Commands;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -64,8 +63,8 @@ namespace MarbleBot.Common
             }
 
             _endCalled = true;
-            var t1Total = Team1.Marbles.Sum(m => m.HP);
-            var t2Total = Team2.Marbles.Sum(m => m.HP);
+            var t1Total = Team1.Marbles.Sum(m => m.Health);
+            var t2Total = Team2.Marbles.Sum(m => m.Health);
             var winningTeam = t1Total > t2Total ? Team1 : Team2;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
@@ -77,22 +76,22 @@ namespace MarbleBot.Common
             foreach (var marble in Team1.Marbles)
             {
                 var user = context.Client.GetUser(marble.Id);
-                t1Output.AppendLine($"{marble.Name} (HP: **{marble.HP}**/{marble.MaxHP}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
+                t1Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
 
             foreach (var marble in Team2.Marbles)
             {
                 var user = context.Client.GetUser(marble.Id);
-                t2Output.AppendLine($"{marble.Name} (HP: **{marble.HP}**/{marble.MaxHP}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
+                t2Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
 
             builder.AddField($"Team {Team1.Name} Final Stats", t1Output.ToString())
                 .AddField($"Team {Team2.Name} Final Stats", t2Output.ToString());
 
-            var obj = GetUsersObject();
+            var usersDict = MarbleBotUser.GetUsers();
             foreach (var marble in winningTeam.Marbles)
             {
-                var user = await GetUserAsync(context, obj, marble.Id);
+                var user = await MarbleBotUser.FindAsync(context, usersDict, marble.Id);
                 if (DateTime.UtcNow.Subtract(user.LastWarWin).TotalHours > 6 && marble.DamageDealt > 0)
                 {
                     var output = new StringBuilder();
@@ -100,7 +99,7 @@ namespace MarbleBot.Common
                     output.AppendLine($"Damage dealt (x5): {UnitOfMoney}**{earnings:n2}**");
                     user.WarWins++;
 
-                    if (marble.HP > 0)
+                    if (marble.Health > 0)
                     {
                         earnings += 200;
                         output.AppendLine($"Alive bonus: {UnitOfMoney}**{200:n2}**");
@@ -119,13 +118,13 @@ namespace MarbleBot.Common
                         user.NetWorth += earnings;
                         output.AppendLine($"__**Total: {UnitOfMoney}{earnings:n2}**__");
                         builder.AddField($"**{context.Client.GetUser(marble.Id).Username}**'s earnings", output.ToString());
-                        obj.Remove(marble.Id.ToString());
-                        obj.Add(new JProperty(marble.Id.ToString(), JObject.FromObject(user)));
+                        usersDict.Remove(marble.Id);
+                        usersDict.Add(marble.Id, user);
                     }
                 }
             }
             await context.Channel.SendMessageAsync(embed: builder.Build());
-            WriteUsers(obj);
+            MarbleBotUser.UpdateUsers(usersDict);
             Dispose(true);
         }
 
@@ -145,16 +144,16 @@ namespace MarbleBot.Common
                     timeout = true;
                     break;
                 }
-                else if (_aiMarble != null && _aiMarble.HP > 0)
+                else if (_aiMarble != null && _aiMarble.Health > 0)
                 {
                     var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
                     var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
                     if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
-                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageIncrease / 100d) * (1 - 0.2 * (randMarble.Shield == null ? Convert.ToDouble(randMarble.Shield!.Id == 63) : 1) * (0.5 + _randomService.Rand.NextDouble())));
-                        randMarble.HP -= dmg;
+                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageBoost / 100d) * (1 - 0.2 * (randMarble.Shield == null ? Convert.ToDouble(randMarble.Shield!.Id == 63) : 1) * (0.5 + _randomService.Rand.NextDouble())));
+                        randMarble.Health -= dmg;
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                            .AddField("Remaining HP", $"**{randMarble.HP}**/{randMarble.MaxHP}")
+                            .AddField("Remaining Health", $"**{randMarble.Health}**/{randMarble.MaxHealth}")
                             .WithColor(GetColor(context))
                             .WithCurrentTimestamp()
                             .WithDescription($"**{_aiMarble.Name}** dealt **{dmg}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
@@ -172,7 +171,7 @@ namespace MarbleBot.Common
                     }
                 }
             }
-            while (!timeout && !_disposed && !Team1.Marbles.All(m => m.HP == 0) && !Team2.Marbles.All(m => m.HP == 0));
+            while (!timeout && !_disposed && !Team1.Marbles.All(m => m.Health == 0) && !Team2.Marbles.All(m => m.Health == 0));
 
             if (!timeout)
             {

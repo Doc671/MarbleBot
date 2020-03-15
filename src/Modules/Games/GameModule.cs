@@ -33,7 +33,7 @@ namespace MarbleBot.Modules.Games
 
         protected async Task Checkearn(GameType gameType)
         {
-            var user = GetUser(Context);
+            var user = MarbleBotUser.Find(Context);
             var lastWin = gameType switch
             {
                 GameType.Race => user.LastRaceWin,
@@ -248,7 +248,7 @@ namespace MarbleBot.Modules.Games
                     {
                         bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
                         user = Context.Client.GetUser(id);
-                        marbleOutput.AppendLine($"{bold}{name}{bold} (Weapon: **{GetItem<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
+                        marbleOutput.AppendLine($"{bold}{name}{bold} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
                     }
                 }
                 else
@@ -312,13 +312,13 @@ Func<Task> startCommand, Weapon? weapon = null)
                     return;
                 }
 
-                if (weapon!.WarClass == WeaponClass.None || weapon.WarClass == WeaponClass.Artillery)
+                if (weapon!.WeaponClass == WeaponClass.None || weapon.WeaponClass == WeaponClass.Artillery)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, this item cannot be used as a weapon!");
                     return;
                 }
 
-                var user = GetUser(Context);
+                var user = MarbleBotUser.Find(Context);
                 if (!user.Items.ContainsKey(weapon.Id) || user.Items[weapon.Id] < 1)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");
@@ -416,7 +416,7 @@ Func<Task> startCommand, Weapon? weapon = null)
         [Summary("Uses an item.")]
         public async Task UseCommand([Remainder] string searchTerm)
         {
-            var item = GetItem<Weapon>(searchTerm);
+            var item = Item.Find<Item>(searchTerm);
 
             if (item == null)
             {
@@ -424,8 +424,7 @@ Func<Task> startCommand, Weapon? weapon = null)
                 return;
             }
 
-            var obj = GetUsersObject();
-            var user = GetUser(Context, obj);
+            var user = MarbleBotUser.Find(Context);
 
             void UpdateUser(Item itm, int noOfItems)
             {
@@ -439,12 +438,12 @@ Func<Task> startCommand, Weapon? weapon = null)
                 }
 
                 user.NetWorth += item.Price * noOfItems;
-                WriteUsers(obj, Context.User, user);
+                MarbleBotUser.UpdateUser(user);
             }
 
             if (user.Items.ContainsKey(item.Id) && user.Items[item.Id] > 0)
             {
-                if (item.WarClass != WeaponClass.None)
+                if (item is Weapon weapon)
                 {
                     ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                     if (!_gamesService.SiegeInfo.ContainsKey(fileId))
@@ -453,7 +452,7 @@ Func<Task> startCommand, Weapon? weapon = null)
                         return;
                     }
 
-                    await _gamesService.SiegeInfo[fileId].WeaponAttack(Context, item);
+                    await _gamesService.SiegeInfo[fileId].WeaponAttack(Context, weapon);
                     return;
                 }
 
@@ -468,8 +467,8 @@ Func<Task> startCommand, Weapon? weapon = null)
                                 var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
                                 foreach (var marble in _gamesService.SiegeInfo[fileId].Marbles)
                                 {
-                                    marble.HP = marble.MaxHP;
-                                    output.AppendLine($"**{marble.Name}** (HP: **{marble.HP}**/{marble.MaxHP}, DMG: **{marble.DamageDealt}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
+                                    marble.Health = marble.MaxHealth;
+                                    output.AppendLine($"**{marble.Name}** (Health: **{marble.Health}**/{marble.MaxHealth}, DMG: **{marble.DamageDealt}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
                                 }
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .AddField("Marbles", output.ToString())
@@ -492,8 +491,8 @@ Func<Task> startCommand, Weapon? weapon = null)
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                await _gamesService.SiegeInfo[fileId].ItemAttack(obj, item.Id,
-                                    (int)Math.Round(90 + _gamesService.SiegeInfo[fileId].Boss.MaxHP * 0.05 * _randomService.Rand.NextDouble() * 0.12 + 0.94));
+                                await _gamesService.SiegeInfo[fileId].ItemAttack(item.Id,
+                                    (int)Math.Round(90 + _gamesService.SiegeInfo[fileId].Boss.MaxHealth * 0.05 * _randomService.Rand.NextDouble() * 0.12 + 0.94));
                             }
                             else
                             {
@@ -507,7 +506,7 @@ Func<Task> startCommand, Weapon? weapon = null)
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                             if (_gamesService.SiegeInfo.ContainsKey(fileId))
                             {
-                                await _gamesService.SiegeInfo[fileId].ItemAttack(obj, 14,
+                                await _gamesService.SiegeInfo[fileId].ItemAttack(14,
                                     70 + 10 * (int)_gamesService.SiegeInfo[fileId].Boss.Difficulty, true);
                             }
                             else
@@ -527,12 +526,12 @@ Func<Task> startCommand, Weapon? weapon = null)
                             UpdateUser(item, -1);
                             if (_gamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.CanaryBeach)
                             {
-                                UpdateUser(GetItem<Item>("019"), 1);
+                                UpdateUser(Item.Find<Item>("019"), 1);
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the water, turning it into a **Water Bucket**!");
                             }
                             else if (_gamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.VioletVolcanoes)
                             {
-                                UpdateUser(GetItem<Item>("020"), 1);
+                                UpdateUser(Item.Find<Item>("020"), 1);
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the lava, turning it into a **Lava Bucket**!");
                             }
                         }
@@ -563,8 +562,8 @@ Func<Task> startCommand, Weapon? weapon = null)
                             {
                                 var randDish = 22 + _randomService.Rand.Next(0, 13);
                                 UpdateUser(item, -1);
-                                UpdateUser(GetItem<Item>(randDish.ToString("000")), 1);
-                                await ReplyAsync($"**{Context.User.Username}** used their **{item.Name}**! It somehow picked up a disease and is now a **{GetItem<Item>(randDish.ToString("000")).Name}**!");
+                                UpdateUser(Item.Find<Item>(randDish.ToString("000")), 1);
+                                await ReplyAsync($"**{Context.User.Username}** used their **{item.Name}**! It somehow picked up a disease and is now a **{Item.Find<Item>(randDish.ToString("000")).Name}**!");
                             }
                             else
                             {
@@ -684,7 +683,7 @@ Func<Task> startCommand, Weapon? weapon = null)
                                 _gamesService.SiegeInfo.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, new List<SiegeMarble>())
                                 {
                                     Active = false,
-                                    Boss = Siege.GetBoss("Destroyer")
+                                    Boss = Boss.GetBoss("Destroyer")
                                 });
                                 await ReplyAsync("*You hear the whirring of machinery...*");
                             }

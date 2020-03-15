@@ -8,7 +8,7 @@ namespace MarbleBot.Common.TypeReaders
     {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services)
         {
-            var item = Modules.MarbleBotModule.GetItem<Item>(input);
+            var item = Item.Find<Item>(input);
             if (item == null)
             {
                 return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, "Input could not be parsed as an item."));

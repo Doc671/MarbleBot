@@ -1,5 +1,6 @@
-{
+ {
   "000": {
+    "Id": 0,
     "Name": "The Amazing Marble Race Ticket",
     "Price": 0.01,
     "Description": "A ticket to go see The Amazing Marble Race! But... which one?",
@@ -7,6 +8,7 @@
     "ScavengeLocation": 0
   },
   "001": {
+    "Id": 1,
     "Name": "Poup Soop",
     "Price": 364400.00,
     "Description": "A hole-y drink of Qefpedun origin that contains Poup, acid, lava, rotten flesh and 13 different lethal diseases. Approved by Orange.",
@@ -34,13 +36,15 @@
     }
   },
   "002": {
+    "Id": 2,
     "Name": "Limited Edition Poup Soop",
     "Price": 552387946.00,
     "Description": "A special edition of Poup Soop that contains extra Poup, extra acid, extra lava, rotten-er flesh, 14.5 lethal diseases and solid chunks of gold. Approved by Orange.",
     "OnSale": false,
-    "ScavengeLocation": 1
+    "ScavengeLocation": 0
   },
   "003": {
+    "Id": 3,
     "Name": "Frozen Edition Poup Soop",
     "Price": 140732609585.00,
     "Description": "A special edition of Poup Soop with all the ingredients of regular Poup Soop frozen with solid chunks of ice. Approved by Orange.",
@@ -48,13 +52,15 @@
     "ScavengeLocation": 0
   },
   "004": {
+    "Id": 4,
     "Name": "Orange Edition Poup Soop",
     "Price": 180269042735.00,
     "Description": "A special edition of Poup Soop with twice the ingredients of regular Poup Soop and the essence of Orange. Approved by Orange.",
     "OnSale": false,
-    "ScavengeLocation": 1
+    "ScavengeLocation": 0
   },
   "005": {
+    "Id": 5,
     "Name": "Electric Edition Poup Soop",
     "Price": 221548933670.00,
     "Description": "A special edition of Poup Soop with 20% more lava, 20% more acid and electricity generators inside the barrel. Very good conductor of electricity. Approved by Orange.",
@@ -62,6 +68,7 @@
     "ScavengeLocation": 0
   },
   "006": {
+    "Id": 6,
     "Name": "Burning Edition Poup Soop",
     "Price": 262310854791.00,
     "Description": "A special edition of Poup Soop with three times as much lava. Everything including the barrel is flammable and on fire. Approved by Orange.",
@@ -69,6 +76,7 @@
     "ScavengeLocation": 0
   },
   "007": {
+    "Id": 7,
     "Name": "Rotten Edition Poup Soop",
     "Price": 303496572188.00,
     "Description": "A special edition of Poup Soop with 6.66 times as much rotten flesh, twice as much acid and 21.25 lethal diseases. Approved by Orange.",
@@ -76,6 +84,7 @@
     "ScavengeLocation": 0
   },
   "008": {
+    "Id": 8,
     "Name": "Ulteymut Edition Poup Soop",
     "Price": 1802201667100.00,
     "Description": "The final edition of Poup Soop with three times as much Poup, lava and acid, 47.41394 lethal diseases and several classified ingredients. Approved by Orange.",
@@ -83,6 +92,7 @@
     "ScavengeLocation": 0
   },
   "009": {
+    "Id": 9,
     "Name": "Poup Soop Variety Pack",
     "Price": 374180952623987.00,
     "Description": "Contains 50 of each Poup Soop version currently on sale + Poup Bwedd + Poup Stoo + Poup Joos + HATT MANN action figure. Approved by Orange.",
@@ -90,6 +100,7 @@
     "ScavengeLocation": 0
   },
   "010": {
+    "Id": 10,
     "Name": "Qefpedun Charm",
     "Price": -1.00,
     "Description": "A special charm given to those who got dailies in the run up to Orange Day 2019. Imbued with special Qefpedun powers.",
@@ -97,6 +108,7 @@
     "ScavengeLocation": 0
   },
   "011": {
+    "Id": 11,
     "Name": "Old Boot",
     "Price": 0.40,
     "Description": "An old boot - once worn long ago...",
@@ -104,6 +116,7 @@
     "ScavengeLocation": 1
   },
   "012": {
+    "Id": 12,
     "Name": "Broken Plastic Bottle",
     "Price": 0.35,
     "Description": "A broken plastic bottle which was releasing harmful microplastics into the ocean.",
@@ -111,6 +124,7 @@
     "ScavengeLocation": 1
   },
   "013": {
+    "Id": 13,
     "Name": "Baking Powder",
     "Price": 1.00,
     "Description": "A jar containing powdered sodium bicarbonate.",
@@ -118,6 +132,7 @@
     "ScavengeLocation": 0
   },
   "014": {
+    "Id": 14,
     "Name": "Bottle Rocket",
     "Price": 12.00,
     "Description": "An explosive plastic bottle that can be used as a weapon. Consumable.",
@@ -133,6 +148,7 @@
     }
   },
   "015": {
+    "Id": 15,
     "Name": "Cardboard Wings",
     "Price": 0.25,
     "Description": "A pair of wings made from cardboard.",
@@ -140,6 +156,7 @@
     "ScavengeLocation": 1
   },
   "016": {
+    "Id": 16,
     "Name": "Vinegar Bottle",
     "Price": 1.00,
     "Description": "A bottle containing an aqueous solution of acetic acid with trace chemicals.",
@@ -147,6 +164,7 @@
     "ScavengeLocation": 0
   },
   "017": {
+    "Id": 17,
     "Name": "Crafting Station Mk.I",
     "Price": -1.00,
     "Description": "A workbench providing several different utilities allowing you to craft items.",
@@ -154,6 +172,7 @@
     "ScavengeLocation": 0
   },
   "018": {
+    "Id": 18,
     "Name": "Steel Bucket",
     "Price": 3.00,
     "Description": "A bucket made of stainless steel.",
@@ -161,6 +180,7 @@
     "ScavengeLocation": 0
   },
   "019": {
+    "Id": 19,
     "Name": "Water Bucket",
     "Price": 3.00,
     "Description": "A stainless steel bucket containing water.",
@@ -168,6 +188,7 @@
     "ScavengeLocation": 0
   },
   "020": {
+    "Id": 20,
     "Name": "Lava Bucket",
     "Price": 3.00,
     "Description": "A stainless steel bucket containing lava.",
@@ -175,6 +196,7 @@
     "ScavengeLocation": 0
   },
   "021": {
+    "Id": 21,
     "Name": "Rotten Flesh",
     "Price": 0.00,
     "Description": "A piece of rotting flesh.",
@@ -182,6 +204,7 @@
     "ScavengeLocation": 1
   },
   "022": {
+    "Id": 22,
     "Name": "Petri Dish",
     "Price": 0.80,
     "Description": "A shallow cylindrical glass dish.",
@@ -189,6 +212,7 @@
     "ScavengeLocation": 0
   },
   "023": {
+    "Id": 23,
     "Name": "Plague Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Yersinia pestis*.",
@@ -196,6 +220,7 @@
     "ScavengeLocation": 0
   },
   "024": {
+    "Id": 24,
     "Name": "Nipah Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Nipah henipavirus*.",
@@ -203,6 +228,7 @@
     "ScavengeLocation": 0
   },
   "025": {
+    "Id": 25,
     "Name": "Flu Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Influenza A* subtype H1N1.",
@@ -210,6 +236,7 @@
     "ScavengeLocation": 0
   },
   "026": {
+    "Id": 26,
     "Name": "TB Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Mycobacterium tuberculosis*.",
@@ -217,6 +244,7 @@
     "ScavengeLocation": 0
   },
   "027": {
+    "Id": 27,
     "Name": "Aureus Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Staphylococcus aureus*.",
@@ -224,6 +252,7 @@
     "ScavengeLocation": 0
   },
   "028": {
+    "Id": 28,
     "Name": "Malaria Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the parasite *Plasmodium malariae*.",
@@ -231,6 +260,7 @@
     "ScavengeLocation": 0
   },
   "029": {
+    "Id": 29,
     "Name": "Ebola Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Sudan ebolavirus*.",
@@ -238,6 +268,7 @@
     "ScavengeLocation": 0
   },
   "030": {
+    "Id": 30,
     "Name": "Cholera Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Vibrio cholerae*.",
@@ -245,6 +276,7 @@
     "ScavengeLocation": 0
   },
   "031": {
+    "Id": 31,
     "Name": "Tetanus Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Clostridium tetani*.",
@@ -252,6 +284,7 @@
     "ScavengeLocation": 0
   },
   "032": {
+    "Id": 32,
     "Name": "Salmonella Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the bacterium *Salmonella enterica*.",
@@ -259,6 +292,7 @@
     "ScavengeLocation": 0
   },
   "033": {
+    "Id": 33,
     "Name": "Smallpox Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Variola major*.",
@@ -266,6 +300,7 @@
     "ScavengeLocation": 0
   },
   "034": {
+    "Id": 34,
     "Name": "Measles Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the virus *Measles morbillivirus*.",
@@ -273,6 +308,7 @@
     "ScavengeLocation": 0
   },
   "035": {
+    "Id": 35,
     "Name": "Toxoplasmosis Petri Dish",
     "Price": -1.00,
     "Description": "A sealed petri dish containing the parasite *Toxoplasma gondii*.",
@@ -280,6 +316,7 @@
     "ScavengeLocation": 0
   },
   "036": {
+    "Id": 36,
     "Name": "Acid Bucket",
     "Price": -1.00,
     "Description": "A stainless steel bucket containing hydrofluoric acid.",
@@ -287,6 +324,7 @@
     "ScavengeLocation": 0
   },
   "037": {
+    "Id": 37,
     "Name": "Animal Faecal Matter",
     "Price": -1.00,
     "Description": "A polythene bag containing the faeces of an animal.",
@@ -294,6 +332,7 @@
     "ScavengeLocation": 0
   },
   "038": {
+    "Id": 38,
     "Name": "Poop Soup",
     "Price": 0.00,
     "Description": "An unholy combination of faeces, lava, acid, rotten flesh and 13 different lethal diseases.",
@@ -321,6 +360,7 @@
     }
   },
   "039": {
+    "Id": 39,
     "Name": "Raw Essence of Orange",
     "Price": 100.00,
     "Description": "An orange fluid containing the essence of Qefped. Approved by Orange.",
@@ -328,6 +368,7 @@
     "ScavengeLocation": 0
   },
   "040": {
+    "Id": 40,
     "Name": "Poup",
     "Price": 1000.00,
     "Description": "Qefpedun matter formed of the faeces of an animal endowed with the raw essence of Orange. Approved by Orange.",
@@ -340,6 +381,7 @@
     }
   },
   "041": {
+    "Id": 41,
     "Name": "Stick",
     "Price": 0.00,
     "Description": "A stick. Wow.",
@@ -347,6 +389,7 @@
     "ScavengeLocation": 2
   },
   "042": {
+    "Id": 42,
     "Name": "Oak Log",
     "Price": 1.50,
     "Description": "A log from an oak tree.",
@@ -354,6 +397,7 @@
     "ScavengeLocation": 2
   },
   "043": {
+    "Id": 43,
     "Name": "Ash Log",
     "Price": 1.70,
     "Description": "A log from an ash tree.",
@@ -361,6 +405,7 @@
     "ScavengeLocation": 2
   },
   "044": {
+    "Id": 44,
     "Name": "Elm Log",
     "Price": 1.40,
     "Description": "A log from an elm tree.",
@@ -368,6 +413,7 @@
     "ScavengeLocation": 2
   },
   "045": {
+    "Id": 45,
     "Name": "Oak Plank",
     "Price": 7.50,
     "Description": "A plank of oak wood.",
@@ -379,6 +425,7 @@
     }
   },
   "046": {
+    "Id": 46,
     "Name": "Ash Plank",
     "Price": 8.50,
     "Description": "A plank of ash wood.",
@@ -390,6 +437,7 @@
     }
   },
   "047": {
+    "Id": 47,
     "Name": "Elm Plank",
     "Price": 7.00,
     "Description": "A plank of elm wood.",
@@ -401,6 +449,7 @@
     }
   },
   "048": {
+    "Id": 48,
     "Name": "Rock",
     "Price": 0.00,
     "Description": "A rock.",
@@ -409,6 +458,7 @@
     "Damage": 9
   },
   "049": {
+    "Id": 49,
     "Name": "Rope",
     "Price": 4.00,
     "Description": "A 4m-long strong cord of twisted nylon strands.",
@@ -416,6 +466,7 @@
     "ScavengeLocation": 0
   },
   "050": {
+    "Id": 50,
     "Name": "Oak Trebuchet",
     "Price": 40.00,
     "Description": "A trebuchet made from oak wood and rope.",
@@ -425,7 +476,7 @@
     "Ammo": [ 48 ],
     "Damage": 16,
     "Hits": 1,
-    "WarClass": 3,
+    "WeaponClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 5,
@@ -434,6 +485,7 @@
     }
   },
   "051": {
+    "Id": 51,
     "Name": "Ash Trebuchet",
     "Price": 40.00,
     "Description": "A trebuchet made from ash wood and rope.",
@@ -443,7 +495,7 @@
     "Ammo": [ 48 ],
     "Damage": 16,
     "Hits": 1,
-    "WarClass": 3,
+    "WeaponClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 5,
@@ -452,6 +504,7 @@
     }
   },
   "052": {
+    "Id": 52,
     "Name": "Elm Trebuchet",
     "Price": 40.00,
     "Description": "A trebuchet made from elm wood and rope.",
@@ -461,7 +514,7 @@
     "Ammo": [ 48 ],
     "Damage": 16,
     "Hits": 1,
-    "WarClass": 3,
+    "WeaponClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 5,
@@ -470,6 +523,7 @@
     }
   },
   "053": {
+    "Id": 53,
     "Name": "Trebuchet Array",
     "Price": 125.00,
     "Description": "An array of three trebuchets, each made of different types of wood.",
@@ -479,7 +533,7 @@
     "Ammo": [ 48 ],
     "Damage": 18,
     "Hits": 3,
-    "WarClass": 3,
+    "WeaponClass": 3,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "049": 1,
@@ -489,6 +543,7 @@
     }
   },
   "054": {
+    "Id": 54,
     "Name": "Duct Tape",
     "Price": 2.15,
     "Description": "Strong cloth-backed waterproof adhesive tape.",
@@ -496,6 +551,7 @@
     "ScavengeLocation": 0
   },
   "055": {
+    "Id": 55,
     "Name": "Leather Piece",
     "Price": 0.55,
     "Description": "A material made from the skin of an animal by tanning.",
@@ -503,6 +559,7 @@
     "ScavengeLocation": 1
   },
   "056": {
+    "Id": 56,
     "Name": "Leather Boots",
     "Price": 13.00,
     "Description": "A pair of boots made of leather.",
@@ -515,6 +572,7 @@
     }
   },
   "057": {
+    "Id": 57,
     "Name": "Rocket Boots",
     "Price": 40.00,
     "Description": "Boots with bottle rockets strapped on both sides.",
@@ -528,6 +586,7 @@
     }
   },
   "058": {
+    "Id": 58,
     "Name": "Phase Orb",
     "Price": 1500.00,
     "Description": "A light blue orb of unknown origin that could be used as a power source.",
@@ -536,6 +595,7 @@
     "ScavengeLocation": 0
   },
   "059": {
+    "Id": 59,
     "Name": "Repulsor Arm Fragment",
     "Price": 550.00,
     "Description": "The remnants of an arm-mounted repulsor, once belonging to a dangerous cyborg.",
@@ -544,6 +604,7 @@
     "ScavengeLocation": 3
   },
   "060": {
+    "Id": 60,
     "Name": "Flamethrower Fragment",
     "Price": 650.00,
     "Description": "The remnants of a flamethrower, once belonging to a dangerous cyborg.",
@@ -552,6 +613,7 @@
     "ScavengeLocation": 3
   },
   "061": {
+    "Id": 61,
     "Name": "Composite Protection Fragment",
     "Price": 75.00,
     "Description": "Reinforced chromium plating around a mesh of ceramic and kevlar, once part of a dangerous cyborg.",
@@ -560,6 +622,7 @@
     "ScavengeLocation": 3
   },
   "062": {
+    "Id": 62,
     "Name": "Crafting Station Mk.II",
     "Price": -1.00,
     "Description": "A large, advanced workbench providing complex crafting and smelting utilities.",
@@ -580,6 +643,7 @@
     }
   },
   "063": {
+    "Id": 63,
     "Name": "Coating of Destruction",
     "Price": 2000.00,
     "Description": "A marble coating formed of chromium plating, ceramic and kevlar. Reduces all inbound damage by 20%.",
@@ -590,9 +654,11 @@
     "CraftingRecipe": {
       "061": 20
     },
-    "CraftingStationRequired": 2
+    "CraftingStationRequired": 2,
+    "DamageAbsorption": 20
   },
   "064": {
+    "Id": 64,
     "Name": "Iron Ore",
     "Price": 0.09,
     "Description": "Rocks from which iron can be profitably extracted.",
@@ -601,6 +667,7 @@
     "ScavengeLocation": 3
   },
   "065": {
+    "Id": 65,
     "Name": "Iron Bar",
     "Price": 19.00,
     "Description": "A piece of iron cast into a trapezoidal pyramid for further processing.",
@@ -614,6 +681,7 @@
     "CraftingStationRequired": 2
   },
   "066": {
+    "Id": 66,
     "Name": "Iron Spikes",
     "Price": 300.00,
     "Description": "A spherical plating of iron covered with sharp spikes.",
@@ -624,9 +692,11 @@
     "CraftingRecipe": {
       "065": 3
     },
-    "CraftingStationRequired": 2
+    "CraftingStationRequired": 2,
+    "DamageBoost": 40
   },
   "067": {
+    "Id": 67,
     "Name": "Ashes",
     "Price": 0.02,
     "Description": "A powdery residue left after the burning of a substance, consisting of metal carbonates.",
@@ -635,6 +705,7 @@
     "ScavengeLocation": 4
   },
   "068": {
+    "Id": 68,
     "Name": "Nickel Ore",
     "Price": 0.10,
     "Description": "Rocks from which nickel can be profitably extracted.",
@@ -643,6 +714,7 @@
     "ScavengeLocation": 3
   },
   "069": {
+    "Id": 69,
     "Name": "Nickel Bar",
     "Price": 20.59,
     "Description": "A piece of nickel cast into a trapezoidal pyramid for further processing.",
@@ -656,6 +728,7 @@
     "CraftingStationRequired": 2
   },
   "070": {
+    "Id": 70,
     "Name": "Steel Bar",
     "Price": 40.00,
     "Description": "A piece of stainless steel cast into a trapezoidal pyramind for further processing.",
@@ -671,6 +744,7 @@
     }
   },
   "071": {
+    "Id": 71,
     "Name": "Steel Spikes",
     "Price": 620.00,
     "Description": "A spherical plating of stainless steel covered with sharp spikes.",
@@ -681,9 +755,11 @@
     "CraftingRecipe": {
       "070": 3
     },
-    "CraftingStationRequired": 2
+    "CraftingStationRequired": 2,
+    "DamageBoost": 60
   },
   "072": {
+    "Id": 72,
     "Name": "Infernite Ore",
     "Price": 1.66,
     "Description": "Heated rocks containing a strange purple-orange magma-like substance.",
@@ -692,6 +768,7 @@
     "ScavengeLocation": 4
   },
   "073": {
+    "Id": 73,
     "Name": "Infernite Bar",
     "Price": 66.66,
     "Description": "A piece of infernite cast into a trapezoidal pyramind for further processing.",
@@ -705,6 +782,7 @@
     "CraftingStationRequired": 2
   },
   "074": {
+    "Id": 74,
     "Name": "Infernite Spikes",
     "Price": 1166.66,
     "Description": "A spherical plating of infernite covered with heated sharp spikes.",
@@ -717,9 +795,11 @@
       "061": 3,
       "073": 5
     },
-    "CraftingStationRequired": 2
+    "CraftingStationRequired": 2,
+    "DamageBoost": 95
   },
   "075": {
+    "Id": 75,
     "Name": "Gold Ore",
     "Price": 104.00,
     "Description": "Rocks from which gold can be profitably extracted.",
@@ -728,6 +808,7 @@
     "ScavengeLocation": 0
   },
   "076": {
+    "Id": 76,
     "Name": "Gold Bar",
     "Price": 950.00,
     "Description": "A piece of gold cast into a trapezoidal pyramind for further processing.",
@@ -741,6 +822,7 @@
     "CraftingStationRequired": 2
   },
   "077": {
+    "Id": 77,
     "Name": "Gold Doubloon",
     "Price": 38.00,
     "Description": "A coin made from gold.",
@@ -754,6 +836,7 @@
     "CraftingStationRequired": 2
   },
   "078": {
+    "Id": 78,
     "Name": "Raw Essence of Horror",
     "Price": 100.00,
     "Description": "A black-red fluid, containing the essence of a truly horrific being.",
@@ -762,6 +845,7 @@
     "ScavengeLocation": 0
   },
   "079": {
+    "Id": 79,
     "Name": "Essence of Corruption",
     "Price": 200.00,
     "Description": "A black-orange fluid containing the mixed essence of holiness and terror. Truly an abomination.",
@@ -776,6 +860,7 @@
     "CraftingStationRequired": 2
   },
   "080": {
+    "Id": 80,
     "Name": "Cursed Inferno Spikes",
     "Price": 1666.66,
     "Description": "A spherical plating of cursed infernite covered with heated sharp spikes. Imbued with mixed essence.",
@@ -787,9 +872,11 @@
       "074": 1,
       "079": 2
     },
-    "CraftingStationRequired": 2
+    "CraftingStationRequired": 2,
+    "DamageBoost": 100
   },
   "081": {
+    "Id": 81,
     "Name": "Chromium Drill",
     "Price": 350.00,
     "Description": "A drill forged from chromium. Can extract ores.",
@@ -803,6 +890,7 @@
     "CraftingStationRequired": 2
   },
   "082": {
+    "Id": 82,
     "Name": "Infernite Drill",
     "Price": 1050.00,
     "Description": "A drill forged from infernite and steel. Can extract ores using high temperatures.",
@@ -817,9 +905,10 @@
     "CraftingStationRequired": 2
   },
   "083": {
+    "Id": 83,
     "Name": "Pendant of Fortune",
     "Price": 1000.00,
-    "Description": "A golden pendant signifying wealth. Triples money earnt at the races.",
+    "Description": "A golden pendant signifying wealth. Triples money earnings.",
     "Stage": 2,
     "OnSale": false,
     "ScavengeLocation": 0,
@@ -831,6 +920,7 @@
     "CraftingStationRequired": 2
   },
   "084": {
+    "Id": 84,
     "Name": "Big Bottle Rocket",
     "Price": 96.00,
     "Description": "An large explosive plastic bottle that can be used as a weapon. Consumable. Requires a weapon to be launched.",
@@ -846,6 +936,7 @@
     }
   },
   "085": {
+    "Id": 85,
     "Name": "Bottle Rocket Launcher",
     "Price": 290.00,
     "Description": "A device capable of launching Big Bottle Rockets. Fires normal Bottle Rockets with increased damage.",
@@ -855,7 +946,7 @@
     "Accuracy": 80,
     "Damage": 15,
     "Hits": 1,
-    "WarClass": 2,
+    "WeaponClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "059": 1,
@@ -865,6 +956,7 @@
     "CraftingStationRequired": 2
   },
   "086": {
+    "Id": 86,
     "Name": "Gilded Dagger",
     "Price": 110.00,
     "Description": "A dagger covered lightly with gold.",
@@ -874,7 +966,7 @@
     "Accuracy": 95,
     "Damage": 8,
     "Hits": 1,
-    "WarClass": 1,
+    "WeaponClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "070": 3,
@@ -883,6 +975,7 @@
     "CraftingStationRequired": 2
   },
   "087": {
+    "Id": 87,
     "Name": "Pyrobit",
     "Price": 1040.00,
     "Description": "A sword forged from the ore of the Violet Volcanoes.",
@@ -892,7 +985,7 @@
     "Accuracy": 90,
     "Damage": 10,
     "Hits": 1,
-    "WarClass": 1,
+    "WeaponClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "020": 1,
@@ -903,6 +996,7 @@
     "CraftingStationRequired": 2
   },
   "088": {
+    "Id": 88,
     "Name": "Blizzare",
     "Price": 830.00,
     "Description": "An icy one-handed sword. Cold to the touch.",
@@ -912,9 +1006,10 @@
     "Accuracy": 95,
     "Damage": 9,
     "Hits": 1,
-    "WarClass": 1
+    "WeaponClass": 1
   },
   "089": {
+    "Id": 89,
     "Name": "Aquaria",
     "Price": 680.00,
     "Description": "A rounded sword of the oceans. Once belonged to a witch.",
@@ -924,9 +1019,10 @@
     "Accuracy": 85,
     "Damage": 10,
     "Hits": 1,
-    "WarClass": 1
+    "WeaponClass": 1
   },
   "090": {
+    "Id": 90,
     "Name": "Seaweed",
     "Price": 0.12,
     "Description": "A kilogram of seaweed. Contrary to popular belief, seaweed's composition is actually 42.9% sea, 57.1% weed.",
@@ -935,6 +1031,7 @@
     "ScavengeLocation": 0
   },
   "091": {
+    "Id": 91,
     "Name": "Makeshift Technology Altar",
     "Price": 315.00,
     "Description": "A makeshift altar made from not-very-advanced technology. It might be a good idea not to go on a Siege...",
@@ -953,6 +1050,7 @@
     }
   },
   "092": {
+    "Id": 92,
     "Name": "Mini-Marble",
     "Price": 7.00,
     "Description": "No, it's not a bullet, it's a marble!",
@@ -967,6 +1065,7 @@
     "CraftingStationRequired": 2
   },
   "093": {
+    "Id": 93,
     "Name": "Flintlock Musket",
     "Price": 34.00,
     "Description": "A muzzle-loaded long gun that fires bullets.",
@@ -977,7 +1076,7 @@
     "Ammo": [ 92 ],
     "Damage": 10,
     "Hits": 1,
-    "WarClass": 2,
+    "WeaponClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "059": 4,
@@ -987,6 +1086,7 @@
     "CraftingStationRequired": 2
   },
   "094": {
+    "Id": 94,
     "Name": "Leaf's Breeze",
     "Price": 27.30,
     "Description": "A sword made from oak wood.",
@@ -995,7 +1095,7 @@
     "Accuracy": 95,
     "Damage": 5,
     "Hits": 1,
-    "WarClass": 1,
+    "WeaponClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 3,
@@ -1003,6 +1103,7 @@
     }
   },
   "095": {
+    "Id": 95,
     "Name": "The Hatchet",
     "Price": 34.95,
     "Description": "A striking tool of ash wood with a sharp stone blade on one side.",
@@ -1011,7 +1112,7 @@
     "Accuracy": 85,
     "Damage": 6,
     "Hits": 1,
-    "WarClass": 1,
+    "WeaponClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "041": 3,
@@ -1021,6 +1122,7 @@
     }
   },
   "096": {
+    "Id": 96,
     "Name": "Wooden Crossbow",
     "Price": 33.49,
     "Description": "A bow fixed across a support of elm wood with a groove to fire bolts.",
@@ -1030,7 +1132,7 @@
     "Ammo": [ 98, 100, 101 ],
     "Damage": 4,
     "Hits": 1,
-    "WarClass": 2,
+    "WeaponClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "047": 5,
@@ -1038,6 +1140,7 @@
     }
   },
   "097": {
+    "Id": 97,
     "Name": "Golden Repeater",
     "Price": 3700.00,
     "Description": "A repeating crossbow consisting of a gold-alloy support with a groove to fire bolts.",
@@ -1048,7 +1151,7 @@
     "Ammo": [ 98, 100, 101 ],
     "Damage": 8,
     "Hits": 1,
-    "WarClass": 2,
+    "WeaponClass": 2,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "049": 1,
@@ -1058,6 +1161,7 @@
     "CraftingStationProduced": 2
   },
   "098": {
+    "Id": 98,
     "Name": "Wooden Bolt",
     "Price": 4.15,
     "Description": "An arrow of elm wood used in a crossbow.",
@@ -1070,6 +1174,7 @@
     }
   },
   "099": {
+    "Id": 99,
     "Name": "Deletion",
     "Price": 0.00,
     "Description": "...",
@@ -1078,6 +1183,7 @@
     "ScavengeLocation": 0
   },
   "100": {
+    "Id": 100,
     "Name": "Nickel Bolt",
     "Price": 7.45,
     "Description": "A nickel arrow used in a crossbow.",
@@ -1092,6 +1198,7 @@
     "CraftingStationRequired": 2
   },
   "101": {
+    "Id": 101,
     "Name": "Cursed Inferno Bolt",
     "Price": 466.66,
     "Description": "An infernite crossbow bolt. Imbued with mixed essence.",
@@ -1107,6 +1214,7 @@
     "CraftingStationRequired": 2
   },
   "102": {
+    "Id": 102,
     "Name": "EMP Blaster",
     "Price": 340.00,
     "Description": "Launches an electromagnetic pulse.",
@@ -1115,6 +1223,7 @@
     "ScavengeLocation": 0
   },
   "103": {
+    "Id": 103,
     "Name": "Toxicut",
     "Price": 910.00,
     "Description": "A steel sword imbued with acid and poison.",
@@ -1124,7 +1233,7 @@
     "Accuracy": 90,
     "Damage": 12,
     "Hits": 1,
-    "WarClass": 1,
+    "WeaponClass": 1,
     "CraftingProduced": 1,
     "CraftingRecipe": {
       "023": 1,
@@ -1146,6 +1255,7 @@
     }
   },
   "104": {
+    "Id": 104,
     "Name": "Matrix Overloader",
     "Price": 1500.00,
     "Description": "Alters the Siege so that only Stage 1 bosses can be encountered.",

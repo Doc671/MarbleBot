@@ -1,7 +1,5 @@
 ﻿using Discord.Commands;
-using MarbleBot.Modules;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Common.TypeReaders
@@ -12,18 +10,17 @@ namespace MarbleBot.Common.TypeReaders
         {
             if (ulong.TryParse(input.TrimStart('<').TrimEnd('>').TrimStart('@'), out ulong id))
             {
-                return Task.FromResult(TypeReaderResult.FromSuccess(MarbleBotModule.GetUser(context, id)));
+                return Task.FromResult(TypeReaderResult.FromSuccess(MarbleBotUser.Find(context, id)));
             }
 
-            var usersObj = MarbleBotModule.GetUsersObject();
-            var usersDict = usersObj.ToObject<Dictionary<ulong, MarbleBotUser>>()!;
+            var usersDict = MarbleBotUser.GetUsers();
             foreach (var user in usersDict)
             {
                 if (string.Compare(input, user.Value.Name, true) == 0
                     || input.Contains(user.Value.Name, StringComparison.OrdinalIgnoreCase)
                     || user.Value.Name.Contains(input, StringComparison.OrdinalIgnoreCase))
                 {
-                    return Task.FromResult(TypeReaderResult.FromSuccess(MarbleBotModule.GetUserAsync(context, usersObj, user.Key).Result));
+                    return Task.FromResult(TypeReaderResult.FromSuccess(MarbleBotUser.FindAsync(context, usersDict, user.Key).Result));
                 }
             }
 

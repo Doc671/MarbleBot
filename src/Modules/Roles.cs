@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MarbleBot.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace MarbleBot.Modules
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
-                var guild = GetGuild(Context);
+                var guild = MarbleBotGuild.Find(Context);
                 if (guild.Roles.Any(r => r == role.Id))
                 {
                     await (Context.User as IGuildUser)!.AddRoleAsync(role);
@@ -39,7 +40,7 @@ namespace MarbleBot.Modules
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
-                var guild = GetGuild(Context);
+                var guild = MarbleBotGuild.Find(Context);
                 if (guild.Roles.Any(r => r == role.Id))
                 {
                     await (Context.User as IGuildUser)!.RemoveRoleAsync(role);
@@ -59,7 +60,7 @@ namespace MarbleBot.Modules
             if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
             {
                 var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
-                var guild = GetGuild(Context);
+                var guild = MarbleBotGuild.Find(Context);
                 var socketGuildUser = Context.User as SocketGuildUser;
                 if (guild.Roles.Any(r => r == role.Id))
                 {
@@ -85,7 +86,7 @@ namespace MarbleBot.Modules
         public async Task RoleListCommand()
         {
             var output = new StringBuilder();
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             foreach (var role in guild.Roles)
             {
                 output.AppendLine(Context.Guild.GetRole(role).Name);

@@ -1,11 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using MarbleBot.Extensions;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MarbleBot.Common
 {
+    [JsonConverter(typeof(ItemConverter))]
     public class Item
     {
-        public int Id { get; internal set; }
+        public int Id { get; }
         public string Name { get; }
         public decimal Price { get; }
         public string Description { get; }
@@ -13,24 +17,24 @@ namespace MarbleBot.Common
         public int Stage { get; }
         public ScavengeLocation ScavengeLocation { get; }
         public int CraftingProduced { get; }
-        public Dictionary<string, int>? CraftingRecipe { get; }
+        public Dictionary<int, int>? CraftingRecipe { get; }
         public int CraftingStationRequired { get; }
 
         [JsonConstructor]
-        public Item(int id = 0, string name = "", decimal price = 0m, string description = "", bool onSale = false,
-            int stage = 1, ScavengeLocation scavengeLocation = ScavengeLocation.None, int craftingProduced = 0,
-            Dictionary<string, int>? craftingRecipe = null, int craftingStationRequired = 0)
+        public Item(int? id = -1, string? name = "", decimal? price = 0m, string? description = "", bool? onSale = false,
+            int? stage = 1, ScavengeLocation? scavengeLocation = ScavengeLocation.None, int? craftingProduced = 0,
+            Dictionary<int, int>? craftingRecipe = null, int? craftingStationRequired = 0)
         {
-            Id = id;
-            Name = name;
-            Price = price;
-            Description = description;
-            OnSale = onSale;
-            Stage = stage;
-            ScavengeLocation = scavengeLocation;
-            CraftingProduced = craftingProduced;
-            CraftingRecipe = craftingRecipe ?? new Dictionary<string, int>();
-            CraftingStationRequired = craftingStationRequired;
+            Id = id ?? -1;
+            Name = name ?? "";
+            Price = price ?? 0m;
+            Description = description ?? "";
+            OnSale = onSale ?? false;
+            Stage = stage ?? 1;
+            ScavengeLocation = scavengeLocation ?? ScavengeLocation.None;
+            CraftingProduced = craftingProduced ?? 0;
+            CraftingRecipe = craftingRecipe ?? new Dictionary<int, int>();
+            CraftingStationRequired = craftingStationRequired ?? 0;
         }
 
         public Item(Item baseItem, int id = 0, bool onSale = false)
@@ -47,7 +51,58 @@ namespace MarbleBot.Common
             CraftingStationRequired = baseItem.CraftingStationRequired;
         }
 
-        public override string ToString()
-    => $"`[{Id.ToString("000")}]` **{Name}**";
+        public static T Find<T>(int itemId) where T : Item
+        {
+            var itemsDict = GetItems();
+            if (itemsDict.ContainsKey(itemId))
+            {
+                return (T)itemsDict[itemId];
+            }
+            else
+            {
+                throw new Exception("The requested item could not be found.");
+            }
+        }
+
+        public static T Find<T>(string searchTerm) where T : Item
+        {
+            if (int.TryParse(searchTerm, out int itemId))
+            {
+                var itemsDict = GetItems();
+                if (itemsDict.ContainsKey(itemId))
+                {
+                    return (T)itemsDict[itemId];
+                }
+                else
+                {
+                    throw new Exception("The requested item could not be found.");
+                }
+            }
+            else
+            {
+                var itemsDict = GetItems();
+                string newSearchTerm = searchTerm.ToLower().RemoveChar(' ');
+                foreach (var itemPair in itemsDict)
+                {
+                    if (itemPair.Value.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(itemPair.Value.Name.ToLower()))
+                    {
+                        return (T)itemPair.Value;
+                    }
+                }
+                throw new Exception("The requested item could not be found.");
+            }
+        }
+
+        public static IDictionary<int, Item> GetItems()
+        {
+            string json;
+            using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Items.json"))
+            {
+                json = itemFile.ReadToEnd();
+            }
+            return JsonConvert.DeserializeObject<IDictionary<int, Item>>(json);
+        }
+
+        public override string ToString() => $"`[{Id.ToString("000")}]` **{Name}**";
     }
 }

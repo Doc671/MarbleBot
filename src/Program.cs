@@ -5,12 +5,11 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Util.Store;
 using MarbleBot.Common;
-using MarbleBot.Modules;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
@@ -63,7 +62,7 @@ namespace MarbleBot
                 json = botCredentialFile.ReadToEnd();
             }
 
-            var returnValue = JObject.Parse(json).ToObject<BotCredentials>();
+            var returnValue = JsonConvert.DeserializeObject<BotCredentials>(json);
             using (var stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
             {
                 if (returnValue == null)
@@ -121,14 +120,14 @@ namespace MarbleBot
 
         private Task Client_UserBanned(SocketUser user, SocketGuild socketGuild)
         {
-            var obj = MarbleBotModule.GetGuildsObject();
+            var guildsDict = MarbleBotGuild.GetGuilds();
             MarbleBotGuild? marbleBotGuild;
-            if (!obj.ContainsKey(socketGuild.Id.ToString()))
+            if (!guildsDict.ContainsKey(socketGuild.Id))
             {
                 return Task.CompletedTask;
             }
 
-            marbleBotGuild = obj[socketGuild.Id.ToString()]?.ToObject<MarbleBotGuild>();
+            marbleBotGuild = guildsDict[socketGuild.Id];
             if (string.IsNullOrEmpty(marbleBotGuild?.AppealFormLink))
             {
                 return Task.CompletedTask;

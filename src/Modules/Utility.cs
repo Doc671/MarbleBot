@@ -1,10 +1,11 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -42,7 +43,7 @@ namespace MarbleBot.Modules
                 .AddField("Ongoing Scavenges", _gamesService.ScavengeInfo.Count, true)
                 .AddField("Ongoing Sieges", _gamesService.SiegeInfo.Count, true)
                 .AddField("Ongoing Wars", _gamesService.WarInfo.Count, true)
-                .AddField("Servers", GetGuildsObject().Count, true)
+                .AddField("Servers", MarbleBotGuild.GetGuilds().Count, true)
                 .AddField("Start Time (UTC)", _startTimeService.StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
                 .AddField("Uptime", DateTime.UtcNow.Subtract(_startTimeService.StartTime).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
@@ -56,7 +57,7 @@ namespace MarbleBot.Modules
         [Summary("Shows the time remaining for each activity with a cooldown.")]
         public async Task CheckTimesCommand()
         {
-            var user = GetUser(Context);
+            var user = MarbleBotUser.Find(Context);
             var timeUntilNextDaily = user.LastDaily.Subtract(DateTime.UtcNow.AddHours(-24));
             var timeUntilNextRace = user.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6));
             var timeUntilNextScavenge = user.LastScavenge.Subtract(DateTime.UtcNow.AddHours(-6));
@@ -109,7 +110,7 @@ namespace MarbleBot.Modules
                     commands = commands.Where(c => c.Remarks != "CM Only");
                 }
 
-                if (GetUser(Context)?.Stage < 2)
+                if (MarbleBotUser.Find(Context)?.Stage < 2)
                 {
                     commands = commands.Where(c => c.Remarks != "Stage2");
                 }
@@ -178,7 +179,7 @@ namespace MarbleBot.Modules
                     json = itemFile.ReadToEnd();
                 }
 
-                var commandDict = JObject.Parse(json).ToObject<Dictionary<string, Dictionary<string, string>>>();
+                var commandDict = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
                 if (commandDict!.ContainsKey(command.Name) || command.Aliases.Any(alias => commandDict.ContainsKey(alias)))
                 {
                     example = commandDict[command.Name].ContainsKey("Example") ? commandDict[command.Name]["Example"] : "";
@@ -218,7 +219,7 @@ namespace MarbleBot.Modules
                 {
                     builder.AddField("Preconditions", command.Preconditions.Aggregate(new StringBuilder(), (builder, precondition) =>
                     {
-                        builder.AppendLine((precondition.TypeId as Type)!.Name.CamelToTitleCase());
+                        builder.AppendLine((precondition.TypeId as Type)!.Name[8..^10].CamelToTitleCase());
                         return builder;
                     }).ToString(), true);
                 }
@@ -261,12 +262,11 @@ namespace MarbleBot.Modules
                 }
             }
 
-            var owner = Context.Guild.GetUser(Context.Guild.OwnerId);
-            var mbServer = GetGuild(Context);
+            var mbServer = MarbleBotGuild.Find(Context);
 
             builder.WithThumbnailUrl(Context.Guild.IconUrl)
                 .WithTitle(Context.Guild.Name)
-                .AddField("Owner", $"{owner.Username}#{owner.Discriminator}", true)
+                .AddField("Owner", $"{Context.Guild.Owner.Username}#{Context.Guild.Owner.Discriminator}", true)
                 .AddField("Voice Region", Context.Guild.VoiceRegionId, true)
                 .AddField("Text Channels", Context.Guild.TextChannels.Count, true)
                 .AddField("Voice Channels", Context.Guild.VoiceChannels.Count, true)

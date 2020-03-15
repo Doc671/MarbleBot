@@ -3,6 +3,7 @@ using Discord.Commands;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
+using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Services;
 using NLog;
@@ -31,9 +32,9 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task AddAppealFormCommand(string link)
         {
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             guild.AppealFormLink = link;
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync("Success.");
         }
 
@@ -49,9 +50,9 @@ namespace MarbleBot.Modules
                 return;
             }
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             guild.Roles.Add(id);
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync("Succesfully updated.");
         }
 
@@ -62,9 +63,9 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task AddWarningSheetCommand(string link)
         {
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             guild.WarningSheetLink = link;
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync("Success.");
         }
 
@@ -93,7 +94,7 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task ClearChannelCommand(string option)
         {
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
                 case "announcement": guild.AnnouncementChannel = 0; break;
@@ -101,7 +102,7 @@ namespace MarbleBot.Modules
                 case "usable": guild.UsableChannels = new List<ulong>(); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
             }
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync("Succesfully cleared.");
         }
 
@@ -199,7 +200,7 @@ namespace MarbleBot.Modules
                 HttpClientInitializer = _botCredentials.GoogleUserCredential
             });
 
-            string? spreadsheetId = GetGuild(Context).WarningSheetLink;
+            string? spreadsheetId = MarbleBotGuild.Find(Context).WarningSheetLink;
             const string range = "Warnings!A3:J";
 
             var result = await service.Spreadsheets.Values.Get(spreadsheetId, range).ExecuteAsync();
@@ -445,7 +446,7 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task RemoveRoleCommand([Remainder] string searchTerm)
         {
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
             if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0) ||
                 !guild.Roles.Contains(id))
@@ -454,7 +455,7 @@ namespace MarbleBot.Modules
                 return;
             }
             guild.Roles.Remove(id);
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync("Succesfully updated.");
         }
 
@@ -469,7 +470,7 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Invalid channel!");
                 return;
             }
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
                 case "announcement": guild.AnnouncementChannel = channel; break;
@@ -477,7 +478,7 @@ namespace MarbleBot.Modules
                 case "usable": guild.UsableChannels.Add(channel); break;
                 default: await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info."); return;
             }
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync("Successfully updated.");
         }
 
@@ -493,9 +494,9 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Invalid hexadecimal colour string.");
                 return;
             }
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             guild.Color = input;
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync("Successfully updated.");
         }
 
@@ -505,9 +506,9 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task SetPrefix(string prefix)
         {
-            var guild = GetGuild(Context);
+            var guild = MarbleBotGuild.Find(Context);
             guild.Prefix = prefix;
-            WriteGuilds(GetGuildsObject(), Context.Guild, guild);
+            MarbleBotGuild.UpdateGuild(guild);
             await ReplyAsync($"Successfully updated MarbleBot's prefix for **{Context.Guild.Name}** to **{prefix}**.");
         }
 

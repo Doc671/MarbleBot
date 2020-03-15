@@ -58,7 +58,7 @@ namespace MarbleBot.Services
 
             var guild = context.IsPrivate ?
                 new MarbleBotGuild(id: 0)
-                : Modules.MarbleBotModule.GetGuild(context);
+                : MarbleBotGuild.Find(context);
 
             if (userMsg.HasStringPrefix(guild.Prefix, ref argPos) &&
 #if DEBUG

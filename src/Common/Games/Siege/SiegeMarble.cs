@@ -15,14 +15,18 @@ namespace MarbleBot.Common
         public DateTime LastPoisonTick { get; set; } = DateTime.MinValue;
         public DateTime LastStun { get; set; } = DateTime.MinValue;
 
-        public override string ToString() => $"{Name} HP: {HP}/20 [{Id}] BH: {DamageDealt} PH: {PowerUpHits} Cloned: {Cloned}";
+        public SiegeMarble(ulong id, string name, int maxHealth) : base(id, name, maxHealth)
+        {
+        }
 
-        public string ToString(SocketCommandContext context, bool HPShown = true)
+        public override string ToString() => $"{Name} Health: {Health}/20 [{Id}] BH: {DamageDealt} PH: {PowerUpHits} Cloned: {Cloned}";
+
+        public string ToString(SocketCommandContext context, bool HealthShown = true)
         {
             var user = context.Client.GetUser(Id);
-            if (HPShown)
+            if (HealthShown)
             {
-                return $"**{Name}** (HP: **{HP}**/{MaxHP}, DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
+                return $"**{Name}** (Health: **{Health}**/{MaxHealth}, DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
             }
             else
             {

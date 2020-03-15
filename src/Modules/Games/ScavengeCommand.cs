@@ -4,9 +4,7 @@ using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,7 +50,7 @@ namespace MarbleBot.Modules.Games
         [Alias("canary beach")]
         [Summary("Starts a scavenge session in Canary Beach.")]
         public async Task ScavengeCanaryCommand()
-            => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.CanaryBeach);
+            => await ScavengeStartAsync(MarbleBotUser.Find(Context), ScavengeLocation.CanaryBeach);
 
         [Command("destroyersremains")]
         [Alias("destroyer'sremains", "destroyer's remains")]
@@ -60,7 +58,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Destroyer's Remains.")]
         public async Task ScavengeDestroyerCommand()
         {
-            if (GetUser(Context).Stage < 2)
+            if (MarbleBotUser.Find(Context).Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -71,7 +69,7 @@ namespace MarbleBot.Modules.Games
             }
             else
             {
-                await ScavengeStartAsync(GetUser(Context), ScavengeLocation.DestroyersRemains);
+                await ScavengeStartAsync(MarbleBotUser.Find(Context), ScavengeLocation.DestroyersRemains);
             }
         }
 
@@ -79,7 +77,7 @@ namespace MarbleBot.Modules.Games
         [Alias("tree wurld")]
         [Summary("Starts a scavenge session in Tree Wurld.")]
         public async Task ScavengeTreeCommand()
-            => await ScavengeStartAsync(GetUser(Context), ScavengeLocation.TreeWurld);
+            => await ScavengeStartAsync(MarbleBotUser.Find(Context), ScavengeLocation.TreeWurld);
 
         [Command("violetvolcanoes")]
         [Alias("violet volcanoes")]
@@ -87,7 +85,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in the Violet Volcanoes.")]
         public async Task ScavengeVolcanoCommand()
         {
-            if (GetUser(Context).Stage < 2)
+            if (MarbleBotUser.Find(Context).Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -98,7 +96,7 @@ namespace MarbleBot.Modules.Games
             }
             else
             {
-                await ScavengeStartAsync(GetUser(Context), ScavengeLocation.VioletVolcanoes);
+                await ScavengeStartAsync(MarbleBotUser.Find(Context), ScavengeLocation.VioletVolcanoes);
             }
         }
 
@@ -107,8 +105,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Grabs an item found in a scavenge session.")]
         public async Task ScavengeGrabCommand()
         {
-            var obj = GetUsersObject();
-            var user = GetUser(Context, obj);
+            var user = MarbleBotUser.Find(Context);
 
             if (!_gamesService.ScavengeInfo.ContainsKey(Context.User.Id) || _gamesService.ScavengeInfo[Context.User.Id] == null)
             {
@@ -134,12 +131,12 @@ namespace MarbleBot.Modules.Games
             }
 
             user.NetWorth += item.Price;
-            WriteUsers(obj, Context.User, user);
+            MarbleBotUser.UpdateUser(user);
             await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
 
             // Clean up the messages created if the bot can delete messages
-            if (!Context.IsPrivate && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.ManageMessages)
+            if (!Context.IsPrivate && Context.Guild.CurrentUser.GuildPermissions.ManageMessages)
             {
                 await Task.Delay(4000);
                 await Context.Message.DeleteAsync();
@@ -165,8 +162,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var obj = GetUsersObject();
-            var user = GetUser(Context, obj);
+            var user = MarbleBotUser.Find(Context);
             if (!(user.Items.ContainsKey(81) || user.Items.ContainsKey(82)))
             {
                 await ReplyAsync($"**{Context.User.Username}**, you need a drill to mine ore!");
@@ -185,12 +181,12 @@ namespace MarbleBot.Modules.Games
             }
 
             user.NetWorth += item.Price;
-            WriteUsers(obj, Context.User, user);
+            MarbleBotUser.UpdateUser(user);
             await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully added **{item.Name}** x**1** to your inventory!");
 
             // Clean up the messages created if the bot can delete messages
-            if (!Context.IsPrivate && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.ManageMessages)
+            if (!Context.IsPrivate && Context.Guild.CurrentUser.GuildPermissions.ManageMessages)
             {
                 await Task.Delay(4000);
                 await Context.Message.DeleteAsync();
@@ -202,8 +198,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Sells an item found in a scavenge session.")]
         public async Task ScavengeSellCommand()
         {
-            var obj = GetUsersObject();
-            var user = GetUser(Context, obj);
+            var user = MarbleBotUser.Find(Context);
 
             if (!_gamesService.ScavengeInfo.ContainsKey(Context.User.Id) || _gamesService.ScavengeInfo[Context.User.Id] == null)
             {
@@ -220,12 +215,12 @@ namespace MarbleBot.Modules.Games
             _gamesService.ScavengeInfo[Context.User.Id].UsedItems.Enqueue(item);
             user.Balance += item.Price;
             user.NetWorth += item.Price;
-            WriteUsers(obj, Context.User, user);
+            MarbleBotUser.UpdateUser(user);
             await _gamesService.ScavengeInfo[Context.User.Id].UpdateEmbed();
             var confirmationMessage = await ReplyAsync($"**{Context.User.Username}**, you have successfully sold **{item.Name}** x**1** for {UnitOfMoney}**{item.Price:n2}**!");
 
             // Clean up the messages created if the bot can delete messages
-            if (!Context.IsPrivate && Context.Guild.GetUser(Context.Client.CurrentUser.Id).GuildPermissions.ManageMessages)
+            if (!Context.IsPrivate && Context.Guild.CurrentUser.GuildPermissions.ManageMessages)
             {
                 await Task.Delay(4000);
                 await Context.Message.DeleteAsync();
@@ -237,7 +232,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Shows scavenge locations.")]
         public async Task ScavengeLocationCommand()
         {
-            var stageTwoLocations = GetUser(Context).Stage > 1 ? "Destroyer's Remains\nViolet Volcanoes"
+            var stageTwoLocations = MarbleBotUser.Find(Context).Stage > 1 ? "Destroyer's Remains\nViolet Volcanoes"
                 : $":lock: LOCKED\n:lock: LOCKED";
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -262,13 +257,12 @@ namespace MarbleBot.Modules.Games
                 json = users.ReadToEnd();
             }
 
-            var obj = JObject.Parse(json);
-            var items = obj.ToObject<Dictionary<string, Item>>()!;
-            foreach (var itemPair in items)
+            var itemsDict = Item.GetItems();
+            foreach (var itemPair in itemsDict)
             {
                 if (itemPair.Value.ScavengeLocation == location)
                 {
-                    output.AppendLine($"`[{int.Parse(itemPair.Key).ToString("000")}]` {itemPair.Value.Name}");
+                    output.AppendLine($"`[{itemPair.Key:000}]` {itemPair.Value.Name}");
                 }
             }
             await ReplyAsync(embed: new EmbedBuilder()
@@ -291,7 +285,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Shows scavenge location info for Destroyer's Remains")]
         public async Task ScavengeLocationDestroyerCommand()
         {
-            if (GetUser(Context).Stage < 2)
+            if (MarbleBotUser.Find(Context).Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -318,7 +312,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Destroyer's Remains")]
         public async Task ScavengeLocationVolcanoCommand()
         {
-            if (GetUser(Context).Stage < 2)
+            if (MarbleBotUser.Find(Context).Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -339,7 +333,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Scavenge help.")]
         public async Task ScavengeHelpCommand([Remainder] string _ = "")
         {
-            bool userCanDrill = GetUser(Context).Stage > 1;
+            bool userCanDrill = MarbleBotUser.Find(Context).Stage > 1;
             const string helpP1 = "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
             const string helpP2 = "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
             const string helpP3 = "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";

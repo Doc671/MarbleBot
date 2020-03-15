@@ -1,7 +1,7 @@
 {
   "PreeTheTree": {
     "Name": "Pree the Tree",
-    "HP": 300,
+    "Health": 300,
     "Difficulty": 2,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383182197719040/BossPreeTheTree.png",
@@ -54,7 +54,7 @@
   },
   "HelpMeTheTree": {
     "Name": "Help Me the Tree",
-    "HP": 500,
+    "Health": 500,
     "Difficulty": 3,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548220911317286932/BossHelpMeTheTree.png",
@@ -95,7 +95,7 @@
   },
   "HattMann": {
     "Name": "HATT MANN",
-    "HP": 600,
+    "Health": 600,
     "Difficulty": 3,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383185481596940/BossHATTMANN.png",
@@ -136,7 +136,7 @@
   },
   "Orange": {
     "Name": "Orange",
-    "HP": 1200,
+    "Health": 1200,
     "Difficulty": 4,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383189114126339/BossOrange.png",
@@ -183,7 +183,7 @@
   },
   "Erango": {
     "Name": "erangO",
-    "HP": 1200,
+    "Health": 1200,
     "Difficulty": 5,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548221808294232071/unknown.png",
@@ -224,7 +224,7 @@
   },
   "Octopheesh": {
     "Name": "Octopheesh",
-    "HP": 800,
+    "Health": 800,
     "Difficulty": 6,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/548220914488049665/BossOctopheesh.png",
@@ -271,7 +271,7 @@
   },
   "Green": {
     "Name": "Green",
-    "HP": 1500,
+    "Health": 1500,
     "Difficulty": 7,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383199943819289/BossGreen.png",
@@ -342,7 +342,7 @@
   },
   "Destroyer": {
     "Name": "Destroyer",
-    "HP": 3720,
+    "Health": 3720,
     "Difficulty": 9,
     "Stage": 1,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/541383205048287262/BossDestroyer.png",
@@ -407,7 +407,7 @@
   },
   "Chest": {
     "Name": "Chest",
-    "HP": 1900,
+    "Health": 1900,
     "Difficulty": 4,
     "Stage": 2,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/574238015573196810/unknown.png",
@@ -466,7 +466,7 @@
   },
   "ScaryFace": {
     "Name": "Scary Face",
-    "HP": 2600,
+    "Health": 2600,
     "Difficulty": 5,
     "Stage": 2,
     "ImageUrl": "https://cdn.discordapp.com/attachments/224277738608001024/299820469064957952/unknown.png",
@@ -507,7 +507,7 @@
   },
   "Red": {
     "Name": "Red",
-    "HP": 5000,
+    "Health": 5000,
     "Difficulty": 8,
     "Stage": 2,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/572031775556108318/Red.png",
@@ -566,7 +566,7 @@
   },
   "CorruptPurple": {
     "Name": "Corrupt Purple",
-    "HP": 6000,
+    "Health": 6000,
     "Difficulty": 9,
     "Stage": 2,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/572031772875948041/Corrupt_Purple.png",
@@ -613,7 +613,7 @@
   },
   "MarbleBotPrototype": {
     "Name": "MarbleBot Prototype",
-    "HP": 7194,
+    "Health": 7194,
     "Difficulty": 9,
     "Stage": 2,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/574343417568690185/D15MambelBote.png",
@@ -666,7 +666,7 @@
   },
   "Overlord": {
     "Name": "Overlord",
-    "HP": 15000,
+    "Health": 15000,
     "Difficulty": 10,
     "Stage": 2,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/572031774222188564/Overlord.png",
@@ -713,7 +713,7 @@
   },
   "RockGolem": {
     "Name": "Rock Golem",
-    "HP": 2000,
+    "Health": 2000,
     "Difficulty": 4,
     "Stage": 3,
     "ImageUrl": "https://cdn.discordapp.com/attachments/296376584238137355/627480778535862302/unknown.png",

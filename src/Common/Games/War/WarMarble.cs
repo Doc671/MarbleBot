@@ -8,24 +8,17 @@ namespace MarbleBot.Common
         public DateTime LastRage { get; set; } = DateTime.MinValue;
         public bool Rage { get; set; } = false;
         public int Team { get; set; }
-        public WeaponClass WarClass { get; }
+        public WeaponClass WeaponClass { get; }
         public Weapon Weapon { get; }
 
-        public WarMarble(ulong id, int HP, string name, Weapon weapon, Item shield, int spikeId = 0)
+        public WarMarble(ulong id, string name, int maxHealth, Weapon weapon, Shield? shield, Spikes? spikes) : base(id, name, maxHealth)
         {
             Id = id;
-            SetHP(HP);
-            WarClass = weapon.WarClass;
-            DamageIncrease = spikeId switch
-            {
-                66 => 40,
-                71 => 60,
-                74 => 95,
-                80 => 110,
-                _ => 0
-            };
+            Health = MaxHealth = maxHealth;
+            WeaponClass = weapon.WeaponClass;
             Name = name;
             Shield = shield;
+            Spikes = spikes;
             Weapon = weapon;
         }
     }

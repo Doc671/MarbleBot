@@ -54,7 +54,7 @@ namespace MarbleBot.Modules
         [Summary("Gives advice on progression.")]
         public async Task AdviceCommand()
         {
-            MarbleBotUser user = GetUser(Context);
+            MarbleBotUser user = MarbleBotUser.Find(Context);
             string msg;
             if (user.Items.ContainsKey(78))
             {
@@ -408,7 +408,7 @@ namespace MarbleBot.Modules
                 18 => "No? I suppose not.You've used this command 18 times in the past 100 messages, after all.",
                 19 => "Hm.",
                 20 => "You know... I do actually have something for you...",
-                _ => $"Your stage is {GetUser(Context).Stage}!"
+                _ => $"Your stage is {MarbleBotUser.Find(Context).Stage}!"
             };
 
             builder.AddField("Level", level, true)

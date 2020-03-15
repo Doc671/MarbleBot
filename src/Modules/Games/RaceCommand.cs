@@ -5,7 +5,6 @@ using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -132,8 +131,7 @@ namespace MarbleBot.Modules.Games
             await ReplyAsync($"{bold2}{winningMarble.name}{bold2} won the race!");
 
             // Reward winner
-            var obj = GetUsersObject();
-            var user = await GetUserAsync(Context, obj, winningMarble.id);
+            var user = MarbleBotUser.Find(winningMarble.id);
             if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
             {
                 var noOfSameUser = 0;
@@ -157,9 +155,7 @@ namespace MarbleBot.Modules.Games
                     user.NetWorth += gift;
                     user.LastRaceWin = DateTime.UtcNow;
                     user.RaceWins++;
-                    obj.Remove(winningMarble.id.ToString());
-                    obj.Add(new JProperty(winningMarble.id.ToString(), JObject.FromObject(user)));
-                    WriteUsers(obj);
+                    MarbleBotUser.UpdateUser(user);
                     await ReplyAsync($"**{user.Name}** won {UnitOfMoney}**{gift:n2}** for winning the race!");
                 }
             }

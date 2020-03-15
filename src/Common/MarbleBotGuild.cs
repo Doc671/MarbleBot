@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Discord;
+using Discord.Commands;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace MarbleBot.Common
@@ -20,8 +23,8 @@ namespace MarbleBot.Common
 
         [JsonConstructor]
         public MarbleBotGuild(ulong id, ulong announcementChannel, ulong autoresponseChannel, string color,
-IEnumerable<ulong> roles, IEnumerable<ulong> usableChannels,
-string? warningSheetLink = null)
+            IEnumerable<ulong> roles, IEnumerable<ulong> usableChannels,
+            string? warningSheetLink = null)
         {
             Id = id;
             AnnouncementChannel = announcementChannel;
@@ -30,6 +33,59 @@ string? warningSheetLink = null)
             Roles = roles.ToList();
             UsableChannels = usableChannels.ToList();
             WarningSheetLink = warningSheetLink;
+        }
+
+        public static MarbleBotGuild Find(SocketCommandContext context)
+        {
+            var obj = GetGuilds();
+            MarbleBotGuild guild;
+            if (obj.ContainsKey(context.Guild.Id))
+            {
+                guild = obj[context.Guild.Id];
+            }
+            else
+            {
+                guild = new MarbleBotGuild(context.Guild.Id);
+            }
+            return guild;
+        }
+
+        public static IDictionary<ulong, MarbleBotGuild> GetGuilds()
+        {
+            string json;
+            using (var itemFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Guilds.json"))
+            {
+                json = itemFile.ReadToEnd();
+            }
+            return JsonConvert.DeserializeObject<IDictionary<ulong, MarbleBotGuild>>(json);
+        }
+
+        public static void UpdateGuild(MarbleBotGuild guild)
+        {
+            var guildsDict = GetGuilds();
+
+            if (guildsDict.ContainsKey(guild.Id))
+            {
+                guildsDict.Remove(guild.Id);
+            }
+
+            guildsDict.Add(guild.Id, guild);
+            using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json"));
+            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            serialiser.Serialize(guilds, guildsDict);
+        }
+
+        public static void UpdateGuilds(IDictionary<ulong, MarbleBotGuild> guildsDict, IGuild socketGuild, MarbleBotGuild mbGuild)
+        {
+            if (guildsDict.ContainsKey(socketGuild.Id))
+            {
+                guildsDict.Remove(socketGuild.Id);
+            }
+
+            guildsDict.Add(socketGuild.Id, mbGuild);
+            using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json"));
+            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            serialiser.Serialize(guilds, guildsDict);
         }
     }
 }

@@ -5,7 +5,6 @@ using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
-using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Targets;
 using System;
@@ -100,20 +99,20 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task FixBalanceCommand()
         {
-            var itemsObj = GetItemsObject();
-            var usersDict = GetUsersObject().ToObject<Dictionary<string, MarbleBotUser>>();
-            var newUsersDict = new Dictionary<string, MarbleBotUser>();
+            var itemsDict = Item.GetItems();
+            var usersDict = MarbleBotUser.GetUsers();
+            var newUsersDict = new Dictionary<ulong, MarbleBotUser>();
             foreach (var userPair in usersDict!)
             {
                 var user = userPair.Value;
                 user.Balance = user.NetWorth - (user.Items == null ? 0 : user.Items.Aggregate(0m, (total, itemPair) =>
                 {
-                    total += itemsObj[itemPair.Key.ToString("000")]!.ToObject<Item>()!.Price * itemPair.Value;
+                    total += itemsDict[itemPair.Key].Price * itemPair.Value;
                     return total;
                 }));
                 newUsersDict.Add(userPair.Key, user);
             }
-            WriteUsers(JObject.FromObject(newUsersDict));
+            MarbleBotUser.UpdateUsers(newUsersDict);
             await ReplyAsync("Success.");
         }
 
@@ -201,9 +200,9 @@ namespace MarbleBot.Modules
         [Command("update")]
         [Summary("Releases update info to all bot channels.")]
         [RequireOwner]
-        public async Task UpdateCommand(string _major, [Remainder] string info)
+        public async Task UpdateCommand(string major, [Remainder] string info)
         {
-            var major = string.Compare(_major, "major", true) == 0;
+            var isMajor = string.Compare(major, "major", true) == 0;
 
             var builder = new EmbedBuilder()
                 .WithColor(Color.Red)
@@ -211,14 +210,14 @@ namespace MarbleBot.Modules
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 
-            var guildDict = GetGuildsObject().ToObject<Dictionary<ulong, MarbleBotGuild>>();
-            foreach (var guildPair in guildDict!)
+            var guildsDict = MarbleBotGuild.GetGuilds();
+            foreach (var guildPair in guildsDict)
             {
                 if (guildPair.Value.AnnouncementChannel != 0)
                 {
                     var channel = Context.Client.GetGuild(guildPair.Key).GetTextChannel(guildPair.Value.AnnouncementChannel);
                     var msg = await channel.SendMessageAsync(embed: builder.Build());
-                    if (major)
+                    if (isMajor)
                     {
                         await msg.PinAsync();
                     }

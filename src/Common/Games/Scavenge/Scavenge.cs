@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using MarbleBot.Extensions;
-using MarbleBot.Modules;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using System;
@@ -68,14 +67,13 @@ namespace MarbleBot.Common
         {
             var stopwatch = new Stopwatch();
             var collectableItems = new List<Item>();
-            var itemObject = MarbleBotModule.GetItemsObject();
-            var items = itemObject.ToObject<Dictionary<string, Item>>()!;
+            var items = Item.GetItems();
             foreach (var itemPair in items)
             {
                 if (itemPair.Value.ScavengeLocation == Location)
                 {
                     var outputItem = itemPair.Value;
-                    outputItem = new Item(outputItem, int.Parse(itemPair.Key));
+                    outputItem = new Item(outputItem, itemPair.Key);
                     collectableItems.Add(outputItem);
                 }
             }
@@ -100,7 +98,8 @@ namespace MarbleBot.Common
 
                     await UpdateEmbed();
                 }
-            } while (stopwatch.Elapsed.TotalSeconds < 63);
+            }
+            while (stopwatch.Elapsed.TotalSeconds < 63);
             stopwatch.Stop();
 
             await OnGameEnd();
@@ -108,8 +107,7 @@ namespace MarbleBot.Common
 
         public async Task OnGameEnd()
         {
-            var usersObject = MarbleBotModule.GetUsersObject();
-            var user = MarbleBotModule.GetUser(_context, usersObject);
+            var user = MarbleBotUser.Find(_context);
             user.LastScavenge = DateTime.UtcNow;
             foreach (var item in Items)
             {
@@ -127,7 +125,7 @@ namespace MarbleBot.Common
                     user.Items.Add(item.Id, 1);
                 }
             }
-            MarbleBotModule.WriteUsers(usersObject, _context.User, user);
+            MarbleBotUser.UpdateUser(user);
 
             await UpdateEmbed(true, user.Stage);
 
