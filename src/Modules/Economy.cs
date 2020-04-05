@@ -234,7 +234,7 @@ namespace MarbleBot.Modules
 
                 decimal gift;
                 var power = user.DailyStreak > 100 ? 100 : user.DailyStreak;
-                gift = Convert.ToDecimal(Math.Round(Math.Pow(200, 1 + (Convert.ToDouble(power) / 100)), 2));
+                gift = Convert.ToDecimal(MathF.Round(MathF.Pow(200f, 1f + (power / 100f)), 2));
                 user.Balance += gift;
                 user.NetWorth += gift;
                 user.DailyStreak++;
@@ -430,7 +430,7 @@ namespace MarbleBot.Modules
                 itemOutput.Append($"**{Context.User.Username}**, there are no items on page **{page}**!");
             }
 
-            await base.ReplyAsync(embed: new EmbedBuilder()
+            await ReplyAsync(embed: new EmbedBuilder()
                 .WithAuthor(Context.Client.GetUser(id))
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -484,9 +484,9 @@ namespace MarbleBot.Modules
                         if (weapon.Ammo.Length != 0)
                         {
                             var output = new StringBuilder();
-                            foreach (var weaponId in weapon.Ammo)
+                            foreach (var ammoId in weapon.Ammo)
                             {
-                                output.AppendLine($"`[{weaponId:000}]` {Item.Find<Weapon>(weaponId.ToString("000")).Name}");
+                                output.AppendLine($"`[{ammoId:000}]` {Item.Find<Ammo>(ammoId.ToString("000")).Name}");
                             }
 
                             builder.AddField("Ammo", output.ToString(), true);
@@ -494,7 +494,6 @@ namespace MarbleBot.Modules
 
                         break;
                     }
-
                 case Ammo ammo:
                     builder.AddField("Ammo Damage", ammo.Damage, true);
                     break;
@@ -615,33 +614,20 @@ namespace MarbleBot.Modules
 
             if (user.Stage == 2)
             {
-                var shield = user.Items.ContainsKey(063) && user.Items[063] > 0 ? "Coating of Destruction" : "None";
-                var spikes = "None";
-                foreach (var itemPair in user.Items)
-                {
-                    var item = Item.Find<Item>(itemPair.Key.ToString("000"));
-                    if (item.Name.Contains("Spikes") && itemPair.Value > 0)
-                    {
-                        spikes = item.Name;
-                    }
-                }
                 builder.AddField("Stage", user.Stage, true)
-                  .AddField("Shield", shield, true)
-                  .AddField("Spikes", spikes, true);
+                  .AddField("Shield", user.GetShield()?.Name ?? "None", true)
+                  .AddField("Spikes", user.GetShield()?.Name ?? "None", true);
             }
 
             var weaponOutput = new StringBuilder();
-            foreach (var itemPair in user.Items)
+            foreach (var item in user.Items.Select(item => Item.Find<Item>(item.Key)))
             {
-                var weapon = Item.Find<Weapon>(itemPair.Key.ToString("000"));
-                if (weapon.WeaponClass == 0)
+                if (item is Weapon weapon)
                 {
-                    continue;
+                    weaponOutput.AppendLine(weapon.ToString());
                 }
-
-                weaponOutput.AppendLine(weapon.ToString());
             }
-            if (weaponOutput.Length > 0)
+            if (weaponOutput.Length != 0)
             {
                 builder.AddField("Weapons", weaponOutput.ToString());
             }

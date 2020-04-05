@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace MarbleBot.Common
 {
@@ -54,7 +53,7 @@ namespace MarbleBot.Common
         {
             if (Shield != null && Shield.Id == 63)
             {
-                damage = (int)Math.Round(damage * 0.8);
+                damage = (int)MathF.Round(damage * 0.8f);
             }
             Health -= damage;
         }

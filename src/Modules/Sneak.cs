@@ -45,24 +45,24 @@ namespace MarbleBot.Modules
         public async Task ClearMemoryCommand()
         {
             _dailyTimeoutService.DailyTimeout = 48;
-            foreach (var pair in _gamesService.ScavengeInfo)
+            foreach (var pair in _gamesService.Scavenges)
             {
                 pair.Value.Dispose();
             }
 
-            foreach (var pair in _gamesService.SiegeInfo)
+            foreach (var pair in _gamesService.Sieges)
             {
                 pair.Value.Dispose();
             }
 
-            foreach (var pair in _gamesService.WarInfo)
+            foreach (var pair in _gamesService.Wars)
             {
                 pair.Value.Dispose();
             }
 
-            _gamesService.ScavengeInfo = new ConcurrentDictionary<ulong, Scavenge>();
-            _gamesService.SiegeInfo = new ConcurrentDictionary<ulong, Siege>();
-            _gamesService.WarInfo = new ConcurrentDictionary<ulong, War>();
+            _gamesService.Scavenges = new ConcurrentDictionary<ulong, Scavenge>();
+            _gamesService.Sieges = new ConcurrentDictionary<ulong, Siege>();
+            _gamesService.Wars = new ConcurrentDictionary<ulong, War>();
 
             await ReplyAsync("Success.");
         }
@@ -184,7 +184,7 @@ namespace MarbleBot.Modules
         public async Task SiegeDictCommand()
         {
             var output = new StringBuilder();
-            foreach (var siegePair in _gamesService.SiegeInfo)
+            foreach (var siegePair in _gamesService.Sieges)
             {
                 output.AppendLine($"**{siegePair.Key}** - {siegePair.Value}");
             }
@@ -193,7 +193,7 @@ namespace MarbleBot.Modules
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
-                .WithTitle($"All Sieges: {_gamesService.SiegeInfo.Count}")
+                .WithTitle($"All Sieges: {_gamesService.Sieges.Count}")
                 .Build());
         }
 

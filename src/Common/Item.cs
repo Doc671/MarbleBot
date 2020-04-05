@@ -103,6 +103,6 @@ namespace MarbleBot.Common
             return JsonConvert.DeserializeObject<IDictionary<int, Item>>(json);
         }
 
-        public override string ToString() => $"`[{Id.ToString("000")}]` **{Name}**";
+        public override string ToString() => $"`[{Id:000}]` **{Name}**";
     }
 }

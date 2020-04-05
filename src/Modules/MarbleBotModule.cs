@@ -35,51 +35,51 @@ namespace MarbleBot.Modules
             var output = new StringBuilder();
             if (dateTime.Days > 1)
             {
-                output.Append(dateTime.Days + " days, ");
+                output.Append($"{dateTime.Days} days, ");
             }
-            else if (dateTime.Days > 0)
+            else if (dateTime.Days == 1)
             {
-                output.Append(dateTime.Days + " day, ");
+                output.Append("1 day, ");
             }
 
             if (dateTime.Hours > 1)
             {
-                output.Append(dateTime.Hours + " hours, ");
+                output.Append($"{dateTime.Hours} hours, ");
             }
-            else if (dateTime.Hours > 0)
+            else if (dateTime.Hours == 1)
             {
-                output.Append(dateTime.Hours + " hour, ");
+                output.Append("1 hour, ");
             }
 
             if (dateTime.Minutes > 1)
             {
-                output.Append(dateTime.Minutes + " minutes ");
+                output.Append($"{dateTime.Minutes} minutes ");
             }
-            else if (dateTime.Minutes > 0)
+            else if (dateTime.Minutes == 1)
             {
-                output.Append(dateTime.Minutes + " minute ");
+                output.Append("1 minute ");
             }
 
             if (dateTime.Seconds > 1)
             {
                 if (dateTime.Minutes > 0)
                 {
-                    output.Append("and " + dateTime.Seconds + " seconds");
+                    output.Append($"and {dateTime.Seconds} seconds");
                 }
                 else
                 {
                     output.Append(dateTime.Seconds + " seconds");
                 }
             }
-            else if (dateTime.Seconds > 0)
+            else if (dateTime.Seconds == 1)
             {
                 if (dateTime.Minutes > 0)
                 {
-                    output.Append("and " + dateTime.Seconds + " second");
+                    output.Append("and 1 second");
                 }
                 else
                 {
-                    output.Append(dateTime.Seconds + " second");
+                    output.Append("1 second");
                 }
             }
             else if (dateTime.TotalSeconds < 1)
@@ -94,6 +94,18 @@ namespace MarbleBot.Modules
                 }
             }
             return output.ToString();
+        }
+
+        protected internal static string GetDateString(double seconds)
+        {
+            if (seconds == 1)
+            {
+                return "**1** second";
+            }
+            else
+            {
+                return $"**{seconds:n1}** seconds";
+            }
         }
 
         protected internal async Task<IUserMessage> SendErrorAsync(string messageContent)

@@ -128,7 +128,7 @@ namespace MarbleBot.Modules.Games
                 await racers.WriteLineAsync(winningMarble.name);
             }
             await msg.ModifyAsync(_msg => _msg.Embed = builder.Build());
-            await ReplyAsync($"{bold2}{winningMarble.name}{bold2} won the race!");
+            await ReplyAsync($":trophy: | {bold2}{winningMarble.name}{bold2} won the race!");
 
             // Reward winner
             var user = MarbleBotUser.Find(winningMarble.id);
@@ -143,7 +143,7 @@ namespace MarbleBot.Modules.Games
                     }
                 }
 
-                var gift = Convert.ToDecimal(Math.Round(((Convert.ToDouble(marbleCount) / noOfSameUser) - 1) * 100, 2));
+                var gift = (decimal)MathF.Round((((float)marbleCount / noOfSameUser) - 1) * 100, 2);
                 if (gift > 0)
                 {
                     if (user.Items.ContainsKey(83))

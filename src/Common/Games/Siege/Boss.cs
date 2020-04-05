@@ -2,13 +2,14 @@ using MarbleBot.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 
 namespace MarbleBot.Common
 {
     public class Boss
     {
-        public string Name { get; set; }
+        public string Name { get; }
         private int _health;
         public int Health
         {
@@ -16,27 +17,28 @@ namespace MarbleBot.Common
             set => _health = value > MaxHealth ? MaxHealth : value < 1 ? 0 : value;
         }
         public int MaxHealth { get; }
-        public IReadOnlyCollection<Attack> Attacks { get; set; }
-        public Difficulty Difficulty { get; set; }
-        public IReadOnlyCollection<BossDrops> Drops { get; set; }
-        public string ImageUrl { get; set; }
-        public int Stage { get; set; }
+        public ImmutableArray<Attack> Attacks { get; }
+        public Difficulty Difficulty { get; }
+        public ImmutableArray<BossDrops> Drops { get; }
+        public string ImageUrl { get; }
+        public int Stage { get; }
 
         public static Boss Empty => new Boss("", 0, Difficulty.None, 1, "",
             new Attack[] { Attack.Empty },
             new BossDrops[] { new BossDrops(0, 0, 0, 0) }
         );
 
-        public Boss(string name, int health, Difficulty diff, int stage, string imgUrl, IReadOnlyCollection<Attack> atks, IReadOnlyCollection<BossDrops> itemDrops)
+        public Boss(string name, int health, Difficulty difficulty, int stage, string imageUrl,
+            IEnumerable<Attack> attacks, IEnumerable<BossDrops> itemDrops)
         {
             Name = name;
             _health = health;
             MaxHealth = health;
-            Difficulty = diff;
+            Difficulty = difficulty;
             Stage = stage;
-            Attacks = atks;
-            Drops = itemDrops;
-            ImageUrl = imgUrl;
+            Attacks = attacks.ToImmutableArray();
+            Drops = itemDrops == null ? ImmutableArray.Create<BossDrops>() : itemDrops.ToImmutableArray();
+            ImageUrl = imageUrl;
         }
 
         public static Boss GetBoss(string searchTerm)

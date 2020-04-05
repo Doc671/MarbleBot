@@ -42,7 +42,7 @@ namespace MarbleBot.Common
             }
 
             _disposed = true;
-            _gamesService.WarInfo.TryRemove(Id, out _);
+            _gamesService.Wars.TryRemove(Id, out _);
             using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.war"))
             {
                 marbleList.Write("");
@@ -69,7 +69,7 @@ namespace MarbleBot.Common
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
-                .WithTitle($"Team {winningTeam.Name} has defeated Team {(t1Total > t2Total ? Team2 : Team1).Name}!");
+                .WithTitle($"Team {winningTeam.Name} has defeated Team {(t1Total > t2Total ? Team2 : Team1).Name}! :trophy:");
             var t1Output = new StringBuilder();
             var t2Output = new StringBuilder();
 
@@ -142,7 +142,6 @@ namespace MarbleBot.Common
                 else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
                 {
                     timeout = true;
-                    break;
                 }
                 else if (_aiMarble != null && _aiMarble.Health > 0)
                 {
@@ -183,15 +182,8 @@ namespace MarbleBot.Common
             }
         }
 
-        public War(GamesService gamesService, RandomService randomService, ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble? aiMarble, WarBoost team1Boost, WarBoost team2Boost)
+        private (string, string) GetTeamNames()
         {
-            _gamesService = gamesService;
-            _randomService = randomService;
-
-            Id = id;
-            _aiMarble = aiMarble;
-
-            // Decide team names
             var nameList = new List<string>();
             using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
             {
@@ -202,12 +194,25 @@ namespace MarbleBot.Common
             }
 
             string team2Name;
-            var team1Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
+            string team1Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
             do
             {
                 team2Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
             }
             while (string.Compare(team1Name, team2Name, false) == 0);
+
+            return (team1Name, team2Name);
+        }
+
+        public War(GamesService gamesService, RandomService randomService, ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble? aiMarble, WarBoost team1Boost, WarBoost team2Boost)
+        {
+            _gamesService = gamesService;
+            _randomService = randomService;
+
+            Id = id;
+            _aiMarble = aiMarble;
+
+            (string team1Name, string team2Name) = GetTeamNames();
 
             Team1 = new WarTeam(team1Name, team1Marbles, team1Boost);
             Team2 = new WarTeam(team2Name, team2Marbles, team2Boost);

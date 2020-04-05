@@ -291,7 +291,7 @@ Func<Task> startCommand, Weapon? weapon = null)
             var binaryFormatter = new BinaryFormatter();
             if (gameType == GameType.Siege)
             {
-                if (_gamesService.SiegeInfo.ContainsKey(fileId) && _gamesService.SiegeInfo[fileId].Active)
+                if (_gamesService.Sieges.ContainsKey(fileId) && _gamesService.Sieges[fileId].Active)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
                     return;
@@ -306,7 +306,7 @@ Func<Task> startCommand, Weapon? weapon = null)
             }
             else if (gameType == GameType.War)
             {
-                if (_gamesService.WarInfo.ContainsKey(fileId))
+                if (_gamesService.Wars.ContainsKey(fileId))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, a battle is currently ongoing!");
                     return;
@@ -446,13 +446,13 @@ Func<Task> startCommand, Weapon? weapon = null)
                 if (item is Weapon weapon)
                 {
                     ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                    if (!_gamesService.SiegeInfo.ContainsKey(fileId))
+                    if (!_gamesService.Sieges.ContainsKey(fileId))
                     {
                         await SendErrorAsync($"**{Context.User.Username}**, that item can't be used here!");
                         return;
                     }
 
-                    await _gamesService.SiegeInfo[fileId].WeaponAttack(Context, weapon);
+                    await _gamesService.Sieges[fileId].WeaponAttack(Context, weapon);
                     return;
                 }
 
@@ -461,11 +461,11 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 1:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.Sieges.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
-                                foreach (var marble in _gamesService.SiegeInfo[fileId].Marbles)
+                                var userMarble = _gamesService.Sieges[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                foreach (var marble in _gamesService.Sieges[fileId].Marbles)
                                 {
                                     marble.Health = marble.MaxHealth;
                                     output.AppendLine($"**{marble.Name}** (Health: **{marble.Health}**/{marble.MaxHealth}, DMG: **{marble.DamageDealt}**) [{Context.Client.GetUser(marble.Id).Username}#{Context.Client.GetUser(marble.Id).Discriminator}]");
@@ -489,10 +489,10 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 10:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.Sieges.ContainsKey(fileId))
                             {
-                                await _gamesService.SiegeInfo[fileId].ItemAttack(item.Id,
-                                    (int)Math.Round(90 + _gamesService.SiegeInfo[fileId].Boss.MaxHealth * 0.05 * _randomService.Rand.NextDouble() * 0.12 + 0.94));
+                                await _gamesService.Sieges[fileId].ItemAttack(item.Id,
+                                    (int)Math.Round(90 + _gamesService.Sieges[fileId].Boss.MaxHealth * 0.05 * _randomService.Rand.NextDouble() * 0.12 + 0.94));
                             }
                             else
                             {
@@ -504,10 +504,10 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 14:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.Sieges.ContainsKey(fileId))
                             {
-                                await _gamesService.SiegeInfo[fileId].ItemAttack(14,
-                                    70 + 10 * (int)_gamesService.SiegeInfo[fileId].Boss.Difficulty, true);
+                                await _gamesService.Sieges[fileId].ItemAttack(14,
+                                    70 + 10 * (int)_gamesService.Sieges[fileId].Boss.Difficulty, true);
                             }
                             else
                             {
@@ -521,15 +521,15 @@ Func<Task> startCommand, Weapon? weapon = null)
                         await ReplyAsync("Er... why aren't you using `mb/craft`?");
                         break;
                     case 18:
-                        if (_gamesService.ScavengeInfo.ContainsKey(Context.User.Id))
+                        if (_gamesService.Scavenges.ContainsKey(Context.User.Id))
                         {
                             UpdateUser(item, -1);
-                            if (_gamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.CanaryBeach)
+                            if (_gamesService.Scavenges[Context.User.Id].Location == ScavengeLocation.CanaryBeach)
                             {
                                 UpdateUser(Item.Find<Item>("019"), 1);
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the water, turning it into a **Water Bucket**!");
                             }
-                            else if (_gamesService.ScavengeInfo[Context.User.Id].Location == ScavengeLocation.VioletVolcanoes)
+                            else if (_gamesService.Scavenges[Context.User.Id].Location == ScavengeLocation.VioletVolcanoes)
                             {
                                 UpdateUser(Item.Find<Item>("020"), 1);
                                 await ReplyAsync($"**{Context.User.Username}** dragged a **{item.Name}** across the lava, turning it into a **Lava Bucket**!");
@@ -558,7 +558,7 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 22:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId) && string.Compare(_gamesService.SiegeInfo[fileId].Boss.Name, "Help Me the Tree", true) == 0)
+                            if (_gamesService.Sieges.ContainsKey(fileId) && string.Compare(_gamesService.Sieges[fileId].Boss.Name, "Help Me the Tree", true) == 0)
                             {
                                 var randDish = 22 + _randomService.Rand.Next(0, 13);
                                 UpdateUser(item, -1);
@@ -587,11 +587,11 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 35:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.Sieges.ContainsKey(fileId))
                             {
                                 var output = new StringBuilder();
-                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
-                                foreach (var marble in _gamesService.SiegeInfo[fileId].Marbles)
+                                var userMarble = _gamesService.Sieges[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                foreach (var marble in _gamesService.Sieges[fileId].Marbles)
                                 {
                                     marble.StatusEffect = StatusEffect.Poison;
                                 }
@@ -614,10 +614,10 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 38:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.Sieges.ContainsKey(fileId))
                             {
-                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
-                                foreach (var marble in _gamesService.SiegeInfo[fileId].Marbles)
+                                var userMarble = _gamesService.Sieges[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                foreach (var marble in _gamesService.Sieges[fileId].Marbles)
                                 {
                                     marble.StatusEffect = StatusEffect.Doom;
                                 }
@@ -640,9 +640,9 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 39:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.Sieges.ContainsKey(fileId))
                             {
-                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                var userMarble = _gamesService.Sieges[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
                                 userMarble.StatusEffect = StatusEffect.None;
                                 await ReplyAsync(embed: new EmbedBuilder()
                                     .WithColor(GetColor(Context))
@@ -662,9 +662,9 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 57:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (_gamesService.Sieges.ContainsKey(fileId))
                             {
-                                var userMarble = _gamesService.SiegeInfo[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
+                                var userMarble = _gamesService.Sieges[fileId].Marbles.Find(m => m.Id == Context.User.Id)!;
                                 userMarble.Evade = 50;
                                 userMarble.BootsUsed = true;
                                 await ReplyAsync(embed: new EmbedBuilder()
@@ -678,9 +678,9 @@ Func<Task> startCommand, Weapon? weapon = null)
                     case 91:
                         {
                             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-                            if (!_gamesService.SiegeInfo.ContainsKey(fileId))
+                            if (!_gamesService.Sieges.ContainsKey(fileId))
                             {
-                                _gamesService.SiegeInfo.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, new List<SiegeMarble>())
+                                _gamesService.Sieges.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, new List<SiegeMarble>())
                                 {
                                     Active = false,
                                     Boss = Boss.GetBoss("Destroyer")

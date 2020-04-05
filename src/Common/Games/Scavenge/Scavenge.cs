@@ -44,7 +44,7 @@ namespace MarbleBot.Common
             }
 
             _disposed = true;
-            _gamesService.ScavengeInfo.TryRemove(Id, out _);
+            _gamesService.Scavenges.TryRemove(Id, out _);
             if (disposing && Actions != null)
             {
                 Actions.Wait();
@@ -166,14 +166,14 @@ namespace MarbleBot.Common
             {
                 fields.Add(new EmbedFieldBuilder()
                     .WithName("Items")
-                    .WithValue($"{itemOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"));
+                    .WithValue($"{itemOutput}{(gameEnded ? "" : "\nUse `mb/scavenge grab` to add the bolded item to your inventory or use `mb/scavenge sell` to sell it. ")}"));
             }
 
             if (_oreHasAppeared)
             {
                 fields.Add(new EmbedFieldBuilder()
                     .WithName("Ores")
-                    .WithValue($"{oreOutput.ToString()}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}"));
+                    .WithValue($"{oreOutput}{(gameEnded ? "" : "\nUse `mb/scavenge drill` to add the bolded ore to your inventory. A drill is required to drill ores.")}"));
             }
 
             var embed = _originalMessage.Embeds.First();
