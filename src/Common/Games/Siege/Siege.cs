@@ -333,42 +333,41 @@ namespace MarbleBot.Common
                         if (Boss.Drops.Length > 0)
                         {
                             output.AppendLine("**Item Drops:**");
-                        }
-
-                        var dropPresent = false;
-                        foreach (var itemDrops in Boss.Drops)
-                        {
-                            if (_randomService.Rand.Next(0, 100) < itemDrops.Chance)
+                            bool dropPresent = false;
+                            foreach (var itemDrops in Boss.Drops)
                             {
-                                dropPresent = true;
+                                if (_randomService.Rand.Next(0, 100) < itemDrops.Chance)
+                                {
+                                    dropPresent = true;
 
-                                int noOfDrops;
-                                if (itemDrops.MinCount == itemDrops.MaxCount)
-                                {
-                                    noOfDrops = itemDrops.MinCount;
-                                }
-                                else
-                                {
-                                    noOfDrops = _randomService.Rand.Next(itemDrops.MinCount, itemDrops.MaxCount + 1);
-                                }
+                                    int noOfDrops;
+                                    if (itemDrops.MinCount == itemDrops.MaxCount)
+                                    {
+                                        noOfDrops = itemDrops.MinCount;
+                                    }
+                                    else
+                                    {
+                                        noOfDrops = _randomService.Rand.Next(itemDrops.MinCount, itemDrops.MaxCount + 1);
+                                    }
 
-                                if (user.Items.ContainsKey(itemDrops.ItemId))
-                                {
-                                    user.Items[itemDrops.ItemId] += noOfDrops;
-                                }
-                                else
-                                {
-                                    user.Items.Add(itemDrops.ItemId, noOfDrops);
-                                }
+                                    if (user.Items.ContainsKey(itemDrops.ItemId))
+                                    {
+                                        user.Items[itemDrops.ItemId] += noOfDrops;
+                                    }
+                                    else
+                                    {
+                                        user.Items.Add(itemDrops.ItemId, noOfDrops);
+                                    }
 
-                                var item = Item.Find<Item>(itemDrops.ItemId.ToString("000"));
-                                user.NetWorth += item.Price * noOfDrops;
-                                output.AppendLine($"`[{itemDrops.ItemId:000}]` {item.Name} x{noOfDrops}");
+                                    var item = Item.Find<Item>(itemDrops.ItemId.ToString("000"));
+                                    user.NetWorth += item.Price * noOfDrops;
+                                    output.AppendLine($"`[{itemDrops.ItemId:000}]` {item.Name} x{noOfDrops}");
+                                }
                             }
-                        }
-                        if (!dropPresent)
-                        {
-                            output.AppendLine("None");
+                            if (!dropPresent)
+                            {
+                                output.AppendLine("None");
+                            }
                         }
 
                         output.AppendLine($"__**Total: {UnitOfMoney}{earnings:n2}**__");

@@ -149,7 +149,10 @@ namespace MarbleBot.Common
                     var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
                     if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
-                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * (1 + _aiMarble.DamageBoost / 100d) * (1 - 0.2 * (randMarble.Shield == null ? Convert.ToDouble(randMarble.Shield!.Id == 63) : 1) * (0.5 + _randomService.Rand.NextDouble())));
+                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * 
+                            (1 + _aiMarble.DamageBoost / 100d) * 
+                            (1 - 0.2 * (randMarble.Shield == null ? 1 : Convert.ToDouble(randMarble.Shield!.Id == 63) * 
+                            (0.5 + _randomService.Rand.NextDouble()))));
                         randMarble.Health -= dmg;
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                             .AddField("Remaining Health", $"**{randMarble.Health}**/{randMarble.MaxHealth}")

@@ -137,7 +137,7 @@ namespace MarbleBot.Modules.Games
                         0 => "094",
                         1 => "095",
                         _ => "096"
-                    }), Item.Find<Shield>("000"), Item.Find<Spikes>("000"));
+                    }), null, null);
                 }
 
                 aiMarble.Team = 2;
@@ -181,14 +181,13 @@ namespace MarbleBot.Modules.Games
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
 
-            if (!_gamesService.Wars.ContainsKey(fileId))
+            if (!_gamesService.Wars.TryGetValue(fileId, out War? war))
             {
                 await SendErrorAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
                 return;
             }
 
-            var war = _gamesService.Wars[fileId];
-            var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            var currentMarble = war!.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
             if (currentMarble == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");
@@ -338,14 +337,13 @@ namespace MarbleBot.Modules.Games
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
 
-            if (!_gamesService.Wars.ContainsKey(fileId))
+            if (!_gamesService.Wars.TryGetValue(fileId, out War? war))
             {
                 await SendErrorAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
                 return;
             }
 
-            var war = _gamesService.Wars[fileId];
-            var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            var currentMarble = war!.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
             if (currentMarble == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");
@@ -425,14 +423,13 @@ namespace MarbleBot.Modules.Games
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
 
-            if (!_gamesService.Wars.ContainsKey(fileId))
+            if (!_gamesService.Wars.TryGetValue(fileId, out War? war))
             {
                 await SendErrorAsync($"**{Context.User.Username}**, there is no currently ongoing war!");
                 return;
             }
 
-            var war = _gamesService.Wars[fileId];
-            var currentMarble = war.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            var currentMarble = war!.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
             if (currentMarble == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");

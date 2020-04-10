@@ -183,14 +183,13 @@ namespace MarbleBot.Modules.Games
         public async Task SiegeAttackCommand()
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-            if (!_gamesService.Sieges.ContainsKey(fileId) || !_gamesService.Sieges[fileId].Active)
+            if (!_gamesService.Sieges.TryGetValue(fileId, out Siege? currentSiege) || !currentSiege.Active)
             {
                 await SendErrorAsync("There is no currently ongoing Siege!");
                 return;
             }
 
-            var currentSiege = _gamesService.Sieges[fileId];
-            var currentMarble = currentSiege.Marbles.Find(m => m.Id == Context.User.Id);
+            var currentMarble = currentSiege!.Marbles.Find(m => m.Id == Context.User.Id);
             if (currentMarble == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you aren't in this Siege!");
