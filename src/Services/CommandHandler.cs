@@ -91,11 +91,6 @@ namespace MarbleBot.Services
                     await context.Channel.SendMessageAsync(autoresponses[context.Message.Content]);
                 }
             }
-
-            if (context.IsPrivate)
-            {
-                _logger.Info("{0}: {1}", context.User, context.Message);
-            }
         }
 
         private async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)

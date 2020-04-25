@@ -120,8 +120,8 @@ namespace MarbleBot.Modules
             });
 
             string videoId = url.Contains("https://www.youtube.com/watch?v=")
-                ? url.Remove(0, 32)     // removes "https://www.youtube.com/watch?v="
-                : url.Remove(0, 17);    // removes "https://youtu.be/"
+                ? url[32..]     // removes "https://www.youtube.com/watch?v="
+                : url[17..];    // removes "https://youtu.be/"
 
             var videoListRequest = youtubeService.Videos.List("snippet");
             videoListRequest.Id = videoId;
@@ -134,7 +134,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (DateTime.Now.Subtract((DateTime)video.Snippet.PublishedAt!).Days > 1)
+            if ((DateTime.Now - video.Snippet.PublishedAt!.Value).Days > 1)
             {
                 await SendErrorAsync("The video cannot be more than two days old!");
                 return;

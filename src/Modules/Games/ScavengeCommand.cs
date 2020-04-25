@@ -23,10 +23,10 @@ namespace MarbleBot.Modules.Games
 
         public async Task ScavengeStartAsync(MarbleBotUser user, ScavengeLocation location)
         {
-            if (DateTime.UtcNow.Subtract(user.LastScavenge).TotalHours < 6)
+            if ((DateTime.UtcNow - user.LastScavenge).TotalHours < 6)
             {
                 var sixHoursAgo = DateTime.UtcNow.AddHours(-6);
-                await SendErrorAsync($"**{Context.User.Username}**, you need to wait for **{GetDateString(user.LastScavenge.Subtract(sixHoursAgo))}** until you can scavenge again.");
+                await SendErrorAsync($"**{Context.User.Username}**, you need to wait for **{GetTimeSpanSentence(user.LastScavenge - sixHoursAgo)}** until you can scavenge again.");
             }
             else
             {

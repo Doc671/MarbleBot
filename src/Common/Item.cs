@@ -33,7 +33,7 @@ namespace MarbleBot.Common
             Stage = stage ?? 1;
             ScavengeLocation = scavengeLocation ?? ScavengeLocation.None;
             CraftingProduced = craftingProduced ?? 0;
-            CraftingRecipe = craftingRecipe ?? new Dictionary<int, int>();
+            CraftingRecipe = craftingRecipe;
             CraftingStationRequired = craftingStationRequired ?? 0;
         }
 

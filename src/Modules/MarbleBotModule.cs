@@ -30,7 +30,7 @@ namespace MarbleBot.Modules
             }
         }
 
-        protected internal static string GetDateString(TimeSpan dateTime)
+        protected internal static string GetTimeSpanSentence(TimeSpan dateTime)
         {
             var output = new StringBuilder();
             if (dateTime.Days > 1)

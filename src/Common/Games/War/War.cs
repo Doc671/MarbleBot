@@ -63,8 +63,8 @@ namespace MarbleBot.Common
             }
 
             _endCalled = true;
-            var t1Total = Team1.Marbles.Sum(m => m.Health);
-            var t2Total = Team2.Marbles.Sum(m => m.Health);
+            int t1Total = Team1.Marbles.Sum(m => m.Health);
+            int t2Total = Team2.Marbles.Sum(m => m.Health);
             var winningTeam = t1Total > t2Total ? Team1 : Team2;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
@@ -92,7 +92,7 @@ namespace MarbleBot.Common
             foreach (var marble in winningTeam.Marbles)
             {
                 var user = await MarbleBotUser.FindAsync(context, usersDict, marble.Id);
-                if (DateTime.UtcNow.Subtract(user.LastWarWin).TotalHours > 6 && marble.DamageDealt > 0)
+                if ((DateTime.UtcNow - user.LastWarWin).TotalHours > 6 && marble.DamageDealt > 0)
                 {
                     var output = new StringBuilder();
                     var earnings = marble.DamageDealt * 5;
@@ -139,7 +139,7 @@ namespace MarbleBot.Common
                 {
                     return;
                 }
-                else if (DateTime.UtcNow.Subtract(startTime).TotalMinutes >= 10)
+                else if ((DateTime.UtcNow - startTime).TotalMinutes >= 10)
                 {
                     timeout = true;
                 }
@@ -149,9 +149,9 @@ namespace MarbleBot.Common
                     var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
                     if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                     {
-                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage * 
-                            (1 + _aiMarble.DamageBoost / 100d) * 
-                            (1 - 0.2 * (randMarble.Shield == null ? 1 : Convert.ToDouble(randMarble.Shield!.Id == 63) * 
+                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage *
+                            (1 + _aiMarble.DamageBoost / 100d) *
+                            (1 - 0.2 * (randMarble.Shield == null ? 1 : Convert.ToDouble(randMarble.Shield!.Id == 63) *
                             (0.5 + _randomService.Rand.NextDouble()))));
                         randMarble.Health -= dmg;
                         await context.Channel.SendMessageAsync(embed: new EmbedBuilder()

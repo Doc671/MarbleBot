@@ -39,18 +39,18 @@ namespace MarbleBot.Modules
         [Summary("Shows bot info.")]
         public async Task BotInfoCommand()
             => await ReplyAsync(embed: new EmbedBuilder()
-                .AddField("Daily Timeout", $"{_dailyTimeoutService.DailyTimeout} hours", true)
-                .AddField("Ongoing Scavenges", _gamesService.Scavenges.Count, true)
-                .AddField("Ongoing Sieges", _gamesService.Sieges.Count, true)
-                .AddField("Ongoing Wars", _gamesService.Wars.Count, true)
-                .AddField("Servers", MarbleBotGuild.GetGuilds().Count, true)
-                .AddField("Start Time (UTC)", _startTimeService.StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
-                .AddField("Uptime", DateTime.UtcNow.Subtract(_startTimeService.StartTime).ToString(), true)
-                .WithAuthor(Context.Client.CurrentUser)
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
-                .WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator}")
-                .Build());
+                    .AddField("Daily Timeout", $"{_dailyTimeoutService.DailyTimeout} hours", true)
+                    .AddField("Ongoing Scavenges", _gamesService.Scavenges.Count, true)
+                    .AddField("Ongoing Sieges", _gamesService.Sieges.Count, true)
+                    .AddField("Ongoing Wars", _gamesService.Wars.Count, true)
+                    .AddField("Servers", MarbleBotGuild.GetGuilds().Count, true)
+                    .AddField("Start Time (UTC)", _startTimeService.StartTime.ToString("yyyy-MM-dd HH:mm:ss"), true)
+                    .AddField("Uptime", (DateTime.UtcNow - _startTimeService.StartTime).ToString(), true)
+                    .WithAuthor(Context.Client.CurrentUser)
+                    .WithColor(GetColor(Context))
+                    .WithCurrentTimestamp()
+                    .WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator}")
+                    .Build());
 
         [Command("checkearn")]
         [Alias("check", "checktimes")]
@@ -58,11 +58,11 @@ namespace MarbleBot.Modules
         public async Task CheckTimesCommand()
         {
             var user = MarbleBotUser.Find(Context);
-            var timeUntilNextDaily = user.LastDaily.Subtract(DateTime.UtcNow.AddHours(-24));
-            var timeUntilNextRace = user.LastRaceWin.Subtract(DateTime.UtcNow.AddHours(-6));
-            var timeUntilNextScavenge = user.LastScavenge.Subtract(DateTime.UtcNow.AddHours(-6));
-            var timeUntilNextSiege = user.LastSiegeWin.Subtract(DateTime.UtcNow.AddHours(-6));
-            var timeUntilNextWar = user.LastWarWin.Subtract(DateTime.UtcNow.AddHours(-6));
+            var timeUntilNextDaily = user.LastDaily - DateTime.UtcNow.AddHours(-24);
+            var timeUntilNextRace = user.LastRaceWin - DateTime.UtcNow.AddHours(-6);
+            var timeUntilNextScavenge = user.LastScavenge - DateTime.UtcNow.AddHours(-6);
+            var timeUntilNextSiege = user.LastSiegeWin - DateTime.UtcNow.AddHours(-6);
+            var timeUntilNextWar = user.LastWarWin - DateTime.UtcNow.AddHours(-6);
             await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Daily", timeUntilNextDaily.TotalHours < 0 ? "**Ready!**" : timeUntilNextDaily.ToString(@"hh\:mm\:ss"), true)
                 .AddField("Race", timeUntilNextRace.TotalHours < 0 ? "**Ready!**" : timeUntilNextRace.ToString(@"hh\:mm\:ss"), true)
@@ -232,12 +232,12 @@ namespace MarbleBot.Modules
         [Alias("invitelink")]
         [Summary("Gives the bot's invite link.")]
         public async Task InviteCommand() => await ReplyAsync(new StringBuilder()
-                .AppendLine("Use this link to invite MarbleBot to your guild: https://discordapp.com/oauth2/authorize?client_id=286228526234075136&scope=bot&permissions=1")
-                .Append("\nUse `mb/setchannel announcement <channel ID>` to set the channel where bot updates get posted, ")
-                .Append("`mb/setchannel autoresponse <channel ID>` to set the channel where autoresponses can be used and ")
-                .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used! ")
-                .Append("If no usable channel is set, commands can be used anywhere.")
-                .ToString());
+            .AppendLine("Use this link to invite MarbleBot to your guild: https://discordapp.com/oauth2/authorize?client_id=286228526234075136&scope=bot&permissions=1")
+            .Append("\nUse `mb/setchannel announcement <channel ID>` to set the channel where bot updates get posted, ")
+            .Append("`mb/setchannel autoresponse <channel ID>` to set the channel where autoresponses can be used and ")
+            .Append("`mb/setchannel usable <channel ID>` to set a channel where commands can be used! ")
+            .Append("If no usable channel is set, commands can be used anywhere.")
+            .ToString());
 
         [Command("serverinfo")]
         [Alias("guildinfo")]
@@ -248,15 +248,14 @@ namespace MarbleBot.Modules
             var builder = new EmbedBuilder();
             int botUsers = 0;
             int onlineUsers = 0;
-            SocketGuildUser[] users = Context.Guild.Users.ToArray();
-            for (int i = 0; i < Context.Guild.Users.Count - 1; i++)
+            foreach (var user in Context.Guild.Users)
             {
-                if (users[i].IsBot)
+                if (user.IsBot)
                 {
                     botUsers++;
                 }
 
-                if (users[i].Status.ToString().ToLower() == "online")
+                if (user.Status != UserStatus.Offline)
                 {
                     onlineUsers++;
                 }
@@ -293,9 +292,12 @@ namespace MarbleBot.Modules
             if (mbServer.UsableChannels.Count != 0)
             {
                 var output = new StringBuilder();
-                foreach (var channel in mbServer.UsableChannels)
+                foreach (var channelId in mbServer.UsableChannels)
                 {
-                    output.AppendLine($"<#{channel}>");
+                    if ((Context.User as IGuildUser)!.GetPermissions(Context.Guild.GetChannel(channelId)).ViewChannel)
+                    {
+                        output.AppendLine($"<#{channelId}>");
+                    }
                 }
 
                 builder.AddField("Usable Channels", output.ToString(), true);
@@ -338,7 +340,7 @@ namespace MarbleBot.Modules
         [Command("uptime")]
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommand()
-        => await ReplyAsync($"The bot has been running for **{GetDateString(DateTime.UtcNow.Subtract(_startTimeService.StartTime))}**.");
+        => await ReplyAsync($"The bot has been running for **{GetTimeSpanSentence(DateTime.UtcNow - _startTimeService.StartTime)}**.");
 
         [Command("userinfo")]
         [Summary("Displays information about a user.")]

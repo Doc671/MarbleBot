@@ -10,23 +10,20 @@ namespace MarbleBot.Common
     public class Boss
     {
         public string Name { get; }
+
         private int _health;
         public int Health
         {
             get => _health;
             set => _health = value > MaxHealth ? MaxHealth : value < 1 ? 0 : value;
         }
+
         public int MaxHealth { get; }
         public ImmutableArray<Attack> Attacks { get; }
         public Difficulty Difficulty { get; }
         public ImmutableArray<BossDrops> Drops { get; }
         public string ImageUrl { get; }
         public int Stage { get; }
-
-        public static Boss Empty => new Boss("", 0, Difficulty.None, 1, "",
-            new Attack[] { Attack.Empty },
-            new BossDrops[] { new BossDrops(0, 0, 0, 0) }
-        );
 
         public Boss(string name, int health, Difficulty difficulty, int stage, string imageUrl,
             IEnumerable<Attack> attacks, IEnumerable<BossDrops> itemDrops)

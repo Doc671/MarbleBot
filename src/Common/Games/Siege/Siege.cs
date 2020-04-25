@@ -16,13 +16,13 @@ namespace MarbleBot.Common
     public class Siege : IMarbleBotGame
     {
         public Task? Actions { get; set; }
-        public bool Active { get; set; } = true;
-        public Boss Boss { get; set; } = Boss.Empty;
+        public bool Active { get; private set; } = false;
+        public int ActiveMoraleBoosts { get; set; }
+        public Boss? Boss { get; set; } = null;
         public float DamageMultiplier { get; private set; } = 1f;
         public ulong Id { get; }
         public DateTime LastMorale { get; set; } = DateTime.MinValue;
-        public List<SiegeMarble> Marbles { get; set; }
-        public int Morales { get; set; }
+        public List<SiegeMarble> Marbles { get; }
         public PowerUp PowerUp { get; set; }
 
         private readonly SocketCommandContext _context;
@@ -51,13 +51,13 @@ namespace MarbleBot.Common
         }
 
         // Separate task dealing with time-based boss responses
-        public async Task BossActions()
+        private async Task BossActions()
         {
             var startTime = DateTime.UtcNow;
             bool timeout = false;
 
             await Task.Delay(15000);
-            while (Boss.Health > 0 && !timeout && Marbles.Any(m => m.Health != 0) && !_disposed)
+            while (Boss!.Health > 0 && !timeout && Marbles.Any(m => m.Health != 0) && !_disposed)
             {
                 var attack = Boss.Attacks[_randomService.Rand.Next(0, Boss.Attacks.Length)];
                 var embedBuilder = new EmbedBuilder()
@@ -85,9 +85,9 @@ namespace MarbleBot.Common
                 }
 
                 // Wear off Morale Boost
-                if (Morales > 0 && DateTime.UtcNow.Subtract(LastMorale).TotalSeconds > 20)
+                if (ActiveMoraleBoosts > 0 && (DateTime.UtcNow - LastMorale).TotalSeconds > 20)
                 {
-                    Morales--;
+                    ActiveMoraleBoosts--;
                     embedBuilder.AddField("Morale Boost has worn off!",
                         $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
                 }
@@ -98,7 +98,7 @@ namespace MarbleBot.Common
 
                 await Task.Delay(15000);
 
-                timeout = DateTime.UtcNow.Subtract(startTime).TotalMinutes > 20;
+                timeout = (DateTime.UtcNow - startTime).TotalMinutes > 20;
             }
 
             if (Boss.Health > 0 && !_disposed)
@@ -131,7 +131,7 @@ namespace MarbleBot.Common
 
         public async Task DealDamageToBoss(int damageToDeal)
         {
-            Boss.Health -= damageToDeal;
+            Boss!.Health -= damageToDeal;
             if (Boss.Health < 1)
             {
                 await OnVictory();
@@ -225,7 +225,7 @@ namespace MarbleBot.Common
                 return;
             }
 
-            double totalSeconds = DateTime.UtcNow.Subtract(marble.LastMoveUsed).TotalSeconds;
+            double totalSeconds = (DateTime.UtcNow - marble.LastMoveUsed).TotalSeconds;
             if (totalSeconds < 5)
             {
                 await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you must wait for {GetDateString(5 - totalSeconds):n2} until you can act again!");
@@ -242,7 +242,7 @@ namespace MarbleBot.Common
 
             damage = (int)MathF.Round(damage * DamageMultiplier);
             await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                .AddField("Boss Health", $"**{Math.Max(Boss.Health - damage, 0)}**/{Boss.MaxHealth}")
+                .AddField("Boss Health", $"**{Math.Max(Boss!.Health - damage, 0)}**/{Boss.MaxHealth}")
                 .WithAuthor(_context.User)
                 .WithColor(GetColor(_context))
                 .WithCurrentTimestamp()
@@ -279,7 +279,7 @@ namespace MarbleBot.Common
                 .WithColor(GetColor(_context))
                 .WithCurrentTimestamp()
                 .WithTitle("Siege Victory! :trophy:")
-                .WithDescription($"**{Boss.Name}** has been defeated!");
+                .WithDescription($"**{Boss!.Name}** has been defeated!");
             var usersDict = MarbleBotUser.GetUsers();
 
             for (int i = 0; i < Marbles.Count; i++)
@@ -301,7 +301,7 @@ namespace MarbleBot.Common
                 }
 
                 int earnings = marble.DamageDealt + (marble.PowerUpHits * 50);
-                if (DateTime.UtcNow.Subtract(user.LastSiegeWin).TotalHours > 6 && marble.DamageDealt > 0)
+                if ((DateTime.UtcNow - user.LastSiegeWin).TotalHours > 6 && marble.DamageDealt > 0)
                 {
                     output.AppendLine($"Damage dealt: {UnitOfMoney}**{marble.DamageDealt:n2}**");
 
@@ -389,14 +389,14 @@ namespace MarbleBot.Common
             switch (marble.StatusEffect)
             {
                 case StatusEffect.Doom:
-                    if (DateTime.UtcNow.Subtract(marble.DoomStart).TotalSeconds > 45)
+                    if ((DateTime.UtcNow - marble.DoomStart).TotalSeconds > 45)
                     {
                         marble.Health = 0;
                         embedBuilder.AddField($"**{marble.Name}** has died of Doom!", $"Health: **0**/{marble.MaxHealth}\nDamage Multiplier: **{DamageMultiplier}**");
                     }
                     break;
                 case StatusEffect.Poison:
-                    if (DateTime.UtcNow.Subtract(marble.LastPoisonTick).TotalSeconds > 15)
+                    if ((DateTime.UtcNow - marble.LastPoisonTick).TotalSeconds > 15)
                     {
                         if (marble.Health < 1)
                         {
@@ -450,9 +450,15 @@ namespace MarbleBot.Common
             }
         }
 
-        public override string ToString() => $"[{Id}] {Boss.Name}: {Marbles.Count}";
+        public void Start()
+        {
+            Actions = Task.Run(async () => { await BossActions(); });
+            Active = true;
+        }
 
-        public async Task WeaponAttack(SocketCommandContext _context, Weapon weapon)
+        public override string ToString() => $"[{Id}] {Boss?.Name}: {Marbles.Count}";
+
+        public async Task WeaponAttack(Weapon weapon)
         {
             if (_disposed)
             {
@@ -473,7 +479,7 @@ namespace MarbleBot.Common
                 return;
             }
 
-            double totalSeconds = DateTime.UtcNow.Subtract(marble.LastMoveUsed).TotalSeconds;
+            double totalSeconds = (DateTime.UtcNow - marble.LastMoveUsed).TotalSeconds;
             if (totalSeconds < 5)
             {
                 await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you must wait for {GetDateString(5 - totalSeconds):n2} until you can act again!");
@@ -520,7 +526,7 @@ namespace MarbleBot.Common
                     totalDamage = (int)Math.Round((weapon.Damage + (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
                         * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                     marble.LastMoveUsed = DateTime.UtcNow;
-                    builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{totalDamage}** damage to **{Boss.Name}**!");
+                    builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{totalDamage}** damage to **{Boss!.Name}**!");
                 }
                 else
                 {
@@ -536,7 +542,7 @@ namespace MarbleBot.Common
                         damage = (int)Math.Round((weapon.Damage + (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery ? ammo.Damage : 0.0))
                             * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                         totalDamage += damage;
-                        builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss.Name}**.");
+                        builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss!.Name}**.");
                     }
                     else
                     {
@@ -546,7 +552,7 @@ namespace MarbleBot.Common
                     await Task.Delay(1);
                 }
                 marble.DamageDealt += totalDamage;
-                builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing a total of **{totalDamage}** damage to **{Boss.Name}**!");
+                builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing a total of **{totalDamage}** damage to **{Boss!.Name}**!");
 
                 if (totalDamage != 0)
                 {
@@ -555,7 +561,7 @@ namespace MarbleBot.Common
             }
 
             await _context.Channel.SendMessageAsync(embed: builder
-                        .AddField("Boss Health", $"**{Math.Max(Boss.Health - totalDamage, 0)}**/{Boss.MaxHealth}")
+                        .AddField("Boss Health", $"**{Math.Max(Boss!.Health - totalDamage, 0)}**/{Boss.MaxHealth}")
                         .Build());
 
             await DealDamageToBoss(totalDamage);

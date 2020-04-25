@@ -200,14 +200,14 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            double totalSeconds = DateTime.UtcNow.Subtract(currentMarble.LastMoveUsed).TotalSeconds;
+            double totalSeconds = (DateTime.UtcNow - currentMarble.LastMoveUsed).TotalSeconds;
             if (totalSeconds < 5)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you must wait for {GetDateString(5 - totalSeconds)} until you can attack again!");
                 return;
             }
 
-            if (currentMarble.Rage && DateTime.UtcNow.Subtract(currentMarble.LastRage).Seconds > 20)
+            if (currentMarble.Rage && (DateTime.UtcNow - currentMarble.LastRage).Seconds > 20)
             {
                 currentMarble.DamageBoost = (currentMarble.DamageBoost - 100) / 2;
                 currentMarble.Rage = false;
@@ -356,14 +356,14 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            double totalSeconds = DateTime.UtcNow.Subtract(currentMarble.LastMoveUsed).TotalSeconds;
+            double totalSeconds = (DateTime.UtcNow - currentMarble.LastMoveUsed).TotalSeconds;
             if (totalSeconds < 5)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you must wait for {GetDateString(5 - totalSeconds)} until you can attack again!");
                 return;
             }
 
-            if (currentMarble.Rage && DateTime.UtcNow.Subtract(currentMarble.LastRage).Seconds > 20)
+            if (currentMarble.Rage && (DateTime.UtcNow - currentMarble.LastRage).Seconds > 20)
             {
                 currentMarble.DamageBoost = (currentMarble.DamageBoost - 100) / 2;
                 currentMarble.Rage = false;

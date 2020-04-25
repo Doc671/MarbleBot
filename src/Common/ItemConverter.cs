@@ -27,7 +27,7 @@ namespace MarbleBot.Common
                     jObject["Stage"]?.ToObject<int>(),
                     jObject["ScavengeLocation"]?.ToObject<ScavengeLocation>(),
                     jObject["CraftingProduced"]?.ToObject<int>(),
-                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>>(),
+                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>?>(),
                     jObject["CraftingStationRequired"]?.ToObject<int>(),
                     jObject["Accuracy"]?.ToObject<int>(),
                     jObject["Ammo"]?.ToObject<int[]>(),
@@ -45,7 +45,7 @@ namespace MarbleBot.Common
                     jObject["Stage"]?.ToObject<int>(),
                     jObject["ScavengeLocation"]?.ToObject<ScavengeLocation>(),
                     jObject["CraftingProduced"]?.ToObject<int>(),
-                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>>(),
+                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>?>(),
                     jObject["CraftingStationRequired"]?.ToObject<int>(),
                     jObject["Damage"]?.ToObject<int>());
             }
@@ -59,7 +59,7 @@ namespace MarbleBot.Common
                     jObject["Stage"]?.ToObject<int>(),
                     jObject["ScavengeLocation"]?.ToObject<ScavengeLocation>(),
                     jObject["CraftingProduced"]?.ToObject<int>(),
-                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>>(),
+                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>?>(),
                     jObject["CraftingStationRequired"]?.ToObject<int>(),
                     jObject["DamageAbsorption"]?.ToObject<int>());
             }
@@ -73,7 +73,7 @@ namespace MarbleBot.Common
                     jObject["Stage"]?.ToObject<int>(),
                     jObject["ScavengeLocation"]?.ToObject<ScavengeLocation>(),
                     jObject["CraftingProduced"]?.ToObject<int>(),
-                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>>(),
+                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>?>(),
                     jObject["CraftingStationRequired"]?.ToObject<int>(),
                     jObject["DamageBoost"]?.ToObject<int>());
             }
@@ -87,7 +87,7 @@ namespace MarbleBot.Common
                     jObject["Stage"]?.ToObject<int>(),
                     jObject["ScavengeLocation"]?.ToObject<ScavengeLocation>(),
                     jObject["CraftingProduced"]?.ToObject<int>(),
-                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>>(),
+                    jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>?>(),
                     jObject["CraftingStationRequired"]?.ToObject<int>());
             }
 

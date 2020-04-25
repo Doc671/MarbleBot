@@ -132,7 +132,7 @@ namespace MarbleBot.Modules.Games
 
             // Reward winner
             var user = MarbleBotUser.Find(winningMarble.id);
-            if (DateTime.UtcNow.Subtract(user.LastRaceWin).TotalHours > 6)
+            if ((DateTime.UtcNow - user.LastRaceWin).TotalHours > 6)
             {
                 var noOfSameUser = 0;
                 foreach (var (id, name) in marbles)
