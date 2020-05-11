@@ -148,7 +148,7 @@ namespace MarbleBot.Modules.Games
             var team1Boost = (WarBoost)_randomService.Rand.Next(1, 4);
             var team2Boost = (WarBoost)_randomService.Rand.Next(1, 4);
 
-            var war = new War(_gamesService, _randomService, fileId, team1, team2, aiMarble, team1Boost, team2Boost);
+            var war = new War(Context, _gamesService, _randomService, fileId, team1, team2, aiMarble, team1Boost, team2Boost);
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -164,14 +164,15 @@ namespace MarbleBot.Modules.Games
             }
 
             _gamesService.Wars.GetOrAdd(fileId, war);
-            war.Actions = Task.Run(async () => { await war.WarActions(Context); });
+
+            war.Start();
         }
 
         [Command("stop")]
         [RequireOwner]
         public async Task WarStopCommand()
         {
-            _gamesService.Wars[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Dispose();
+            _gamesService.Wars[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Finalise();
             await ReplyAsync("War successfully stopped.");
         }
 

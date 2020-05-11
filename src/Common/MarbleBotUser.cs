@@ -130,6 +130,8 @@ namespace MarbleBot.Common
             if (userDict.ContainsKey(id))
             {
                 user = userDict[id];
+                user.Name = context.User.Username;
+                user.Discriminator = context.User.Discriminator;
             }
             else
             {
@@ -149,6 +151,8 @@ namespace MarbleBot.Common
             if (usersDict.ContainsKey(context.User.Id))
             {
                 user = usersDict[context.User.Id];
+                user.Name = context.User.Username;
+                user.Discriminator = context.User.Discriminator;
             }
             else
             {
@@ -213,8 +217,6 @@ namespace MarbleBot.Common
                 usersDict.Remove(socketUser.Id);
             }
 
-            newMBUser.Name = socketUser.Username;
-            newMBUser.Discriminator = socketUser.Discriminator;
             usersDict.Add(socketUser.Id, newMBUser);
             using var userWriter = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
             var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };

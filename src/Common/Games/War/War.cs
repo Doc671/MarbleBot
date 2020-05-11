@@ -8,14 +8,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Timers;
 using static MarbleBot.Modules.MarbleBotModule;
 
 namespace MarbleBot.Common
 {
-    public class War : IMarbleBotGame
+    public class War
     {
-        public Task? Actions { get; set; }
         public IEnumerable<WarMarble> AllMarbles => Team1.Marbles.Union(Team2.Marbles);
         public ulong Id { get; set; }
 
@@ -23,36 +22,66 @@ namespace MarbleBot.Common
         public WarTeam Team2 { get; set; }
 
         private readonly WarMarble? _aiMarble;
-        private bool _disposed = false;
         private bool _endCalled = false;
+        private bool _finished = false;
+        private readonly SocketCommandContext _context;
         private readonly GamesService _gamesService;
+        private DateTime _startTime;
+        private readonly Timer _timer = new Timer(7000);
         private readonly RandomService _randomService;
 
-        public void Dispose()
+        public War(SocketCommandContext context, GamesService gamesService, RandomService randomService, ulong id,
+                   IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble? aiMarble,
+                   WarBoost team1Boost, WarBoost team2Boost)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            _context = context;
+            _gamesService = gamesService;
+            _randomService = randomService;
+
+            Id = id;
+            _aiMarble = aiMarble;
+
+            (string team1Name, string team2Name) = GetTeamNames();
+
+            Team1 = new WarTeam(team1Name, team1Marbles, team1Boost);
+            Team2 = new WarTeam(team2Name, team2Marbles, team2Boost);
+
+            _timer.Elapsed += Timer_Elapsed;
         }
 
-        protected virtual void Dispose(bool disposing)
+        public void Finalise()
         {
-            if (_disposed)
+            if (_finished)
             {
                 return;
             }
 
-            _disposed = true;
+            _finished = true;
             _gamesService.Wars.TryRemove(Id, out _);
-            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.war"))
+            using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.war");
+            marbleList.Write("");
+        }
+
+        private (string, string) GetTeamNames()
+        {
+            var nameList = new List<string>();
+            using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
             {
-                marbleList.Write("");
+                while (!teamNames.EndOfStream)
+                {
+                    nameList.Add(teamNames.ReadLine()!);
+                }
             }
 
-            if (disposing && Actions != null)
+            string team2Name;
+            string team1Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
+            do
             {
-                Actions.Wait();
-                Actions.Dispose();
+                team2Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
             }
+            while (string.Compare(team1Name, team2Name, false) == 0);
+
+            return (team1Name, team2Name);
         }
 
         public async Task OnGameEnd(SocketCommandContext context)
@@ -125,102 +154,55 @@ namespace MarbleBot.Common
             }
             await context.Channel.SendMessageAsync(embed: builder.Build());
             MarbleBotUser.UpdateUsers(usersDict);
-            Dispose(true);
+            Finalise();
         }
 
-        public async Task WarActions(SocketCommandContext context)
+        public void Start()
         {
-            var startTime = DateTime.UtcNow;
-            var timeout = false;
-            do
-            {
-                await Task.Delay(7000);
-                if (_disposed)
-                {
-                    return;
-                }
-                else if ((DateTime.UtcNow - startTime).TotalMinutes >= 10)
-                {
-                    timeout = true;
-                }
-                else if (_aiMarble != null && _aiMarble.Health > 0)
-                {
-                    var enemyTeam = _aiMarble.Team == 1 ? Team2 : Team1;
-                    var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
-                    if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
-                    {
-                        var dmg = (int)Math.Round(_aiMarble.Weapon.Damage *
-                            (1 + _aiMarble.DamageBoost / 100d) *
-                            (1 - 0.2 * (randMarble.Shield == null ? 1 : Convert.ToDouble(randMarble.Shield!.Id == 63) *
-                            (0.5 + _randomService.Rand.NextDouble()))));
-                        randMarble.Health -= dmg;
-                        await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                            .AddField("Remaining Health", $"**{randMarble.Health}**/{randMarble.MaxHealth}")
-                            .WithColor(GetColor(context))
-                            .WithCurrentTimestamp()
-                            .WithDescription($"**{_aiMarble.Name}** dealt **{dmg}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
-                            .WithTitle($"**{_aiMarble.Name}** attacks!")
-                            .Build());
-                    }
-                    else
-                    {
-                        await context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                            .WithColor(GetColor(context))
-                            .WithCurrentTimestamp()
-                            .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
-                            .WithTitle($"**{_aiMarble.Name}** attacks!")
-                            .Build());
-                    }
-                }
-            }
-            while (!timeout && !_disposed && !Team1.Marbles.All(m => m.Health == 0) && !Team2.Marbles.All(m => m.Health == 0));
-
-            if (!timeout)
-            {
-                await OnGameEnd(context);
-            }
-            else
-            {
-                Dispose(true);
-            }
+            _startTime = DateTime.UtcNow;
+            _timer.Start();
         }
 
-        private (string, string) GetTeamNames()
+        private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
         {
-            var nameList = new List<string>();
-            using (var teamNames = new StreamReader($"Resources{Path.DirectorySeparatorChar}WarTeamNames.txt"))
+            if (_aiMarble != null && _aiMarble.Health > 0)
             {
-                while (!teamNames.EndOfStream)
+                var enemyTeam = Team2;
+                var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
+                if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                 {
-                    nameList.Add(teamNames.ReadLine()!);
+                    var damage = (int)Math.Round(_aiMarble.Weapon.Damage *
+                        (1 + _aiMarble.DamageBoost / 100d) *
+                        (1 - 0.2 * (randMarble.Shield == null ? 1 : Convert.ToDouble(randMarble.Shield!.Id == 63) *
+                        (0.5 + _randomService.Rand.NextDouble()))));
+                    randMarble.Health -= damage;
+                    await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        .AddField("Remaining Health", $"**{randMarble.Health}**/{randMarble.MaxHealth}")
+                        .WithColor(GetColor(_context))
+                        .WithCurrentTimestamp()
+                        .WithDescription($"**{_aiMarble.Name}** dealt **{damage}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
+                        .WithTitle($"**{_aiMarble.Name}** attacks! :boom:")
+                        .Build());
+                }
+                else
+                {
+                    await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                        .WithColor(GetColor(_context))
+                        .WithCurrentTimestamp()
+                        .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
+                        .WithTitle($"**{_aiMarble.Name}** attacks! :boom:")
+                        .Build());
                 }
             }
 
-            string team2Name;
-            string team1Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
-            do
+            if ((DateTime.UtcNow - _startTime).TotalMinutes >= 10)
             {
-                team2Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
+                await OnGameEnd(_context);
             }
-            while (string.Compare(team1Name, team2Name, false) == 0);
-
-            return (team1Name, team2Name);
+            else if (Team1.Marbles.Sum(marble => marble.Health) == 0) // AI marble is always on team 2
+            {
+                await OnGameEnd(_context);
+            }
         }
-
-        public War(GamesService gamesService, RandomService randomService, ulong id, IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble? aiMarble, WarBoost team1Boost, WarBoost team2Boost)
-        {
-            _gamesService = gamesService;
-            _randomService = randomService;
-
-            Id = id;
-            _aiMarble = aiMarble;
-
-            (string team1Name, string team2Name) = GetTeamNames();
-
-            Team1 = new WarTeam(team1Name, team1Marbles, team1Boost);
-            Team2 = new WarTeam(team2Name, team2Marbles, team2Boost);
-        }
-
-        ~War() => Dispose(false);
     }
 }

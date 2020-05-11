@@ -124,8 +124,7 @@ namespace MarbleBot.Modules.Games
                 }
             }
 
-            Siege currentSiege = _gamesService.Sieges.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, marbles));
-            currentSiege.Boss = boss;
+            Siege currentSiege = _gamesService.Sieges.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, boss, marbles));
 
             int marbleHealth = ((int)boss.Difficulty + 2) * 5;
             foreach (SiegeMarble marble in marbles)
@@ -169,7 +168,7 @@ namespace MarbleBot.Modules.Games
         [RequireOwner]
         public async Task SiegeStopCommand()
         {
-            _gamesService.Sieges[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Dispose();
+            _gamesService.Sieges[Context.IsPrivate ? Context.User.Id : Context.Guild.Id].Finalise();
             await ReplyAsync("Siege successfully stopped.");
         }
 
@@ -408,13 +407,14 @@ namespace MarbleBot.Modules.Games
                 .WithCurrentTimestamp()
                 .WithTitle("Siege Info");
 
-            if (_gamesService.Sieges.TryGetValue(fileId, out Siege? siege))
+            if (!_gamesService.Sieges.TryGetValue(fileId, out Siege? siege))
             {
                 builder.AddField("Marbles", "No-one is signed up!");
+                await ReplyAsync(embed: builder.Build());
                 return;
             }
 
-            if (siege!.Active)
+            if (siege.Active)
             {
                 foreach (var marble in siege.Marbles)
                 {

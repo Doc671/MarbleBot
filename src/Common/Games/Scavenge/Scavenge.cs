@@ -5,16 +5,15 @@ using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace MarbleBot.Common
 {
-    public class Scavenge : IMarbleBotGame
+    public class Scavenge
     {
-        public Task? Actions { get; set; }
         public ulong Id { get; set; }
         public Queue<Item> Items { get; set; } = new Queue<Item>();
         public ScavengeLocation Location { get; set; }
@@ -22,87 +21,45 @@ namespace MarbleBot.Common
         public Queue<Item> UsedItems { get; set; } = new Queue<Item>();
         public Queue<Item> UsedOres { get; set; } = new Queue<Item>();
 
-        private bool _disposed = false;
+        private readonly List<Item> _collectableItems;
+        private bool _finished = false;
         private bool _itemHasAppeared = false;
         private bool _oreHasAppeared = false;
+        private readonly DateTime _startTime;
         private readonly SocketCommandContext _context;
         private readonly IUserMessage _originalMessage;
+        private readonly Timer _timer = new Timer(8000);
         private readonly GamesService _gamesService;
         private readonly RandomService _randomService;
 
-        public void Dispose()
+        public Scavenge(SocketCommandContext context, GamesService gamesService, RandomService randomService, ScavengeLocation location, IUserMessage message)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            _collectableItems = new List<Item>();
+            _context = context;
+            _gamesService = gamesService;
+            _randomService = randomService;
+            _originalMessage = message;
+
+            Id = context.User.Id;
+            Location = location;
+
+            _timer.Elapsed += Timer_Elapsed;
+
+            PopulateCollectableItems();
+
+            _startTime = DateTime.Now;
+            _timer.Start();
         }
 
-        protected virtual void Dispose(bool disposing)
+        public void Finalise()
         {
-            if (_disposed)
+            if (_finished)
             {
                 return;
             }
 
-            _disposed = true;
+            _finished = true;
             _gamesService.Scavenges.TryRemove(Id, out _);
-            if (disposing && Actions != null)
-            {
-                Actions.Wait();
-                Actions.Dispose();
-            }
-        }
-
-        public Scavenge(SocketCommandContext context, GamesService gamesService, RandomService randomService, ScavengeLocation location, IUserMessage message)
-        {
-            _context = context;
-            _gamesService = gamesService;
-            _randomService = randomService;
-            Actions = Task.Run(async () => { await Session(); });
-            Id = context.User.Id;
-            Location = location;
-            _originalMessage = message;
-        }
-
-        private async Task Session()
-        {
-            var stopwatch = new Stopwatch();
-            var collectableItems = new List<Item>();
-            var items = Item.GetItems();
-            foreach (var itemPair in items)
-            {
-                if (itemPair.Value.ScavengeLocation == Location)
-                {
-                    var outputItem = itemPair.Value;
-                    outputItem = new Item(outputItem, itemPair.Key);
-                    collectableItems.Add(outputItem);
-                }
-            }
-
-            stopwatch.Start();
-            do
-            {
-                await Task.Delay(8000);
-                if (_randomService.Rand.Next(0, 5) < 4)
-                {
-                    var item = collectableItems[_randomService.Rand.Next(0, collectableItems.Count)];
-                    if (item.Name.Contains("Ore"))
-                    {
-                        Ores.Enqueue(item);
-                        _oreHasAppeared = true;
-                    }
-                    else
-                    {
-                        Items.Enqueue(item);
-                        _itemHasAppeared = true;
-                    }
-
-                    await UpdateEmbed();
-                }
-            }
-            while (stopwatch.Elapsed.TotalSeconds < 63);
-            stopwatch.Stop();
-
-            await OnGameEnd();
         }
 
         public async Task OnGameEnd()
@@ -129,7 +86,47 @@ namespace MarbleBot.Common
 
             await UpdateEmbed(true, user.Stage);
 
-            Dispose(true);
+            Finalise();
+        }
+
+        private void PopulateCollectableItems()
+        {
+            var items = Item.GetItems();
+            foreach (var itemPair in items)
+            {
+                if (itemPair.Value.ScavengeLocation == Location)
+                {
+                    var outputItem = itemPair.Value;
+                    outputItem = new Item(outputItem, itemPair.Key);
+                    _collectableItems.Add(outputItem);
+                }
+            }
+        }
+
+        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (_randomService.Rand.Next(0, 5) < 4)
+            {
+                var item = _collectableItems[_randomService.Rand.Next(0, _collectableItems.Count)];
+                if (item.Name.Contains("Ore"))
+                {
+                    Ores.Enqueue(item);
+                    _oreHasAppeared = true;
+                }
+                else
+                {
+                    Items.Enqueue(item);
+                    _itemHasAppeared = true;
+                }
+
+                await UpdateEmbed();
+            }
+
+            if ((e.SignalTime - _startTime).TotalSeconds >= 64)
+            {
+                _timer.Stop();
+                await OnGameEnd();
+            }
         }
 
         public async Task UpdateEmbed(bool gameEnded = false, int stage = 1)
@@ -188,7 +185,5 @@ namespace MarbleBot.Common
                 Title = $"Item Scavenge: {Enum.GetName(typeof(ScavengeLocation), Location)!.CamelToTitleCase()}"
             }.Build());
         }
-
-        ~Scavenge() => Dispose(false);
     }
 }

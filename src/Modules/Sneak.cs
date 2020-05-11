@@ -47,17 +47,17 @@ namespace MarbleBot.Modules
             _dailyTimeoutService.DailyTimeout = 48;
             foreach (var pair in _gamesService.Scavenges)
             {
-                pair.Value.Dispose();
+                pair.Value.Finalise();
             }
 
             foreach (var pair in _gamesService.Sieges)
             {
-                pair.Value.Dispose();
+                pair.Value.Finalise();
             }
 
             foreach (var pair in _gamesService.Wars)
             {
-                pair.Value.Dispose();
+                pair.Value.Finalise();
             }
 
             _gamesService.Scavenges = new ConcurrentDictionary<ulong, Scavenge>();

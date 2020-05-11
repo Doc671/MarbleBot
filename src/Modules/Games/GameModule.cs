@@ -687,10 +687,7 @@ namespace MarbleBot.Modules.Games
                         ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
                         if (!_gamesService.Sieges.ContainsKey(fileId))
                         {
-                            _gamesService.Sieges.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, new List<SiegeMarble>())
-                            {
-                                Boss = Boss.GetBoss("Destroyer")
-                            });
+                            _gamesService.Sieges.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, Boss.GetBoss("Destroyer"), new List<SiegeMarble>()));
                             await ReplyAsync("*You hear the whirring of machinery...*");
                         }
                         else

@@ -8,17 +8,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Timers;
 using static MarbleBot.Modules.MarbleBotModule;
 
 namespace MarbleBot.Common
 {
-    public class Siege : IMarbleBotGame
+    public class Siege
     {
-        public Task? Actions { get; set; }
         public bool Active { get; private set; } = false;
         public int ActiveMoraleBoosts { get; set; }
-        public Boss? Boss { get; set; } = null;
+        public Boss Boss { get; set; }
         public float DamageMultiplier { get; private set; } = 1f;
         public ulong Id { get; }
         public DateTime LastMorale { get; set; } = DateTime.MinValue;
@@ -26,10 +25,24 @@ namespace MarbleBot.Common
         public PowerUp PowerUp { get; set; }
 
         private readonly SocketCommandContext _context;
-        private bool _disposed = false;
+        private bool _finished = false;
         private readonly GamesService _gamesService;
         private readonly RandomService _randomService;
+        private DateTime _startTime;
+        private readonly Timer _timer = new Timer(15000);
         private bool _victoryCalled = false;
+
+        public Siege(SocketCommandContext context, GamesService gamesService, RandomService randomService, Boss boss, IEnumerable<SiegeMarble> marbles)
+        {
+            _context = context;
+            _gamesService = gamesService;
+            _randomService = randomService;
+            Id = _context.IsPrivate ? _context.User.Id : _context.Guild.Id;
+            Boss = boss;
+            Marbles = marbles.ToList();
+
+            _timer.Elapsed += Timer_Elapsed;
+        }
 
         private void AttackMarble(SiegeMarble marble, Attack attack, EmbedBuilder embedBuilder, ref bool attackMissed)
         {
@@ -50,120 +63,27 @@ namespace MarbleBot.Common
             }
         }
 
-        // Separate task dealing with time-based boss responses
-        private async Task BossActions()
-        {
-            var startTime = DateTime.UtcNow;
-            bool timeout = false;
-
-            await Task.Delay(15000);
-            while (Boss!.Health > 0 && !timeout && Marbles.Any(m => m.Health != 0) && !_disposed)
-            {
-                var attack = Boss.Attacks[_randomService.Rand.Next(0, Boss.Attacks.Length)];
-                var embedBuilder = new EmbedBuilder()
-                    .WithAuthor(Boss.Name, Boss.ImageUrl)
-                    .WithColor(GetColor(_context))
-                    .WithCurrentTimestamp()
-                    .WithDescription($"**{Boss.Name}** used **{attack.Name}**!")
-                    .WithTitle($"WARNING: {attack.Name.ToUpper()} INBOUND! :warning:");
-
-                bool attackMissed = true;
-                var aliveMarbles = Marbles.Where(marble => marble.Health != 0);
-                foreach (var marble in aliveMarbles)
-                {
-                    AttackMarble(marble, attack, embedBuilder, ref attackMissed);
-                }
-
-                if (attackMissed)
-                {
-                    embedBuilder.AddField("Missed!", "No-one got hurt!");
-                }
-
-                foreach (var marble in aliveMarbles)
-                {
-                    PerformStatusEffect(marble, embedBuilder);
-                }
-
-                // Wear off Morale Boost
-                if (ActiveMoraleBoosts > 0 && (DateTime.UtcNow - LastMorale).TotalSeconds > 20)
-                {
-                    ActiveMoraleBoosts--;
-                    embedBuilder.AddField("Morale Boost has worn off!",
-                        $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
-                }
-
-                SpawnNewPowerUp(embedBuilder);
-
-                await _context.Channel.SendMessageAsync(embed: embedBuilder.Build());
-
-                await Task.Delay(15000);
-
-                timeout = (DateTime.UtcNow - startTime).TotalMinutes > 20;
-            }
-
-            if (Boss.Health > 0 && !_disposed)
-            {
-                if (timeout)
-                {
-                    await _context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
-                }
-                else
-                {
-                    var marbles = new StringBuilder();
-                    foreach (var marble in Marbles)
-                    {
-                        marbles.AppendLine(marble.ToString(_context, false));
-                    }
-
-                    await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
-                        .WithAuthor(Boss.Name, Boss.ImageUrl)
-                        .WithColor(GetColor(_context))
-                        .WithCurrentTimestamp()
-                        .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal Health: **{Boss.Health}**/{Boss.MaxHealth}")
-                        .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
-                        .WithThumbnailUrl(Boss.ImageUrl)
-                        .WithTitle("Siege Failure! :skull_crossbones:")
-                        .Build());
-                }
-                Dispose(true);
-            }
-        }
-
         public async Task DealDamageToBoss(int damageToDeal)
         {
             Boss!.Health -= damageToDeal;
             if (Boss.Health < 1)
             {
+                _timer.Stop();
                 await OnVictory();
             }
         }
 
-        public void Dispose()
+        public void Finalise()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_disposed)
+            if (_finished)
             {
                 return;
             }
 
-            Active = false;
-            _disposed = true;
-            using (var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.siege"))
-            {
-                marbleList.Write("");
-            }
-
+            _finished = true;
             _gamesService.Sieges.TryRemove(Id, out _);
-            if (disposing && Actions != null)
-            {
-                Actions.Wait();
-                Actions.Dispose();
-            }
+            using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.siege");
+            marbleList.Write("");
         }
 
         public static string GetPowerUpImageUrl(PowerUp powerUp)
@@ -206,7 +126,7 @@ namespace MarbleBot.Common
 
         public async Task ItemAttack(int itemId, int damage, bool consumable = false)
         {
-            if (_disposed)
+            if (_finished)
             {
                 await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, there is no currently ongoing Siege!");
                 return;
@@ -265,6 +185,27 @@ namespace MarbleBot.Common
             {
                 marble.QefpedunCharmUsed = true;
             }
+        }
+
+        private async Task OnFailure()
+        {
+            var marbles = new StringBuilder();
+            foreach (var marble in Marbles)
+            {
+                marbles.AppendLine(marble.ToString(_context, false));
+            }
+
+            await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
+                .WithAuthor(Boss.Name, Boss.ImageUrl)
+                .WithColor(GetColor(_context))
+                .WithCurrentTimestamp()
+                .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal Health: **{Boss.Health}**/{Boss.MaxHealth}")
+                .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
+                .WithThumbnailUrl(Boss.ImageUrl)
+                .WithTitle("Siege Failure! :skull_crossbones:")
+                .Build());
+
+            Finalise();
         }
 
         private async Task OnVictory()
@@ -381,7 +322,7 @@ namespace MarbleBot.Common
             }
             await _context.Channel.SendMessageAsync(embed: builder.Build());
             MarbleBotUser.UpdateUsers(usersDict);
-            Dispose(true);
+            Finalise();
         }
 
         private void PerformStatusEffect(SiegeMarble marble, EmbedBuilder embedBuilder)
@@ -452,15 +393,68 @@ namespace MarbleBot.Common
 
         public void Start()
         {
-            Actions = Task.Run(async () => { await BossActions(); });
             Active = true;
+            _startTime = DateTime.UtcNow;
+            _timer.Start();
+        }
+
+        private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
+        {
+            var attack = Boss.Attacks[_randomService.Rand.Next(0, Boss.Attacks.Length)];
+            var embedBuilder = new EmbedBuilder()
+                .WithAuthor(Boss.Name, Boss.ImageUrl)
+                .WithColor(GetColor(_context))
+                .WithCurrentTimestamp()
+                .WithDescription($"**{Boss.Name}** used **{attack.Name}**!")
+                .WithTitle($"WARNING: {attack.Name.ToUpper()} INBOUND! :warning:");
+
+            bool attackMissed = true;
+            var aliveMarbles = Marbles.Where(marble => marble.Health != 0);
+            foreach (var marble in aliveMarbles)
+            {
+                AttackMarble(marble, attack, embedBuilder, ref attackMissed);
+            }
+
+            if (attackMissed)
+            {
+                embedBuilder.AddField("Missed!", "No-one got hurt!");
+            }
+
+            foreach (var marble in aliveMarbles)
+            {
+                PerformStatusEffect(marble, embedBuilder);
+            }
+
+            // Wear off Morale Boost
+            if (ActiveMoraleBoosts > 0 && (DateTime.UtcNow - LastMorale).TotalSeconds > 20)
+            {
+                ActiveMoraleBoosts--;
+                embedBuilder.AddField("Morale Boost has worn off!",
+                    $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
+            }
+
+            SpawnNewPowerUp(embedBuilder);
+
+            await _context.Channel.SendMessageAsync(embed: embedBuilder.Build());
+
+            if ((DateTime.UtcNow - _startTime).TotalMinutes > 20)
+            {
+                _timer.Stop();
+                await _context.Channel.SendMessageAsync("20 minute timeout reached! Siege aborted!");
+                Finalise();
+            }
+            else if (Marbles.Sum(marble => marble.Health) == 0)
+            {
+                _timer.Stop();
+                await OnFailure();
+            }
         }
 
         public override string ToString() => $"[{Id}] {Boss?.Name}: {Marbles.Count}";
 
         public async Task WeaponAttack(Weapon weapon)
         {
-            if (_disposed)
+            if (_finished)
             {
                 await _context.Channel.SendMessageAsync("There is no currently ongoing Siege!");
                 return;
@@ -567,16 +561,5 @@ namespace MarbleBot.Common
             await DealDamageToBoss(totalDamage);
             marble.DamageDealt += totalDamage;
         }
-
-        public Siege(SocketCommandContext context, GamesService gamesService, RandomService randomService, IEnumerable<SiegeMarble> marbles)
-        {
-            _context = context;
-            _gamesService = gamesService;
-            _randomService = randomService;
-            Id = _context.IsPrivate ? _context.User.Id : _context.Guild.Id;
-            Marbles = marbles.ToList();
-        }
-
-        ~Siege() => Dispose(false);
     }
 }
