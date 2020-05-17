@@ -187,7 +187,7 @@ namespace MarbleBot.Modules
                     if (craftable)
                     {
                         itemInfo = $"`[{itemPair.Key:000}]` {itemPair.Value.Name}: {noCraftable}";
-                        if (output.Length + itemInfo.Length > 2048)
+                        if (output.Length + itemInfo.Length > EmbedFieldBuilder.MaxFieldValueLength)
                         {
                             currentPart++;
                             embed.AddField($"Part {currentPart}", output.ToString());
@@ -460,7 +460,7 @@ namespace MarbleBot.Modules
                 .AddField("ID", $"{item.Id:000}", true)
                 .AddField("Price", price, true)
                 .AddField("For Sale", item.OnSale ? "Yes" : "No", true)
-                .AddField("Scavenge Location", Enum.GetName(typeof(ScavengeLocation), item.ScavengeLocation), true);
+                .AddField("Scavenge Location", item.ScavengeLocation, true);
 
             if (user.Stage > 1)
             {
@@ -472,7 +472,7 @@ namespace MarbleBot.Modules
                 case Weapon weapon:
                     {
                         builder.AddField("Weapon Info", new StringBuilder()
-                            .AppendLine($"Class: **{Enum.GetName(typeof(WeaponClass), weapon.WeaponClass)}**")
+                            .AppendLine($"Class: **{weapon.WeaponClass}**")
                             .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
                             .AppendLine($"Damage: **{weapon.Damage}**")
                             .AppendLine($"Uses: **{weapon.Hits}**"), true);
@@ -499,7 +499,7 @@ namespace MarbleBot.Modules
                 case Shield shield:
                     builder.AddField("Shield Damage Absorption:", $"{shield.DamageAbsorption}%");
                     break;
-                    
+
             }
 
             if (item.CraftingRecipe != null)
@@ -694,65 +694,63 @@ namespace MarbleBot.Modules
         [Command("richlist")]
         [Alias("richest", "top10", "leaderboard", "networthleaderboard")]
         [Summary("Shows the ten richest people globally by Net Worth.")]
-        public async Task RichListCommand(string rawPage = "1")
+        public async Task RichListCommand(int page = 1)
         {
-            if (!int.TryParse(rawPage, out int page))
-            {
-                await SendErrorAsync($"**{Context.User.Username}**, this is not a valid integer!");
-                return;
-            }
-
             if (page < 1)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, the leaderboard page must be at least one!");
                 return;
             }
 
-            var richList = from user in MarbleBotUser.GetUsers() orderby user.Value.NetWorth descending select user.Value;
-            var dataList = new List<(int place, MarbleBotUser user)>();
-            int displayedPlace = 0;
-            decimal lastValue = 0m;
+            var richList = (from user in MarbleBotUser.GetUsers()
+                           orderby user.Value.NetWorth descending
+                           select (place: 0, user: user.Value))
+                           .ToArray();
 
-            foreach (var user in richList)
-            {
-                if (user.NetWorth != lastValue)
-                {
-                    displayedPlace++;
-                }
-
-                dataList.Add((displayedPlace, user));
-                lastValue = user.NetWorth;
-            }
-
-            if (page > dataList.Last().place / 10)
+            if (page > (richList.Length / 10) + 1)
             {
                 await ReplyAsync($"**{Context.User.Username}**, there is nobody in page **{page}**!");
                 return;
             }
 
-            int maxValue = page * 10, minValue = (page - 1) * 10 + 1, userPos = 0;
-            var output = new StringBuilder();
-            foreach (var (place, user) in dataList)
+            int displayedPlace = 0;
+            decimal lastValue = 0m;
+            for (int i = 0; i < richList.Length; i++)
             {
-                if (place < maxValue + 1 && place >= minValue)
+                var (place, user) = richList[i];
+                if (user.NetWorth != lastValue)
+                {
+                    displayedPlace++;
+                }
+                lastValue = user.NetWorth;
+                richList[i] = (displayedPlace, user);
+            }
+
+            int maxIndex = page * 10 - 1, minIndex = (page - 1) * 10, currentUserIndex = 0;
+            var output = new StringBuilder();
+            for (int i = 0; i < richList.Length; i++)
+            {
+                var (place, user) = richList[i];
+                if (i < maxIndex + 1 && i >= minIndex)
                 {
                     output.AppendLine($"{place}{place.Ordinal()}: {user.Name}#{user.Discriminator} - {UnitOfMoney}**{user.NetWorth:n2}**");
                 }
 
-                if (string.Compare(user.Name, Context.User.Username, false) == 0 && string.Compare(user.Discriminator, Context.User.Discriminator) == 0)
+                if (user.Id == Context.User.Id)
                 {
-                    userPos = place;
+                    currentUserIndex = place;
                 }
             }
 
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithTitle("Net Worth Leaderboard")
+                .WithTitle($"Net Worth Leaderboard: Page {page}")
                 .WithDescription(output.ToString());
-            if (userPos != 0)
+
+            if (currentUserIndex != 0)
             {
-                builder.WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator} ({userPos}{userPos.Ordinal()})", Context.User.GetAvatarUrl());
+                builder.WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator} ({currentUserIndex}{currentUserIndex.Ordinal()})", Context.User.GetAvatarUrl());
             }
             else
             {

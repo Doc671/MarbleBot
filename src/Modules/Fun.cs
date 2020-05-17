@@ -318,7 +318,7 @@ namespace MarbleBot.Modules
 
             if (colorEnumerable.Count() > 0)
             {
-                builder.WithTitle(Enum.GetName(typeof(System.Drawing.KnownColor), colorEnumerable.First())!.CamelToTitleCase());
+                builder.WithTitle(colorEnumerable.First().ToString().CamelToTitleCase());
             }
 
             await ReplyAsync(embed: builder.Build());

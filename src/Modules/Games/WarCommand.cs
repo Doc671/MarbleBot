@@ -154,8 +154,8 @@ namespace MarbleBot.Modules.Games
                 .WithCurrentTimestamp()
                 .WithDescription("Use `mb/war attack <marble name>` to attack with your weapon and `mb/war bash <marble name>` to attack without.")
                 .WithTitle("Let the battle commence! :crossed_swords:")
-                .AddField($"Team {war.Team1.Name}", $"Boost: **{Enum.GetName(typeof(WarBoost), team1Boost)!.CamelToTitleCase()}**\n{t1Output}")
-                .AddField($"Team {war.Team2.Name}", $"Boost: **{Enum.GetName(typeof(WarBoost), team2Boost)!.CamelToTitleCase()}**\n{t2Output}")
+                .AddField($"Team {war.Team1.Name}", $"Boost: **{team1Boost.ToString().CamelToTitleCase()}**\n{t1Output}")
+                .AddField($"Team {war.Team2.Name}", $"Boost: **{team2Boost.ToString().CamelToTitleCase()}**\n{t2Output}")
                 .Build());
 
             if (pings.Length != 0)
@@ -519,12 +519,12 @@ namespace MarbleBot.Modules.Games
                         }
                 }
                 builder.AddField("Boost successful!", output.ToString())
-                    .WithTitle($"{currentTeam.Name}: **{Enum.GetName(typeof(WarBoost), currentTeam.Boost)!.CamelToTitleCase()}** used!");
+                    .WithTitle($"{currentTeam.Name}: **{currentTeam.Boost.ToString().CamelToTitleCase()}** used!");
             }
             else
             {
                 builder.AddField("Boost failed!",
-                    $"**{boosters}** out of the required **{boostsRequired}** team members have chosen to use Team {currentTeam.Name}'s **{Enum.GetName(typeof(WarBoost), currentTeam.Boost)!.CamelToTitleCase()}**.");
+                    $"**{boosters}** out of the required **{boostsRequired}** team members have chosen to use Team {currentTeam.Name}'s **{currentTeam.Boost.ToString().CamelToTitleCase()}**.");
             }
 
             await ReplyAsync(embed: builder.Build());
@@ -639,19 +639,24 @@ namespace MarbleBot.Modules.Games
                         }
                     }
                 }
+
                 var winList = new List<(string elementName, int value)>();
                 foreach (var winner in winners)
                 {
                     winList.Add((winner.Key, winner.Value));
                 }
 
-                winList = (from winner in winList orderby winner.value descending select winner).ToList();
-                await ReplyAsync(embed: new EmbedBuilder()
+                winList = (from winner in winList 
+                           orderby winner.value 
+                           descending select winner)
+                           .ToList();
+
+                var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
-                    .WithDescription(Leaderboard(winList, page))
-                    .WithTitle("War Leaderboard: Most Used")
-                    .Build());
+                    .WithTitle("War Leaderboard: Most Used");
+
+                await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
             }
             else
             {
@@ -706,7 +711,7 @@ namespace MarbleBot.Modules.Games
                     weapon = (Weapon)itemPair.Value;
                     if (weapon.WeaponClass != 0 && weapon.WeaponClass != WeaponClass.Artillery && weapon.Stage <= MarbleBotUser.Find(Context).Stage)
                     {
-                        output.AppendLine($"{weapon} ({Enum.GetName(typeof(WeaponClass), weapon.WeaponClass)})");
+                        output.AppendLine($"{weapon} ({weapon.WeaponClass})");
                     }
                 }
             }

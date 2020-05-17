@@ -182,7 +182,7 @@ namespace MarbleBot.Common
                     : "Scavenge session ongoing.",
                 Fields = fields,
                 Timestamp = embed.Timestamp,
-                Title = $"Item Scavenge: {Enum.GetName(typeof(ScavengeLocation), Location)!.CamelToTitleCase()}"
+                Title = $"Item Scavenge: {Location.ToString().CamelToTitleCase()}"
             }.Build());
         }
     }

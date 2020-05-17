@@ -111,6 +111,37 @@ namespace MarbleBot.Modules
         protected internal async Task<IUserMessage> SendErrorAsync(string messageContent)
             => await ReplyAsync($":warning: | {messageContent}");
 
+        protected internal async Task SendLargeEmbedDescriptionAsync(EmbedBuilder builder, string content)
+        {
+            if (content.Length > EmbedBuilder.MaxDescriptionLength)
+            {
+                bool endOfMessageReached = false;
+                string currentMessageSlice;
+                int currentMessageNo = 0;
+                while (!endOfMessageReached)
+                {
+                    currentMessageSlice = content[(EmbedBuilder.MaxDescriptionLength * currentMessageNo)..(EmbedBuilder.MaxDescriptionLength * (currentMessageNo + 1))];
+
+                    if (currentMessageSlice.Length < EmbedBuilder.MaxDescriptionLength)
+                    {
+                        endOfMessageReached = true;
+                    }
+                    else
+                    {
+                        currentMessageNo++;
+                    }
+
+                    builder.WithDescription(currentMessageSlice);
+                    await ReplyAsync(embed: builder.Build());
+                }
+            }
+            else
+            {
+                builder.WithDescription(content.ToString());
+                await ReplyAsync(embed: builder.Build());
+            }
+        }
+
         protected static string StageTooHighString()
             => (new Random().Next(0, 6)) switch
             {

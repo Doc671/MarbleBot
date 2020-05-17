@@ -142,7 +142,7 @@ namespace MarbleBot.Modules.Games
                 .AddField($"Boss: **{boss.Name}**", new StringBuilder()
                     .AppendLine($"Health: **{boss.Health}**")
                     .AppendLine($"Attacks: **{boss.Attacks.Length}**")
-                    .AppendLine($"Difficulty: **{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
+                    .AppendLine($"Difficulty: **{boss.Difficulty} {(int)boss.Difficulty}**/10")
                     .ToString());
 
             // Siege Start
@@ -337,7 +337,7 @@ namespace MarbleBot.Modules.Games
                         break;
                     case PowerUp.Cure:
                         builder.WithTitle("Cured!")
-                            .WithDescription($"**{currentMarble.Name}** has been cured of **{Enum.GetName(typeof(StatusEffect), currentMarble.StatusEffect)}**!");
+                            .WithDescription($"**{currentMarble.Name}** has been cured of **{currentMarble.StatusEffect}**!");
                         currentMarble.StatusEffect = StatusEffect.None;
                         break;
                     case PowerUp.MoraleBoost:
@@ -421,7 +421,7 @@ namespace MarbleBot.Modules.Games
                     marbleOutput.AppendLine(marble.ToString(Context));
                 }
 
-                builder.AddField($"Boss: **{siege.Boss!.Name}**", $"\nHealth: **{siege.Boss.Health}**/{siege.Boss.MaxHealth}\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**");
+                builder.AddField($"Boss: **{siege.Boss!.Name}**", $"\nHealth: **{siege.Boss.Health}**/{siege.Boss.MaxHealth}\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{siege.Boss.Difficulty}**");
 
                 if (marbleOutput.Length > 1024)
                 {
@@ -437,14 +437,14 @@ namespace MarbleBot.Modules.Games
                     builder.AddField($"Marbles: **{siege.Marbles.Count}**", marbleOutput.ToString());
                 }
 
-                builder.WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{Enum.GetName(typeof(PowerUp), siege.PowerUp)!.CamelToTitleCase()}**")
+                builder.WithDescription($"Damage Multiplier: **{siege.DamageMultiplier}**\nActive Power-up: **{siege.PowerUp.ToString().CamelToTitleCase()}**")
                      .WithThumbnailUrl(siege.Boss.ImageUrl);
             }
             else
             {
                 if (siege.Boss != null)
                 {
-                    builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHealth: **{siege.Boss.MaxHealth}**\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{Enum.GetName(typeof(Difficulty), siege.Boss.Difficulty)}**")
+                    builder.AddField($"Boss: **{siege.Boss.Name}**", $"\nHealth: **{siege.Boss.MaxHealth}**\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{siege.Boss.Difficulty}**")
                         .WithThumbnailUrl(siege.Boss.ImageUrl);
                 }
 
@@ -510,7 +510,7 @@ namespace MarbleBot.Modules.Games
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Health", $"**{currentMarble.Health}**/{currentMarble.MaxHealth}", true)
-                .AddField("Status Effect", Enum.GetName(typeof(StatusEffect), currentMarble.StatusEffect), true)
+                .AddField("Status Effect", currentMarble.StatusEffect, true)
                 .AddField("Shield", currentMarble.Shield?.Name, true)
                 .AddField("Damage Increase", $"{currentMarble.DamageBoost}%", true)
                 .AddField("Damage Dealt", currentMarble.DamageDealt, true)
@@ -550,13 +550,17 @@ namespace MarbleBot.Modules.Games
                 winList.Add((winner.Key, winner.Value));
             }
 
-            winList = (from winner in winList orderby winner.value descending select winner).ToList();
-            await ReplyAsync(embed: new EmbedBuilder()
+            winList = (from winner in winList 
+                       orderby winner.value descending 
+                       select winner)
+                       .ToList();
+
+            var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithDescription(Leaderboard(winList, page))
-                .WithTitle("Siege Leaderboard: Most Used")
-                .Build());
+                .WithTitle("Siege Leaderboard: Most Used");
+
+            await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
         }
 
         [Command("boss")]
@@ -605,7 +609,7 @@ namespace MarbleBot.Modules.Games
                 var attacks = new StringBuilder();
                 foreach (var attack in boss.Attacks)
                 {
-                    attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {Enum.GetName(typeof(StatusEffect), attack.StatusEffect)}>");
+                    attacks.AppendLine($"**{attack.Name}** (Accuracy: {attack.Accuracy}%) [Damage: {attack.Damage}] <MSE: {attack.StatusEffect}>");
                 }
 
                 var drops = new StringBuilder();
@@ -619,7 +623,7 @@ namespace MarbleBot.Modules.Games
                 var builder = new EmbedBuilder()
                     .AddField("Health", $"**{boss.MaxHealth}**")
                     .AddField("Attacks", attacks.ToString())
-                    .AddField("Difficulty", $"**{Enum.GetName(typeof(Difficulty), boss.Difficulty)} {(int)boss.Difficulty}**/10")
+                    .AddField("Difficulty", $"**{boss.Difficulty} {(int)boss.Difficulty}**/10")
                     .WithColor(GetColor(Context))
                     .WithCurrentTimestamp()
                     .WithThumbnailUrl(boss.ImageUrl)
@@ -695,7 +699,7 @@ namespace MarbleBot.Modules.Games
                 if (bossPair.Value.Stage == stage)
                 {
                     var difficulty = bossPair.Value.Stage > userStage ? StageTooHighString() :
-                        $"Difficulty: **{Enum.GetName(typeof(Difficulty), bossPair.Value.Difficulty)} {(int)bossPair.Value.Difficulty}**/10, Health: **{bossPair.Value.MaxHealth}**, Attacks: **{bossPair.Value.Attacks.Count()}**";
+                        $"Difficulty: **{bossPair.Value.Difficulty} {(int)bossPair.Value.Difficulty}**/10, Health: **{bossPair.Value.MaxHealth}**, Attacks: **{bossPair.Value.Attacks.Count()}**";
                     builder.AddField($"{bossPair.Value.Name}", difficulty);
                 }
             }

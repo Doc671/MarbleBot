@@ -29,7 +29,10 @@ namespace MarbleBot.Modules.Games
         }
 
         private string GameName(GameType gameType, bool capitalised = true)
-        => capitalised ? Enum.GetName(typeof(GameType), gameType)! : Enum.GetName(typeof(GameType), gameType)!.ToLower();
+        {
+            string name = gameType.ToString();
+            return capitalised ? name : name.ToLower();
+        }
 
         protected async Task Checkearn(GameType gameType)
         {
@@ -90,10 +93,12 @@ namespace MarbleBot.Modules.Games
                 dataList.Add((displayedPlace, elementName, value));
                 lastValue = value;
             }
+
             if (no > dataList.Last().place / 10)
             {
-                return $"There are no entries in page **{no}**!";
+                 return ($"There are no entries in page **{no}**!");
             }
+
             // This displays in groups of ten (i.e. if no is 1, first 10 displayed;
             // no = 2, next 10, etc.
             int minValue = (no - 1) * 10 + 1, maxValue = no * 10;
@@ -109,10 +114,6 @@ namespace MarbleBot.Modules.Games
                 {
                     output.AppendLine($"{place}{place.Ordinal()}: {elementName} {value}");
                 }
-            }
-            if (output.Length > 2048)
-            {
-                return string.Concat(output.ToString().Take(2048));
             }
 
             return output.ToString();

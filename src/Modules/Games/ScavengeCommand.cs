@@ -39,7 +39,7 @@ namespace MarbleBot.Modules.Games
                     var scavengeMessage = await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
                         .WithCurrentTimestamp()
-                        .WithDescription($"**{Context.User.Username}** has begun scavenging in **{Enum.GetName(typeof(ScavengeLocation), location)!.CamelToTitleCase()}**!")
+                        .WithDescription($"**{Context.User.Username}** has begun scavenging in **{location.ToString().CamelToTitleCase()}**!")
                         .WithTitle("Item Scavenge Begin!").Build());
                     _gamesService.Scavenges.GetOrAdd(Context.User.Id, new Scavenge(Context, _gamesService, _randomService, location, scavengeMessage));
                 }
@@ -269,7 +269,7 @@ namespace MarbleBot.Modules.Games
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
-                .WithTitle($"Scavenge Location Info: {Enum.GetName(typeof(ScavengeLocation), location)}")
+                .WithTitle($"Scavenge Location Info: {location}")
                 .Build());
         }
 

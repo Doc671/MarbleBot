@@ -215,10 +215,14 @@ namespace MarbleBot.Modules.Games
                         winList.Add((winner.Key, winner.Value));
                     }
 
-                    winList = (from winner in winList orderby winner.value descending select winner).ToList();
-                    builder.WithTitle("Race Leaderboard: Winners")
-                        .WithDescription(Leaderboard(winList, page));
-                    await ReplyAsync(embed: builder.Build());
+                    winList = (from winner in winList
+                               orderby winner.value descending 
+                               select winner)
+                               .ToList();
+
+                    builder.WithTitle("Race Leaderboard: Winners");
+
+                    await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
                 }
                 else
                 {
@@ -244,10 +248,14 @@ namespace MarbleBot.Modules.Games
                         winList.Add((winner.Key, winner.Value));
                     }
 
-                    winList = (from winner in winList orderby winner.value descending select winner).ToList();
-                    builder.WithTitle("Race Leaderboard: Most Used")
-                        .WithDescription(Leaderboard(winList, page));
-                    await ReplyAsync(embed: builder.Build());
+                    winList = (from winner in winList 
+                               orderby winner.value descending
+                               select winner)
+                               .ToList();
+
+                    builder.WithTitle("Race Leaderboard: Most Used");
+
+                    await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
                 }
             }
             else
