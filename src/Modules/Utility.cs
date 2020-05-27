@@ -96,7 +96,7 @@ namespace MarbleBot.Modules
                     return;
                 }
 
-                IEnumerable<CommandInfo> commands = module.Commands.Where(c => owner ? true : !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
+                IEnumerable<CommandInfo> commands = module.Commands.Where(c => owner || !c.Preconditions.Any(p => p is RequireOwnerAttribute)).OrderBy(c => c.Name);
 
                 if (Context.IsPrivate)
                 {

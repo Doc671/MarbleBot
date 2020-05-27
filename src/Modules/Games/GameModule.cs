@@ -372,7 +372,7 @@ namespace MarbleBot.Modules.Games
                     }
                 }
 
-                marbles.Add((Context.User.Id, marbleName, weapon.Id));
+                marbles.Add((Context.User.Id, marbleName, weapon!.Id));
 
                 using (var marbleFile = new StreamWriter(marbleListFilePath))
                 {

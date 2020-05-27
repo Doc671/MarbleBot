@@ -21,7 +21,7 @@ namespace MarbleBot.Common
         public float DamageMultiplier { get; private set; } = 1f;
         public ulong Id { get; }
         public DateTime LastMorale { get; set; } = DateTime.MinValue;
-        public List<SiegeMarble> Marbles { get; }
+        public List<SiegeMarble> Marbles { get; set; }
         public PowerUp PowerUp { get; set; }
 
         private readonly SocketCommandContext _context;
@@ -398,6 +398,11 @@ namespace MarbleBot.Common
             _timer.Start();
         }
 
+        public void Stop()
+        {
+            Finalise();
+        }
+
         private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
         {
             var attack = Boss.Attacks[_randomService.Rand.Next(0, Boss.Attacks.Length)];
@@ -447,6 +452,10 @@ namespace MarbleBot.Common
             {
                 _timer.Stop();
                 await OnFailure();
+            }
+            else if (_finished)
+            {
+                _timer.Stop();
             }
         }
 

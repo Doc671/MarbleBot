@@ -92,39 +92,46 @@ namespace MarbleBot.Modules.Games
                 }
             }
 
-            // Pick boss & set battle stats based on boss
             Boss boss;
-            if (overrideString.Contains("override") && (_botCredentials.AdminIds.Any(id => id == Context.User.Id) || Context.IsPrivate))
+            if (!_gamesService.Sieges.TryGetValue(fileId, out Siege? currentSiege))
             {
-                boss = Boss.GetBoss(overrideString.Split(' ')[1].RemoveChar(' '));
-            }
-            else
-            {
-                // Choose a stage 1 or stage 2 boss depending on the stage of each participant
-                float stage = stageTotal / (float)marbles.Count;
-                if (stage == 1f)
+                // Pick boss & set battle stats based on boss
+                if (overrideString.Contains("override") && (_botCredentials.AdminIds.Any(id => id == Context.User.Id) || Context.IsPrivate))
                 {
-                    boss = ChooseStageOneBoss(marbles);
-                }
-                else if (stage == 2f)
-                {
-                    boss = ChooseStageTwoBoss(marbles);
+                    boss = Boss.GetBoss(overrideString.Split(' ')[1].RemoveChar(' '));
                 }
                 else
                 {
-                    stage--;
-                    if (_randomService.Rand.NextDouble() < stage)
+                    // Choose a stage 1 or stage 2 boss depending on the stage of each participant
+                    float stage = stageTotal / (float)marbles.Count;
+                    if (stage == 1f)
+                    {
+                        boss = ChooseStageOneBoss(marbles);
+                    }
+                    else if (stage == 2f)
                     {
                         boss = ChooseStageTwoBoss(marbles);
                     }
                     else
                     {
-                        boss = ChooseStageOneBoss(marbles);
+                        stage--;
+                        if (_randomService.Rand.NextDouble() < stage)
+                        {
+                            boss = ChooseStageTwoBoss(marbles);
+                        }
+                        else
+                        {
+                            boss = ChooseStageOneBoss(marbles);
+                        }
                     }
                 }
+                _gamesService.Sieges.TryAdd(fileId, currentSiege = new Siege(Context, _gamesService, _randomService, boss, marbles));
             }
-
-            Siege currentSiege = _gamesService.Sieges.GetOrAdd(fileId, new Siege(Context, _gamesService, _randomService, boss, marbles));
+            else
+            {
+                boss = currentSiege.Boss;
+                currentSiege.Marbles = marbles;
+            }
 
             int marbleHealth = ((int)boss.Difficulty + 2) * 5;
             foreach (SiegeMarble marble in marbles)

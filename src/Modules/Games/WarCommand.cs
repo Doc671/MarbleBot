@@ -703,12 +703,10 @@ namespace MarbleBot.Modules.Games
         {
             var items = Item.GetItems();
             var output = new StringBuilder();
-            Weapon weapon;
             foreach (var itemPair in items)
             {
-                if (itemPair.Value is Weapon)
+                if (itemPair.Value is Weapon weapon)
                 {
-                    weapon = (Weapon)itemPair.Value;
                     if (weapon.WeaponClass != 0 && weapon.WeaponClass != WeaponClass.Artillery && weapon.Stage <= MarbleBotUser.Find(Context).Stage)
                     {
                         output.AppendLine($"{weapon} ({weapon.WeaponClass})");
