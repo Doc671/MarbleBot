@@ -405,6 +405,12 @@ namespace MarbleBot.Common
 
         private async void Timer_Elapsed(object? sender, ElapsedEventArgs e)
         {
+            if (_finished)
+            {
+                _timer.Stop();
+                return;
+            }
+
             var attack = Boss.Attacks[_randomService.Rand.Next(0, Boss.Attacks.Length)];
             var embedBuilder = new EmbedBuilder()
                 .WithAuthor(Boss.Name, Boss.ImageUrl)
@@ -452,10 +458,6 @@ namespace MarbleBot.Common
             {
                 _timer.Stop();
                 await OnFailure();
-            }
-            else if (_finished)
-            {
-                _timer.Stop();
             }
         }
 

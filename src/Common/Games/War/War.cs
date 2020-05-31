@@ -167,7 +167,7 @@ namespace MarbleBot.Common
         {
             if (_aiMarble != null && _aiMarble.Health > 0)
             {
-                var enemyTeam = Team2;
+                var enemyTeam = Team1;
                 var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
                 if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                 {
