@@ -155,43 +155,6 @@ namespace MarbleBot.Modules
         public async Task BestCommand()
             => await ReplyAsync($"**{Context.Guild.Users.ElementAt(_randomService.Rand.Next(0, Context.Guild.Users.Count))}** is the best!");
 
-        [Command("bet")]
-        [Summary("Bets on a marble.")]
-        public async Task BetCommand(int noOfMarbles)
-        {
-            if (noOfMarbles > 100)
-            {
-                await ReplyAsync("The number you gave is too large. It needs to be 100 or below.");
-                return;
-            }
-
-            if (noOfMarbles < 1)
-            {
-                await ReplyAsync("The number you gave is too small.");
-                return;
-            }
-
-            string[,] marbles = new string[10, 10];
-            using (var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Marbles.csv"))
-            {
-                int a = 0;
-                while (!stream.EndOfStream)
-                {
-                    string[] row = stream.ReadLine()!.Split(',');
-                    for (int b = 0; b < row.Length - 1; b++)
-                    {
-                        marbles[a, b] = row[b];
-                    }
-
-                    a++;
-                }
-            }
-            int choice = _randomService.Rand.Next(0, noOfMarbles);
-            int d = choice / 10;
-            int c = choice - (d * 10);
-            await ReplyAsync($"**{Context.User.Username}**, I bet that **{marbles[d - 1, c - 1]}** will win!");
-        }
-
         [Command("buyhat")]
         [Summary("Fakes buying an Uglee Hat.")]
         public async Task BuyHatCommand()
@@ -209,10 +172,7 @@ namespace MarbleBot.Modules
         {
             string[] choices = input.Split('|');
             int choice = _randomService.Rand.Next(0, choices.Length);
-            if (!(await Moderation.CheckSwearAsync(input) || await Moderation.CheckSwearAsync(choices[choice])))
-            {
-                await ReplyAsync($"**{Context.User.Username}**, I choose **{choices[choice].Trim()}**!");
-            }
+            await ReplyAsync($"**{Context.User.Username}**, I choose **{choices[choice].Trim()}**!");
         }
 
         [Command("color")]
@@ -236,7 +196,7 @@ namespace MarbleBot.Modules
                 .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
                 .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
 
-            await ColorMessage(color, builder);
+            await SendColorMessage(color, builder);
         }
 
         [Command("color")]
@@ -272,7 +232,7 @@ namespace MarbleBot.Modules
                 .AddField("HSL", $"Hue: **{hue}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
                 .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
 
-            await ColorMessage(color, builder);
+            await SendColorMessage(color, builder);
         }
 
         [Command("color")]
@@ -305,10 +265,10 @@ namespace MarbleBot.Modules
                 .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
                 .AddField("Hex Code", $"#{hexCode.ToUpper()}");
 
-            await ColorMessage(color, builder);
+            await SendColorMessage(color, builder);
         }
 
-        public async Task ColorMessage(System.Drawing.Color color, EmbedBuilder builder)
+        public async Task SendColorMessage(System.Drawing.Color color, EmbedBuilder builder)
         {
             builder.WithColor(new Color(color.R, color.G, color.B));
 
@@ -347,10 +307,7 @@ namespace MarbleBot.Modules
                 orangeified.Append(input[length]);
                 length--;
             }
-            if (!(await Moderation.CheckSwearAsync(input) || await Moderation.CheckSwearAsync(orangeified.ToString())))
-            {
-                await ReplyAsync(orangeified.ToString());
-            }
+            await ReplyAsync(orangeified.ToString());
         }
 
         [Command("random")]
@@ -469,39 +426,17 @@ namespace MarbleBot.Modules
             }
             else
             {
-                if (!await Moderation.CheckSwearAsync(input))
-                {
-                    await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
-                }
+                await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
             }
         }
 
         [Command("repeat")]
         [Summary("Repeats the given message.")]
-        public async Task RepeatCommand([Remainder] string repeat)
-        {
-            if (!await Moderation.CheckSwearAsync(repeat))
-            {
-                await ReplyAsync(repeat);
-            }
-        }
+        public async Task RepeatCommand([Remainder] string repeat) => await ReplyAsync(repeat);
 
         [Command("reverse")]
         [Summary("Returns the user input reversed.")]
-        public async Task ReverseCommand([Remainder] string input)
-        {
-            var reverse = new StringBuilder();
-            int length = input.Length - 1;
-            while (length >= 0)
-            {
-                reverse.Append(input[length]);
-                length--;
-            }
-            if (!(await Moderation.CheckSwearAsync(input) || await Moderation.CheckSwearAsync(reverse.ToString())))
-            {
-                await ReplyAsync(reverse.ToString());
-            }
-        }
+        public async Task ReverseCommand([Remainder] string input) => await ReplyAsync(string.Concat(input.Reverse()));
 
         [Command("submit")]
         public async Task SubmitCommand([Remainder] string message = "")

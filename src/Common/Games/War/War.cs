@@ -22,9 +22,9 @@ namespace MarbleBot.Common
         public WarTeam Team2 { get; set; }
 
         private readonly WarMarble? _aiMarble;
+        private readonly SocketCommandContext _context;
         private bool _endCalled = false;
         private bool _finished = false;
-        private readonly SocketCommandContext _context;
         private readonly GamesService _gamesService;
         private DateTime _startTime;
         private readonly Timer _timer = new Timer(7000);

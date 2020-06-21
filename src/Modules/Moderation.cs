@@ -10,7 +10,6 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,7 +34,7 @@ namespace MarbleBot.Modules
             var guild = MarbleBotGuild.Find(Context);
             guild.AppealFormLink = link;
             MarbleBotGuild.UpdateGuild(guild);
-            await ReplyAsync("Success.");
+            await SendSuccessAsync("Success.");
         }
 
         [Command("addrole")]
@@ -44,16 +43,16 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task AddRoleCommand([Remainder] string searchTerm)
         {
-            if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0))
+            if (!Context.Guild.Roles.Any(role => string.Compare(role.Name, searchTerm, true) == 0))
             {
                 await SendErrorAsync("Could not find the role!");
                 return;
             }
-            var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
+            var id = Context.Guild.Roles.Where(role => string.Compare(role.Name, searchTerm, true) == 0).First().Id;
             var guild = MarbleBotGuild.Find(Context);
             guild.Roles.Add(id);
             MarbleBotGuild.UpdateGuild(guild);
-            await ReplyAsync("Succesfully updated.");
+            await SendSuccessAsync("Successfully updated.");
         }
 
         [Command("addwarningsheet")]
@@ -66,7 +65,7 @@ namespace MarbleBot.Modules
             var guild = MarbleBotGuild.Find(Context);
             guild.WarningSheetLink = link;
             MarbleBotGuild.UpdateGuild(guild);
-            await ReplyAsync("Success.");
+            await SendSuccessAsync("Success.");
         }
 
         [Command("clear")]
@@ -83,9 +82,9 @@ namespace MarbleBot.Modules
             }
 
             const int delay = 5000;
-            var m = await ReplyAsync($"{amount} message(s) have been deleted. This message will be deleted in {delay / 1000} seconds.");
+            var confirmationMessage = await SendSuccessAsync($"**{amount}** message(s) have been deleted. This message will be deleted in **{delay / 1000}** seconds.");
             await Task.Delay(delay);
-            await m.DeleteAsync();
+            await confirmationMessage.DeleteAsync();
         }
 
         [Command("clearchannel")]
@@ -99,96 +98,11 @@ namespace MarbleBot.Modules
             {
                 case "announcement": guild.AnnouncementChannel = 0; break;
                 case "autoresponse": guild.AutoresponseChannel = 0; break;
-                case "usable": guild.UsableChannels = new List<ulong>(); break;
-                default: await ReplyAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
+                case "usable": guild.UsableChannels.Clear(); break;
+                default: await SendErrorAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
             }
             MarbleBotGuild.UpdateGuild(guild);
-            await ReplyAsync("Succesfully cleared.");
-        }
-
-        [Command("clearrecentspam")]
-        [Alias("clear-recent-spam")]
-        [Summary("Clears recent empty messages")]
-        [RequireBotPermission(ChannelPermission.ManageMessages)]
-        [RequireContext(ContextType.Guild)]
-        [RequireUserPermission(GuildPermission.ManageMessages)]
-        public async Task ClearRecentSpamCommand(string rguild, string rchannel)
-        {
-            var guild = ulong.Parse(rguild);
-            var channel = ulong.Parse(rchannel);
-            var msgs = await Context.Client.GetGuild(guild).GetTextChannel(channel).GetMessagesAsync(100).FlattenAsync();
-            var srvr = new EmbedAuthorBuilder();
-            if (guild == TheHatStoar)
-            {
-                var _THS = Context.Client.GetGuild(TheHatStoar);
-                srvr.WithName(_THS.Name);
-                srvr.WithIconUrl(_THS.IconUrl);
-            }
-            else if (guild == CommunityMarble)
-            {
-                var _CM = Context.Client.GetGuild(CommunityMarble);
-                srvr.WithName(_CM.Name);
-                srvr.WithIconUrl(_CM.IconUrl);
-            }
-            var builder = new EmbedBuilder()
-                .WithAuthor(srvr)
-                .WithTitle("Bulk delete in " + Context.Client.GetGuild(guild).GetTextChannel(channel).Mention)
-                .WithColor(Discord.Color.Red)
-                .WithDescription("Reason: Empty Messages")
-                .WithFooter("ID: " + channel)
-                .WithCurrentTimestamp();
-            foreach (var msg in msgs)
-            {
-                var IsLett = !(char.TryParse(msg.Content.Trim('`'), out char e));
-                if (!IsLett)
-                {
-                    IsLett = (char.IsLetter(e) || e == '?' || e == '^' || char.IsNumber(e));
-                }
-
-                if (!(IsLett) && channel != 252481530130202624)
-                {
-                    builder.AddField(msg.Author.Mention, msg.Content);
-                    await msg.DeleteAsync();
-                }
-            }
-            if (guild == TheHatStoar)
-            {
-                var logs = Context.Client.GetGuild(TheHatStoar).GetTextChannel(327132239257272327);
-                await logs.SendMessageAsync("", false, builder.Build());
-            }
-            else if (guild == CommunityMarble)
-            {
-                var logs = Context.Client.GetGuild(CommunityMarble).GetTextChannel(387306347936350213);
-                await logs.SendMessageAsync("", false, builder.Build());
-            }
-        }
-
-
-        // Checks if a string contains a swear; returns true if profanity is present
-        public static async Task<bool> CheckSwearAsync(string msg)
-        {
-            string swears;
-            using (var FS = new StreamReader($"Keys{Path.DirectorySeparatorChar}ListOfBand.txt"))
-            {
-                swears = (await FS.ReadLineAsync())!;
-            }
-
-            string[] swearList = swears.Split(',');
-            var swearPresent = false;
-            foreach (var swear in swearList)
-            {
-                if (msg.ToLower().Contains(swear))
-                {
-                    swearPresent = true;
-                    break;
-                }
-            }
-            if (swearPresent)
-            {
-                LogManager.GetCurrentClassLogger().Warn($"Profanity detected, violation: {msg}");
-            }
-
-            return swearPresent;
+            await SendSuccessAsync("Successfully cleared.");
         }
 
         public async Task LogWarningAsync(IGuildUser user, string warningCode, int warningsToGive)
@@ -479,7 +393,7 @@ namespace MarbleBot.Modules
                 default: await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info."); return;
             }
             MarbleBotGuild.UpdateGuild(guild);
-            await ReplyAsync("Successfully updated.");
+            await SendSuccessAsync("Successfully updated.");
         }
 
         [Command("setcolor")]
@@ -497,7 +411,7 @@ namespace MarbleBot.Modules
             var guild = MarbleBotGuild.Find(Context);
             guild.Color = input;
             MarbleBotGuild.UpdateGuild(guild);
-            await ReplyAsync("Successfully updated.");
+            await SendSuccessAsync("Successfully updated.");
         }
 
         [Command("setprefix")]

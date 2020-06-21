@@ -96,7 +96,7 @@ namespace MarbleBot.Modules.Games
 
             if (no > dataList.Last().place / 10)
             {
-                 return ($"There are no entries in page **{no}**!");
+                return ($"There are no entries in page **{no}**!");
             }
 
             // This displays in groups of ten (i.e. if no is 1, first 10 displayed;

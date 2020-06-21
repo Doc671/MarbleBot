@@ -9,10 +9,6 @@
   "balance": {
     "Usage": "mb/balance <optional user>"
   },
-  "bet": {
-    "Usage": "mb/bet <number of marbles>",
-    "Example": "mb/bet 30"
-  },
   "buy": {
     "Usage": "mb/buy <item ID> <# of items>",
     "Example": "mb/craft 001 1"
@@ -34,7 +30,7 @@
   },
   "cv": {
     "Usage": "mb/cv <video link> <optional description>",
-    "Example": "A thrilling race made with an incredible, one of a kind feature! https://www.youtube.com/watch?v=7lp80lBO1Vs"
+    "Example": "https://www.youtube.com/watch?v=7lp80lBO1Vs A thrilling race made with an incredible, one of a kind feature!"
   },
   "dismantle": {
     "Usage": "mb/dismantle <item ID> <# of items>",
@@ -46,7 +42,7 @@
   },
   "inventory": {
     "Usage": "mb/inventory <optional user> <optional page>",
-    "Example": "mb/inventory Doc671 2"
+    "Example": "mb/inventory Doc671"
   },
   "item": {
     "Usage": "mb/item <item ID>"

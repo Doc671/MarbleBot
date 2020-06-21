@@ -111,6 +111,9 @@ namespace MarbleBot.Modules
         protected internal async Task<IUserMessage> SendErrorAsync(string messageContent)
             => await ReplyAsync($":warning: | {messageContent}");
 
+        protected internal async Task<IUserMessage> SendSuccessAsync(string messageContent)
+            => await ReplyAsync($":white_check_mark: | {messageContent}");
+
         protected internal async Task SendLargeEmbedDescriptionAsync(EmbedBuilder builder, string content)
         {
             if (content.Length > EmbedBuilder.MaxDescriptionLength)

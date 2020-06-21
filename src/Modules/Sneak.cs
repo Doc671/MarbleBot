@@ -35,7 +35,7 @@ namespace MarbleBot.Modules
         public async Task BackupCommand()
         {
             System.IO.Compression.ZipFile.CreateFromDirectory("Data", $"Backup-{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.zip");
-            await ReplyAsync("Success.");
+            await SendSuccessAsync("Success.");
         }
 
         [Command("clearmemory")]
@@ -64,7 +64,7 @@ namespace MarbleBot.Modules
             _gamesService.Sieges = new ConcurrentDictionary<ulong, Siege>();
             _gamesService.Wars = new ConcurrentDictionary<ulong, War>();
 
-            await ReplyAsync("Success.");
+            await SendSuccessAsync("Success.");
         }
 
         [Command("dailytimeout")]
@@ -113,7 +113,7 @@ namespace MarbleBot.Modules
                 newUsersDict.Add(userPair.Key, user);
             }
             MarbleBotUser.UpdateUsers(newUsersDict);
-            await ReplyAsync("Success.");
+            await SendSuccessAsync("Success.");
         }
 
         [Command("logs")]
@@ -162,7 +162,7 @@ namespace MarbleBot.Modules
         public async Task SetGameCommand([Remainder] string game)
         {
             await Context.Client.SetGameAsync(game);
-            await ReplyAsync("Success.");
+            await SendSuccessAsync("Success.");
         }
 
         [Command("setstatus")]
@@ -176,7 +176,7 @@ namespace MarbleBot.Modules
                 "invisible" => UserStatus.Invisible,
                 _ => UserStatus.Online
             });
-            await ReplyAsync("Success.");
+            await SendSuccessAsync("Success.");
         }
 
         [Command("siegedict")]

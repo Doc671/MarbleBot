@@ -557,8 +557,8 @@ namespace MarbleBot.Modules.Games
                 winList.Add((winner.Key, winner.Value));
             }
 
-            winList = (from winner in winList 
-                       orderby winner.value descending 
+            winList = (from winner in winList
+                       orderby winner.value descending
                        select winner)
                        .ToList();
 

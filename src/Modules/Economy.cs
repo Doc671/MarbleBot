@@ -354,35 +354,20 @@ namespace MarbleBot.Modules
         [Command("inventory")]
         [Alias("inv", "items")]
         [Summary("Shows all the items a user has.")]
-        public async Task InventoryCommand([Remainder] string rawSearchTerm = "")
+        public async Task InventoryCommand(IUser? user = null, int page = 1)
         {
-            var searchTermParts = rawSearchTerm.Length == 0 ? Array.Empty<string>() : rawSearchTerm.Split(' ');
-            int page = 1;
-            var name = new StringBuilder();
-            string part;
-            for (int i = 0; i < searchTermParts.Length; i++)
-            {
-                part = searchTermParts[i];
-                if (!int.TryParse(part, out page))
-                {
-                    name.Append($"{part}{(i == searchTermParts.Length - 2 ? "" : " ")}");
-                }
-            }
-
-            page = page == 0 ? 1 : page;
-
             if (page < 1)
             {
                 await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
                 return;
             }
 
-            var searchTerm = name.ToString();
-            var user = new MarbleBotUser();
-            if (string.IsNullOrEmpty(searchTerm))
+            MarbleBotUser marbleBotUser;
+            if (user == null)
             {
-                user = MarbleBotUser.Find(Context);
-                if (user.Items == null)
+                user = Context.User;
+                marbleBotUser = MarbleBotUser.Find(Context);
+                if (marbleBotUser.Items == null)
                 {
                     await SendErrorAsync($"**{Context.User.Username}**, you don't have any items!");
                     return;
@@ -390,25 +375,34 @@ namespace MarbleBot.Modules
             }
             else
             {
-                var foundUser = MarbleBotUser.GetUsers().Where(usr => searchTerm.ToLower().Contains(usr.Value.Name.ToLower())
-                    || usr.Value.Name.ToLower().Contains(searchTerm.ToLower())
-                    || searchTerm.ToLower().Contains(usr.Value.Discriminator)).LastOrDefault();
-
-                if (foundUser.Value == null)
-                {
-                    await SendErrorAsync($"**{Context.User.Username}**, the requested user could not be found.");
-                    return;
-                }
-
-                else if (foundUser.Value.Items == null)
-                {
-                    await SendErrorAsync($"**{Context.User.Username}**, the user **{foundUser.Value.Name}** does not have any items!");
-                    return;
-                }
-                user = foundUser.Value;
+                marbleBotUser = MarbleBotUser.Find(user.Id);
             }
+
+            await ShowUserInventory(user, marbleBotUser, page);
+        }
+
+        public async Task InventoryCommand(int page = 1)
+        {
+            if (page < 1)
+            {
+                await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
+                return;
+            }
+
+            var marbleBotUser = MarbleBotUser.Find(Context);
+            if (marbleBotUser.Items == null)
+            {
+                await SendErrorAsync($"**{Context.User.Username}**, you don't have any items!");
+                return;
+            }
+
+            await ShowUserInventory(Context.User, marbleBotUser, page);
+        }
+
+        private async Task ShowUserInventory(IUser discordUser, MarbleBotUser marbleBotUser, int page = 1)
+        {
             var itemOutput = new StringBuilder();
-            var items = user.Items.Skip((page - 1) * 20).Take(20);
+            var items = marbleBotUser.Items.Skip((page - 1) * 20).Take(20);
             var itemsPresent = items.Count() > 0;
             if (itemsPresent)
             {
@@ -426,11 +420,11 @@ namespace MarbleBot.Modules
             }
 
             await ReplyAsync(embed: new EmbedBuilder()
-                .WithAuthor(Context.Client.GetUser(user.Id))
+                .WithAuthor(discordUser)
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithDescription(itemOutput.ToString())
-                .WithTitle(itemsPresent ? $"Page **{page}** of **{user.Items.Count / 20 + 1}**" : "Invalid page")
+                .WithTitle(itemsPresent ? $"Page **{page}** of **{marbleBotUser.Items.Count / 20 + 1}**" : "Invalid page")
                 .Build());
         }
 
@@ -703,8 +697,8 @@ namespace MarbleBot.Modules
             }
 
             var richList = (from user in MarbleBotUser.GetUsers()
-                           orderby user.Value.NetWorth descending
-                           select (place: 0, user: user.Value))
+                            orderby user.Value.NetWorth descending
+                            select (place: 0, user: user.Value))
                            .ToArray();
 
             if (page > (richList.Length / 10) + 1)
