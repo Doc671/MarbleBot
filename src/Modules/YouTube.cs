@@ -196,7 +196,7 @@ namespace MarbleBot.Modules
 
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (string.Compare(searchResult.Id.Kind, "youtube#channel", true) == 0 && !await Moderation.CheckSwearAsync(searchResult.Snippet.Title))
+                if (string.Compare(searchResult.Id.Kind, "youtube#channel", true) == 0)
                 {
                     channels.Add($"{searchResult.Snippet.Title} (<https://www.youtube.com/channel/{searchResult.Id.ChannelId}>)");
                     found = true;
@@ -240,7 +240,7 @@ namespace MarbleBot.Modules
             bool found = false;
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (string.Compare(searchResult.Id.Kind, "youtube#video", true) == 0 && !await Moderation.CheckSwearAsync(searchResult.Snippet.Title))
+                if (string.Compare(searchResult.Id.Kind, "youtube#video", true) == 0)
                 {
                     videos.Add($"{searchResult.Snippet.Title} (<https://youtu.be/{searchResult.Id.VideoId}>)");
                     found = true;

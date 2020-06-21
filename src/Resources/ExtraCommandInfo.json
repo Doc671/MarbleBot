@@ -110,9 +110,5 @@
   "userinfo": {
     "Usage": "mb/userinfo <user>",
     "Example": "mb/userinfo MarbleBot"
-  },
-  "vinhglish": {
-    "Usage": "mb/vinhglish <optional word>",
-    "Example": "mb/vinhglish Am Will You"
   }
 }

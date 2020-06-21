@@ -268,7 +268,7 @@ namespace MarbleBot.Modules
             await SendColorMessage(color, builder);
         }
 
-        public async Task SendColorMessage(System.Drawing.Color color, EmbedBuilder builder)
+        private async Task SendColorMessage(System.Drawing.Color color, EmbedBuilder builder)
         {
             builder.WithColor(new Color(color.R, color.G, color.B));
 
@@ -295,20 +295,6 @@ namespace MarbleBot.Modules
             5 => "!haoW",
             _ => "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"
         });
-
-        [Command("orangeify")]
-        [Summary("Returns the user input in Orange Language.")]
-        public async Task OrangeifyCommand([Remainder] string input)
-        {
-            var orangeified = new StringBuilder();
-            int length = input.Length - 1;
-            while (length >= 0)
-            {
-                orangeified.Append(input[length]);
-                length--;
-            }
-            await ReplyAsync(orangeified.ToString());
-        }
 
         [Command("random")]
         [Summary("Returns a random number with user-defined bounds.")]
@@ -386,8 +372,6 @@ namespace MarbleBot.Modules
 
             string emoji = rating switch
             {
-                -999 => ":gun: :dagger: :bomb:",
-                -1 => ":gun:",
                 0 => ":no_entry_sign:",
                 1 => ":nauseated_face:",
                 2 => ":rage:",
@@ -399,8 +383,6 @@ namespace MarbleBot.Modules
                 8 => ":thumbsup:",
                 9 => ":white_check_mark:",
                 10 => ":rofl:",
-                11 => ":heart:",
-                69 => "<:deletion:296013805782040576>",
                 _ => ":thinking:",
             };
 
@@ -420,14 +402,7 @@ namespace MarbleBot.Modules
                 _ => "Uhhhhhhhh\nNot",
             };
 
-            if (rating == -2)
-            {
-                await ReplyAsync($"**{Context.User.Username}**, I rATE {input} UNd3FINED10. {emoji}\n({message})");
-            }
-            else
-            {
-                await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
-            }
+            await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
         }
 
         [Command("repeat")]
@@ -435,6 +410,7 @@ namespace MarbleBot.Modules
         public async Task RepeatCommand([Remainder] string repeat) => await ReplyAsync(repeat);
 
         [Command("reverse")]
+        [Alias("orangeify")]
         [Summary("Returns the user input reversed.")]
         public async Task ReverseCommand([Remainder] string input) => await ReplyAsync(string.Concat(input.Reverse()));
 
@@ -459,54 +435,6 @@ namespace MarbleBot.Modules
                 }
             }
             await ReplyAsync("Your submission has been received and will now be reviewed. Expect up to 48 hours for a reply.");
-        }
-
-        [Command("vinhglish")]
-        [Summary("Returns a Vinhglish word, its inventor and meaning.")]
-        public async Task VinhglishCommand([Remainder] string word = "")
-        {
-            int randNo = 0;
-            bool wordSet = false;
-            var wordList = new List<(string word, string inventor, string description)>();
-            int noOfWords = 0;
-            if (string.IsNullOrEmpty(word))
-            {
-                using (var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
-                {
-                    while (!stream.EndOfStream)
-                    {
-                        string list = stream.ReadLine()!;
-                        string[] wordInfo = list.Split(',');
-                        wordList.Add((wordInfo[0], wordInfo[1], wordInfo[2]));
-                        noOfWords++;
-                    }
-                }
-                randNo = _randomService.Rand.Next(1, noOfWords);
-            }
-            else
-            {
-                using (var stream = new StreamReader($"Resources{Path.DirectorySeparatorChar}Vinhglish.csv"))
-                {
-                    while (!stream.EndOfStream)
-                    {
-                        string list = stream.ReadLine()!;
-                        string[] wordInfo = list.Split(',');
-                        wordList.Add((wordInfo[0], wordInfo[1], wordInfo[2]));
-                        if (wordList[noOfWords].word.ToLower() == word.ToLower())
-                        {
-                            randNo = noOfWords;
-                            wordSet = true;
-                            break;
-                        }
-                        noOfWords++;
-                    }
-                }
-                if (!wordSet)
-                {
-                    randNo = _randomService.Rand.Next(1, noOfWords);
-                }
-            }
-            await ReplyAsync($"**__{wordList[randNo].word}__**\nInventor: {wordList[randNo].inventor}\nDescription: {wordList[randNo].description}");
         }
     }
 }
