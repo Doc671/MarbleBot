@@ -1,17 +1,18 @@
 ﻿using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using Google.Apis.Services;
 using Google.Apis.Sheets.v4;
 using Google.Apis.Sheets.v4.Data;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Services;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Color = Google.Apis.Sheets.v4.Data.Color;
 
 namespace MarbleBot.Modules
 {
@@ -43,12 +44,13 @@ namespace MarbleBot.Modules
         [RequireUserPermission(GuildPermission.ManageRoles)]
         public async Task AddRoleCommand([Remainder] string searchTerm)
         {
-            if (!Context.Guild.Roles.Any(role => string.Compare(role.Name, searchTerm, true) == 0))
+            if (Context.Guild.Roles.All(role => string.Compare(role.Name, searchTerm, StringComparison.OrdinalIgnoreCase) != 0))
             {
                 await SendErrorAsync("Could not find the role!");
                 return;
             }
-            var id = Context.Guild.Roles.Where(role => string.Compare(role.Name, searchTerm, true) == 0).First().Id;
+
+            ulong id = Context.Guild.Roles.First(role => string.Compare(role.Name, searchTerm, StringComparison.OrdinalIgnoreCase) == 0).Id;
             var guild = MarbleBotGuild.Find(Context);
             guild.Roles.Add(id);
             MarbleBotGuild.UpdateGuild(guild);
@@ -96,18 +98,27 @@ namespace MarbleBot.Modules
             var guild = MarbleBotGuild.Find(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
-                case "announcement": guild.AnnouncementChannel = 0; break;
-                case "autoresponse": guild.AutoresponseChannel = 0; break;
-                case "usable": guild.UsableChannels.Clear(); break;
-                default: await SendErrorAsync("Invalid option. Use `mb/help clearchannel` for more info."); return;
+                case "announcement":
+                    guild.AnnouncementChannel = 0;
+                    break;
+                case "autoresponse":
+                    guild.AutoresponseChannel = 0;
+                    break;
+                case "usable":
+                    guild.UsableChannels.Clear();
+                    break;
+                default:
+                    await SendErrorAsync("Invalid option. Use `mb/help clearchannel` for more info.");
+                    return;
             }
+
             MarbleBotGuild.UpdateGuild(guild);
             await SendSuccessAsync("Successfully cleared.");
         }
 
         public async Task LogWarningAsync(IGuildUser user, string warningCode, int warningsToGive)
         {
-            using var service = new SheetsService(new BaseClientService.Initializer()
+            using var service = new SheetsService(new BaseClientService.Initializer
             {
                 ApiKey = _botCredentials.GoogleApiKey,
                 ApplicationName = GetType().ToString(),
@@ -135,7 +146,7 @@ namespace MarbleBot.Modules
 
             var userToWarnRow = new string[10];
 
-            int rowIndex = 3;
+            int rowIndex;
 
             // Find the row corresponding to the user to be warned
             var requests = new List<Request>();
@@ -154,8 +165,8 @@ namespace MarbleBot.Modules
                 // If the user could not be found, add a new row with the user's details
                 if (userToWarnRow[0] == null)
                 {
-                    userToWarnRow = new string[] { user.ToString()!, "", "", "", "", "", "", "Normal", "0", "0" };
-                    var rowData = new RowData()
+                    userToWarnRow = new[] { user.ToString()!, "", "", "", "", "", "", "Normal", "0", "0" };
+                    var rowData = new RowData
                     {
                         Values = new List<CellData>()
                     };
@@ -176,20 +187,21 @@ namespace MarbleBot.Modules
                             cellContents.StringValue = cell;
                         }
 
-                        rowData.Values.Add(new CellData()
+                        rowData.Values.Add(new CellData
                         {
                             UserEnteredValue = cellContents
                         });
                     }
 
-                    requests.Add(new Request()
+                    requests.Add(new Request
                     {
-                        AppendCells = new AppendCellsRequest()
+                        AppendCells = new AppendCellsRequest
                         {
                             SheetId = sheetId,
-                            Rows = new List<RowData>() {
-                            rowData
-                        },
+                            Rows = new List<RowData>
+                            {
+                                rowData
+                            },
                             Fields = "*"
                         }
                     });
@@ -209,72 +221,76 @@ namespace MarbleBot.Modules
 
             totalWarnings += warningsToGive;
 
-            static Google.Apis.Sheets.v4.Data.Color GetCellBackgroundColour(int warnings)
-                => warnings switch
+            static Color GetCellBackgroundColour(int warnings)
+            {
+                return warnings switch
                 {
-                    3 => new Google.Apis.Sheets.v4.Data.Color
+                    3 => new Color
                     {
                         Red = 1f,
                         Green = 0.5f,
-                        Blue = 0f,
+                        Blue = 0f
                     },
-                    4 => new Google.Apis.Sheets.v4.Data.Color
+                    4 => new Color
                     {
                         Red = 1f,
                         Green = 0f,
-                        Blue = 0f,
+                        Blue = 0f
                     },
-                    5 => new Google.Apis.Sheets.v4.Data.Color
+                    5 => new Color
                     {
                         Red = 0.5f,
                         Green = 0f,
-                        Blue = 0f,
+                        Blue = 0f
                     },
-                    6 => new Google.Apis.Sheets.v4.Data.Color
+                    6 => new Color
                     {
                         Red = 0f,
                         Green = 0f,
-                        Blue = 0f,
+                        Blue = 0f
                     },
-                    _ => new Google.Apis.Sheets.v4.Data.Color
+                    _ => new Color
                     {
                         Red = 1f,
                         Green = 1f,
-                        Blue = 0f,
+                        Blue = 0f
                     }
                 };
+            }
 
-            static Google.Apis.Sheets.v4.Data.Color GetCellForegroundColour(int warnings)
-                => warnings switch
+            static Color GetCellForegroundColour(int warnings)
+            {
+                return warnings switch
                 {
-                    5 => new Google.Apis.Sheets.v4.Data.Color
+                    5 => new Color
                     {
                         Red = 1f,
                         Green = 1f,
-                        Blue = 1f,
+                        Blue = 1f
                     },
-                    6 => new Google.Apis.Sheets.v4.Data.Color
+                    6 => new Color
                     {
                         Red = 1f,
                         Green = 1f,
-                        Blue = 1f,
+                        Blue = 1f
                     },
-                    _ => new Google.Apis.Sheets.v4.Data.Color
+                    _ => new Color
                     {
                         Red = 0f,
                         Green = 0f,
-                        Blue = 0f,
+                        Blue = 0f
                     }
                 };
+            }
 
             // Add the appropriate colours and text to the sheet
             for (int i = 0; i < warningsToGive; i++)
             {
-                requests.Add(new Request()
+                requests.Add(new Request
                 {
-                    RepeatCell = new RepeatCellRequest()
+                    RepeatCell = new RepeatCellRequest
                     {
-                        Range = new GridRange()
+                        Range = new GridRange
                         {
                             SheetId = sheetId,
                             StartColumnIndex = currentWarnings + i + 1,
@@ -282,17 +298,17 @@ namespace MarbleBot.Modules
                             StartRowIndex = rowIndex - 1,
                             EndRowIndex = rowIndex
                         },
-                        Cell = new CellData()
+                        Cell = new CellData
                         {
-                            UserEnteredFormat = new CellFormat()
+                            UserEnteredFormat = new CellFormat
                             {
                                 BackgroundColor = GetCellBackgroundColour(currentWarnings + i + 1),
-                                TextFormat = new TextFormat()
+                                TextFormat = new TextFormat
                                 {
                                     ForegroundColor = GetCellForegroundColour(currentWarnings + i + 1)
                                 }
                             },
-                            UserEnteredValue = new ExtendedValue()
+                            UserEnteredValue = new ExtendedValue
                             {
                                 StringValue = warningCode
                             }
@@ -302,11 +318,11 @@ namespace MarbleBot.Modules
                 });
             }
 
-            requests.Add(new Request()
+            requests.Add(new Request
             {
-                RepeatCell = new RepeatCellRequest()
+                RepeatCell = new RepeatCellRequest
                 {
-                    Range = new GridRange()
+                    Range = new GridRange
                     {
                         SheetId = sheetId,
                         StartColumnIndex = 9,
@@ -314,9 +330,9 @@ namespace MarbleBot.Modules
                         StartRowIndex = rowIndex - 1,
                         EndRowIndex = rowIndex
                     },
-                    Cell = new CellData()
+                    Cell = new CellData
                     {
-                        UserEnteredValue = new ExtendedValue()
+                        UserEnteredValue = new ExtendedValue
                         {
                             StringValue = currentWarnings < 3 ? "Normal" : currentWarnings == 6 ? "Banned" : "Criminal"
                         }
@@ -325,11 +341,11 @@ namespace MarbleBot.Modules
                 }
             });
 
-            requests.Add(new Request()
+            requests.Add(new Request
             {
-                RepeatCell = new RepeatCellRequest()
+                RepeatCell = new RepeatCellRequest
                 {
-                    Range = new GridRange()
+                    Range = new GridRange
                     {
                         SheetId = sheetId,
                         StartColumnIndex = 9,
@@ -337,9 +353,9 @@ namespace MarbleBot.Modules
                         StartRowIndex = rowIndex - 1,
                         EndRowIndex = rowIndex
                     },
-                    Cell = new CellData()
+                    Cell = new CellData
                     {
-                        UserEnteredValue = new ExtendedValue()
+                        UserEnteredValue = new ExtendedValue
                         {
                             NumberValue = totalWarnings
                         }
@@ -361,37 +377,43 @@ namespace MarbleBot.Modules
         public async Task RemoveRoleCommand([Remainder] string searchTerm)
         {
             var guild = MarbleBotGuild.Find(Context);
-            var id = Context.Guild.Roles.Where(r => string.Compare(r.Name, searchTerm, true) == 0).First().Id;
-            if (!Context.Guild.Roles.Any(r => string.Compare(r.Name, searchTerm, true) == 0) ||
+            ulong id = Context.Guild.Roles
+                .First(r => string.Compare(r.Name, searchTerm, StringComparison.OrdinalIgnoreCase) == 0).Id;
+            if (Context.Guild.Roles.All(r => string.Compare(r.Name, searchTerm, StringComparison.OrdinalIgnoreCase) != 0) ||
                 !guild.Roles.Contains(id))
             {
                 await SendErrorAsync("Could not find the role!");
                 return;
             }
+
             guild.Roles.Remove(id);
             MarbleBotGuild.UpdateGuild(guild);
-            await ReplyAsync("Succesfully updated.");
+            await ReplyAsync("Successfully updated.");
         }
 
         [Command("setchannel")]
         [Summary("Sets a channel.")]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageChannels)]
-        public async Task SetChannelAsync(string option, string rawChannel)
+        public async Task SetChannelAsync(string option, ITextChannel channel)
         {
-            if (!ulong.TryParse(rawChannel.RemoveChar('<').RemoveChar('>').RemoveChar('#'), out ulong channel))
-            {
-                await ReplyAsync("Invalid channel!");
-                return;
-            }
             var guild = MarbleBotGuild.Find(Context);
             switch (option.ToLower().RemoveChar(' '))
             {
-                case "announcement": guild.AnnouncementChannel = channel; break;
-                case "autoresponse": guild.AutoresponseChannel = channel; break;
-                case "usable": guild.UsableChannels.Add(channel); break;
-                default: await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info."); return;
+                case "announcement":
+                    guild.AnnouncementChannel = channel.Id;
+                    break;
+                case "autoresponse":
+                    guild.AutoresponseChannel = channel.Id;
+                    break;
+                case "usable":
+                    guild.UsableChannels.Add(channel.Id);
+                    break;
+                default:
+                    await ReplyAsync("Invalid option. Use `mb/help setchannel` for more info.");
+                    return;
             }
+
             MarbleBotGuild.UpdateGuild(guild);
             await SendSuccessAsync("Successfully updated.");
         }
@@ -408,6 +430,7 @@ namespace MarbleBot.Modules
                 await ReplyAsync("Invalid hexadecimal colour string.");
                 return;
             }
+
             var guild = MarbleBotGuild.Find(Context);
             guild.Color = input;
             MarbleBotGuild.UpdateGuild(guild);
@@ -431,7 +454,7 @@ namespace MarbleBot.Modules
         [RequireBotPermission(ChannelPermission.ManageChannels)]
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageChannels)]
-        public async Task SetSlowmodeCommand(Discord.WebSocket.SocketTextChannel textChannel, int slowmodeInterval)
+        public async Task SetSlowmodeCommand(SocketTextChannel textChannel, int slowmodeInterval)
         {
             await textChannel.ModifyAsync(c => c.SlowModeInterval = slowmodeInterval);
             await ReplyAsync($"Successfully updated the slowmode interval of <#{textChannel.Id}> to **{slowmodeInterval}** second{(slowmodeInterval == 1 ? "" : "s")}.");
@@ -442,7 +465,9 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
         public async Task WarnCommand(IGuildUser user, string warningCode, int warningsToGive)
-            => await WarnUserAsync(Context, user, warningCode, warningsToGive);
+        {
+            await WarnUserAsync(Context, user, warningCode, warningsToGive);
+        }
 
         [Command("warn", RunMode = RunMode.Async)]
         [Summary("Warns a user.")]
@@ -460,7 +485,8 @@ namespace MarbleBot.Modules
             }
         }
 
-        public async Task WarnUserAsync(SocketCommandContext context, IGuildUser user, string warningCode, int warningsToGive)
+        private async Task WarnUserAsync(SocketCommandContext context, IGuildUser user, string warningCode,
+            int warningsToGive)
         {
             if (warningsToGive < 1)
             {

@@ -5,12 +5,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 
-namespace MarbleBot.Common
+namespace MarbleBot.Common.Games.Siege
 {
     public class Boss
     {
-        public string Name { get; }
-
         private int _health;
         public int Health
         {
@@ -18,15 +16,16 @@ namespace MarbleBot.Common
             set => _health = value > MaxHealth ? MaxHealth : value < 1 ? 0 : value;
         }
 
+        public string Name { get; }
         public int MaxHealth { get; }
         public ImmutableArray<Attack> Attacks { get; }
         public Difficulty Difficulty { get; }
-        public ImmutableArray<BossDrops> Drops { get; }
+        public ImmutableArray<BossDropInfo> Drops { get; }
         public string ImageUrl { get; }
         public int Stage { get; }
 
         public Boss(string name, int health, Difficulty difficulty, int stage, string imageUrl,
-            IEnumerable<Attack> attacks, IEnumerable<BossDrops> itemDrops)
+            IEnumerable<Attack> attacks, IEnumerable<BossDropInfo> itemDrops)
         {
             Name = name;
             _health = health;
@@ -34,7 +33,7 @@ namespace MarbleBot.Common
             Difficulty = difficulty;
             Stage = stage;
             Attacks = attacks.ToImmutableArray();
-            Drops = itemDrops == null ? ImmutableArray.Create<BossDrops>() : itemDrops.ToImmutableArray();
+            Drops = itemDrops == null ? ImmutableArray.Create<BossDropInfo>() : itemDrops.ToImmutableArray();
             ImageUrl = imageUrl;
         }
 
@@ -43,11 +42,11 @@ namespace MarbleBot.Common
             var bossesDict = GetBosses();
             searchTerm = searchTerm.ToPascalCase();
 
-            foreach (var boss in bossesDict)
+            foreach ((string bossName, Boss boss) in bossesDict)
             {
-                if (string.Compare(boss.Key, searchTerm, true) == 0)
+                if (string.Compare(bossName, searchTerm, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    return boss.Value;
+                    return boss;
                 }
             }
 
@@ -61,6 +60,7 @@ namespace MarbleBot.Common
             {
                 json = bosses.ReadToEnd();
             }
+
             return JsonConvert.DeserializeObject<IDictionary<string, Boss>>(json);
         }
     }

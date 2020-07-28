@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using MarbleBot.Common.Games;
+using MarbleBot.Common.Games.Scavenge;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,8 @@ namespace MarbleBot.Common
             throw new NotImplementedException();
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+            JsonSerializer serializer)
         {
             var jObject = JToken.ReadFrom(reader);
             Item? result;
@@ -49,7 +52,7 @@ namespace MarbleBot.Common
                     jObject["CraftingStationRequired"]?.ToObject<int>(),
                     jObject["Damage"]?.ToObject<int>());
             }
-            else if (jObject["DamageAbsorption"] != null)
+            else if (jObject["IncomingDamageMultiplier"] != null)
             {
                 result = new Shield(jObject["Id"]?.ToObject<int>(),
                     jObject["Name"]?.ToObject<string>(),
@@ -61,9 +64,9 @@ namespace MarbleBot.Common
                     jObject["CraftingProduced"]?.ToObject<int>(),
                     jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>?>(),
                     jObject["CraftingStationRequired"]?.ToObject<int>(),
-                    jObject["DamageAbsorption"]?.ToObject<int>());
+                    jObject["IncomingDamageMultiplier"]?.ToObject<int>());
             }
-            else if (jObject["DamageBoost"] != null)
+            else if (jObject["OutgoingDamageMultiplier"] != null)
             {
                 result = new Spikes(jObject["Id"]?.ToObject<int>(),
                     jObject["Name"]?.ToObject<string>(),
@@ -75,7 +78,7 @@ namespace MarbleBot.Common
                     jObject["CraftingProduced"]?.ToObject<int>(),
                     jObject["CraftingRecipe"]?.ToObject<Dictionary<int, int>?>(),
                     jObject["CraftingStationRequired"]?.ToObject<int>(),
-                    jObject["DamageBoost"]?.ToObject<int>());
+                    jObject["OutgoingDamageMultiplier"]?.ToObject<float>());
             }
             else
             {

@@ -47,10 +47,6 @@
   "item": {
     "Usage": "mb/item <item ID>"
   },
-  "orangeify": {
-    "Usage": "mb/orangeify <text>",
-    "Example": "mb/orangeify Drink Poup Soop!"
-  },
   "poupsoop": {
     "Usage": "mb/poupsoop <# Regular> | <optional # Limited> | <optional # Frozen> | <optional # Orange> | <optional # Electric> | <optional # Burning> | optional <# Rotten> | <optional # Ulteymut> | <optional # Variety Pack>",
     "Example": "mb/poupsoop 3 | 1"

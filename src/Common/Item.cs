@@ -1,4 +1,5 @@
-﻿using MarbleBot.Extensions;
+﻿using MarbleBot.Common.Games.Scavenge;
+using MarbleBot.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,19 +10,9 @@ namespace MarbleBot.Common
     [JsonConverter(typeof(ItemConverter))]
     public class Item
     {
-        public int Id { get; }
-        public string Name { get; }
-        public decimal Price { get; }
-        public string Description { get; }
-        public bool OnSale { get; }
-        public int Stage { get; }
-        public ScavengeLocation ScavengeLocation { get; }
-        public int CraftingProduced { get; }
-        public Dictionary<int, int>? CraftingRecipe { get; }
-        public int CraftingStationRequired { get; }
-
         [JsonConstructor]
-        public Item(int? id = -1, string? name = "", decimal? price = 0m, string? description = "", bool? onSale = false,
+        public Item(int? id = -1, string? name = "", decimal? price = 0m, string? description = "",
+            bool? onSale = false,
             int? stage = 1, ScavengeLocation? scavengeLocation = ScavengeLocation.None, int? craftingProduced = 0,
             Dictionary<int, int>? craftingRecipe = null, int? craftingStationRequired = 0)
         {
@@ -51,6 +42,17 @@ namespace MarbleBot.Common
             CraftingStationRequired = baseItem.CraftingStationRequired;
         }
 
+        public int Id { get; }
+        public string Name { get; }
+        public decimal Price { get; }
+        public string Description { get; }
+        public bool OnSale { get; }
+        public int Stage { get; }
+        public ScavengeLocation ScavengeLocation { get; }
+        public int CraftingProduced { get; }
+        public Dictionary<int, int>? CraftingRecipe { get; }
+        public int CraftingStationRequired { get; }
+
         public static T Find<T>(int itemId) where T : Item
         {
             var itemsDict = GetItems();
@@ -58,10 +60,8 @@ namespace MarbleBot.Common
             {
                 return (T)itemsDict[itemId];
             }
-            else
-            {
-                throw new Exception("The requested item could not be found.");
-            }
+
+            throw new Exception("The requested item could not be found.");
         }
 
         public static T Find<T>(string searchTerm) where T : Item
@@ -73,22 +73,22 @@ namespace MarbleBot.Common
                 {
                     return (T)itemsDict[itemId];
                 }
-                else
-                {
-                    throw new Exception("The requested item could not be found.");
-                }
+
+                throw new Exception("The requested item could not be found.");
             }
             else
             {
                 var itemsDict = GetItems();
                 string newSearchTerm = searchTerm.ToLower().RemoveChar(' ');
-                foreach (var itemPair in itemsDict)
+                foreach ((int _, Item item) in itemsDict)
                 {
-                    if (itemPair.Value.Name.ToLower().Contains(newSearchTerm) || newSearchTerm.Contains(itemPair.Value.Name.ToLower()))
+                    if (item.Name.ToLower().Contains(newSearchTerm) ||
+                        newSearchTerm.Contains(item.Name.ToLower()))
                     {
-                        return (T)itemPair.Value;
+                        return (T)item;
                     }
                 }
+
                 throw new Exception("The requested item could not be found.");
             }
         }
@@ -100,9 +100,13 @@ namespace MarbleBot.Common
             {
                 json = itemFile.ReadToEnd();
             }
+
             return JsonConvert.DeserializeObject<IDictionary<int, Item>>(json);
         }
 
-        public override string ToString() => $"`[{Id:000}]` **{Name}**";
+        public override string ToString()
+        {
+            return $"`[{Id:000}]` **{Name}**";
+        }
     }
 }

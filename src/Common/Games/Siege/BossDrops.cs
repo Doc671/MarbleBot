@@ -1,13 +1,15 @@
-﻿namespace MarbleBot.Common
+﻿using System;
+
+namespace MarbleBot.Common.Games.Siege
 {
-    public readonly struct BossDrops
+    public readonly struct BossDropInfo : IEquatable<BossDropInfo>
     {
         public int ItemId { get; }
         public int MinCount { get; }
         public int MaxCount { get; }
         public int Chance { get; }
 
-        public BossDrops(int itemId, int minCount, int maxCount, int chance)
+        public BossDropInfo(int itemId, int minCount, int maxCount, int chance)
         {
             ItemId = itemId;
             MinCount = minCount;
@@ -17,27 +19,32 @@
 
         public override bool Equals(object? obj)
         {
-            return obj is BossDrops drops &&
+            return obj is BossDropInfo drops &&
                    ItemId == drops.ItemId &&
                    MinCount == drops.MinCount &&
                    MaxCount == drops.MaxCount &&
                    Chance == drops.Chance;
         }
 
-        public override int GetHashCode()
+        public bool Equals(BossDropInfo other)
         {
-            unchecked
-            {
-                return 17 * ItemId.GetHashCode() + MinCount.GetHashCode() + MaxCount.GetHashCode() + Chance.GetHashCode();
-            }
+            return ItemId == other.ItemId &&
+                   MinCount == other.MinCount &&
+                   MaxCount == other.MaxCount &&
+                   Chance == other.Chance;
         }
 
-        public static bool operator ==(BossDrops left, BossDrops right)
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ItemId, MinCount, MaxCount, Chance);
+        }
+
+        public static bool operator ==(BossDropInfo left, BossDropInfo right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(BossDrops left, BossDrops right)
+        public static bool operator !=(BossDropInfo left, BossDropInfo right)
         {
             return !(left == right);
         }

@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Common;
+using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,10 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task GiveRoleCommand([Remainder] string roleName)
         {
-            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
+            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
+                var role = Context.Guild.Roles.First(r =>
+                    string.Compare(r.Name, roleName, StringComparison.OrdinalIgnoreCase) == 0);
                 var guild = MarbleBotGuild.Find(Context);
                 if (guild.Roles.Any(r => r == role.Id))
                 {
@@ -28,6 +30,7 @@ namespace MarbleBot.Modules
                     return;
                 }
             }
+
             await SendErrorAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
         }
 
@@ -37,9 +40,10 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task TakeRoleCommand([Remainder] string roleName)
         {
-            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
+            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
+                var role = Context.Guild.Roles.First(r =>
+                    string.Compare(r.Name, roleName, StringComparison.OrdinalIgnoreCase) == 0);
                 var guild = MarbleBotGuild.Find(Context);
                 if (guild.Roles.Any(r => r == role.Id))
                 {
@@ -48,6 +52,7 @@ namespace MarbleBot.Modules
                     return;
                 }
             }
+
             await SendErrorAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
         }
 
@@ -57,9 +62,10 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task RoleToggleCommand([Remainder] string roleName)
         {
-            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, true) == 0))
+            if (Context.Guild.Roles.Any(r => string.Compare(r.Name, roleName, StringComparison.OrdinalIgnoreCase) == 0))
             {
-                var role = Context.Guild.Roles.Where(r => string.Compare(r.Name, roleName, true) == 0).First();
+                var role = Context.Guild.Roles.First(r =>
+                    string.Compare(r.Name, roleName, StringComparison.OrdinalIgnoreCase) == 0);
                 var guild = MarbleBotGuild.Find(Context);
                 var socketGuildUser = Context.User as SocketGuildUser;
                 if (guild.Roles.Any(r => r == role.Id))
@@ -74,9 +80,11 @@ namespace MarbleBot.Modules
                         await socketGuildUser!.AddRoleAsync(role);
                         await ReplyAsync($"Success. The **{role.Name}** role has been given to you.");
                     }
+
                     return;
                 }
             }
+
             await SendErrorAsync("The requested role either does not exist or cannot be requested for. Make sure your spelling is correct!");
         }
 
@@ -87,7 +95,7 @@ namespace MarbleBot.Modules
         {
             var output = new StringBuilder();
             var guild = MarbleBotGuild.Find(Context);
-            foreach (var role in guild.Roles)
+            foreach (ulong role in guild.Roles)
             {
                 output.AppendLine(Context.Guild.GetRole(role).Name);
             }

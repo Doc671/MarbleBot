@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
 using System;
 
-namespace MarbleBot.Common
+namespace MarbleBot.Common.Games.Siege
 {
     public class SiegeMarble : BaseMarble
     {
@@ -19,19 +19,17 @@ namespace MarbleBot.Common
         {
         }
 
-        public override string ToString() => $"{Name} Health: {Health}/20 [{Id}] BH: {DamageDealt} PH: {PowerUpHits} Cloned: {Cloned}";
+        public override string ToString()
+        {
+            return $"{Name} Health: {Health}/20 [{Id}] BH: {DamageDealt} PH: {PowerUpHits} Cloned: {Cloned}";
+        }
 
-        public string ToString(SocketCommandContext context, bool HealthShown = true)
+        public string ToString(SocketCommandContext context, bool healthShown = true)
         {
             var user = context.Client.GetUser(Id);
-            if (HealthShown)
-            {
-                return $"**{Name}** (Health: **{Health}**/{MaxHealth}, DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
-            }
-            else
-            {
-                return $"**{Name}** (DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
-            }
+            return healthShown
+                ? $"**{Name}** (Health: **{Health}**/{MaxHealth}, DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]"
+                : $"**{Name}** (DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
         }
     }
 }

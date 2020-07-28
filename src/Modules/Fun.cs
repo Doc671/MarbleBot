@@ -4,12 +4,12 @@ using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Services;
 using System;
-using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Color = System.Drawing.Color;
 
 namespace MarbleBot.Modules
 {
@@ -63,7 +63,8 @@ namespace MarbleBot.Modules
                     .Append("\n**TO ADVANCE:** Craft the **Essence of Corruption** (ID `079`).")
                     .ToString();
             }
-            else if (user.Items.ContainsKey(66) || user.Items.ContainsKey(71) || user.Items.ContainsKey(74) || user.Items.ContainsKey(80))
+            else if (user.Items.ContainsKey(66) || user.Items.ContainsKey(71) || user.Items.ContainsKey(74) ||
+                     user.Items.ContainsKey(80))
             {
                 msg = new StringBuilder().Append("Your equipment will prove very useful in the upcoming battles.")
                     .AppendLine("Seek the Chest of sentience and the Scary Face to test your newfound power.")
@@ -86,56 +87,64 @@ namespace MarbleBot.Modules
             }
             else if (user.Items.ContainsKey(62))
             {
-                msg = new StringBuilder().Append("Before you can successfully take on the new terrors roaming the land, ")
+                msg = new StringBuilder()
+                    .Append("Before you can successfully take on the new terrors roaming the land, ")
                     .AppendLine("you must first improve your equipment. Use Destroyer's plating to craft your own shield.")
                     .Append("\n**TO ADVANCE:** Craft the **Coating of Destruction** (ID `063`).")
                     .ToString();
             }
             else if (user.Stage == 2)
             {
-                msg = new StringBuilder().Append("The cyborg's defeat has both given you new options and caught the attention of ")
+                msg = new StringBuilder()
+                    .Append("The cyborg's defeat has both given you new options and caught the attention of ")
                     .AppendLine("even more powerful foes. Head to its remains and gather the resources to upgrade your workstation.")
                     .Append("\n**TO ADVANCE:** Craft the **Crafting Station Mk.II** (ID `062`).")
                     .ToString();
             }
             else if (user.Items.ContainsKey(53) && user.Items.ContainsKey(57))
             {
-                msg = new StringBuilder().Append("You have done very well, and have forged the best with the resources available ")
+                msg = new StringBuilder()
+                    .Append("You have done very well, and have forged the best with the resources available ")
                     .AppendLine("to you. There is more to this world, however. Gather your allies and seek the cyborg Destroyer.")
                     .Append("\n**TO ADVANCE:** Defeat Destroyer. Item `091` may provide assistance.")
                     .ToString();
             }
             else if (user.Items.ContainsKey(53))
             {
-                msg = new StringBuilder().Append("The Trebuchet Array is a potent weapon, albeit rather inaccurate. To assist ")
+                msg = new StringBuilder()
+                    .Append("The Trebuchet Array is a potent weapon, albeit rather inaccurate. To assist ")
                     .AppendLine("in your battles, create the Rocket Boots, which shall help you evade their menacing attacks.")
                     .Append("\n**TO ADVANCE:** Craft the **Rocket Boots** (ID `057`).")
                     .ToString();
             }
             else if (user.Items.ContainsKey(17))
             {
-                msg = new StringBuilder().Append("With your workstation, forge the Trebuchet Array from the different woods found ")
+                msg = new StringBuilder()
+                    .Append("With your workstation, forge the Trebuchet Array from the different woods found ")
                     .AppendLine("in the forest. You will have to create three separate trebuchets first, then combine them.")
                     .Append("\n**TO ADVANCE:** Craft the **Trebuchet Array** (ID `053`).")
                     .ToString();
             }
             else if (user.LastScavenge.DayOfYear != 1 || user.LastScavenge.Year != 2019)
             {
-                msg = new StringBuilder().Append("The items you have gathered are likely unable to be used in their current form. ")
+                msg = new StringBuilder()
+                    .Append("The items you have gathered are likely unable to be used in their current form. ")
                     .AppendLine("You must find a way to obtain a Crafting Station.")
                     .Append("\n**TO ADVANCE:** Obtain the **Crafting Station Mk.I** (ID `017`) via dailies.")
                     .ToString();
             }
             else if (user.NetWorth > 1000)
             {
-                msg = new StringBuilder().Append("Well done. Your next goal is to gather for items at Canary Beach and Tree Wurld. ")
+                msg = new StringBuilder()
+                    .Append("Well done. Your next goal is to gather for items at Canary Beach and Tree Wurld. ")
                     .AppendLine("Use `mb/scavenge help` if you are unsure of how to proceed.")
                     .Append("\n**TO ADVANCE:** Successfully complete a Scavenge.")
                     .ToString();
             }
             else
             {
-                msg = new StringBuilder().Append($"Welcome! Your first task is to gain {UnitOfMoney}1000! If you need help ")
+                msg = new StringBuilder()
+                    .Append($"Welcome! Your first task is to gain {UnitOfMoney}1000! If you need help ")
                     .AppendLine("earning money, try using `mb/daily`, `mb/race` or `mb/siege`.")
                     .Append($"\n**TO ADVANCE:** Obtain {UnitOfMoney}1000.")
                     .ToString();
@@ -153,18 +162,17 @@ namespace MarbleBot.Modules
         [Summary("Picks a random person to call the best.")]
         [RequireContext(ContextType.Guild)]
         public async Task BestCommand()
-            => await ReplyAsync($"**{Context.Guild.Users.ElementAt(_randomService.Rand.Next(0, Context.Guild.Users.Count))}** is the best!");
-
-        [Command("buyhat")]
-        [Summary("Fakes buying an Uglee Hat.")]
-        public async Task BuyHatCommand()
-            => await ReplyAsync($"That'll be **{_randomService.Rand.Next(0, int.MaxValue)}** units of money please. Thank you for buying Uglee Hat #**{_randomService.Rand.Next(0, 69042)}**!");
+        {
+            await ReplyAsync($"**{Context.Guild.Users.ElementAt(_randomService.Rand.Next(0, Context.Guild.Users.Count))}** is the best!");
+        }
 
         [Command("cameltotitlecase")]
         [Alias("cameltotitle")]
         [Summary("Converts a camel case string to title case.")]
         public async Task CamelToTitleCaseCommand([Remainder] string input)
-            => await ReplyAsync(input.CamelToTitleCase());
+        {
+            await ReplyAsync(input.CamelToTitleCase());
+        }
 
         [Command("choose")]
         [Summary("Chooses between several provided choices.")]
@@ -188,12 +196,14 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            var color = System.Drawing.Color.FromArgb(red, green, blue);
-            color.GetHSV(out float hue, out float saturation, out float value);
+            Color color = Color.FromArgb(red, green, blue);
+            color.GetHsv(out float hue, out float saturation, out float value);
             var builder = new EmbedBuilder()
                 .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
                 .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
-                .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
+                .AddField("HSL",
+                    $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**",
+                    true)
                 .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
 
             await SendColorMessage(color, builder);
@@ -217,19 +227,19 @@ namespace MarbleBot.Modules
             int p = Convert.ToInt32(v * (1 - saturation));
             int q = Convert.ToInt32(v * (1 - f * saturation));
             int t = Convert.ToInt32(v * (1 - (1 - f) * saturation));
-            var color = hi switch
+            Color color = hi switch
             {
-                0 => System.Drawing.Color.FromArgb(v, t, p),
-                1 => System.Drawing.Color.FromArgb(q, v, p),
-                2 => System.Drawing.Color.FromArgb(p, v, t),
-                3 => System.Drawing.Color.FromArgb(p, q, v),
-                4 => System.Drawing.Color.FromArgb(t, p, v),
-                _ => System.Drawing.Color.FromArgb(v, p, q),
+                0 => Color.FromArgb(v, t, p),
+                1 => Color.FromArgb(q, v, p),
+                2 => Color.FromArgb(p, v, t),
+                3 => Color.FromArgb(p, q, v),
+                4 => Color.FromArgb(t, p, v),
+                _ => Color.FromArgb(v, p, q)
             };
             var builder = new EmbedBuilder()
-                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
-                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
-                .AddField("HSL", $"Hue: **{hue}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
+                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", inline: true)
+                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", inline: true)
+                .AddField("HSL", $"Hue: **{hue}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", inline: true)
                 .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
 
             await SendColorMessage(color, builder);
@@ -248,7 +258,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (!int.TryParse(hexCode[0..2], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out int red)
+            if (!int.TryParse(hexCode[..2], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out int red)
                 || !int.TryParse(hexCode[2..4], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out int green)
                 || !int.TryParse(hexCode[4..6], NumberStyles.AllowHexSpecifier, CultureInfo.CurrentCulture, out int blue))
             {
@@ -256,45 +266,34 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            var color = System.Drawing.Color.FromArgb(red, green, blue);
-            color.GetHSV(out float hue, out float saturation, out float value);
+            Color color = Color.FromArgb(red, green, blue);
+            color.GetHsv(out float hue, out float saturation, out float value);
 
             var builder = new EmbedBuilder()
-                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
-                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
-                .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
+                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", inline: true)
+                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", inline: true)
+                .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", inline: true)
                 .AddField("Hex Code", $"#{hexCode.ToUpper()}");
 
             await SendColorMessage(color, builder);
         }
 
-        private async Task SendColorMessage(System.Drawing.Color color, EmbedBuilder builder)
+        private async Task SendColorMessage(Color color, EmbedBuilder builder)
         {
-            builder.WithColor(new Color(color.R, color.G, color.B));
+            builder.WithColor(new Discord.Color(color.R, color.G, color.B));
 
-            var colorEnumerable = Enum.GetValues(typeof(System.Drawing.KnownColor))
-                .Cast<System.Drawing.KnownColor>()
-                .Where(c => System.Drawing.Color.FromKnownColor(c).ToArgb() == color.ToArgb());
+            var allColors = Enum.GetValues(typeof(KnownColor))
+                .Cast<KnownColor>()
+                .Where(c => Color.FromKnownColor(c).ToArgb() == color.ToArgb())
+                .ToArray();
 
-            if (colorEnumerable.Count() > 0)
+            if (allColors.Length == 0)
             {
-                builder.WithTitle(colorEnumerable.First().ToString().CamelToTitleCase());
+                builder.WithTitle(allColors[0].ToString().CamelToTitleCase());
             }
 
             await ReplyAsync(embed: builder.Build());
         }
-
-        [Command("orange")]
-        [Summary("Gives the user a random statement in Orange Language.")]
-        public async Task OrangeCommand() => await ReplyAsync((_randomService.Rand.Next(1, 6)) switch
-        {
-            1 => "!olleH",
-            2 => "!raotS taH ehT owt oG",
-            3 => "!pooS puoP knirD",
-            4 => ".depfeQ ,ytiC ogitreV ni evil I",
-            5 => "!haoW",
-            _ => "!ainomleM dna dnalkseD ,ytiC ogitreV :depfeQ ni seitic eerht era erehT"
-        });
 
         [Command("random")]
         [Summary("Returns a random number with user-defined bounds.")]
@@ -308,60 +307,6 @@ namespace MarbleBot.Modules
             {
                 await ReplyAsync(_randomService.Rand.Next(start, end).ToString());
             }
-        }
-
-        [Command("rank")]
-        [Summary("Returns a randomised level and XP count.")]
-        public async Task RankCommand()
-        {
-            var builder = new EmbedBuilder();
-            int level = _randomService.Rand.Next(0, 25);
-            int xp = level * 100 * _randomService.Rand.Next(1, 5);
-
-            IEnumerable<IMessage> msgs = await Context.Channel.GetMessagesAsync(100).FlattenAsync();
-            int ranks = 0;
-
-            foreach (IMessage msg in msgs)
-            {
-                if (msg.Content == "mb/rank" && msg.Author == Context.Message.Author)
-                {
-                    ranks++;
-                }
-            }
-
-            string flavour = ranks switch
-            {
-                1 => "Pretty cool, right?",
-                2 => "100% legitimate",
-                3 => "I have a feeling you doubt me. Why is that?",
-                4 => "What? I'm telling the truth, I swear!",
-                5 => "What do you mean: \"This is random!\"?",
-                6 => "Stop! Now!",
-                7 => "I mean, you're probably breaking a no-spam rule!",
-                8 => "...or slowmode is on...",
-                9 => "Please... don't expose me... ;-;",
-                10 => "At least I tried to generate a level...",
-                11 => "I want to cry now. I really do.",
-                12 => "...and I cry acid.",
-                13 => "Just kidding, I actually cry Poup Soop...",
-                14 => "...which has acid in it...",
-                15 => "Why are you still going?",
-                16 => "Aren't you bored?",
-                17 => "Don't you have anything better to do?",
-                18 => "No? I suppose not.You've used this command 18 times in the past 100 messages, after all.",
-                19 => "Hm.",
-                20 => "You know... I do actually have something for you...",
-                _ => $"Your stage is {MarbleBotUser.Find(Context).Stage}!"
-            };
-
-            builder.AddField("Level", level, true)
-                .AddField("Total XP", xp, true)
-                .WithColor(GetColor(Context))
-                .WithTimestamp(DateTime.UtcNow)
-                .WithAuthor(Context.User)
-                .WithFooter(flavour);
-
-            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("rate")]
@@ -383,7 +328,7 @@ namespace MarbleBot.Modules
                 8 => ":thumbsup:",
                 9 => ":white_check_mark:",
                 10 => ":rofl:",
-                _ => ":thinking:",
+                _ => ":thinking:"
             };
 
             string message = rating switch
@@ -399,7 +344,7 @@ namespace MarbleBot.Modules
                 8 => "yes",
                 9 => "approaching perfection",
                 10 => "PERFECT!!",
-                _ => "Uhhhhhhhh\nNot",
+                _ => "Uhhhhhhhh\nNot"
             };
 
             await ReplyAsync($"**{Context.User.Username}**, I rate {input} **{rating}**/10. {emoji}\n({message})");
@@ -407,14 +352,21 @@ namespace MarbleBot.Modules
 
         [Command("repeat")]
         [Summary("Repeats the given message.")]
-        public async Task RepeatCommand([Remainder] string repeat) => await ReplyAsync(repeat);
+        public async Task RepeatCommand([Remainder] string repeat)
+        {
+            await ReplyAsync(repeat);
+        }
 
         [Command("reverse")]
         [Alias("orangeify")]
         [Summary("Returns the user input reversed.")]
-        public async Task ReverseCommand([Remainder] string input) => await ReplyAsync(string.Concat(input.Reverse()));
+        public async Task ReverseCommand([Remainder] string input)
+        {
+            await ReplyAsync(string.Concat(input.Reverse()));
+        }
 
         [Command("submit")]
+        [Summary("Submits a file to the bot owner.")]
         public async Task SubmitCommand([Remainder] string message = "")
         {
             if (string.IsNullOrEmpty(message) && Context.Message.Attachments.Count == 0)
@@ -423,7 +375,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            foreach (var adminId in _botCredentials.AdminIds)
+            foreach (ulong adminId in _botCredentials.AdminIds)
             {
                 if (Context.Message.Attachments.Count == 0)
                 {
@@ -431,9 +383,11 @@ namespace MarbleBot.Modules
                 }
                 else
                 {
-                    await Context.Client.GetUser(adminId).SendMessageAsync($"{Context.User.Id} {message} {Context.Message.Attachments.First().Url}");
+                    await Context.Client.GetUser(adminId)
+                        .SendMessageAsync($"{Context.User.Id} {message} {Context.Message.Attachments.First().Url}");
                 }
             }
+
             await ReplyAsync("Your submission has been received and will now be reviewed. Expect up to 48 hours for a reply.");
         }
     }

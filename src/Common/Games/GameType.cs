@@ -1,4 +1,4 @@
-﻿namespace MarbleBot.Common
+﻿namespace MarbleBot.Common.Games
 {
     public enum GameType
     {

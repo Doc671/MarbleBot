@@ -10,11 +10,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace MarbleBot.Common
+namespace MarbleBot.Common.Games.Scavenge
 {
     public class Scavenge
     {
-        public ulong Id { get; set; }
         public Queue<Item> Items { get; set; } = new Queue<Item>();
         public ScavengeLocation Location { get; set; }
         public Queue<Item> Ores { get; set; } = new Queue<Item>();
@@ -22,17 +21,19 @@ namespace MarbleBot.Common
         public Queue<Item> UsedOres { get; set; } = new Queue<Item>();
 
         private readonly List<Item> _collectableItems;
-        private bool _finished = false;
-        private bool _itemHasAppeared = false;
-        private bool _oreHasAppeared = false;
-        private readonly DateTime _startTime;
         private readonly SocketCommandContext _context;
-        private readonly IUserMessage _originalMessage;
-        private readonly Timer _timer = new Timer(8000);
         private readonly GamesService _gamesService;
+        private readonly ulong _id;
+        private readonly IUserMessage _originalMessage;
         private readonly RandomService _randomService;
+        private readonly DateTime _startTime;
+        private readonly Timer _timer = new Timer(8000);
+        private bool _finished;
+        private bool _itemHasAppeared;
+        private bool _oreHasAppeared;
 
-        public Scavenge(SocketCommandContext context, GamesService gamesService, RandomService randomService, ScavengeLocation location, IUserMessage message)
+        public Scavenge(SocketCommandContext context, GamesService gamesService, RandomService randomService,
+            ScavengeLocation location, IUserMessage message)
         {
             _collectableItems = new List<Item>();
             _context = context;
@@ -40,7 +41,7 @@ namespace MarbleBot.Common
             _randomService = randomService;
             _originalMessage = message;
 
-            Id = context.User.Id;
+            _id = context.User.Id;
             Location = location;
 
             _timer.Elapsed += Timer_Elapsed;
@@ -59,20 +60,15 @@ namespace MarbleBot.Common
             }
 
             _finished = true;
-            _gamesService.Scavenges.TryRemove(Id, out _);
+            _gamesService.Scavenges.TryRemove(_id, out _);
         }
 
-        public async Task OnGameEnd()
+        private async Task OnGameEnd()
         {
             var user = MarbleBotUser.Find(_context);
             user.LastScavenge = DateTime.UtcNow;
-            foreach (var item in Items)
+            foreach (var item in Items.Where(item => !item.Name.Contains("Ore")))
             {
-                if (item.Name.Contains("Ore"))
-                {
-                    continue;
-                }
-
                 if (user.Items.ContainsKey(item.Id))
                 {
                     user.Items[item.Id]++;
@@ -82,6 +78,7 @@ namespace MarbleBot.Common
                     user.Items.Add(item.Id, 1);
                 }
             }
+
             MarbleBotUser.UpdateUser(user);
 
             await UpdateEmbed(true, user.Stage);
@@ -92,7 +89,7 @@ namespace MarbleBot.Common
         private void PopulateCollectableItems()
         {
             var items = Item.GetItems();
-            foreach (var itemPair in items)
+            foreach (KeyValuePair<int, Item> itemPair in items)
             {
                 if (itemPair.Value.ScavengeLocation == Location)
                 {
@@ -105,7 +102,7 @@ namespace MarbleBot.Common
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (_randomService.Rand.Next(0, 5) < 4)
+            if (_randomService.Rand.Next(0, 5) != 0)
             {
                 var item = _collectableItems[_randomService.Rand.Next(0, _collectableItems.Count)];
                 if (item.Name.Contains("Ore"))
@@ -174,11 +171,13 @@ namespace MarbleBot.Common
             }
 
             var embed = _originalMessage.Embeds.First();
-            await _originalMessage.ModifyAsync(m => m.Embed = new EmbedBuilder()
+            await _originalMessage.ModifyAsync(m => m.Embed = new EmbedBuilder
             {
                 Color = embed.Color,
-                Description = gameEnded ? stage == 1 ? "The scavenge session is over! Any remaining items have been added to your inventory!"
-                    : "The scavenge session is over! Any remaining non-ore items have been added to your inventory!"
+                Description = gameEnded
+                    ? stage == 1
+                        ? "The scavenge session is over! Any remaining items have been added to your inventory!"
+                        : "The scavenge session is over! Any remaining non-ore items have been added to your inventory!"
                     : "Scavenge session ongoing.",
                 Fields = fields,
                 Timestamp = embed.Timestamp,

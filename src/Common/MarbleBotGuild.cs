@@ -9,17 +9,10 @@ namespace MarbleBot.Common
 {
     public class MarbleBotGuild
     {
-        public ulong Id { get; set; } = 0;
-        public ulong AnnouncementChannel { get; set; }
-        public string? AppealFormLink { get; set; }
-        public ulong AutoresponseChannel { get; set; }
-        public string Color { get; set; } = "607D8B";
-        public string Prefix { get; set; } = "mb/";
-        public List<ulong> Roles { get; set; } = new List<ulong>();
-        public List<ulong> UsableChannels { get; set; } = new List<ulong>();
-        public string? WarningSheetLink { get; set; }
-
-        public MarbleBotGuild(ulong id) => Id = id;
+        public MarbleBotGuild(ulong id)
+        {
+            Id = id;
+        }
 
         [JsonConstructor]
         public MarbleBotGuild(ulong id, ulong announcementChannel, ulong autoresponseChannel, string color,
@@ -35,19 +28,23 @@ namespace MarbleBot.Common
             WarningSheetLink = warningSheetLink;
         }
 
+        public ulong Id { get; }
+        public ulong AnnouncementChannel { get; set; }
+        public string? AppealFormLink { get; set; }
+        public ulong AutoresponseChannel { get; set; }
+        public string Color { get; set; } = "607D8B";
+        public string Prefix { get; set; } = "mb/";
+        public List<ulong> Roles { get; } = new List<ulong>();
+        public List<ulong> UsableChannels { get; } = new List<ulong>();
+        public string? WarningSheetLink { get; set; }
+
         public static MarbleBotGuild Find(SocketCommandContext context)
         {
-            var obj = GetGuilds();
-            MarbleBotGuild guild;
-            if (obj.ContainsKey(context.Guild.Id))
-            {
-                guild = obj[context.Guild.Id];
-            }
-            else
-            {
-                guild = new MarbleBotGuild(context.Guild.Id);
-            }
-            return guild;
+            IDictionary<ulong, MarbleBotGuild> obj = GetGuilds();
+
+            return obj.ContainsKey(context.Guild.Id) 
+                ? obj[context.Guild.Id] 
+                : new MarbleBotGuild(context.Guild.Id);
         }
 
         public static IDictionary<ulong, MarbleBotGuild> GetGuilds()
@@ -57,12 +54,13 @@ namespace MarbleBot.Common
             {
                 json = itemFile.ReadToEnd();
             }
+
             return JsonConvert.DeserializeObject<IDictionary<ulong, MarbleBotGuild>>(json);
         }
 
         public static void UpdateGuild(MarbleBotGuild guild)
         {
-            var guildsDict = GetGuilds();
+            IDictionary<ulong, MarbleBotGuild> guildsDict = GetGuilds();
 
             if (guildsDict.ContainsKey(guild.Id))
             {
@@ -71,11 +69,12 @@ namespace MarbleBot.Common
 
             guildsDict.Add(guild.Id, guild);
             using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json"));
-            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
             serialiser.Serialize(guilds, guildsDict);
         }
 
-        public static void UpdateGuilds(IDictionary<ulong, MarbleBotGuild> guildsDict, IGuild socketGuild, MarbleBotGuild mbGuild)
+        public static void UpdateGuilds(IDictionary<ulong, MarbleBotGuild> guildsDict, IGuild socketGuild,
+            MarbleBotGuild mbGuild)
         {
             if (guildsDict.ContainsKey(socketGuild.Id))
             {
@@ -84,7 +83,7 @@ namespace MarbleBot.Common
 
             guildsDict.Add(socketGuild.Id, mbGuild);
             using var guilds = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json"));
-            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
             serialiser.Serialize(guilds, guildsDict);
         }
     }

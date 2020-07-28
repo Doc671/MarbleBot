@@ -1,5 +1,6 @@
 using Discord;
 using Discord.Commands;
+using MarbleBot.Common.Games;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,34 +12,15 @@ namespace MarbleBot.Common
 {
     public class MarbleBotUser
     {
-        public ulong Id { get; set; } = 0;
-        public string Name { get; set; } = "";
-        public string Discriminator { get; set; } = "0000";
-        public decimal Balance { get; set; }
-        public decimal NetWorth { get; set; }
-        public int Stage { get; set; } = 1;
-        public int DailyStreak { get; set; }
-        public bool SiegePing { get; set; }
-        public bool WarPing { get; set; }
-        public int RaceWins { get; set; }
-        public int SiegeWins { get; set; }
-        public int WarWins { get; set; }
-        public DateTime LastDaily { get; set; } = DateTime.MinValue;
-        public DateTime LastRaceWin { get; set; } = DateTime.MinValue;
-        public DateTime LastScavenge { get; set; } = DateTime.MinValue;
-        public DateTime LastSiegeWin { get; set; } = DateTime.MinValue;
-        public DateTime LastWarWin { get; set; } = DateTime.MinValue;
-        public SortedDictionary<int, int> Items { get; set; } = new SortedDictionary<int, int>();
-
         public MarbleBotUser()
         {
         }
 
         [JsonConstructor]
         public MarbleBotUser(ulong id, string name, string discriminator, decimal balance, decimal netWorth, int stage,
-                     int dailyStreak, bool siegePing, bool warPing, int raceWins, int siegeWins, int warWins,
-                     DateTime lastDaily, DateTime lastRaceWin, DateTime lastScavenge, DateTime lastSiegeWin,
-                     DateTime lastWarWin, SortedDictionary<int, int>? items)
+            int dailyStreak, bool siegePing, bool warPing, int raceWins, int siegeWins, int warWins,
+            DateTime lastDaily, DateTime lastRaceWin, DateTime lastScavenge, DateTime lastSiegeWin,
+            DateTime lastWarWin, SortedDictionary<int, int>? items)
         {
             Id = id;
             Name = name;
@@ -60,32 +42,65 @@ namespace MarbleBot.Common
             Items = items ?? new SortedDictionary<int, int>();
         }
 
+        public ulong Id { get; private set; }
+        public string Name { get; private set; } = "";
+        public string Discriminator { get; private set; } = "0000";
+        public decimal Balance { get; set; }
+        public decimal NetWorth { get; set; }
+        public int Stage { get; set; } = 1;
+        public int DailyStreak { get; set; }
+        public bool SiegePing { get; set; }
+        public bool WarPing { get; set; }
+        public int RaceWins { get; set; }
+        public int SiegeWins { get; set; }
+        public int WarWins { get; set; }
+        public DateTime LastDaily { get; set; } = DateTime.MinValue;
+        public DateTime LastRaceWin { get; set; } = DateTime.MinValue;
+        public DateTime LastScavenge { get; set; } = DateTime.MinValue;
+        public DateTime LastSiegeWin { get; set; } = DateTime.MinValue;
+        public DateTime LastWarWin { get; set; } = DateTime.MinValue;
+        public SortedDictionary<int, int> Items { get; } = new SortedDictionary<int, int>();
+
+        public Ammo? GetAmmo(Weapon weapon)
+        {
+            for (int i = weapon.Ammo.Length - 1; i >= 0; i--)
+            {
+                if (Items.ContainsKey(weapon.Ammo[i]) &&
+                    Items[weapon.Ammo[i]] >= weapon.Hits)
+                {
+                    return Item.Find<Ammo>(weapon.Ammo[i].ToString("000"));
+                }
+            }
+
+            return null;
+        }
+
         public Shield? GetShield()
         {
             var shields = Items.Select(item => Item.Find<Item>(item.Key))
-                .Where(item => item as Shield != null);
+                .Where(item => item is Shield)
+                .ToArray();
 
-            if (shields.Count() == 0)
+            if (!shields.Any())
             {
                 return null;
             }
 
-            return shields.Cast<Shield>()
-                .Last();
+            return (Shield)shields.Last();
         }
 
         public Spikes? GetSpikes()
         {
             var spikes = Items.Select(item => Item.Find<Item>(item.Key))
-                .Where(item => item as Spikes != null);
+                .Where(item => item is Spikes)
+                .ToArray();
 
-            if (spikes.Count() == 0)
+            if (!spikes.Any())
             {
                 return null;
             }
 
-            return spikes.Cast<Spikes>()
-                .Last();
+            return (Spikes)spikes.Last();
         }
 
         public static MarbleBotUser Find(ulong id)
@@ -100,6 +115,7 @@ namespace MarbleBot.Common
             {
                 throw new InvalidOperationException("The requested user was not found.");
             }
+
             return user;
         }
 
@@ -110,16 +126,19 @@ namespace MarbleBot.Common
             if (userDict.ContainsKey(context.User.Id))
             {
                 user = userDict[context.User.Id];
+                user.Name = context.User.Username;
+                user.Discriminator = context.User.Discriminator;
             }
             else
             {
-                user = new MarbleBotUser()
+                user = new MarbleBotUser
                 {
                     Id = context.User.Id,
                     Name = context.User.Username,
-                    Discriminator = context.User.Discriminator,
+                    Discriminator = context.User.Discriminator
                 };
             }
+
             return user;
         }
 
@@ -135,13 +154,14 @@ namespace MarbleBot.Common
             }
             else
             {
-                user = new MarbleBotUser()
+                user = new MarbleBotUser
                 {
                     Id = context.User.Id,
                     Name = context.User.Username,
-                    Discriminator = context.User.Discriminator,
+                    Discriminator = context.User.Discriminator
                 };
             }
+
             return user;
         }
 
@@ -156,17 +176,19 @@ namespace MarbleBot.Common
             }
             else
             {
-                user = new MarbleBotUser()
+                user = new MarbleBotUser
                 {
                     Id = context.User.Id,
                     Name = context.User.Username,
-                    Discriminator = context.User.Discriminator,
+                    Discriminator = context.User.Discriminator
                 };
             }
+
             return user;
         }
 
-        public static async Task<MarbleBotUser> FindAsync(ICommandContext context, IDictionary<ulong, MarbleBotUser> usersDict, ulong id)
+        public static async Task<MarbleBotUser> FindAsync(ICommandContext context,
+            IDictionary<ulong, MarbleBotUser> usersDict, ulong id)
         {
             MarbleBotUser user;
             if (usersDict.ContainsKey(id))
@@ -175,13 +197,14 @@ namespace MarbleBot.Common
             }
             else
             {
-                user = new MarbleBotUser()
+                user = new MarbleBotUser
                 {
                     Id = context.User.Id,
                     Name = (await context.Client.GetUserAsync(id)).Username,
-                    Discriminator = (await context.Client.GetUserAsync(id)).Discriminator,
+                    Discriminator = (await context.Client.GetUserAsync(id)).Discriminator
                 };
             }
+
             return user;
         }
 
@@ -192,6 +215,7 @@ namespace MarbleBot.Common
             {
                 json = usersDict.ReadToEnd();
             }
+
             return JsonConvert.DeserializeObject<IDictionary<ulong, MarbleBotUser>>(json);
         }
 
@@ -206,30 +230,34 @@ namespace MarbleBot.Common
 
             usersDict.Add(user.Id, user);
             using var userWriter = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
-            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
             serialiser.Serialize(userWriter, usersDict);
         }
 
-        public static void UpdateUser(IDictionary<ulong, MarbleBotUser> usersDict, IUser socketUser, MarbleBotUser newMBUser)
+        public static void UpdateUser(IDictionary<ulong, MarbleBotUser> usersDict, IUser socketUser,
+            MarbleBotUser newMarbleBotUser)
         {
             if (usersDict.ContainsKey(socketUser.Id))
             {
                 usersDict.Remove(socketUser.Id);
             }
 
-            usersDict.Add(socketUser.Id, newMBUser);
+            usersDict.Add(socketUser.Id, newMarbleBotUser);
             using var userWriter = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
-            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
             serialiser.Serialize(userWriter, usersDict);
         }
 
         public static void UpdateUsers(IDictionary<ulong, MarbleBotUser> usersDict)
         {
             using var userWriter = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
-            var serialiser = new JsonSerializer() { Formatting = Formatting.Indented };
+            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
             serialiser.Serialize(userWriter, usersDict);
         }
 
-        public override string ToString() => $"{Name}#{Discriminator}";
+        public override string ToString()
+        {
+            return $"{Name}#{Discriminator}";
+        }
     }
 }

@@ -27,16 +27,17 @@ namespace MarbleBot.Extensions
                     output.Append(" ");
                 }
             }
+
             return output.ToString();
         }
 
-        public static void GetHSV(this Color color, out float hue, out float saturation, out float value)
+        public static void GetHsv(this Color color, out float hue, out float saturation, out float value)
         {
             int max = Math.Max(color.R, Math.Max(color.G, color.B));
             int min = Math.Min(color.R, Math.Min(color.G, color.B));
 
             hue = color.GetHue();
-            saturation = (max == 0) ? 0 : 1f - (1f * min / max);
+            saturation = max == 0 ? 0 : 1f - 1f * min / max;
             value = max / 255f;
         }
 
@@ -66,6 +67,7 @@ namespace MarbleBot.Extensions
                     output.Append(str[i]);
                 }
             }
+
             return output.ToString();
         }
 

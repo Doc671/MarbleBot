@@ -1,4 +1,5 @@
-# ignore Visual Studio solution settings
+# ignore IDE settings
+.idea
 .vs
 .vscode
 src/.vscode

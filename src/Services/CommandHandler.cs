@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Common;
+using MarbleBot.Common.Games;
 using MarbleBot.Common.TypeReaders;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
@@ -56,17 +57,18 @@ namespace MarbleBot.Services
 
             int argPos = 0;
 
-            var guild = context.IsPrivate ?
-                new MarbleBotGuild(id: 0)
+            var guild = context.IsPrivate
+                ? new MarbleBotGuild(id: 0)
                 : MarbleBotGuild.Find(context);
 
             if (userMsg.HasStringPrefix(guild.Prefix, ref argPos) &&
 #if DEBUG
-            // If debugging, run commands in a single channel only
-            context.Channel.Id == _botCredentials.DebugChannel || context.IsPrivate && _botCredentials.AdminIds.Any(id => id == (context.Channel as IDMChannel)!.Recipient.Id))
+                // If debugging, run commands in a single channel only
+                context.Channel.Id == _botCredentials.DebugChannel || context.IsPrivate &&
+                _botCredentials.AdminIds.Any(id => id == (context.Channel as IDMChannel)!.Recipient.Id))
 #else
-            // Otherwise, run as usual
-            (context.IsPrivate || guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
+                // Otherwise, run as usual
+                (context.IsPrivate || guild.UsableChannels.Count == 0 || guild.UsableChannels.Contains(context.Channel.Id)))
 #endif
             {
                 await context.Channel.TriggerTypingAsync();
@@ -86,6 +88,7 @@ namespace MarbleBot.Services
                         }
                     }
                 }
+
                 if (autoresponses.ContainsKey(context.Message.Content))
                 {
                     await context.Channel.SendMessageAsync(autoresponses[context.Message.Content]);
@@ -112,7 +115,7 @@ namespace MarbleBot.Services
                         await context.Channel.SendMessageAsync(":warning: | Unknown command. Use `mb/help` to see what commands there are.");
                         break;
                     default:
-                        await context.Channel.SendMessageAsync($":warning: | An error has occured. ```{result.ErrorReason}```");
+                        await context.Channel.SendMessageAsync($":warning: | {result.ErrorReason}");
                         _logger.Error($"{result.Error!.Value}: {result.ErrorReason}");
                         break;
                 }

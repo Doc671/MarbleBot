@@ -655,7 +655,7 @@
       "061": 20
     },
     "CraftingStationRequired": 2,
-    "DamageAbsorption": 20
+    "IncomingDamageMultiplier": 0.8
   },
   "064": {
     "Id": 64,
@@ -693,7 +693,7 @@
       "065": 3
     },
     "CraftingStationRequired": 2,
-    "DamageBoost": 40
+    "OutgoingDamageMultiplier": 1.4
   },
   "067": {
     "Id": 67,
@@ -756,7 +756,7 @@
       "070": 3
     },
     "CraftingStationRequired": 2,
-    "DamageBoost": 60
+    "OutgoingDamageMultiplier": 1.6
   },
   "072": {
     "Id": 72,
@@ -796,7 +796,7 @@
       "073": 5
     },
     "CraftingStationRequired": 2,
-    "DamageBoost": 95
+    "OutgoingDamageMultiplier": 1.95
   },
   "075": {
     "Id": 75,
@@ -873,7 +873,7 @@
       "079": 2
     },
     "CraftingStationRequired": 2,
-    "DamageBoost": 100
+    "OutgoingDamageMultiplier": 2.2
   },
   "081": {
     "Id": 81,

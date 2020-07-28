@@ -2,6 +2,8 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Common;
+using MarbleBot.Common.Games;
+using MarbleBot.Common.Games.War;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
@@ -30,7 +32,9 @@ namespace MarbleBot.Modules.Games
         [Alias("join")]
         [Summary("Sign up to the Marble War!")]
         public async Task WarSignupCommand(Weapon weapon, [Remainder] string marbleName = "")
-        => await Signup(Type, marbleName, 20, async () => { await WarStartCommand(); }, weapon);
+        {
+            await Signup(Type, marbleName, 20, async () => { await WarStartCommand(); }, weapon);
+        }
 
         [Command("start")]
         [Alias("commence")]
@@ -63,19 +67,19 @@ namespace MarbleBot.Modules.Games
                 }
 
                 MarbleBotUser user;
-                foreach (var (id, name, itemId) in rawMarbles.OrderBy(marbleInfo => _randomService.Rand.Next()))
+                foreach ((ulong id, string name, int itemId) in rawMarbles.OrderBy(marbleInfo => _randomService.Rand.Next()))
                 {
                     user = MarbleBotUser.Find(Context, id);
-                    marbles.Add(new WarMarble(id, name, maxHealth: 40, Item.Find<Weapon>(itemId),
+                    marbles.Add(new WarMarble(id, name, 40, Item.Find<Weapon>(itemId),
                         user.GetShield(), user.GetSpikes()));
                 }
             }
 
             var team1 = new List<WarMarble>();
             var team2 = new List<WarMarble>();
-            var t1Output = new StringBuilder();
-            var t2Output = new StringBuilder();
-            var pings = new StringBuilder();
+            var team1Output = new StringBuilder();
+            var team2Output = new StringBuilder();
+            var mentions = new StringBuilder();
             SocketUser? currentUser = null;
             for (int i = 0; i < marbles.Count; i++)
             {
@@ -85,10 +89,10 @@ namespace MarbleBot.Modules.Games
                     team1.Add(marble);
                     currentUser = Context.Client.GetUser(marble.Id);
                     marble.Team = 1;
-                    t1Output.AppendLine($"`[{team1.Count}]` **{marble.Name}** [{currentUser.Username}#{currentUser.Discriminator}]");
+                    team1Output.AppendLine($"`[{team1.Count}]` **{marble.Name}** [{currentUser.Username}#{currentUser.Discriminator}]");
                     if (MarbleBotUser.Find(Context, marble.Id).SiegePing)
                     {
-                        pings.Append($"<@{marble.Id}> ");
+                        mentions.Append($"<@{marble.Id}> ");
                     }
                 }
                 else
@@ -96,10 +100,10 @@ namespace MarbleBot.Modules.Games
                     team2.Add(marble);
                     currentUser = Context.Client.GetUser(marble.Id);
                     marble.Team = 2;
-                    t2Output.AppendLine($"`[{team2.Count}]` **{marble.Name}** [{currentUser.Username}#{currentUser.Discriminator}]");
+                    team2Output.AppendLine($"`[{team2.Count}]` **{marble.Name}** [{currentUser.Username}#{currentUser.Discriminator}]");
                     if (MarbleBotUser.Find(Context, marble.Id).SiegePing)
                     {
-                        pings.Append($"<@{marble.Id}> ");
+                        mentions.Append($"<@{marble.Id}> ");
                     }
                 }
             }
@@ -107,10 +111,11 @@ namespace MarbleBot.Modules.Games
             WarMarble? aiMarble = null;
             if ((team1.Count + team2.Count) % 2 > 0)
             {
-                var allMarbles = team1.Union(team2);
-                if (MathF.Round(allMarbles.Sum(m => MarbleBotUser.Find(Context, m.Id).Stage) / (float)allMarbles.Count()) == 2)
+                IEnumerable<WarMarble> allMarbles = team1.Union(team2);
+                if (Math.Abs(MathF.Round(allMarbles.Sum(m => MarbleBotUser.Find(Context, m.Id).Stage) /
+                                         (float)allMarbles.Count()) - 2) < float.Epsilon)
                 {
-                    aiMarble = new WarMarble(Context.Client.CurrentUser.Id, "MarbleBot", maxHealth: 40, Item.Find<Weapon>(_randomService.Rand.Next(0, 9) switch
+                    aiMarble = new WarMarble(Context.Client.CurrentUser.Id, "MarbleBot", 40, Item.Find<Weapon>(_randomService.Rand.Next(0, 9) switch
                     {
                         0 => "086",
                         1 => "087",
@@ -131,18 +136,18 @@ namespace MarbleBot.Modules.Games
                 }
                 else
                 {
-                    aiMarble = new WarMarble(Context.Client.CurrentUser.Id, "MarbleBot", maxHealth: 35,
-                    Item.Find<Weapon>(_randomService.Rand.Next(0, 2) switch
-                    {
-                        0 => "094",
-                        1 => "095",
-                        _ => "096"
-                    }), null, null);
+                    aiMarble = new WarMarble(Context.Client.CurrentUser.Id, "MarbleBot", 35,
+                        Item.Find<Weapon>(_randomService.Rand.Next(0, 2) switch
+                        {
+                            0 => "094",
+                            1 => "095",
+                            _ => "096"
+                        }), null, null);
                 }
 
                 aiMarble.Team = 2;
                 team2.Add(aiMarble);
-                t2Output.AppendLine($"`[{team2.Count}]` **MarbleBot** [MarbleBot#7194]");
+                team2Output.AppendLine($"`[{team2.Count}]` **MarbleBot** [MarbleBot#7194]");
             }
 
             var team1Boost = (WarBoost)_randomService.Rand.Next(1, 4);
@@ -152,15 +157,17 @@ namespace MarbleBot.Modules.Games
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithDescription("Use `mb/war attack <marble name>` to attack with your weapon and `mb/war bash <marble name>` to attack without.")
+                .WithDescription("Use `mb/war attack <marble code>` to attack with your weapon and `mb/war bash <marble code>` to attack without.")
                 .WithTitle("Let the battle commence! :crossed_swords:")
-                .AddField($"Team {war.Team1.Name}", $"Boost: **{team1Boost.ToString().CamelToTitleCase()}**\n{t1Output}")
-                .AddField($"Team {war.Team2.Name}", $"Boost: **{team2Boost.ToString().CamelToTitleCase()}**\n{t2Output}")
+                .AddField($"Team {war.Team1.Name}",
+                    $"Boost: **{team1Boost.ToString().CamelToTitleCase()}**\n{team1Output}")
+                .AddField($"Team {war.Team2.Name}",
+                    $"Boost: **{team2Boost.ToString().CamelToTitleCase()}**\n{team2Output}")
                 .Build());
 
-            if (pings.Length != 0)
+            if (mentions.Length != 0)
             {
-                await ReplyAsync(pings.ToString());
+                await ReplyAsync(mentions.ToString());
             }
 
             _gamesService.Wars.GetOrAdd(fileId, war);
@@ -188,7 +195,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var currentMarble = war!.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            WarMarble currentMarble = war!.AllMarbles.FirstOrDefault(m => m.Id == Context.User.Id);
             if (currentMarble == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");
@@ -210,37 +217,29 @@ namespace MarbleBot.Modules.Games
 
             if (currentMarble.Rage && (DateTime.UtcNow - currentMarble.LastRage).Seconds > 20)
             {
-                currentMarble.DamageBoost = (currentMarble.DamageBoost - 100) / 2;
+                currentMarble.DamageMultiplier /= 2;
                 currentMarble.Rage = false;
             }
 
-            var user = MarbleBotUser.Find(Context);
+            MarbleBotUser user = MarbleBotUser.Find(Context);
             var ammo = new Ammo();
             if (currentMarble.Weapon.Ammo != null && currentMarble.Weapon.Ammo.Length != 0)
             {
-                var ammoId = 0;
-                for (int i = currentMarble.Weapon.Ammo.Length - 1; i >= 0; i--)
-                {
-                    if (user.Items.ContainsKey(currentMarble.Weapon.Ammo[i]) && user.Items[currentMarble.Weapon.Ammo[i]] >= currentMarble.Weapon.Hits)
-                    {
-                        ammoId = currentMarble.Weapon.Ammo[i];
-                        break;
-                    }
-                }
+                ammo = user.GetAmmo(currentMarble.Weapon);
 
-                if (ammoId == 0)
+                if (ammo == null)
                 {
                     await SendErrorAsync($"{Context.User.Username}, you do not have enough ammo to use the weapon {currentMarble.Weapon.Name}!");
                     return;
                 }
 
-                ammo = Item.Find<Ammo>(ammoId.ToString("000"));
+                ammo = Item.Find<Ammo>(ammo.Id.ToString("000"));
                 user.Items[ammo.Id] -= currentMarble.Weapon.Hits;
                 user.NetWorth -= ammo.Price * currentMarble.Weapon.Hits;
                 MarbleBotUser.UpdateUser(user);
             }
 
-            var enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
+            WarTeam enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
             WarMarble? enemyMarble = null;
             if (int.TryParse(target, out int index) && enemyTeam.Marbles.Count >= index)
             {
@@ -250,7 +249,7 @@ namespace MarbleBot.Modules.Games
             {
                 foreach (WarMarble enemy in enemyTeam.Marbles)
                 {
-                    if (string.Compare(enemy.Name, target, true) == 0)
+                    if (string.Compare(enemy.Name, target, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         enemyMarble = enemy;
                         break;
@@ -279,13 +278,8 @@ namespace MarbleBot.Modules.Games
             {
                 if (_randomService.Rand.Next(0, 100) < currentMarble.Weapon.Accuracy)
                 {
-                    var damage = (int)Math.Round((currentMarble.Weapon.Damage +
-                        (currentMarble.WeaponClass == WeaponClass.Ranged ? ammo.Damage : 0)) *
-                        (1 + currentMarble.DamageBoost / 100d) *
-                        (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0) *
-                        (0.5 + _randomService.Rand.NextDouble())));
-                    enemyMarble.Health -= damage;
-                    currentMarble.DamageDealt += damage;
+                    int baseDamage = currentMarble.Weapon.Damage + (currentMarble.WeaponClass == WeaponClass.Ranged ? ammo.Damage : 0);
+                    int damage = war.DealDamage(currentMarble, enemyMarble, baseDamage);
                     await ReplyAsync(embed: builder
                         .AddField("Remaining Health", $"**{enemyMarble.Health}**/{enemyMarble.MaxHealth}")
                         .WithDescription($"**{currentMarble.Name}** dealt **{damage}** damage to **{enemyMarble.Name}** with **{currentMarble.Weapon.Name}**!")
@@ -294,23 +288,19 @@ namespace MarbleBot.Modules.Games
                 else
                 {
                     await ReplyAsync(embed: builder
-                    .WithDescription($"**{currentMarble.Name}** tried to attack **{enemyMarble.Name}** but missed!")
-                    .Build());
+                        .WithDescription($"**{currentMarble.Name}** tried to attack **{enemyMarble.Name}** but missed!")
+                        .Build());
                 }
             }
             else
             {
-                var totalDamage = 0;
+                int totalDamage = 0;
                 for (int i = 0; i < currentMarble.Weapon.Hits; i++)
                 {
                     if (_randomService.Rand.Next(0, 100) < currentMarble.Weapon.Accuracy)
                     {
-                        var damage = (int)Math.Round(currentMarble.Weapon.Damage +
-                            (currentMarble.WeaponClass == WeaponClass.Ranged ? ammo.Damage : 0) *
-                            (1 + currentMarble.DamageBoost / 100d) *
-                            (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0) *
-                            (0.5 + _randomService.Rand.NextDouble())));
-                        enemyMarble.Health -= damage;
+                        int baseDamage = currentMarble.Weapon.Damage + (currentMarble.WeaponClass == WeaponClass.Ranged ? ammo.Damage : 0);
+                        int damage = war.DealDamage(currentMarble, enemyMarble, baseDamage);
                         totalDamage += damage;
                         builder.AddField($"Attack {i}", $"**{damage}** damage to **{enemyMarble.Name}**.");
                     }
@@ -319,7 +309,7 @@ namespace MarbleBot.Modules.Games
                         builder.AddField($"Attack {i}", "Missed!");
                     }
                 }
-                currentMarble.DamageDealt += totalDamage;
+
                 await ReplyAsync(embed: builder
                     .WithDescription($"**{currentMarble.Name}** dealt a total of **{totalDamage}** to **{enemyMarble.Name}** with **{currentMarble.Weapon.Name}**!")
                     .Build());
@@ -344,7 +334,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var currentMarble = war!.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            WarMarble currentMarble = war!.AllMarbles.FirstOrDefault(marble => marble.Id == Context.User.Id);
             if (currentMarble == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");
@@ -366,12 +356,11 @@ namespace MarbleBot.Modules.Games
 
             if (currentMarble.Rage && (DateTime.UtcNow - currentMarble.LastRage).Seconds > 20)
             {
-                currentMarble.DamageBoost = (currentMarble.DamageBoost - 100) / 2;
+                currentMarble.DamageMultiplier /= 2;
                 currentMarble.Rage = false;
             }
 
-            var user = MarbleBotUser.Find(Context);
-            var enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
+            WarTeam enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
             WarMarble? enemyMarble = null;
             if (int.TryParse(target, out int index) && enemyTeam.Marbles.Count >= index)
             {
@@ -381,12 +370,13 @@ namespace MarbleBot.Modules.Games
             {
                 foreach (WarMarble enemy in enemyTeam.Marbles)
                 {
-                    if (string.Compare(enemy.Name, target, true) == 0)
+                    if (string.Compare(enemy.Name, target, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         enemyMarble = enemy;
                         break;
                     }
                 }
+
                 await SendErrorAsync($"**{currentMarble.Name}**, could not find the enemy!");
                 return;
             }
@@ -398,20 +388,17 @@ namespace MarbleBot.Modules.Games
             }
 
             currentMarble.LastMoveUsed = DateTime.UtcNow;
-            var dmg = (int)Math.Round(3 * (1 + currentMarble.DamageBoost / 50d) *
-                (1 - 0.2 * (enemyMarble.Shield != null ? Convert.ToDouble(enemyMarble.Shield.Id == 63) : 0) *
-                (1 + 0.5 * _randomService.Rand.NextDouble())));
-            enemyMarble.Health -= dmg;
-            currentMarble.DamageDealt += dmg;
+            const int bashBaseDamage = 3;
+            int damage = war.DealDamage(currentMarble, enemyMarble, bashBaseDamage);
             await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Remaining Health", $"**{enemyMarble.Health}**/{enemyMarble.MaxHealth}")
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
-                .WithDescription($"**{currentMarble.Name}** dealt **{dmg}** damage to **{enemyMarble.Name}**!")
+                .WithDescription($"**{currentMarble.Name}** dealt **{damage}** damage to **{enemyMarble.Name}**!")
                 .WithTitle($"**{currentMarble.Name}** attacks! :boom:")
                 .Build());
 
-            if (war.Team1.Marbles.Sum(m => m.Health) < 1 || war.Team2.Marbles.Sum(m => m.Health) < 1)
+            if (war.Team1.Marbles.Sum(m => m.Health) == 0 || war.Team2.Marbles.Sum(m => m.Health) == 0)
             {
                 await war.OnGameEnd(Context);
             }
@@ -430,7 +417,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var currentMarble = war!.AllMarbles.Where(m => m.Id == Context.User.Id).FirstOrDefault();
+            WarMarble currentMarble = war!.AllMarbles.FirstOrDefault(m => m.Id == Context.User.Id);
             if (currentMarble == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you are not in this battle!");
@@ -443,7 +430,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var currentTeam = currentMarble.Team == 1 ? war.Team1 : war.Team2;
+            WarTeam currentTeam = currentMarble.Team == 1 ? war.Team1 : war.Team2;
             if (currentTeam.BoostUsed)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, your team's boost has already been used!");
@@ -451,7 +438,7 @@ namespace MarbleBot.Modules.Games
             }
 
             currentMarble.Boosted = true;
-            var enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
+            WarTeam enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
 
             var builder = new EmbedBuilder()
                 .WithAuthor(Context.User)
@@ -460,8 +447,8 @@ namespace MarbleBot.Modules.Games
                 .WithDescription($"**{Context.User.Username}** has attempted to use Team {currentTeam.Name}'s boost!");
 
             // Activate boost if enough team members (half rounded up) have chosen to boost
-            var boosters = currentTeam.Marbles.Aggregate(0, (total, m) => m.Boosted ? total + 1 : total);
-            var boostsRequired = Convert.ToInt32(Math.Ceiling(currentTeam.Marbles.Count / 2d));
+            int boosters = currentTeam.Marbles.Aggregate(0, (total, marble) => marble.Boosted ? total + 1 : total);
+            int boostsRequired = (int)MathF.Ceiling(currentTeam.Marbles.Count / 2f);
             var output = new StringBuilder();
             if (boosters >= boostsRequired)
             {
@@ -469,55 +456,60 @@ namespace MarbleBot.Modules.Games
                 switch (currentTeam.Boost)
                 {
                     case WarBoost.HealKit:
+                    {
+                        IEnumerable<WarMarble> teammatesToHeal = currentTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
+                        foreach (WarMarble teammate in teammatesToHeal)
                         {
-                            var teammatesToHeal = currentTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
-                            foreach (var teammate in teammatesToHeal)
+                            if (teammate.Health > 0)
                             {
-                                if (teammate.Health > 0)
-                                {
-                                    teammate.Health += 8;
-                                    output.AppendLine($"**{teammate.Name}** recovered **8** Health! (**{teammate.Health}**/{teammate.MaxHealth})");
-                                }
+                                teammate.Health += 8;
+                                output.AppendLine($"**{teammate.Name}** recovered **8** Health! (**{teammate.Health}**/{teammate.MaxHealth})");
                             }
-                            break;
                         }
+
+                        break;
+                    }
                     case WarBoost.MissileStrike:
+                    {
+                        foreach (WarMarble enemy in enemyTeam.Marbles)
                         {
-                            foreach (var enemy in enemyTeam.Marbles)
+                            if (enemy.Health > 0)
                             {
-                                if (enemy.Health > 0)
-                                {
-                                    enemy.Health -= 5;
-                                }
+                                enemy.Health -= 5;
                             }
-                            output.Append($"All of Team **{enemyTeam.Name}** took **5** damage!");
-                            break;
                         }
+
+                        output.Append($"All of Team **{enemyTeam.Name}** took **5** damage!");
+                        break;
+                    }
                     case WarBoost.Rage:
+                    {
+                        foreach (WarMarble teammate in currentTeam.Marbles)
                         {
-                            foreach (var teammate in currentTeam.Marbles)
-                            {
-                                teammate.DamageBoost += 100 + teammate.DamageBoost;
-                                teammate.LastRage = DateTime.UtcNow;
-                                teammate.Rage = true;
-                            }
-                            output.Append($"Team **{currentTeam.Name}** can deal x2 damage for the next 10 seconds!");
-                            break;
+                            teammate.DamageMultiplier *= 2;
+                            teammate.LastRage = DateTime.UtcNow;
+                            teammate.Rage = true;
                         }
+
+                        output.Append($"Team **{currentTeam.Name}** can deal x2 damage for the next 10 seconds!");
+                        break;
+                    }
                     case WarBoost.SpikeTrap:
+                    {
+                        IEnumerable<WarMarble> enemiesToDamage = enemyTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
+                        foreach (WarMarble enemy in enemiesToDamage)
                         {
-                            var enemiesToDamage = enemyTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
-                            foreach (var enemy in enemiesToDamage)
+                            if (enemy.Health > 0)
                             {
-                                if (enemy.Health > 0)
-                                {
-                                    enemy.Health -= 8;
-                                    output.AppendLine($"**{enemy.Name}** took **8** damage! (**{enemy.Health}**/{enemy.MaxHealth})");
-                                }
+                                enemy.Health -= 8;
+                                output.AppendLine($"**{enemy.Name}** took **8** damage! (**{enemy.Health}**/{enemy.MaxHealth})");
                             }
-                            break;
                         }
+
+                        break;
+                    }
                 }
+
                 builder.AddField("Boost successful!", output.ToString())
                     .WithTitle($"{currentTeam.Name}: **{currentTeam.Boost.ToString().CamelToTitleCase()}** used!");
             }
@@ -533,18 +525,24 @@ namespace MarbleBot.Modules.Games
         [Command("checkearn")]
         [Summary("Shows whether you can earn money from wars and if not, when.")]
         public async Task WarCheckearnCommand()
-        => await Checkearn(Type);
+        {
+            await Checkearn(Type);
+        }
 
         [Command("clear")]
         [Summary("Clears the list of contestants.")]
         public async Task WarClearCommand()
-        => await Clear(Type);
+        {
+            await Clear(Type);
+        }
 
         [Command("contestants")]
         [Alias("marbles", "participants")]
         [Summary("Shows a list of all the contestants in the war.")]
         public async Task WarContestantsCommand()
-        => await ShowContestants(Type);
+        {
+            await ShowContestants(Type);
+        }
 
         [Command("info")]
         [Summary("Shows information about the war.")]
@@ -557,21 +555,24 @@ namespace MarbleBot.Modules.Games
                 .WithTitle("War Info");
             if (_gamesService.Wars.ContainsKey(fileId))
             {
-                var t1Output = new StringBuilder();
-                var t2Output = new StringBuilder();
-                var war = _gamesService.Wars[fileId];
-                foreach (var marble in war.Team1.Marbles)
+                War war = _gamesService.Wars[fileId];
+
+                var team1Output = new StringBuilder();
+                foreach (WarMarble marble in war.Team1.Marbles)
                 {
-                    var user = Context.Client.GetUser(marble.Id);
-                    t1Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
+                    SocketUser user = Context.Client.GetUser(marble.Id);
+                    team1Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
                 }
-                foreach (var marble in war.Team2.Marbles)
+
+                var team2Output = new StringBuilder();
+                foreach (WarMarble marble in war.Team2.Marbles)
                 {
-                    var user = Context.Client.GetUser(marble.Id);
-                    t2Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
+                    SocketUser user = Context.Client.GetUser(marble.Id);
+                    team2Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
                 }
-                builder.AddField($"Team {war.Team1.Name}", t1Output.ToString())
-                    .AddField($"Team {war.Team2.Name}", t2Output.ToString());
+
+                builder.AddField($"Team {war.Team1.Name}", team1Output.ToString())
+                    .AddField($"Team {war.Team2.Name}", team2Output.ToString());
             }
             else
             {
@@ -601,7 +602,7 @@ namespace MarbleBot.Modules.Games
                         {
                             string bold;
                             SocketUser user;
-                            foreach (var (id, name, itemId) in marbles)
+                            foreach ((ulong id, string name, int itemId) in marbles)
                             {
                                 bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
                                 user = Context.Client.GetUser(id);
@@ -610,74 +611,74 @@ namespace MarbleBot.Modules.Games
                         }
                     }
                 }
+
                 builder.AddField("Marbles", marbleOutput.ToString());
                 builder.WithDescription("War not started yet.");
             }
+
             await ReplyAsync(embed: builder.Build());
         }
 
         [Command("leaderboard")]
         [Alias("leaderboard mostused")]
         [Summary("Shows a leaderboard of most used marbles in wars.")]
-        public async Task WarLeaderboardCommand(string rawPage = "1")
+        public async Task WarLeaderboardCommand(int page)
         {
-            if (int.TryParse(rawPage, out int page))
+            var winners = new Dictionary<string, int>();
+            using (var mostUsedMarbleFile = new StreamReader($"Data{Path.DirectorySeparatorChar}WarMostUsed.txt"))
             {
-                var winners = new SortedDictionary<string, int>();
-                using (var mostUsedMarbleFile = new StreamReader($"Data{Path.DirectorySeparatorChar}WarMostUsed.txt"))
+                while (!mostUsedMarbleFile.EndOfStream)
                 {
-                    while (!mostUsedMarbleFile.EndOfStream)
+                    string? racerInfo = (await mostUsedMarbleFile.ReadLineAsync())!;
+                    if (winners.ContainsKey(racerInfo))
                     {
-                        var racerInfo = (await mostUsedMarbleFile.ReadLineAsync())!;
-                        if (winners.ContainsKey(racerInfo))
-                        {
-                            winners[racerInfo]++;
-                        }
-                        else
-                        {
-                            winners.Add(racerInfo, 1);
-                        }
+                        winners[racerInfo]++;
+                    }
+                    else
+                    {
+                        winners.Add(racerInfo, 1);
                     }
                 }
-
-                var winList = new List<(string elementName, int value)>();
-                foreach (var winner in winners)
-                {
-                    winList.Add((winner.Key, winner.Value));
-                }
-
-                winList = (from winner in winList
-                           orderby winner.value descending
-                           select winner)
-                           .ToList();
-
-                var builder = new EmbedBuilder()
-                    .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
-                    .WithTitle("War Leaderboard: Most Used");
-
-                await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
             }
-            else
+
+            var winList = new List<(string elementName, int value)>();
+            foreach ((string marbleName, int wins) in winners)
             {
-                await ReplyAsync("This is not a valid number! Format: `mb/war leaderboard <optional number>`");
+                winList.Add((marbleName, wins));
             }
+
+            winList = (from winner in winList
+                       orderby winner.value descending
+                       select winner).ToList();
+
+            var builder = new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .WithCurrentTimestamp()
+                .WithTitle("War Leaderboard: Most Used");
+
+            await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
         }
 
         [Command("ping")]
         [Summary("Toggles whether you are pinged when a war that you are in starts.")]
         public async Task WarPingCommand(string option = "")
         {
-            var user = MarbleBotUser.Find(Context);
+            MarbleBotUser user = MarbleBotUser.Find(Context);
             switch (option)
             {
                 case "enable":
                 case "true":
-                case "on": user.WarPing = true; break;
+                case "on":
+                    user.WarPing = true;
+                    break;
                 case "disable":
                 case "false":
-                case "off": user.WarPing = false; break;
-                default: user.WarPing = !user.WarPing; break;
+                case "off":
+                    user.WarPing = false;
+                    break;
+                default:
+                    user.WarPing = !user.WarPing;
+                    break;
             }
 
             MarbleBotUser.UpdateUser(user);
@@ -694,25 +695,29 @@ namespace MarbleBot.Modules.Games
         [Command("remove")]
         [Summary("Removes a contestant from the contestant list.")]
         public async Task WarRemoveCommand([Remainder] string marbleToRemove)
-        => await RemoveContestant(Type, marbleToRemove);
+        {
+            await RemoveContestant(Type, marbleToRemove);
+        }
 
         [Command("valid")]
         [Alias("validweapons")]
         [Summary("Shows all valid weapons to use in war battles.")]
         public async Task WarValidWeaponsCommand()
         {
-            var items = Item.GetItems();
+            IDictionary<int, Item> items = Item.GetItems();
             var output = new StringBuilder();
-            foreach (var itemPair in items)
+            foreach ((_, Item item) in items)
             {
-                if (itemPair.Value is Weapon weapon)
+                if (item is Weapon weapon)
                 {
-                    if (weapon.WeaponClass != 0 && weapon.WeaponClass != WeaponClass.Artillery && weapon.Stage <= MarbleBotUser.Find(Context).Stage)
+                    if (weapon.WeaponClass != 0 && weapon.WeaponClass != WeaponClass.Artillery &&
+                        weapon.Stage <= MarbleBotUser.Find(Context).Stage)
                     {
                         output.AppendLine($"{weapon} ({weapon.WeaponClass})");
                     }
                 }
             }
+
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
@@ -726,25 +731,28 @@ namespace MarbleBot.Modules.Games
         [Priority(-1)]
         [Summary("War help.")]
         public async Task WarHelpCommand([Remainder] string _ = "")
-            => await ReplyAsync(embed: new EmbedBuilder()
+        {
+            await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("How to play", new StringBuilder()
-                        .AppendLine("Use `mb/war signup <weapon ID> <marble name>` to sign up as a marble!")
-                        .AppendLine("When everyone's done, use `mb/war start`! The war begins automatically if 20 marbles have signed up.")
-                        .Append("\nWhen the war begins, use `mb/war attack <marble code>` to attack an enemy with your weapon")
-                        .AppendLine($" and `mb/war bash <marble code>` to attack without.{(MarbleBotUser.Find(Context).Stage > 1 ? "Spikes are twice as effective with `mb/war bash`." : "")}")
-                        .Append("\nEveryone is split into two teams. If there is an odd number of contestants, an AI marble joins")
-                        .AppendLine(" the team that has fewer members!")
-                        .ToString())
+                    .AppendLine("Use `mb/war signup <weapon ID> <marble name>` to sign up as a marble!")
+                    .AppendLine("When everyone's done, use `mb/war start`! The war begins automatically if 20 marbles have signed up.")
+                    .Append("\nWhen the war begins, use `mb/war attack <marble code>` to attack an enemy with your weapon")
+                    .AppendLine($" and `mb/war bash <marble code>` to attack without.{(MarbleBotUser.Find(Context).Stage > 1 ? "Spikes are twice as effective with `mb/war bash`." : "")}")
+                    .Append("\nEveryone is split into two teams. If there is an odd number of contestants, an AI marble joins")
+                    .AppendLine(" the team that has fewer members!")
+                    .ToString())
                 .AddField("Valid weapons", new StringBuilder()
                     .AppendLine("Any item that displays a 'War Class' when you use `mb/item` on it is valid. See `mb/war valid` for more.")
                     .AppendLine("Use `mb/item <item ID>` to see the stats for each item. ")
                     .AppendLine("Ranged weapons require ammo to work.")
                     .Append("Bashing is 100% accurate but only has a base damage of 3.")
                     .ToString())
-                .AddField("Boost", "Each team is given a boost at the beginning. If enough people on a team use `mb/war boost`, the boost will activate!")
+                .AddField("Boost",
+                    "Each team is given a boost at the beginning. If enough people on a team use `mb/war boost`, the boost will activate!")
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .WithTitle("Marble War!")
                 .Build());
+        }
     }
 }

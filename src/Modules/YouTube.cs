@@ -29,11 +29,12 @@ namespace MarbleBot.Modules
         {
             Channel channelListResult;
 
-            using (var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            using (var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
                 ApiKey = _botCredentials.GoogleApiKey,
                 ApplicationName = GetType().ToString()
             }))
+
             {
                 SearchResource.ListRequest searchListRequest = youtubeService.Search.List("snippet");
                 searchListRequest.Q = searchTerm;
@@ -72,12 +73,13 @@ namespace MarbleBot.Modules
 
             if (channelListResult.Snippet.Country != null)
             {
-                builder.AddField("Country", channelListResult.Snippet.Country, true);
+                builder.AddField("Country", channelListResult.Snippet.Country, inline: true);
             }
 
             if (channelListResult.Snippet.PublishedAt != null)
             {
-                builder.AddField("Created", channelListResult.Snippet.PublishedAt.Value.ToString("yyyy-MM-dd HH:mm:ss"), true);
+                // date is in format YYYY-MM-DDThh:mm:ssZ - remove the T and Z
+                builder.AddField("Created", channelListResult.Snippet.PublishedAt.Replace('T', ' ').Remove(19), inline: true);
             }
 
             await ReplyAsync(embed: builder.Build());
@@ -89,13 +91,13 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.DM)]
         public async Task CommunityVideosCommand(string url, [Remainder] string desc = "")
         {
-            var validUser = false;
+            bool validUser = false;
             var channelId = "";
-            using (var CVID = new StreamReader($"Resources{Path.DirectorySeparatorChar}CVID.csv"))
+            using (var communityVideoIds = new StreamReader($"Resources{Path.DirectorySeparatorChar}CommunityVideoIds.csv"))
             {
-                while (!CVID.EndOfStream && !validUser)
+                while (!communityVideoIds.EndOfStream && !validUser)
                 {
-                    var person = (await CVID.ReadLineAsync())!.Split(',');
+                    var person = (await communityVideoIds.ReadLineAsync())!.Split(',');
                     if (Context.User.Id == Convert.ToUInt64(person[0]))
                     {
                         validUser = true;
@@ -107,21 +109,21 @@ namespace MarbleBot.Modules
             if (!validUser)
             {
                 await ReplyAsync(new StringBuilder("It doesn't look like you're allowed to post in <#442474624417005589>.\n\n")
-                  .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
-                  .Append("If you're an accepted user, please notify Doc671.")
-                  .ToString());
+                    .Append("If you have more than 25 subs, post reasonable Algodoo-related content and are in good standing with the rules, sign up here: https://goo.gl/forms/opPSzUg30BECNku13 \n\n")
+                    .Append("If you're an accepted user, please notify Doc671.")
+                    .ToString());
                 return;
             }
 
-            using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            using var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
                 ApiKey = _botCredentials.GoogleApiKey,
                 ApplicationName = GetType().ToString()
             });
 
             string videoId = url.Contains("https://www.youtube.com/watch?v=")
-                ? url[32..]     // removes "https://www.youtube.com/watch?v="
-                : url[17..];    // removes "https://youtu.be/"
+                ? url[32..] // removes "https://www.youtube.com/watch?v="
+                : url[17..]; // removes "https://youtu.be/"
 
             var videoListRequest = youtubeService.Videos.List("snippet");
             videoListRequest.Id = videoId;
@@ -134,7 +136,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if ((DateTime.Now - video.Snippet.PublishedAt!.Value).Days > 1)
+            if ((DateTime.Now - DateTime.Parse(video.Snippet.PublishedAt)).Days > 1)
             {
                 await SendErrorAsync("The video cannot be more than two days old!");
                 return;
@@ -147,12 +149,12 @@ namespace MarbleBot.Modules
             }
 
             var communityVideoChannel = (IMessageChannel)Context.Client.GetChannel(442474624417005589);
-            var msgs = await communityVideoChannel.GetMessagesAsync(100).FlattenAsync();
-            var alreadyPosted = false;
+            var messages = await communityVideoChannel.GetMessagesAsync().FlattenAsync();
+            bool alreadyPosted = false;
 
-            foreach (var msg in msgs)
+            foreach (var message in messages)
             {
-                if (msg.Content.Contains(url))
+                if (message.Content.Contains(url))
                 {
                     alreadyPosted = true;
                     break;
@@ -175,7 +177,7 @@ namespace MarbleBot.Modules
         {
             SearchResource.ListRequest searchListRequest;
 
-            using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            using var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
                 ApiKey = _botCredentials.GoogleApiKey,
                 ApplicationName = GetType().ToString()
@@ -196,7 +198,7 @@ namespace MarbleBot.Modules
 
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (string.Compare(searchResult.Id.Kind, "youtube#channel", true) == 0)
+                if (string.Compare(searchResult.Id.Kind, "youtube#channel", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     channels.Add($"{searchResult.Snippet.Title} (<https://www.youtube.com/channel/{searchResult.Id.ChannelId}>)");
                     found = true;
@@ -220,7 +222,7 @@ namespace MarbleBot.Modules
         {
             SearchResource.ListRequest searchListRequest;
 
-            using var youtubeService = new YouTubeService(new BaseClientService.Initializer()
+            using var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
                 ApiKey = _botCredentials.GoogleApiKey,
                 ApplicationName = GetType().ToString()
@@ -240,7 +242,7 @@ namespace MarbleBot.Modules
             bool found = false;
             foreach (var searchResult in searchListResponse.Items)
             {
-                if (string.Compare(searchResult.Id.Kind, "youtube#video", true) == 0)
+                if (string.Compare(searchResult.Id.Kind, "youtube#video", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     videos.Add($"{searchResult.Snippet.Title} (<https://youtu.be/{searchResult.Id.VideoId}>)");
                     found = true;

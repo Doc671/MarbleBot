@@ -11,7 +11,8 @@ namespace MarbleBot.Services
         public ulong DebugChannel { get; set; }
         public UserCredential GoogleUserCredential { get; set; }
 
-        public BotCredentials(string token, string googleApiKey, ImmutableArray<ulong> adminIds, ulong debugChannel, UserCredential googleUserCredential)
+        public BotCredentials(string token, string googleApiKey, ImmutableArray<ulong> adminIds, ulong debugChannel,
+            UserCredential googleUserCredential)
         {
             Token = token;
             GoogleApiKey = googleApiKey;

@@ -11,34 +11,34 @@ using System.Threading.Tasks;
 using System.Timers;
 using static MarbleBot.Modules.MarbleBotModule;
 
-namespace MarbleBot.Common
+namespace MarbleBot.Common.Games.War
 {
     public class War
     {
         public IEnumerable<WarMarble> AllMarbles => Team1.Marbles.Union(Team2.Marbles);
-        public ulong Id { get; set; }
 
-        public WarTeam Team1 { get; set; }
-        public WarTeam Team2 { get; set; }
+        public WarTeam Team1 { get; }
+        public WarTeam Team2 { get; }
 
         private readonly WarMarble? _aiMarble;
         private readonly SocketCommandContext _context;
-        private bool _endCalled = false;
-        private bool _finished = false;
         private readonly GamesService _gamesService;
-        private DateTime _startTime;
-        private readonly Timer _timer = new Timer(7000);
+        private readonly ulong _id;
         private readonly RandomService _randomService;
+        private readonly Timer _timer = new Timer(7000);
+        private bool _endCalled;
+        private bool _finished;
+        private DateTime _startTime;
 
         public War(SocketCommandContext context, GamesService gamesService, RandomService randomService, ulong id,
-                   IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble? aiMarble,
-                   WarBoost team1Boost, WarBoost team2Boost)
+            IEnumerable<WarMarble> team1Marbles, IEnumerable<WarMarble> team2Marbles, WarMarble? aiMarble,
+            WarBoost team1Boost, WarBoost team2Boost)
         {
             _context = context;
             _gamesService = gamesService;
             _randomService = randomService;
 
-            Id = id;
+            _id = id;
             _aiMarble = aiMarble;
 
             (string team1Name, string team2Name) = GetTeamNames();
@@ -49,6 +49,20 @@ namespace MarbleBot.Common
             _timer.Elapsed += Timer_Elapsed;
         }
 
+        public int DealDamage(WarMarble userMarble, WarMarble targetMarble, int baseDamage)
+        {
+            float spikesMultiplier = userMarble.Spikes?.OutgoingDamageMultiplier ?? 1;
+            float shieldMultiplier = targetMarble.Shield?.IncomingDamageMultiplier ?? 1;
+            float randomMultiplier = 1 + 0.5f * (float)_randomService.Rand.NextDouble();
+
+            int damage = (int)MathF.Round(baseDamage * spikesMultiplier * shieldMultiplier * randomMultiplier);
+
+            userMarble.Health -= damage;
+            targetMarble.DamageDealt += damage;
+
+            return damage;
+        }
+
         public void Finalise()
         {
             if (_finished)
@@ -57,8 +71,8 @@ namespace MarbleBot.Common
             }
 
             _finished = true;
-            _gamesService.Wars.TryRemove(Id, out _);
-            using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{Id}.war");
+            _gamesService.Wars.TryRemove(_id, out _);
+            using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{_id}.war");
             marbleList.Write("");
         }
 
@@ -78,8 +92,8 @@ namespace MarbleBot.Common
             do
             {
                 team2Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
-            }
-            while (string.Compare(team1Name, team2Name, false) == 0);
+            } 
+            while (string.CompareOrdinal(team1Name, team2Name) == 0);
 
             return (team1Name, team2Name);
         }
@@ -92,30 +106,30 @@ namespace MarbleBot.Common
             }
 
             _endCalled = true;
-            int t1Total = Team1.Marbles.Sum(m => m.Health);
-            int t2Total = Team2.Marbles.Sum(m => m.Health);
-            var winningTeam = t1Total > t2Total ? Team1 : Team2;
+            int team1Total = Team1.Marbles.Sum(m => m.Health);
+            int team2Total = Team2.Marbles.Sum(m => m.Health);
+            var winningTeam = team1Total > team2Total ? Team1 : Team2;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
                 .WithCurrentTimestamp()
-                .WithTitle($"Team {winningTeam.Name} has defeated Team {(t1Total > t2Total ? Team2 : Team1).Name}! :trophy:");
-            var t1Output = new StringBuilder();
-            var t2Output = new StringBuilder();
+                .WithTitle($"Team {winningTeam.Name} has defeated Team {(team2Total == 0 ? Team2 : Team1).Name}! :trophy:");
+            var team1Output = new StringBuilder();
+            var team2Output = new StringBuilder();
 
             foreach (var marble in Team1.Marbles)
             {
                 var user = context.Client.GetUser(marble.Id);
-                t1Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
+                team1Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
 
             foreach (var marble in Team2.Marbles)
             {
                 var user = context.Client.GetUser(marble.Id);
-                t2Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
+                team2Output.AppendLine($"{marble.Name} (Health: **{marble.Health}**/{marble.MaxHealth}, Wpn: {marble.Weapon}) [{user.Username}#{user.Discriminator}]");
             }
 
-            builder.AddField($"Team {Team1.Name} Final Stats", t1Output.ToString())
-                .AddField($"Team {Team2.Name} Final Stats", t2Output.ToString());
+            builder.AddField($"Team {Team1.Name} Final Stats", team1Output.ToString())
+                .AddField($"Team {Team2.Name} Final Stats", team2Output.ToString());
 
             var usersDict = MarbleBotUser.GetUsers();
             foreach (var marble in winningTeam.Marbles)
@@ -124,7 +138,7 @@ namespace MarbleBot.Common
                 if ((DateTime.UtcNow - user.LastWarWin).TotalHours > 6 && marble.DamageDealt > 0)
                 {
                     var output = new StringBuilder();
-                    var earnings = marble.DamageDealt * 5;
+                    int earnings = marble.DamageDealt * 5;
                     output.AppendLine($"Damage dealt (x5): {UnitOfMoney}**{earnings:n2}**");
                     user.WarWins++;
 
@@ -152,6 +166,7 @@ namespace MarbleBot.Common
                     }
                 }
             }
+
             await context.Channel.SendMessageAsync(embed: builder.Build());
             MarbleBotUser.UpdateUsers(usersDict);
             Finalise();
@@ -171,10 +186,7 @@ namespace MarbleBot.Common
                 var randMarble = enemyTeam.Marbles.ElementAt(_randomService.Rand.Next(0, enemyTeam.Marbles.Count));
                 if (_randomService.Rand.Next(0, 100) < _aiMarble.Weapon.Accuracy)
                 {
-                    var damage = (int)Math.Round(_aiMarble.Weapon.Damage *
-                        (1 + _aiMarble.DamageBoost / 100d) *
-                        (1 - 0.2 * (randMarble.Shield == null ? 1 : Convert.ToDouble(randMarble.Shield!.Id == 63) *
-                        (0.5 + _randomService.Rand.NextDouble()))));
+                    int damage = DealDamage(_aiMarble, randMarble, _aiMarble.Weapon.Damage);
                     randMarble.Health -= damage;
                     await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         .AddField("Remaining Health", $"**{randMarble.Health}**/{randMarble.MaxHealth}")
@@ -195,11 +207,7 @@ namespace MarbleBot.Common
                 }
             }
 
-            if ((DateTime.UtcNow - _startTime).TotalMinutes >= 10)
-            {
-                await OnGameEnd(_context);
-            }
-            else if (Team1.Marbles.Sum(marble => marble.Health) == 0) // AI marble is always on team 2
+            if ((DateTime.UtcNow - _startTime).TotalMinutes >= 10 || Team1.Marbles.Sum(marble => marble.Health) == 0) // AI marble is always on team 2
             {
                 await OnGameEnd(_context);
             }

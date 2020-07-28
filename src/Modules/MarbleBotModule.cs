@@ -3,6 +3,7 @@ using Discord.Commands;
 using MarbleBot.Common;
 using NLog;
 using System;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,8 +12,8 @@ namespace MarbleBot.Modules
     public abstract class MarbleBotModule : ModuleBase<SocketCommandContext>
     {
         // Server IDs
-        protected internal const ulong CommunityMarble = 223616088263491595;
-        protected internal const ulong TheHatStoar = 224277738608001024;
+        protected const ulong CommunityMarble = 223616088263491595;
+        protected const ulong TheHatStoar = 224277738608001024;
 
         protected internal const string UnitOfMoney = "<:unitofmoney:372385317581488128>";
 
@@ -20,17 +21,12 @@ namespace MarbleBot.Modules
 
         protected internal static Color GetColor(SocketCommandContext context)
         {
-            if (context.IsPrivate)
-            {
-                return Color.DarkerGrey;
-            }
-            else
-            {
-                return new Color(uint.Parse(MarbleBotGuild.Find(context).Color, System.Globalization.NumberStyles.HexNumber));
-            }
+            return context.IsPrivate
+                ? Color.DarkerGrey
+                : new Color(uint.Parse(MarbleBotGuild.Find(context).Color, NumberStyles.HexNumber));
         }
 
-        protected internal static string GetTimeSpanSentence(TimeSpan dateTime)
+        protected static string GetTimeSpanSentence(TimeSpan dateTime)
         {
             var output = new StringBuilder();
             if (dateTime.Days > 1)
@@ -93,28 +89,26 @@ namespace MarbleBot.Modules
                     output.Append("<1 second");
                 }
             }
+
             return output.ToString();
         }
 
         protected internal static string GetDateString(double seconds)
         {
-            if (seconds == 1)
-            {
-                return "**1** second";
-            }
-            else
-            {
-                return $"**{seconds:n1}** seconds";
-            }
+            return Math.Abs(seconds - 1) < double.Epsilon ? "**1** second" : $"**{seconds:n1}** seconds";
         }
 
-        protected internal async Task<IUserMessage> SendErrorAsync(string messageContent)
-            => await ReplyAsync($":warning: | {messageContent}");
+        protected async Task<IUserMessage> SendErrorAsync(string messageContent)
+        {
+            return await ReplyAsync($":warning: | {messageContent}");
+        }
 
-        protected internal async Task<IUserMessage> SendSuccessAsync(string messageContent)
-            => await ReplyAsync($":white_check_mark: | {messageContent}");
+        protected async Task<IUserMessage> SendSuccessAsync(string messageContent)
+        {
+            return await ReplyAsync($":white_check_mark: | {messageContent}");
+        }
 
-        protected internal async Task SendLargeEmbedDescriptionAsync(EmbedBuilder builder, string content)
+        protected async Task SendLargeEmbedDescriptionAsync(EmbedBuilder builder, string content)
         {
             if (content.Length > EmbedBuilder.MaxDescriptionLength)
             {
@@ -140,20 +134,22 @@ namespace MarbleBot.Modules
             }
             else
             {
-                builder.WithDescription(content.ToString());
+                builder.WithDescription(content);
                 await ReplyAsync(embed: builder.Build());
             }
         }
 
         protected static string StageTooHighString()
-            => (new Random().Next(0, 6)) switch
+        {
+            return new Random().Next(0, 6) switch
             {
                 0 => "*Your inexperience blinds you...*",
                 1 => "*Your vision is blurry...*",
                 2 => "*Incomprehensible noises rattle in your head...*",
                 3 => "*You sense a desk restricting your path...*",
                 4 => "*You feel as if there is more to be done...*",
-                _ => "*Your mind is wracked with pain...*",
+                _ => "*Your mind is wracked with pain...*"
             };
+        }
     }
 }

@@ -1,17 +1,16 @@
 ﻿using System;
 
-namespace MarbleBot.Common
+namespace MarbleBot.Common.Games
 {
     public abstract class BaseMarble
     {
-        public ulong Id { get; set; }
-        public string Name { get; set; } = "";
+        public float DamageMultiplier { get; set; } = 1f;
 
         private int _health;
         public int Health
         {
             get => _health;
-            set => _health = value > MaxHealth ? MaxHealth : value < 1 ? 0 : value;
+            set => _health = Math.Clamp(value, 0, MaxHealth);
         }
 
         private int _maxHealth;
@@ -25,20 +24,11 @@ namespace MarbleBot.Common
             }
         }
 
+        public ulong Id { get; protected set; }
+        public string Name { get; protected set; }
         public int DamageDealt { get; set; }
         public Shield? Shield { get; set; }
         public Spikes? Spikes { get; set; }
-
-        private int _damageBoost = 0;
-        public int DamageBoost
-        {
-            get
-            {
-                return _damageBoost + (Spikes == null ? 0 : Spikes.DamageBoost);
-            }
-            set => _damageBoost = value;
-        }
-
         public DateTime LastMoveUsed { get; set; } = DateTime.MinValue;
 
         protected BaseMarble(ulong id, string name, int maxHealth)
@@ -51,10 +41,11 @@ namespace MarbleBot.Common
 
         public void DealDamage(int damage)
         {
-            if (Shield != null && Shield.Id == 63)
+            if (Shield != null)
             {
-                damage = (int)MathF.Round(damage * 0.8f);
+                damage = (int)MathF.Round(damage * Shield.IncomingDamageMultiplier);
             }
+
             Health -= damage;
         }
     }

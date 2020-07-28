@@ -1,13 +1,13 @@
-namespace MarbleBot.Common
+using System;
+
+namespace MarbleBot.Common.Games.Siege
 {
-    public readonly struct Attack
+    public readonly struct Attack : IEquatable<Attack>
     {
         public string Name { get; }
         public int Damage { get; }
         public int Accuracy { get; }
         public StatusEffect StatusEffect { get; }
-
-        public static Attack Empty => new Attack("", 0, 0, StatusEffect.None);
 
         public Attack(string name, int damage, int accuracy, StatusEffect statusEffect)
         {
@@ -26,12 +26,17 @@ namespace MarbleBot.Common
                    StatusEffect == attack.StatusEffect;
         }
 
+        public bool Equals(Attack other)
+        {
+            return Name == other.Name &&
+                   Damage == other.Damage &&
+                   Accuracy == other.Accuracy &&
+                   StatusEffect == other.StatusEffect;
+        }
+
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return 17 * Name.GetHashCode() + Damage.GetHashCode() + Accuracy.GetHashCode() + StatusEffect.GetHashCode();
-            }
+            return HashCode.Combine(Name, Damage, Accuracy, StatusEffect);
         }
 
         public static bool operator ==(Attack left, Attack right)

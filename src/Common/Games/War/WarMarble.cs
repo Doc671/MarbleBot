@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace MarbleBot.Common
+namespace MarbleBot.Common.Games.War
 {
     public class WarMarble : BaseMarble
     {
-        public bool Boosted { get; set; } = false;
+        public bool Boosted { get; set; }
         public DateTime LastRage { get; set; } = DateTime.MinValue;
-        public bool Rage { get; set; } = false;
+        public bool Rage { get; set; }
         public int Team { get; set; }
         public WeaponClass WeaponClass { get; }
         public Weapon Weapon { get; }

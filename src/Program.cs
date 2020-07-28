@@ -10,6 +10,7 @@ using MarbleBot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
@@ -17,27 +18,31 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace MarbleBot
 {
     public sealed class Program
     {
         private readonly BotCredentials _botCredentials;
-        private readonly NLog.Logger _logger;
+        private readonly Logger _logger;
         private readonly StartTimeService _startTimeService = new StartTimeService(DateTime.UtcNow);
-
-        public static void Main()
-            => new Program().StartAsync().GetAwaiter().GetResult();
 
         public Program()
         {
             _botCredentials = GetBotCredentials();
             SetLogConfig();
-            _logger = NLog.LogManager.GetCurrentClassLogger();
+            _logger = LogManager.GetCurrentClassLogger();
+        }
+
+        public static void Main()
+        {
+            new Program().StartAsync().GetAwaiter().GetResult();
         }
 
         private ServiceProvider ConfigureServices()
-            => new ServiceCollection()
+        {
+            return new ServiceCollection()
                 .AddSingleton(_botCredentials)
                 .AddSingleton(_startTimeService)
                 .AddSingleton<DiscordSocketClient>()
@@ -53,6 +58,7 @@ namespace MarbleBot
                     loggingBuilder.AddNLog();
                 })
                 .BuildServiceProvider();
+        }
 
         private BotCredentials GetBotCredentials()
         {
@@ -63,23 +69,22 @@ namespace MarbleBot
             }
 
             var returnValue = JsonConvert.DeserializeObject<BotCredentials>(json);
-            using (var stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open, FileAccess.Read))
+            using (var stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open,
+                FileAccess.Read))
             {
                 if (returnValue == null)
                 {
                     throw new Exception("Bot credentials not detected.");
                 }
-                else
-                {
-                    returnValue.GoogleUserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                        GoogleClientSecrets.Load(stream).Secrets,
-                        new string[] { SheetsService.Scope.Spreadsheets },
-                        "user",
-                        CancellationToken.None,
-                        new FileDataStore($"Keys{Path.DirectorySeparatorChar}token.json", true)
-                    ).Result;
-                }
+
+                returnValue.GoogleUserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(GoogleClientSecrets.Load(stream).Secrets,
+                    new[] { SheetsService.Scope.Spreadsheets },
+                    "user",
+                    CancellationToken.None,
+                    new FileDataStore($"Keys{Path.DirectorySeparatorChar}token.json", true)
+                ).Result;
             }
+
             return returnValue;
         }
 
@@ -95,7 +100,7 @@ namespace MarbleBot
             {
                 Layout = @"[${date:universalTime=True:format=yyyy-MM-dd HH\:mm\:ss}] ${message}"
             });
-            NLog.LogManager.Configuration = config;
+            LogManager.Configuration = config;
         }
 
         public async Task StartAsync()

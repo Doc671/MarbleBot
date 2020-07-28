@@ -1,7 +1,9 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using MarbleBot.Common;
+using MarbleBot.Common.Games.Scavenge;
+using MarbleBot.Common.Games.Siege;
+using MarbleBot.Common.Games.War;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
@@ -11,6 +13,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,30 +37,30 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task BackupCommand()
         {
-            System.IO.Compression.ZipFile.CreateFromDirectory("Data", $"Backup-{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.zip");
+            ZipFile.CreateFromDirectory("Data", $"Backup-{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}.zip");
             await SendSuccessAsync("Success.");
         }
 
         [Command("clearmemory")]
         [Alias("cm")]
-        [Summary("Resets all values in MarbleBot.Global")]
         [RequireOwner]
         public async Task ClearMemoryCommand()
         {
             _dailyTimeoutService.DailyTimeout = 48;
-            foreach (var pair in _gamesService.Scavenges)
+
+            foreach ((_, Scavenge scavenge) in _gamesService.Scavenges)
             {
-                pair.Value.Finalise();
+                scavenge.Finalise();
             }
 
-            foreach (var pair in _gamesService.Sieges)
+            foreach ((_, Siege siege) in _gamesService.Sieges)
             {
-                pair.Value.Finalise();
+                siege.Finalise();
             }
 
-            foreach (var pair in _gamesService.Wars)
+            foreach ((_, War war) in _gamesService.Wars)
             {
-                pair.Value.Finalise();
+                war.Finalise();
             }
 
             _gamesService.Scavenges = new ConcurrentDictionary<ulong, Scavenge>();
@@ -71,17 +74,10 @@ namespace MarbleBot.Modules
         [Alias("dt")]
         [Summary("Changes daily timeout (in hours).")]
         [RequireOwner]
-        public async Task DailyTimeoutCommand(string rawHours)
+        public async Task DailyTimeoutCommand(int hours)
         {
-            if (int.TryParse(rawHours, out int hours))
-            {
-                _dailyTimeoutService.DailyTimeout = hours;
-                await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");
-            }
-            else
-            {
-                await ReplyAsync("Invalid number of hours!");
-            }
+            _dailyTimeoutService.DailyTimeout = hours;
+            await ReplyAsync($"Successfully updated daily timeout to **{hours}** hours!");
         }
 
         [Command("directmessage")]
@@ -102,16 +98,16 @@ namespace MarbleBot.Modules
             var itemsDict = Item.GetItems();
             var usersDict = MarbleBotUser.GetUsers();
             var newUsersDict = new Dictionary<ulong, MarbleBotUser>();
-            foreach (var userPair in usersDict!)
+            foreach ((ulong userId, MarbleBotUser user) in usersDict!)
             {
-                var user = userPair.Value;
-                user.Balance = user.NetWorth - (user.Items == null ? 0 : user.Items.Aggregate(0m, (total, itemPair) =>
+                user.Balance = user.NetWorth - (user.Items?.Aggregate(0m, (total, itemPair) =>
                 {
                     total += itemsDict[itemPair.Key].Price * itemPair.Value;
                     return total;
-                }));
-                newUsersDict.Add(userPair.Key, user);
+                }) ?? 0);
+                newUsersDict.Add(userId, user);
             }
+
             MarbleBotUser.UpdateUsers(newUsersDict);
             await SendSuccessAsync("Success.");
         }
@@ -122,39 +118,26 @@ namespace MarbleBot.Modules
         public async Task LogCommand()
         {
             string logs;
-            using (var logFile = new StreamReader((LogManager.Configuration.FindTargetByName("logfile") as FileTarget)!.FileName.ToString()!.RemoveChar('\'')))
+            using (var logFile =
+                new StreamReader((LogManager.Configuration.FindTargetByName("logfile") as FileTarget)
+                !.FileName.ToString()
+                !.RemoveChar('\'')))
             {
                 logs = logFile.ReadToEnd();
             }
+
             for (int i = 0; i < logs.Length; i += 2000)
             {
                 await ReplyAsync(logs[i..(i + 2000 > logs.Length ? logs.Length : i + 2000)]);
             }
         }
 
-        [Command("melmon")]
-        [Summary("melmon")]
+        [Command("postmessage")]
+        [Summary("Posts the given message in the given text channel.")]
         [RequireOwner]
-        public async Task MelmonCommand(string melmon, [Remainder] string msg)
+        public async Task PostMessageCommand(ITextChannel textChannel, string message)
         {
-            SocketGuild srvr = Context.Client.GetGuild(TheHatStoar);
-            ISocketMessageChannel chnl = srvr.GetTextChannel(TheHatStoar);
-            switch (melmon)
-            {
-                case "desk": await chnl.SendMessageAsync(msg); break;
-                case "flam": chnl = srvr.GetTextChannel(224277892182310912); await chnl.SendMessageAsync(msg); break;
-                case "ken": srvr = Context.Client.GetGuild(CommunityMarble); chnl = srvr.GetTextChannel(CommunityMarble); await chnl.SendMessageAsync(msg); break;
-                case "adam": chnl = srvr.GetTextChannel(240570994211684352); await chnl.SendMessageAsync(msg); break;
-                case "brady": chnl = srvr.GetTextChannel(237158048282443776); await chnl.SendMessageAsync(msg); break;
-                default:
-                    var split = melmon.Split(',');
-                    ulong.TryParse(split[0], out ulong srvrId);
-                    ulong.TryParse(split[1], out ulong chnlId);
-                    srvr = Context.Client.GetGuild(srvrId);
-                    chnl = srvr.GetTextChannel(chnlId);
-                    await chnl.SendMessageAsync(msg);
-                    break;
-            }
+            await textChannel.SendMessageAsync(message);
         }
 
         [Command("setgame")]
@@ -184,9 +167,9 @@ namespace MarbleBot.Modules
         public async Task SiegeDictCommand()
         {
             var output = new StringBuilder();
-            foreach (var siegePair in _gamesService.Sieges)
+            foreach ((ulong siegeId, Siege siege) in _gamesService.Sieges)
             {
-                output.AppendLine($"**{siegePair.Key}** - {siegePair.Value}");
+                output.AppendLine($"**{siegeId}** - {siege}");
             }
 
             await ReplyAsync(embed: new EmbedBuilder()
@@ -202,7 +185,7 @@ namespace MarbleBot.Modules
         [RequireOwner]
         public async Task UpdateCommand(string major, [Remainder] string info)
         {
-            var isMajor = string.Compare(major, "major", true) == 0;
+            bool isMajor = string.Compare(major, "major", StringComparison.OrdinalIgnoreCase) == 0;
 
             var builder = new EmbedBuilder()
                 .WithColor(Color.Red)
@@ -211,11 +194,12 @@ namespace MarbleBot.Modules
                 .WithTitle("MarbleBot Update");
 
             var guildsDict = MarbleBotGuild.GetGuilds();
-            foreach (var guildPair in guildsDict)
+            foreach ((ulong key, MarbleBotGuild value) in guildsDict)
             {
-                if (guildPair.Value.AnnouncementChannel != 0)
+                if (value.AnnouncementChannel != 0)
                 {
-                    var channel = Context.Client.GetGuild(guildPair.Key).GetTextChannel(guildPair.Value.AnnouncementChannel);
+                    var channel = Context.Client.GetGuild(key)
+                        .GetTextChannel(value.AnnouncementChannel);
                     var msg = await channel.SendMessageAsync(embed: builder.Build());
                     if (isMajor)
                     {
