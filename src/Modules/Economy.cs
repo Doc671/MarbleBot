@@ -339,7 +339,7 @@ namespace MarbleBot.Modules
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .WithDescription($"**{Context.User.Username}** has successfully decrafted **{requestedItem.Name}** x**{noCrafted}**!")
-                .WithTitle("Crafting: " + requestedItem.Name)
+                .WithTitle($"Crafting: {requestedItem.Name}")
                 .AddField("Gained items", output.ToString())
                 .AddField("Net Worth",
                     $"Old: {UnitOfMoney}**{currentNetWorth:n2}**\nNew: {UnitOfMoney}**{user.NetWorth:n2}**")
@@ -374,6 +374,20 @@ namespace MarbleBot.Modules
             }
 
             await ShowUserInventory(user, marbleBotUser, page);
+        }
+
+        [Command("inventory")]
+        [Alias("inv", "items")]
+        [Summary("Shows all the items a user has.")]
+        public async Task InventoryCommand(MarbleBotUser marbleBotUser, int page = 1)
+        {
+            if (page < 1)
+            {
+                await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
+                return;
+            }
+
+            await ShowUserInventory(Context.Client.GetUser(marbleBotUser.Id), marbleBotUser, page);
         }
 
         [Command("inventory")]
