@@ -349,41 +349,11 @@ namespace MarbleBot.Modules
         [Command("inventory")]
         [Alias("inv", "items")]
         [Summary("Shows all the items a user has.")]
-        public async Task InventoryCommand(IUser? user = null, int page = 1)
-        {
-            if (page < 1)
-            {
-                await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
-                return;
-            }
-
-            MarbleBotUser marbleBotUser;
-            if (user == null)
-            {
-                user = Context.User;
-                marbleBotUser = MarbleBotUser.Find(Context);
-                if (marbleBotUser.Items == null)
-                {
-                    await SendErrorAsync($"**{Context.User.Username}**, you don't have any items!");
-                    return;
-                }
-            }
-            else
-            {
-                marbleBotUser = MarbleBotUser.Find(user.Id);
-            }
-
-            await ShowUserInventory(user, marbleBotUser, page);
-        }
-
-        [Command("inventory")]
-        [Alias("inv", "items")]
-        [Summary("Shows all the items a user has.")]
         public async Task InventoryCommand(MarbleBotUser marbleBotUser, int page = 1)
         {
             if (page < 1)
             {
-                await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
+                await SendErrorAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
                 return;
             }
 
@@ -393,26 +363,26 @@ namespace MarbleBot.Modules
         [Command("inventory")]
         [Alias("inv", "items")]
         [Summary("Shows all the items a user has.")]
+        [Priority(1)]
         public async Task InventoryCommand(int page = 1)
         {
             if (page < 1)
             {
-                await ReplyAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
+                await SendErrorAsync($"**{Context.User.Username}**, the inventory page must be at least one!");
                 return;
             }
 
-            MarbleBotUser marbleBotUser = MarbleBotUser.Find(Context);
+            await ShowUserInventory(Context.User, MarbleBotUser.Find(Context), page);
+        }
+
+        private async Task ShowUserInventory(IUser discordUser, MarbleBotUser marbleBotUser, int page = 1)
+        {
             if (marbleBotUser.Items == null)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you don't have any items!");
                 return;
             }
 
-            await ShowUserInventory(Context.User, marbleBotUser, page);
-        }
-
-        private async Task ShowUserInventory(IUser discordUser, MarbleBotUser marbleBotUser, int page = 1)
-        {
             var itemOutput = new StringBuilder();
             var items = marbleBotUser.Items.Skip((page - 1) * 20).Take(20).ToArray();
             bool itemsPresent = items.Any();
@@ -437,7 +407,7 @@ namespace MarbleBot.Modules
                 .WithCurrentTimestamp()
                 .WithDescription(itemOutput.ToString())
                 .WithTitle(itemsPresent
-                    ? $"Page **{page}** of **{marbleBotUser.Items.Count / 20 + 1}**"
+                    ? $"Page **{page}** of **{(marbleBotUser.Items.Count - 1) / 20 + 1}**"
                     : "Invalid page")
                 .Build());
         }
