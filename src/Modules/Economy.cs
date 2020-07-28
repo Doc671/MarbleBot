@@ -376,6 +376,9 @@ namespace MarbleBot.Modules
             await ShowUserInventory(user, marbleBotUser, page);
         }
 
+        [Command("inventory")]
+        [Alias("inv", "items")]
+        [Summary("Shows all the items a user has.")]
         public async Task InventoryCommand(int page = 1)
         {
             if (page < 1)
