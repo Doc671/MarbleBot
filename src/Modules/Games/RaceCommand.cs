@@ -95,8 +95,7 @@ namespace MarbleBot.Modules.Games
                     eliminated = _randomService.Rand.Next(0, marbleCount);
                 } while (marbles[eliminated].name == "///out");
 
-                string deathMessage;
-                deathMessage = messages[_randomService.Rand.Next(0, messages.Count - 1)];
+                string deathMessage = messages[_randomService.Rand.Next(0, messages.Count - 1)];
                 string bold = marbles[eliminated].name.Contains('*') || marbles[eliminated].name.Contains('\\') ? "" : "**";
                 builder.AddField($"{bold}{marbles[eliminated].name}{bold} is eliminated!",
                     $"{marbles[eliminated].name} {deathMessage} and is now out of the competition!");
@@ -107,7 +106,7 @@ namespace MarbleBot.Modules.Games
                     string json;
                     using (var messageList = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceSpecialMessages.json"))
                     {
-                        json = messageList.ReadToEnd();
+                        json = await messageList.ReadToEndAsync();
                     }
 
                     var messageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);

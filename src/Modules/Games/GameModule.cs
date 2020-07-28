@@ -20,11 +20,11 @@ namespace MarbleBot.Modules.Games
 {
     public class GameModule : MarbleBotModule
     {
-        protected BotCredentials _botCredentials;
-        protected GamesService _gamesService;
-        protected RandomService _randomService;
+        protected readonly BotCredentials _botCredentials;
+        protected readonly GamesService _gamesService;
+        protected readonly RandomService _randomService;
 
-        public GameModule(BotCredentials botCredentials, GamesService gamesService, RandomService randomService)
+        protected GameModule(BotCredentials botCredentials, GamesService gamesService, RandomService randomService)
         {
             _botCredentials = botCredentials;
             _gamesService = gamesService;

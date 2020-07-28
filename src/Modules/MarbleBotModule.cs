@@ -13,7 +13,6 @@ namespace MarbleBot.Modules
     {
         // Server IDs
         protected const ulong CommunityMarble = 223616088263491595;
-        protected const ulong TheHatStoar = 224277738608001024;
 
         protected internal const string UnitOfMoney = "<:unitofmoney:372385317581488128>";
 
@@ -69,25 +68,15 @@ namespace MarbleBot.Modules
             }
             else if (dateTime.Seconds == 1)
             {
-                if (dateTime.Minutes > 0)
-                {
-                    output.Append("and 1 second");
-                }
-                else
-                {
-                    output.Append("1 second");
-                }
+                output.Append(dateTime.Minutes == 0 && dateTime.Hours == 0
+                    ? "1 second" 
+                    : "and 1 second");
             }
             else if (dateTime.TotalSeconds < 1)
             {
-                if (dateTime.Minutes > 0)
-                {
-                    output.Append("and <1 second");
-                }
-                else
-                {
-                    output.Append("<1 second");
-                }
+                output.Append(dateTime.Minutes == 0 && dateTime.Hours == 0
+                    ? "<1 second" 
+                    : "and <1 second");
             }
 
             return output.ToString();
@@ -113,11 +102,10 @@ namespace MarbleBot.Modules
             if (content.Length > EmbedBuilder.MaxDescriptionLength)
             {
                 bool endOfMessageReached = false;
-                string currentMessageSlice;
                 int currentMessageNo = 0;
                 while (!endOfMessageReached)
                 {
-                    currentMessageSlice = content[(EmbedBuilder.MaxDescriptionLength * currentMessageNo)..(EmbedBuilder.MaxDescriptionLength * (currentMessageNo + 1))];
+                    string currentMessageSlice = content[(EmbedBuilder.MaxDescriptionLength * currentMessageNo)..(EmbedBuilder.MaxDescriptionLength * (currentMessageNo + 1))];
 
                     if (currentMessageSlice.Length < EmbedBuilder.MaxDescriptionLength)
                     {

@@ -112,6 +112,29 @@ namespace MarbleBot.Modules
             await SendSuccessAsync("Success.");
         }
 
+        [Command("fixnetworth")]
+        [Summary("Fixes the net worth of each user.")]
+        [Alias("fixnw")]
+        [RequireOwner]
+        public async Task FixNetWorthCommand()
+        {
+            var itemsDict = Item.GetItems();
+            var usersDict = MarbleBotUser.GetUsers();
+            var newUsersDict = new Dictionary<ulong, MarbleBotUser>();
+            foreach ((ulong userId, MarbleBotUser user) in usersDict!)
+            {
+                user.NetWorth = user.Balance + (user.Items?.Aggregate(0m, (total, itemPair) =>
+                {
+                    total += itemsDict[itemPair.Key].Price * itemPair.Value;
+                    return total;
+                }) ?? 0);
+                newUsersDict.Add(userId, user);
+            }
+
+            MarbleBotUser.UpdateUsers(newUsersDict);
+            await SendSuccessAsync("Success.");
+        }
+
         [Command("logs")]
         [Summary("Shows the contents of the current log file.")]
         [RequireOwner]
@@ -123,7 +146,7 @@ namespace MarbleBot.Modules
                 !.FileName.ToString()
                 !.RemoveChar('\'')))
             {
-                logs = logFile.ReadToEnd();
+                logs = await logFile.ReadToEndAsync();
             }
 
             for (int i = 0; i < logs.Length; i += 2000)

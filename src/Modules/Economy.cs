@@ -495,9 +495,9 @@ namespace MarbleBot.Modules
             if (item.CraftingRecipe != null)
             {
                 var output = new StringBuilder();
-                foreach (KeyValuePair<int, int> rawItem in item.CraftingRecipe)
+                foreach ((int ingredientId, int noRequired) in item.CraftingRecipe)
                 {
-                    output.AppendLine($"`[{rawItem.Key:000}]` {Item.Find<Item>(rawItem.Key).Name}: {rawItem.Value}");
+                    output.AppendLine($"`[{ingredientId:000}]` {Item.Find<Item>(ingredientId).Name}: {noRequired}");
                 }
 
                 builder.AddField($"Crafting Recipe (produces **{item.CraftingProduced}**)", output.ToString());
@@ -672,9 +672,9 @@ namespace MarbleBot.Modules
                         else
                         {
                             var output = new StringBuilder();
-                            foreach (KeyValuePair<int, int> ingredient in item.CraftingRecipe)
+                            foreach ((int ingredientId, int noRequired) in item.CraftingRecipe)
                             {
-                                output.AppendLine($"`[{ingredient.Key:000}]` {Item.Find<Item>(ingredient.Key).Name}: {ingredient.Value}");
+                                output.AppendLine($"`[{ingredientId:000}]` {Item.Find<Item>(ingredientId).Name}: {noRequired}");
                             }
 
                             embed.AddField($"`[{itemId:000}]` {item.Name} (produces **{item.CraftingProduced}**)",
@@ -729,9 +729,9 @@ namespace MarbleBot.Modules
             await DisplayRichList(users, page);
         }
 
-        private async Task DisplayRichList((int place, MarbleBotUser user)[] users, int page)
+        private async Task DisplayRichList(IList<(int place, MarbleBotUser user)> users, int page)
         {
-            if (page > users.Length / 10 + 1)
+            if (page > users.Count / 10 + 1)
             {
                 await ReplyAsync($"**{Context.User.Username}**, there is nobody in page **{page}**!");
                 return;
@@ -739,7 +739,7 @@ namespace MarbleBot.Modules
 
             int displayedPlace = 0;
             decimal lastValue = 0m;
-            for (int i = 0; i < users.Length; i++)
+            for (int i = 0; i < users.Count; i++)
             {
                 (_, MarbleBotUser user) = users[i];
                 if (user.NetWorth != lastValue)
@@ -753,7 +753,7 @@ namespace MarbleBot.Modules
 
             int maxIndex = page * 10 - 1, minIndex = (page - 1) * 10, currentUserIndex = 0;
             var output = new StringBuilder();
-            for (int i = 0; i < users.Length; i++)
+            for (int i = 0; i < users.Count; i++)
             {
                 (int place, MarbleBotUser user) = users[i];
                 if (i < maxIndex + 1 && i >= minIndex)

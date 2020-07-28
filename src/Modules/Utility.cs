@@ -352,14 +352,9 @@ namespace MarbleBot.Modules
                         UserStatus.Online => "Online",
                         _ => "Offline"
                     };
-                    if (string.IsNullOrEmpty(user.Nickname))
-                    {
-                        output.AppendLine($"{user.Username}#{user.Discriminator}: **{status}**");
-                    }
-                    else
-                    {
-                        output.AppendLine($"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
-                    }
+                    output.AppendLine(string.IsNullOrEmpty(user.Nickname) 
+                        ? $"{user.Username}#{user.Discriminator}: **{status}**" 
+                        : $"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
                 }
             }
 

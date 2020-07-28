@@ -66,10 +66,9 @@ namespace MarbleBot.Modules.Games
                     return;
                 }
 
-                MarbleBotUser user;
                 foreach ((ulong id, string name, int itemId) in rawMarbles.OrderBy(marbleInfo => _randomService.Rand.Next()))
                 {
-                    user = MarbleBotUser.Find(Context, id);
+                    MarbleBotUser user = MarbleBotUser.Find(Context, id);
                     marbles.Add(new WarMarble(id, name, 40, Item.Find<Weapon>(itemId),
                         user.GetShield(), user.GetSpikes()));
                 }
@@ -600,12 +599,10 @@ namespace MarbleBot.Modules.Games
                         }
                         else
                         {
-                            string bold;
-                            SocketUser user;
                             foreach ((ulong id, string name, int itemId) in marbles)
                             {
-                                bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
-                                user = Context.Client.GetUser(id);
+                                string bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
+                                SocketUser user = Context.Client.GetUser(id);
                                 marbleOutput.AppendLine($"{bold}{name}{bold} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
                             }
                         }

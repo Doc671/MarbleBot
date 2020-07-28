@@ -28,7 +28,7 @@ namespace MarbleBot
         private readonly Logger _logger;
         private readonly StartTimeService _startTimeService = new StartTimeService(DateTime.UtcNow);
 
-        public Program()
+        private Program()
         {
             _botCredentials = GetBotCredentials();
             SetLogConfig();
@@ -60,7 +60,7 @@ namespace MarbleBot
                 .BuildServiceProvider();
         }
 
-        private BotCredentials GetBotCredentials()
+        private static BotCredentials GetBotCredentials()
         {
             string json;
             using (var botCredentialFile = new StreamReader("BotCredentials.json"))
@@ -88,7 +88,7 @@ namespace MarbleBot
             return returnValue;
         }
 
-        private void SetLogConfig()
+        private static void SetLogConfig()
         {
             var config = new LoggingConfiguration();
             config.AddRule(NLog.LogLevel.Trace, NLog.LogLevel.Fatal, new FileTarget("logfile")
@@ -103,11 +103,11 @@ namespace MarbleBot
             LogManager.Configuration = config;
         }
 
-        public async Task StartAsync()
+        private async Task StartAsync()
         {
             Console.Title = "MarbleBot";
 
-            using var services = ConfigureServices();
+            await using var services = ConfigureServices();
 
             var client = services.GetRequiredService<DiscordSocketClient>();
             await client.LoginAsync(TokenType.Bot, _botCredentials.Token).ConfigureAwait(false);
@@ -123,16 +123,15 @@ namespace MarbleBot
             await Task.Delay(-1);
         }
 
-        private Task Client_UserBanned(SocketUser user, SocketGuild socketGuild)
+        private static Task Client_UserBanned(SocketUser user, SocketGuild socketGuild)
         {
             var guildsDict = MarbleBotGuild.GetGuilds();
-            MarbleBotGuild? marbleBotGuild;
             if (!guildsDict.ContainsKey(socketGuild.Id))
             {
                 return Task.CompletedTask;
             }
 
-            marbleBotGuild = guildsDict[socketGuild.Id];
+            MarbleBotGuild? marbleBotGuild = guildsDict[socketGuild.Id];
             if (string.IsNullOrEmpty(marbleBotGuild?.AppealFormLink))
             {
                 return Task.CompletedTask;

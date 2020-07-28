@@ -150,16 +150,7 @@ namespace MarbleBot.Modules
 
             var communityVideoChannel = (IMessageChannel)Context.Client.GetChannel(442474624417005589);
             var messages = await communityVideoChannel.GetMessagesAsync().FlattenAsync();
-            bool alreadyPosted = false;
-
-            foreach (var message in messages)
-            {
-                if (message.Content.Contains(url))
-                {
-                    alreadyPosted = true;
-                    break;
-                }
-            }
+            bool alreadyPosted = messages.Any(message => message.Content.Contains(url));
 
             if (alreadyPosted)
             {
@@ -175,15 +166,13 @@ namespace MarbleBot.Modules
         [Summary("Displays a list of channels that match the search criteria.")]
         public async Task SearchChannelCommand([Remainder] string searchTerm)
         {
-            SearchResource.ListRequest searchListRequest;
-
             using var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
                 ApiKey = _botCredentials.GoogleApiKey,
                 ApplicationName = GetType().ToString()
             });
 
-            searchListRequest = youtubeService.Search.List("snippet");
+            SearchResource.ListRequest searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
 
@@ -220,15 +209,13 @@ namespace MarbleBot.Modules
         [Summary("Displays a list of videos that match the search critera.")]
         public async Task SearchVideoCommand([Remainder] string searchTerm)
         {
-            SearchResource.ListRequest searchListRequest;
-
             using var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
                 ApiKey = _botCredentials.GoogleApiKey,
                 ApplicationName = GetType().ToString()
             });
 
-            searchListRequest = youtubeService.Search.List("snippet");
+            SearchResource.ListRequest searchListRequest = youtubeService.Search.List("snippet");
             searchListRequest.Q = searchTerm;
             searchListRequest.MaxResults = 10;
 

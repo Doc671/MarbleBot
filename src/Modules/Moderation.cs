@@ -171,14 +171,12 @@ namespace MarbleBot.Modules
                         Values = new List<CellData>()
                     };
 
-                    int cellNumber = 0;
-                    ExtendedValue cellContents;
                     foreach (var cell in userToWarnRow)
                     {
-                        cellContents = new ExtendedValue();
+                        var cellContents = new ExtendedValue();
 
                         // If the cell is a number, write it as a number rather than a string
-                        if (int.TryParse(cell, out cellNumber))
+                        if (int.TryParse(cell, out int cellNumber))
                         {
                             cellContents.NumberValue = cellNumber;
                         }

@@ -76,14 +76,13 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            MarbleBotUser user;
             var marbles = new List<SiegeMarble>();
             var marbleOutput = new StringBuilder();
             var mentionOutput = new StringBuilder();
             int stageTotal = 0;
             foreach ((ulong id, string name) in rawMarbleData)
             {
-                user = MarbleBotUser.Find(Context, id);
+                MarbleBotUser user = MarbleBotUser.Find(Context, id);
                 stageTotal += user.Stage;
                 marbles.Add(new SiegeMarble(id, name, 0)
                 {
@@ -506,12 +505,10 @@ namespace MarbleBot.Modules.Games
                             }
                             else
                             {
-                                string bold;
-                                SocketUser user;
                                 foreach ((ulong id, string name) in marbles)
                                 {
-                                    bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
-                                    user = Context.Client.GetUser(id);
+                                    string bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
+                                    SocketUser user = Context.Client.GetUser(id);
                                     marbleOutput.AppendLine($"{bold}{name}{bold} [{user.Username}#{user.Discriminator}]");
                                 }
                             }

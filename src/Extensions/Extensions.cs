@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -12,14 +13,7 @@ namespace MarbleBot.Extensions
             var output = new StringBuilder();
             for (int i = 0; i < str.Length; i++)
             {
-                if (i == 0)
-                {
-                    output.Append(char.ToUpper(str[i]));
-                }
-                else
-                {
-                    output.Append(str[i]);
-                }
+                output.Append(i == 0 ? char.ToUpper(str[i]) : str[i]);
 
                 // Add a space if the next character is a capital letter (indicating a new word)
                 if (i != 0 && i < str.Length - 1 && char.IsUpper(str[i + 1]))
@@ -60,12 +54,9 @@ namespace MarbleBot.Extensions
         public static string RemoveChar(this string str, char charToRemove)
         {
             var output = new StringBuilder();
-            for (int i = 0; i < str.Length; i++)
+            foreach (char c in str.Where(c => c != charToRemove))
             {
-                if (str[i] != charToRemove)
-                {
-                    output.Append(str[i]);
-                }
+                output.Append(c);
             }
 
             return output.ToString();

@@ -5,10 +5,10 @@ namespace MarbleBot.Services
 {
     public class BotCredentials
     {
-        public string Token { get; set; }
-        public string GoogleApiKey { get; set; }
-        public ImmutableArray<ulong> AdminIds { get; set; }
-        public ulong DebugChannel { get; set; }
+        public string Token { get; }
+        public string GoogleApiKey { get; }
+        public ImmutableArray<ulong> AdminIds { get; }
+        public ulong DebugChannel { get; }
         public UserCredential GoogleUserCredential { get; set; }
 
         public BotCredentials(string token, string googleApiKey, ImmutableArray<ulong> adminIds, ulong debugChannel,

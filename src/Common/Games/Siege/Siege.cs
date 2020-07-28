@@ -110,7 +110,7 @@ namespace MarbleBot.Common.Games.Siege
             };
         }
 
-        private void InflictStatusEffect(SiegeMarble marble, StatusEffect statusEffect, EmbedBuilder embedBuilder)
+        private static void InflictStatusEffect(SiegeMarble marble, StatusEffect statusEffect, EmbedBuilder embedBuilder)
         {
             switch (statusEffect)
             {
@@ -242,9 +242,8 @@ namespace MarbleBot.Common.Games.Siege
                 .WithDescription($"**{Boss!.Name}** has been defeated!");
             var usersDict = MarbleBotUser.GetUsers();
 
-            for (int i = 0; i < Marbles.Count; i++)
+            foreach (SiegeMarble marble in Marbles)
             {
-                var marble = Marbles[i];
                 var user = await MarbleBotUser.FindAsync(_context, usersDict, marble.Id);
                 var output = new StringBuilder();
 

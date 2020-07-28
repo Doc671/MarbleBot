@@ -33,7 +33,7 @@ namespace MarbleBot.Common.Games.Siege
             Difficulty = difficulty;
             Stage = stage;
             Attacks = attacks.ToImmutableArray();
-            Drops = itemDrops == null ? ImmutableArray.Create<BossDropInfo>() : itemDrops.ToImmutableArray();
+            Drops = itemDrops?.ToImmutableArray() ?? ImmutableArray.Create<BossDropInfo>();
             ImageUrl = imageUrl;
         }
 
