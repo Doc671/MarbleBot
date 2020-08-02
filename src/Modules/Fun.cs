@@ -287,7 +287,7 @@ namespace MarbleBot.Modules
                 .Where(c => Color.FromKnownColor(c).ToArgb() == color.ToArgb())
                 .ToArray();
 
-            if (allColors.Length == 0)
+            if (allColors.Length != 0)
             {
                 builder.WithTitle(allColors[0].ToString().CamelToTitleCase());
             }

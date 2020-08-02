@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Google.Apis.YouTube.v3.Data;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
@@ -322,7 +323,12 @@ namespace MarbleBot.Modules
                 var output = new StringBuilder();
                 foreach (ulong channelId in mbServer.UsableChannels)
                 {
-                    if ((Context.User as IGuildUser)!.GetPermissions(Context.Guild.GetChannel(channelId)).ViewChannel)
+                    if (!Context.Guild.Channels.Any(channel => channel.Id == channelId))
+                    {
+                        mbServer.UsableChannels.Remove(channelId);
+                        MarbleBotGuild.UpdateGuild(mbServer);
+                    }
+                    else if ((Context.User as IGuildUser)!.GetPermissions(Context.Guild.GetChannel(channelId)).ViewChannel)
                     {
                         output.AppendLine($"<#{channelId}>");
                     }
