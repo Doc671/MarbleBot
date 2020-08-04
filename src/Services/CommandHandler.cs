@@ -35,6 +35,7 @@ namespace MarbleBot.Services
         public async Task InitialiseAsync()
         {
             _client.MessageReceived += HandleCommandAsync;
+            _client.ChannelDestroyed += OnChannelDestroyedAsync;
             _commands.CommandExecuted += OnCommandExecutedAsync;
 
             _commands.AddTypeReader<Item>(new ItemTypeReader());
@@ -94,6 +95,19 @@ namespace MarbleBot.Services
                     await context.Channel.SendMessageAsync(autoresponses[context.Message.Content]);
                 }
             }
+        }
+
+        private Task OnChannelDestroyedAsync(SocketChannel arg)
+        {
+            if (arg is IGuildChannel guildChannel)
+            {
+                var marbleBotGuild = MarbleBotGuild.GetGuilds().Values.First(guild => guild.Id == guildChannel.GuildId);
+                if (marbleBotGuild != null)
+                {
+                    marbleBotGuild.UsableChannels.Remove(guildChannel.Id);
+                }
+            }
+            return Task.CompletedTask;
         }
 
         private async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)

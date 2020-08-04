@@ -139,7 +139,7 @@ namespace MarbleBot.Modules.Games
             var user = MarbleBotUser.Find(winningMarbleId);
             if ((DateTime.UtcNow - user.LastRaceWin).TotalHours > 6)
             {
-                int noOfSameUser = marbles.Cast<ulong>().Count(id => id == winningMarbleId);
+                int noOfSameUser = marbles.Count(marbleInfo => marbleInfo.id == winningMarbleId);
 
                 decimal gift = (decimal)MathF.Round(((float)marbleCount / noOfSameUser - 1) * 100, 2);
                 if (gift > 0)
