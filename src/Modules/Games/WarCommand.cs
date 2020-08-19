@@ -601,9 +601,8 @@ namespace MarbleBot.Modules.Games
                         {
                             foreach ((ulong id, string name, int itemId) in marbles)
                             {
-                                string bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
                                 SocketUser user = Context.Client.GetUser(id);
-                                marbleOutput.AppendLine($"{bold}{name}{bold} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
+                                marbleOutput.AppendLine($"{Bold(name)} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
                             }
                         }
                     }

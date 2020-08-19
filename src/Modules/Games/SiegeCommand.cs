@@ -377,9 +377,13 @@ namespace MarbleBot.Modules.Games
                                 break;
                         }
 
-                        int damage = (int)MathF.Round(_randomService.Rand.Next(25, 30) * currentSiege.Boss!.Stage *
+
+                        int baseDamage = _randomService.Rand.Next(25, 30);
+
+                        int damage = (int)MathF.Round(baseDamage * currentSiege.Boss!.Stage *
                                                        ((int)currentSiege.Boss.Difficulty / 2) *
                                                        currentSiege.DamageMultiplier);
+
                         await currentSiege.DealDamageToBoss(damage);
 
                         builder.WithThumbnailUrl(url)
@@ -507,9 +511,8 @@ namespace MarbleBot.Modules.Games
                             {
                                 foreach ((ulong id, string name) in marbles)
                                 {
-                                    string bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
                                     SocketUser user = Context.Client.GetUser(id);
-                                    marbleOutput.AppendLine($"{bold}{name}{bold} [{user.Username}#{user.Discriminator}]");
+                                    marbleOutput.AppendLine($"{Bold(name)} [{user.Username}#{user.Discriminator}]");
                                 }
                             }
                         }
@@ -545,14 +548,14 @@ namespace MarbleBot.Modules.Games
             }
 
             await ReplyAsync(embed: new EmbedBuilder()
-                .AddField("Health", $"**{currentMarble.Health}**/{currentMarble.MaxHealth}", true)
-                .AddField("Status Effect", currentMarble.StatusEffect, true)
-                .AddField("Shield", currentMarble.Shield?.Name, true)
-                .AddField("Damage Multiplier", $"x{currentMarble.DamageMultiplier}", true)
-                .AddField("Damage Dealt", currentMarble.DamageDealt, true)
-                .AddField("Power-up Hits", currentMarble.PowerUpHits, true)
-                .AddField("Rocket Boots Used?", currentMarble.BootsUsed, true)
-                .AddField("Qefpedun Charm Used?", currentMarble.QefpedunCharmUsed, true)
+                .AddField("Health", $"**{currentMarble.Health}**/{currentMarble.MaxHealth}", inline: true)
+                .AddField("Status Effect", currentMarble.StatusEffect, inline: true)
+                .AddField("Shield", currentMarble.Shield?.Name, inline: true)
+                .AddField("Damage Multiplier", $"x{currentMarble.DamageMultiplier}", inline: true)
+                .AddField("Damage Dealt", currentMarble.DamageDealt, inline: true)
+                .AddField("Power-up Hits", currentMarble.PowerUpHits, inline: true)
+                .AddField("Rocket Boots Used?", currentMarble.BootsUsed, inline: true)
+                .AddField("Qefpedun Charm Used?", currentMarble.QefpedunCharmUsed, inline: true)
                 .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .WithTitle(currentMarble.Name)

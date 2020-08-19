@@ -31,6 +31,26 @@ namespace MarbleBot.Modules.Games
             _randomService = randomService;
         }
 
+        protected static string Bold(string stringToBold)
+        {
+            // Puts two asterisks on each side of the given string
+            // Discord will display this as bold text
+            // If there are already asterisks present, put a backslash in front of them so Discord will ignore
+            var output = new StringBuilder();
+            output.Append("**");
+            foreach (char c in stringToBold)
+            {
+                output.Append(c switch
+                {
+                    '\\' => "",
+                    '*' => "\\*",
+                    _ => c
+                });
+            }
+            output.Append("**");
+            return output.ToString();
+        }
+
         private static string GetGameName(GameType gameType, bool capitalised = true)
         {
             string name = gameType.ToString();
@@ -48,6 +68,7 @@ namespace MarbleBot.Modules.Games
                 _ => user.LastScavenge
             };
             TimeSpan nextEarn = DateTime.UtcNow - lastWin;
+
             string game = gameType switch
             {
                 GameType.Race => "race",
@@ -56,9 +77,11 @@ namespace MarbleBot.Modules.Games
                 GameType.War => "war",
                 _ => "none"
             };
+
             var output = nextEarn.TotalHours < 6
                 ? $"You can earn money from {game} in **{GetTimeSpanSentence(lastWin - DateTime.UtcNow.AddHours(-6))}**!"
                 : $"You can earn money from {game} now!";
+
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
@@ -135,8 +158,11 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            // 0 - Not found, 1 - Found but not yours, 2 - Found & removed
-            int state = _botCredentials.AdminIds.Any(id => id == Context.User.Id) ? 3 : 0;
+            const int notFound = 0;
+            const int foundNotOwner = 1;
+            const int foundRemoved = 2;
+
+            int state = _botCredentials.AdminIds.Any(id => id == Context.User.Id) ? 3 : notFound;
             var wholeFile = new StringBuilder();
             var formatter = new BinaryFormatter();
             if (gameType == GameType.War)
@@ -154,19 +180,19 @@ namespace MarbleBot.Modules.Games
                         (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
                 }
 
-                if (marbles.Any(info =>
-                    string.Compare(marbleToRemove, info.name, StringComparison.OrdinalIgnoreCase) == 0))
+                (ulong id, string name, int itemId)? marble = marbles.Find(info =>
+                    string.Compare(marbleToRemove, info.name, StringComparison.OrdinalIgnoreCase) == 0)!;
+
+                if (marble != null)
                 {
-                    (ulong id, string name, int itemId) = marbles.Find(info =>
-                        string.Compare(marbleToRemove, info.name, StringComparison.OrdinalIgnoreCase) == 0)!;
-                    if (state == 2 || id == Context.User.Id)
+                    if (state == foundRemoved || marble.Value.id == Context.User.Id)
                     {
-                        state = 2;
-                        marbles.Remove((id, name, itemId));
+                        state = foundRemoved;
+                        marbles.Remove(marble.Value);
                     }
                     else
                     {
-                        state = 1;
+                        state = foundNotOwner;
                     }
                 }
 
@@ -189,19 +215,19 @@ namespace MarbleBot.Modules.Games
                     marbles = (List<(ulong id, string name)>)formatter.Deserialize(marbleListFile.BaseStream);
                 }
 
-                if (marbles.Any(info =>
-                    string.Compare(marbleToRemove, info.name, StringComparison.OrdinalIgnoreCase) == 0))
+                (ulong id, string name)? marble = marbles.Find(info =>
+                    string.Compare(marbleToRemove, info.name, StringComparison.OrdinalIgnoreCase) == 0);
+
+                if (marble != null)
                 {
-                    (ulong id, string name) = marbles.Find(info =>
-                        string.Compare(marbleToRemove, info.name, StringComparison.OrdinalIgnoreCase) == 0)!;
-                    if (state == 2 || id == Context.User.Id)
+                    if (state == foundRemoved || marble.Value.id == Context.User.Id)
                     {
-                        state = 2;
-                        marbles.Remove((id, name));
+                        state = foundRemoved;
+                        marbles.Remove(marble.Value);
                     }
                     else
                     {
-                        state = 1;
+                        state = foundNotOwner;
                     }
                 }
 
@@ -213,20 +239,18 @@ namespace MarbleBot.Modules.Games
 
             switch (state)
             {
-                case 0:
+                case notFound:
                     await ReplyAsync($"**{Context.User.Username}**, could not find the requested marble!");
                     break;
-                case 1:
+                case foundNotOwner:
                     await ReplyAsync($"**{Context.User.Username}**, this is not your marble!");
                     break;
-                case 2:
-                    string bold = marbleToRemove.Contains('*') || marbleToRemove.Contains('\\') ? "" : "**";
+                case foundRemoved:
                     await using (var marbleList = new StreamWriter(marbleListDirectory, false))
                     {
                         await marbleList.WriteAsync(wholeFile.ToString());
-                        await ReplyAsync($"**{Context.User.Username}**, removed contestant {bold}{marbleToRemove}{bold}!");
+                        await ReplyAsync($"**{Context.User.Username}**, removed contestant {Bold(marbleToRemove)}!");
                     }
-
                     break;
             }
         }
@@ -252,12 +276,10 @@ namespace MarbleBot.Modules.Games
                 }
 
                 var formatter = new BinaryFormatter();
-                string bold;
                 SocketUser user;
                 if (gameType == GameType.War)
                 {
-                    var marbles =
-                        (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
+                    var marbles = (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
                     count = marbles.Count;
                     if (count == 0)
                     {
@@ -267,9 +289,8 @@ namespace MarbleBot.Modules.Games
 
                     foreach ((ulong id, string name, int itemId) in marbles)
                     {
-                        bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
                         user = Context.Client.GetUser(id);
-                        marbleOutput.AppendLine($"{bold}{name}{bold} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
+                        marbleOutput.AppendLine($"{Bold(name)} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
                     }
                 }
                 else
@@ -284,9 +305,8 @@ namespace MarbleBot.Modules.Games
 
                     foreach ((ulong id, string name) in marbles)
                     {
-                        bold = name.Contains('*') || name.Contains('\\') ? "" : "**";
                         user = Context.Client.GetUser(id);
-                        marbleOutput.AppendLine($"{bold}{name}{bold} [{user.Username}#{user.Discriminator}]");
+                        marbleOutput.AppendLine($"{Bold(name)} [{user.Username}#{user.Discriminator}]");
                     }
                 }
             }
@@ -369,12 +389,12 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            string bold = marbleName.Contains('*') || marbleName.Contains('\\') ? "" : "**";
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp()
                 .AddField($"Marble {GetGameName(gameType)}: Signed up!",
-                    $"**{Context.User.Username}** has successfully signed up as {bold}{marbleName}{bold}{(gameType == GameType.War ? $" with the weapon **{weapon!.Name}**" : "")}!");
+                    $"**{Context.User.Username}** has successfully signed up as {Bold(marbleName)}{(gameType == GameType.War ? $" with the weapon **{weapon!.Name}**" : "")}!");
+
             await using (var mostUsedFile =
                 new StreamWriter($"Data{Path.DirectorySeparatorChar}{GetGameName(gameType)}MostUsed.txt", true))
             {

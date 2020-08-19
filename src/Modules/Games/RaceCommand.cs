@@ -84,21 +84,17 @@ namespace MarbleBot.Modules.Games
 
             // Race start
             builder.WithTitle("The race has started!");
-            var msg = await ReplyAsync(embed: builder.Build());
+            var message = await ReplyAsync(embed: builder.Build());
             await Task.Delay(1500);
 
             for (int alive = marbleCount; alive > 1; alive--)
             {
-                int eliminated = 0;
-                do
-                {
-                    eliminated = _randomService.Rand.Next(0, marbleCount);
-                } while (marbles[eliminated].name == "///out");
+                int eliminatedIndex = _randomService.Rand.Next(0, marbleCount);
 
                 string deathMessage = messages[_randomService.Rand.Next(0, messages.Count - 1)];
-                string bold = marbles[eliminated].name.Contains('*') || marbles[eliminated].name.Contains('\\') ? "" : "**";
-                builder.AddField($"{bold}{marbles[eliminated].name}{bold} is eliminated!",
-                    $"{marbles[eliminated].name} {deathMessage} and is now out of the competition!");
+
+                builder.AddField($"{Bold(marbles[eliminatedIndex].name)} is eliminated!",
+                    $"{marbles[eliminatedIndex].name} {deathMessage} and is now out of the competition!");
 
                 // A special message may be displayed depending on the name of last place
                 if (alive == marbleCount)
@@ -110,30 +106,32 @@ namespace MarbleBot.Modules.Games
                     }
 
                     var messageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-                    var marbleName = marbles[eliminated].name.ToLower().RemoveChar(' ');
+                    var marbleName = marbles[eliminatedIndex].name.ToLower().RemoveChar(' ');
                     if (messageDict.ContainsKey(marbleName))
                     {
                         builder.WithDescription($"*{messageDict[marbleName]}*");
                     }
                 }
 
-                marbles[eliminated] = (marbles[eliminated].id, "///out");
-                await msg.ModifyAsync(msg => msg.Embed = builder.Build());
+                marbles.RemoveAt(eliminatedIndex);
+                await message.ModifyAsync(msg => msg.Embed = builder.Build());
                 await Task.Delay(1500);
             }
 
             // Race finish
-            (ulong winningMarbleId, string winningMarbleName) = marbles.Find(marble => string.CompareOrdinal(marble.name, "///out") != 0)!;
-            string bold2 = winningMarbleName.Contains('*') || winningMarbleName.Contains('\\') ? "" : "**";
-            builder.AddField($"{bold2}{winningMarbleName}{bold2} wins!", winningMarbleName + " is the winner!");
+            (ulong winningMarbleId, string winningMarbleName) = marbles[0];
+
+            string boldedWinningMarbleName = Bold(winningMarbleName);
+            builder.AddField($"{boldedWinningMarbleName} wins!", $"{winningMarbleName} is the winner!");
+
             if (marbleCount > 1)
             {
                 await using var racers = new StreamWriter($"Data{Path.DirectorySeparatorChar}RaceWinners.txt", true);
                 await racers.WriteLineAsync(winningMarbleName);
             }
 
-            await msg.ModifyAsync(msg => msg.Embed = builder.Build());
-            await ReplyAsync($":trophy: | {bold2}{winningMarbleName}{bold2} won the race!");
+            await message.ModifyAsync(msg => msg.Embed = builder.Build());
+            await ReplyAsync($":trophy: | {boldedWinningMarbleName} won the race!");
 
             // Reward winner
             var user = MarbleBotUser.Find(winningMarbleId);

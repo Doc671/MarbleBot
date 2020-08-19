@@ -23,7 +23,7 @@ namespace MarbleBot.Modules
             _botCredentials = botCredentials;
         }
 
-        [Command("channelinfo")]
+        [Command("channelinfo", RunMode = RunMode.Async)]
         [Summary("Returns information about a channel.")]
         public async Task ChannelInfoCommand([Remainder] string searchTerm)
         {
@@ -85,7 +85,7 @@ namespace MarbleBot.Modules
             await ReplyAsync(embed: builder.Build());
         }
 
-        [Command("cv")]
+        [Command("cv", RunMode = RunMode.Async)]
         [Summary("Allows verified users to send a video in Community Marble channel #community-videos.")]
         [Remarks("CM Only")]
         [RequireContext(ContextType.DM)]
@@ -162,7 +162,7 @@ namespace MarbleBot.Modules
             }
         }
 
-        [Command("searchchannel")]
+        [Command("searchchannel", RunMode = RunMode.Async)]
         [Summary("Displays a list of channels that match the search criteria.")]
         public async Task SearchChannelCommand([Remainder] string searchTerm)
         {
@@ -205,7 +205,7 @@ namespace MarbleBot.Modules
         }
 
 
-        [Command("searchvideo")]
+        [Command("searchvideo", RunMode = RunMode.Async)]
         [Summary("Displays a list of videos that match the search critera.")]
         public async Task SearchVideoCommand([Remainder] string searchTerm)
         {
