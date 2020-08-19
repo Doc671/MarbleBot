@@ -53,6 +53,7 @@ namespace MarbleBot.Modules.Games
                 .WithCurrentTimestamp();
             int marbleCount = 0;
             var marbles = new List<(ulong id, string name)>();
+            ulong[] marbleIds = marbles.Select(marbleInfo => marbleInfo.id).ToArray();
             using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.race"))
             {
                 if (marbleList.BaseStream.Length == 0)
@@ -137,7 +138,7 @@ namespace MarbleBot.Modules.Games
             var user = MarbleBotUser.Find(winningMarbleId);
             if ((DateTime.UtcNow - user.LastRaceWin).TotalHours > 6)
             {
-                int noOfSameUser = marbles.Count(marbleInfo => marbleInfo.id == winningMarbleId);
+                int noOfSameUser = marbleIds.Count(marbleId => marbleId == winningMarbleId);
 
                 decimal gift = (decimal)MathF.Round(((float)marbleCount / noOfSameUser - 1) * 100, 2);
                 if (gift > 0)

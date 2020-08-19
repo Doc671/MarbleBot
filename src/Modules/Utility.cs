@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Google.Apis.YouTube.v3.Data;
 using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
@@ -69,19 +68,19 @@ namespace MarbleBot.Modules
             TimeSpan timeUntilNextWar = user.LastWarWin - DateTime.UtcNow.AddHours(-6);
             await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Daily",
-                    timeUntilNextDaily.TotalHours < 0 ? "**Ready!**" : timeUntilNextDaily.ToString(@"hh\:mm\:ss"), 
+                    timeUntilNextDaily.TotalHours < 0 ? "**Ready!**" : timeUntilNextDaily.ToString(@"hh\:mm\:ss"),
                     inline: true)
                 .AddField("Race",
-                    timeUntilNextRace.TotalHours < 0 ? "**Ready!**" : timeUntilNextRace.ToString(@"hh\:mm\:ss"), 
+                    timeUntilNextRace.TotalHours < 0 ? "**Ready!**" : timeUntilNextRace.ToString(@"hh\:mm\:ss"),
                     inline: true)
                 .AddField("Scavenge",
                     timeUntilNextScavenge.TotalHours < 0 ? "**Ready!**" : timeUntilNextScavenge.ToString(@"hh\:mm\:ss"),
                     inline: true)
                 .AddField("Siege",
-                    timeUntilNextSiege.TotalHours < 0 ? "**Ready!**" : timeUntilNextSiege.ToString(@"hh\:mm\:ss"), 
+                    timeUntilNextSiege.TotalHours < 0 ? "**Ready!**" : timeUntilNextSiege.ToString(@"hh\:mm\:ss"),
                     inline: true)
                 .AddField("War",
-                    timeUntilNextWar.TotalHours < 0 ? "**Ready!**" : timeUntilNextWar.ToString(@"hh\:mm\:ss"), 
+                    timeUntilNextWar.TotalHours < 0 ? "**Ready!**" : timeUntilNextWar.ToString(@"hh\:mm\:ss"),
                     inline: true)
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
@@ -358,8 +357,8 @@ namespace MarbleBot.Modules
                         UserStatus.Online => "Online",
                         _ => "Offline"
                     };
-                    output.AppendLine(string.IsNullOrEmpty(user.Nickname) 
-                        ? $"{user.Username}#{user.Discriminator}: **{status}**" 
+                    output.AppendLine(string.IsNullOrEmpty(user.Nickname)
+                        ? $"{user.Username}#{user.Discriminator}: **{status}**"
                         : $"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
                 }
             }

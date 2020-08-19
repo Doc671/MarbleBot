@@ -92,7 +92,7 @@ namespace MarbleBot.Common.Games.War
             do
             {
                 team2Name = nameList[_randomService.Rand.Next(0, nameList.Count)];
-            } 
+            }
             while (string.CompareOrdinal(team1Name, team2Name) == 0);
 
             return (team1Name, team2Name);

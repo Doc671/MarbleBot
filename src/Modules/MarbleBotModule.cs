@@ -69,13 +69,13 @@ namespace MarbleBot.Modules
             else if (dateTime.Seconds == 1)
             {
                 output.Append(dateTime.Minutes == 0 && dateTime.Hours == 0
-                    ? "1 second" 
+                    ? "1 second"
                     : "and 1 second");
             }
             else if (dateTime.TotalSeconds < 1)
             {
                 output.Append(dateTime.Minutes == 0 && dateTime.Hours == 0
-                    ? "<1 second" 
+                    ? "<1 second"
                     : "and <1 second");
             }
 

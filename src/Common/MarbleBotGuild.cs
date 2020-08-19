@@ -42,8 +42,8 @@ namespace MarbleBot.Common
         {
             IDictionary<ulong, MarbleBotGuild> obj = GetGuilds();
 
-            return obj.ContainsKey(context.Guild.Id) 
-                ? obj[context.Guild.Id] 
+            return obj.ContainsKey(context.Guild.Id)
+                ? obj[context.Guild.Id]
                 : new MarbleBotGuild(context.Guild.Id);
         }
 
