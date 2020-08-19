@@ -89,7 +89,7 @@ namespace MarbleBot.Modules.Games
 
             for (int alive = marbleCount; alive > 1; alive--)
             {
-                int eliminatedIndex = _randomService.Rand.Next(0, marbleCount);
+                int eliminatedIndex = _randomService.Rand.Next(0, marbles.Count);
 
                 string deathMessage = messages[_randomService.Rand.Next(0, messages.Count - 1)];
 

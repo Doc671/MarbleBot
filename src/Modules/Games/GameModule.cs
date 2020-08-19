@@ -413,9 +413,7 @@ namespace MarbleBot.Modules.Games
                     }
                     else
                     {
-                        marbles =
-                            (List<(ulong id, string name, int itemId)>)binaryFormatter.Deserialize(marbleFile
-                                .BaseStream);
+                        marbles = (List<(ulong id, string name, int itemId)>)binaryFormatter.Deserialize(marbleFile.BaseStream);
                         marbleNo = marbles.Count;
                     }
                 }
@@ -453,7 +451,7 @@ namespace MarbleBot.Modules.Games
 
             await ReplyAsync(embed: builder.Build());
 
-            if (marbleNo > marbleLimit)
+            if (marbleNo >= marbleLimit)
             {
                 await ReplyAsync($"The limit of {marbleLimit} contestants has been reached!");
                 await startCommand();
