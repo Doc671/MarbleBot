@@ -53,7 +53,6 @@ namespace MarbleBot.Modules.Games
                 .WithCurrentTimestamp();
             int marbleCount = 0;
             var marbles = new List<(ulong id, string name)>();
-            ulong[] marbleIds = marbles.Select(marbleInfo => marbleInfo.id).ToArray();
             using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.race"))
             {
                 if (marbleList.BaseStream.Length == 0)
@@ -66,6 +65,8 @@ namespace MarbleBot.Modules.Games
                 marbles = (List<(ulong, string)>)formatter.Deserialize(marbleList.BaseStream);
                 marbleCount = marbles.Count;
             }
+
+            ulong[] marbleIds = marbles.Select(marbleInfo => marbleInfo.id).ToArray();
 
             if (marbleCount == 0)
             {
