@@ -193,7 +193,7 @@ namespace MarbleBot.Modules.Games
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithCurrentTimestamp();
-            if (string.Compare(option.RemoveChar(' '), "winners", StringComparison.OrdinalIgnoreCase) == 0)
+            if (string.Compare(option.Trim(), "winners", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 var winners = new SortedDictionary<string, int>();
                 using (var winnerFile = new StreamReader($"Data{Path.DirectorySeparatorChar}RaceWinners.txt"))
