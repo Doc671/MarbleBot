@@ -25,60 +25,34 @@ namespace MarbleBot.Modules
                 : new Color(uint.Parse(MarbleBotGuild.Find(context).Color, NumberStyles.HexNumber));
         }
 
-        protected static string GetTimeSpanSentence(TimeSpan dateTime)
+        protected static string GetTimeSpanSentence(TimeSpan timeSpan)
         {
             var output = new StringBuilder();
-            if (dateTime.Days > 1)
+            int[] times = { timeSpan.Days, timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds };
+            string[] timeStrings = { "day", "hour", "minute", "second" };
+            int penultimatePartIndex = 0;
+            int lastPartIndex = 0;
+            for (int i = 0; i < times.Length; i++)
             {
-                output.Append($"{dateTime.Days} days, ");
-            }
-            else if (dateTime.Days == 1)
-            {
-                output.Append("1 day, ");
-            }
-
-            if (dateTime.Hours > 1)
-            {
-                output.Append($"{dateTime.Hours} hours, ");
-            }
-            else if (dateTime.Hours == 1)
-            {
-                output.Append("1 hour, ");
-            }
-
-            if (dateTime.Minutes > 1)
-            {
-                output.Append($"{dateTime.Minutes} minutes ");
-            }
-            else if (dateTime.Minutes == 1)
-            {
-                output.Append("1 minute ");
-            }
-
-            if (dateTime.Seconds > 1)
-            {
-                if (dateTime.Minutes > 0)
+                if (times[i] != 0) 
                 {
-                    output.Append($"and {dateTime.Seconds} seconds");
+                    penultimatePartIndex = lastPartIndex;
+                    lastPartIndex = output.Length;
+                    output.Append($"**{times[i]}** {timeStrings[i]}{(times[i] == 1 ? "" : "s")}, ");
                 }
-                else
+                else if (output.Length == 0 && i == 3)
                 {
-                    output.Append(dateTime.Seconds + " seconds");
+                    // if nothing else has been displayed and <1 second is left, display "<1 second"
+                    penultimatePartIndex = lastPartIndex;
+                    lastPartIndex = output.Length;
+                    output.Append("**<1** second, ");
                 }
             }
-            else if (dateTime.Seconds == 1)
+            output.Remove(output.Length - 2, 2); // remove final ", "
+            if (lastPartIndex != 0)
             {
-                output.Append(dateTime.Minutes == 0 && dateTime.Hours == 0
-                    ? "1 second"
-                    : "and 1 second");
+                output.Replace(", ", " and ", penultimatePartIndex, output.Length - penultimatePartIndex);
             }
-            else if (dateTime.TotalSeconds < 1)
-            {
-                output.Append(dateTime.Minutes == 0 && dateTime.Hours == 0
-                    ? "<1 second"
-                    : "and <1 second");
-            }
-
             return output.ToString();
         }
 
