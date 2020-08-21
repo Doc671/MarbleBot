@@ -58,7 +58,7 @@ namespace MarbleBot.Modules
 
         protected internal static string GetDateString(double seconds)
         {
-            return Math.Abs(seconds - 1) < double.Epsilon ? "**1** second" : $"**{seconds:n1}** seconds";
+            return (seconds - 1) < double.Epsilon ? "**1** second" : $"**{seconds:n1}** seconds";
         }
 
         protected async Task<IUserMessage> SendErrorAsync(string messageContent)
