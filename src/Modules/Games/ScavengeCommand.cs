@@ -219,6 +219,7 @@ namespace MarbleBot.Modules.Games
             if (_gamesService.Scavenges[Context.User.Id].Items.Count == 0)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, there is nothing to sell!");
+                return;
             }
 
             var item = _gamesService.Scavenges[Context.User.Id].Items.Dequeue();
