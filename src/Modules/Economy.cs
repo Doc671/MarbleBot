@@ -226,7 +226,7 @@ namespace MarbleBot.Modules
             if ((DateTime.UtcNow - user.LastDaily).TotalHours < 24)
             {
                 DateTime aDayAgo = DateTime.UtcNow.AddDays(-1);
-                await ReplyAsync($"You need to wait for **{GetTimeSpanSentence(user.LastDaily - aDayAgo)}** until you can get your daily gift again!");
+                await ReplyAsync($"You need to wait for {GetTimeSpanSentence(user.LastDaily - aDayAgo)} until you can get your daily gift again!");
                 return;
             }
 
