@@ -11,12 +11,6 @@ namespace MarbleBot.Common.TypeReaders
             IServiceProvider services)
         {
             var weapon = Item.Find<Weapon>(input);
-            if (weapon == null)
-            {
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
-                    "Input could not be parsed as a weapon."));
-            }
-
             return Task.FromResult(TypeReaderResult.FromSuccess(weapon));
         }
     }

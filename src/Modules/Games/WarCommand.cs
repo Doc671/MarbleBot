@@ -110,9 +110,9 @@ namespace MarbleBot.Modules.Games
             WarMarble? aiMarble = null;
             if ((team1.Count + team2.Count) % 2 > 0)
             {
-                IEnumerable<WarMarble> allMarbles = team1.Union(team2);
+                WarMarble[]? allMarbles = team1.Union(team2).ToArray();
                 if (Math.Abs(MathF.Round(allMarbles.Sum(m => MarbleBotUser.Find(Context, m.Id).Stage) /
-                                         (float)allMarbles.Count()) - 2) < float.Epsilon)
+                                         (float)allMarbles.Length) - 2) < float.Epsilon)
                 {
                     aiMarble = new WarMarble(Context.Client.CurrentUser.Id, "MarbleBot", 40, Item.Find<Weapon>(_randomService.Rand.Next(0, 9) switch
                     {
@@ -267,7 +267,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithTitle($"**{currentMarble.Name}** attacks! :boom:");
             currentMarble.LastMoveUsed = DateTime.UtcNow;
@@ -436,7 +436,7 @@ namespace MarbleBot.Modules.Games
             currentMarble.Boosted = true;
             WarTeam enemyTeam = currentMarble.Team == 1 ? war.Team2 : war.Team1;
 
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
                 .WithDescription($"**{Context.User.Username}** has attempted to use Team {currentTeam.Name}'s boost!");
@@ -544,7 +544,7 @@ namespace MarbleBot.Modules.Games
         public async Task WarInfoCommand()
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithTitle("War Info");
             if (_gamesService.Wars.ContainsKey(fileId))
@@ -642,7 +642,7 @@ namespace MarbleBot.Modules.Games
                 orderby winner.value descending
                 select winner).ToList();
 
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithTitle("War Leaderboard: Most Used");
 

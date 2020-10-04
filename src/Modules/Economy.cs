@@ -279,12 +279,6 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if (requestedItem == null)
-            {
-                await SendErrorAsync($"**{Context.User.Username}**, invalid item ID!");
-                return;
-            }
-
             if (requestedItem.CraftingProduced == 0)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you cannot dismantle this item!");
@@ -373,7 +367,7 @@ namespace MarbleBot.Modules
 
         private async Task ShowUserInventory(IUser discordUser, MarbleBotUser marbleBotUser, int page = 1)
         {
-            if (marbleBotUser.Items == null)
+            if (marbleBotUser.Items.Count == 0)
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you don't have any items!");
                 return;

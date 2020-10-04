@@ -10,12 +10,6 @@ namespace MarbleBot.Common.TypeReaders
             IServiceProvider services)
         {
             var item = Item.Find<Item>(input);
-            if (item == null)
-            {
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
-                    "Input could not be parsed as an item."));
-            }
-
             return Task.FromResult(TypeReaderResult.FromSuccess(item));
         }
     }

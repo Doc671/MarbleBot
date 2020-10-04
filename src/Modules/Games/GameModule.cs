@@ -185,7 +185,7 @@ namespace MarbleBot.Modules.Games
 
                 if (marble != null)
                 {
-                    if (state == foundRemoved || marble.Value.id == Context.User.Id)
+                    if (marble.Value.id == Context.User.Id)
                     {
                         state = foundRemoved;
                         marbles.Remove(marble.Value);
@@ -220,7 +220,7 @@ namespace MarbleBot.Modules.Games
 
                 if (marble != null)
                 {
-                    if (state == foundRemoved || marble.Value.id == Context.User.Id)
+                    if (marble.Value.id == Context.User.Id)
                     {
                         state = foundRemoved;
                         marbles.Remove(marble.Value);
@@ -467,15 +467,7 @@ namespace MarbleBot.Modules.Games
         public async Task UseCommand([Remainder] string searchTerm)
         {
             var item = Item.Find<Item>(searchTerm);
-
-            if (item == null)
-            {
-                await SendErrorAsync("Could not find the requested item!");
-                return;
-            }
-
             var user = MarbleBotUser.Find(Context);
-
             if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] == 0)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");

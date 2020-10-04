@@ -73,11 +73,6 @@ namespace MarbleBot
             using (FileStream? stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open,
                 FileAccess.Read))
             {
-                if (returnValue == null)
-                {
-                    throw new Exception("Bot credentials not detected.");
-                }
-
                 returnValue.GoogleUserCredential = GoogleWebAuthorizationBroker.AuthorizeAsync(GoogleClientSecrets.Load(stream).Secrets,
                     new[] { SheetsService.Scope.Spreadsheets },
                     "user",

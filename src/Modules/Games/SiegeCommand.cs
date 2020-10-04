@@ -475,12 +475,9 @@ namespace MarbleBot.Modules.Games
             }
             else
             {
-                if (siege.Boss != null)
-                {
-                    builder.AddField($"Boss: **{siege.Boss.Name}**",
-                            $"\nHealth: **{siege.Boss.MaxHealth}**\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{siege.Boss.Difficulty}**")
-                        .WithThumbnailUrl(siege.Boss.ImageUrl);
-                }
+                builder.AddField($"Boss: **{siege.Boss.Name}**",
+                        $"\nHealth: **{siege.Boss.MaxHealth}**\nAttacks: **{siege.Boss.Attacks.Length}**\nDifficulty: **{siege.Boss.Difficulty}**")
+                    .WithThumbnailUrl(siege.Boss.ImageUrl);
 
                 if (!File.Exists($"Data{Path.DirectorySeparatorChar}{fileId}.siege"))
                 {

@@ -450,7 +450,7 @@ namespace MarbleBot.Common.Games.Siege
                 .WithTitle($"WARNING: {attack.Name.ToUpper()} INBOUND! :warning:");
 
             bool attackMissed = true;
-            var aliveMarbles = Marbles.Where(marble => marble.Health != 0);
+            var aliveMarbles = Marbles.Where(marble => marble.Health != 0).ToArray();
             foreach (var marble in aliveMarbles)
             {
                 AttackMarble(marble, attack, embedBuilder, ref attackMissed);
