@@ -27,7 +27,7 @@ namespace MarbleBot.Common.Games.Scavenge
         private readonly IUserMessage _originalMessage;
         private readonly RandomService _randomService;
         private readonly DateTime _startTime;
-        private readonly Timer _timer = new Timer(8000);
+        private readonly Timer _timer = new Timer(2000);
         private bool _finished;
         private bool _itemHasAppeared;
         private bool _oreHasAppeared;
@@ -119,7 +119,7 @@ namespace MarbleBot.Common.Games.Scavenge
                 await UpdateEmbed();
             }
 
-            if ((e.SignalTime - _startTime).TotalSeconds >= 64)
+            if ((e.SignalTime - _startTime).TotalSeconds >= 16)
             {
                 _timer.Stop();
                 await OnGameEnd();
