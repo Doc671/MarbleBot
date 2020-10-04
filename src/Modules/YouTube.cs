@@ -62,7 +62,6 @@ namespace MarbleBot.Modules
             var builder = new EmbedBuilder()
                 .WithTitle(channelListResult.Snippet.Title)
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithFooter(channelListResult.Id)
                 .WithThumbnailUrl(channelListResult.Snippet.Thumbnails.Medium.Url);
 
@@ -73,13 +72,13 @@ namespace MarbleBot.Modules
 
             if (channelListResult.Snippet.Country != null)
             {
-                builder.AddField("Country", channelListResult.Snippet.Country, inline: true);
+                builder.AddField("Country", channelListResult.Snippet.Country, true);
             }
 
             if (channelListResult.Snippet.PublishedAt != null)
             {
                 // date is in format YYYY-MM-DDThh:mm:ssZ - remove the T and Z
-                builder.AddField("Created", channelListResult.Snippet.PublishedAt.Replace('T', ' ').Remove(19), inline: true);
+                builder.AddField("Created", channelListResult.Snippet.PublishedAt.Replace('T', ' ').Remove(19), true);
             }
 
             await ReplyAsync(embed: builder.Build());

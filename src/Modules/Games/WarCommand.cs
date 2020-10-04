@@ -155,7 +155,6 @@ namespace MarbleBot.Modules.Games
             var war = new War(Context, _gamesService, _randomService, fileId, team1, team2, aiMarble, team1Boost, team2Boost);
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription("Use `mb/war attack <marble code>` to attack with your weapon and `mb/war bash <marble code>` to attack without.")
                 .WithTitle("Let the battle commence! :crossed_swords:")
                 .AddField($"Team {war.Team1.Name}",
@@ -270,7 +269,6 @@ namespace MarbleBot.Modules.Games
 
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle($"**{currentMarble.Name}** attacks! :boom:");
             currentMarble.LastMoveUsed = DateTime.UtcNow;
             if (currentMarble.Weapon.Hits == 1)
@@ -392,7 +390,6 @@ namespace MarbleBot.Modules.Games
             await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Remaining Health", $"**{enemyMarble.Health}**/{enemyMarble.MaxHealth}")
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription($"**{currentMarble.Name}** dealt **{damage}** damage to **{enemyMarble.Name}**!")
                 .WithTitle($"**{currentMarble.Name}** attacks! :boom:")
                 .Build());
@@ -442,7 +439,6 @@ namespace MarbleBot.Modules.Games
             var builder = new EmbedBuilder()
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription($"**{Context.User.Username}** has attempted to use Team {currentTeam.Name}'s boost!");
 
             // Activate boost if enough team members (half rounded up) have chosen to boost
@@ -550,7 +546,6 @@ namespace MarbleBot.Modules.Games
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("War Info");
             if (_gamesService.Wars.ContainsKey(fileId))
             {
@@ -644,12 +639,11 @@ namespace MarbleBot.Modules.Games
             }
 
             winList = (from winner in winList
-                       orderby winner.value descending
-                       select winner).ToList();
+                orderby winner.value descending
+                select winner).ToList();
 
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("War Leaderboard: Most Used");
 
             await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
@@ -716,7 +710,6 @@ namespace MarbleBot.Modules.Games
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
                 .WithTitle("Marble War: Valid Weapons")
                 .Build());
@@ -746,7 +739,6 @@ namespace MarbleBot.Modules.Games
                 .AddField("Boost",
                     "Each team is given a boost at the beginning. If enough people on a team use `mb/war boost`, the boost will activate!")
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Marble War!")
                 .Build());
         }

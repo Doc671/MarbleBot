@@ -59,7 +59,7 @@ namespace MarbleBot.Services
             int argPos = 0;
 
             var guild = context.IsPrivate
-                ? new MarbleBotGuild(id: 0)
+                ? new MarbleBotGuild(0)
                 : MarbleBotGuild.Find(context);
 
             if (userMsg.HasStringPrefix(guild.Prefix, ref argPos) &&
@@ -107,6 +107,7 @@ namespace MarbleBot.Services
                     marbleBotGuild.UsableChannels.Remove(guildChannel.Id);
                 }
             }
+
             return Task.CompletedTask;
         }
 

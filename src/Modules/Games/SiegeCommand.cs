@@ -144,7 +144,6 @@ namespace MarbleBot.Modules.Games
 
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription("Get ready! Use `mb/siege attack` to attack and `mb/siege grab` to grab power-ups when they appear!")
                 .WithTitle("The Siege has begun! :crossed_swords:")
                 .WithThumbnailUrl(boss.ImageUrl)
@@ -231,8 +230,7 @@ namespace MarbleBot.Modules.Games
             currentMarble.LastMoveUsed = DateTime.UtcNow;
 
             var builder = new EmbedBuilder()
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp();
+                .WithColor(GetColor(Context));
 
             if (currentSiege.ActiveMoraleBoosts > 0 && (DateTime.UtcNow - currentSiege.LastMorale).TotalSeconds > 20)
             {
@@ -336,7 +334,6 @@ namespace MarbleBot.Modules.Games
             {
                 var builder = new EmbedBuilder()
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithThumbnailUrl(Siege.GetPowerUpImageUrl(currentSiege.PowerUp));
 
                 currentMarble.PowerUpHits++;
@@ -381,8 +378,8 @@ namespace MarbleBot.Modules.Games
                         int baseDamage = _randomService.Rand.Next(25, 30);
 
                         int damage = (int)MathF.Round(baseDamage * currentSiege.Boss!.Stage *
-                                                       ((int)currentSiege.Boss.Difficulty / 2) *
-                                                       currentSiege.DamageMultiplier);
+                                                      ((int)currentSiege.Boss.Difficulty / 2) *
+                                                      currentSiege.DamageMultiplier);
 
                         await currentSiege.DealDamageToBoss(damage);
 
@@ -440,7 +437,6 @@ namespace MarbleBot.Modules.Games
             var marbleOutput = new StringBuilder();
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Siege Info");
 
             if (!_gamesService.Sieges.TryGetValue(fileId, out Siege? siege))
@@ -548,15 +544,14 @@ namespace MarbleBot.Modules.Games
             }
 
             await ReplyAsync(embed: new EmbedBuilder()
-                .AddField("Health", $"**{currentMarble.Health}**/{currentMarble.MaxHealth}", inline: true)
-                .AddField("Status Effect", currentMarble.StatusEffect, inline: true)
-                .AddField("Shield", currentMarble.Shield?.Name, inline: true)
-                .AddField("Damage Multiplier", $"x{currentMarble.DamageMultiplier}", inline: true)
-                .AddField("Damage Dealt", currentMarble.DamageDealt, inline: true)
-                .AddField("Power-up Hits", currentMarble.PowerUpHits, inline: true)
-                .AddField("Rocket Boots Used?", currentMarble.BootsUsed, inline: true)
-                .AddField("Qefpedun Charm Used?", currentMarble.QefpedunCharmUsed, inline: true)
-                .WithCurrentTimestamp()
+                .AddField("Health", $"**{currentMarble.Health}**/{currentMarble.MaxHealth}", true)
+                .AddField("Status Effect", currentMarble.StatusEffect, true)
+                .AddField("Shield", currentMarble.Shield?.Name, true)
+                .AddField("Damage Multiplier", $"x{currentMarble.DamageMultiplier}", true)
+                .AddField("Damage Dealt", currentMarble.DamageDealt, true)
+                .AddField("Power-up Hits", currentMarble.PowerUpHits, true)
+                .AddField("Rocket Boots Used?", currentMarble.BootsUsed, true)
+                .AddField("Qefpedun Charm Used?", currentMarble.QefpedunCharmUsed, true)
                 .WithColor(GetColor(Context))
                 .WithTitle(currentMarble.Name)
                 .Build());
@@ -591,13 +586,12 @@ namespace MarbleBot.Modules.Games
             }
 
             winList = (from winner in winList
-                       orderby winner.wins descending
-                       select winner)
+                    orderby winner.wins descending
+                    select winner)
                 .ToList();
 
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Siege Leaderboard: Most Used");
 
             await SendLargeEmbedDescriptionAsync(builder, Leaderboard(winList, page));
@@ -668,7 +662,6 @@ namespace MarbleBot.Modules.Games
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithDescription(StageTooHighString())
                     .WithThumbnailUrl(boss.ImageUrl)
                     .WithTitle(boss.Name)
@@ -697,7 +690,6 @@ namespace MarbleBot.Modules.Games
                     .AddField("Attacks", attacks.ToString())
                     .AddField("Difficulty", $"**{boss.Difficulty} {(int)boss.Difficulty}**/10")
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithThumbnailUrl(boss.ImageUrl)
                     .WithTitle(boss.Name);
 
@@ -716,8 +708,7 @@ namespace MarbleBot.Modules.Games
         public async Task SiegeBossChanceCommand([Remainder] string option)
         {
             var builder = new EmbedBuilder()
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp();
+                .WithColor(GetColor(Context));
             switch (option.ToLower().RemoveChar(' '))
             {
                 case "graph1":
@@ -761,8 +752,7 @@ namespace MarbleBot.Modules.Games
             }
 
             var builder = new EmbedBuilder()
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp();
+                .WithColor(GetColor(Context));
 
             IDictionary<string, Boss> playableBosses = Boss.GetBosses();
             int userStage = MarbleBotUser.Find(Context).Stage;
@@ -826,7 +816,6 @@ namespace MarbleBot.Modules.Games
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(description)
                 .WithThumbnailUrl(imageUrl)
                 .WithTitle(powerUpName)
@@ -958,7 +947,6 @@ namespace MarbleBot.Modules.Games
                     .AppendLine("- **Vengeance**: When a marble dies, the damage multiplier goes up by 0.2 (0.4 if Morale Boost is active).")
                     .ToString())
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Marble Siege!")
                 .Build());
         }

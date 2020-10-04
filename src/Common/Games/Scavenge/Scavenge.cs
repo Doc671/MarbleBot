@@ -180,7 +180,6 @@ namespace MarbleBot.Common.Games.Scavenge
                         : "The scavenge session is over! Any remaining non-ore items have been added to your inventory!"
                     : "Scavenge session ongoing.",
                 Fields = fields,
-                Timestamp = embed.Timestamp,
                 Title = $"Item Scavenge: {Location.ToString().CamelToTitleCase()}"
             }.Build());
         }

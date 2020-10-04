@@ -30,7 +30,6 @@ namespace MarbleBot.Modules
             user ??= MarbleBotUser.Find(Context);
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithAuthor(Context.Client.GetUser(user.Id))
-                .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
                 .AddField("Net Worth", $"{UnitOfMoney}{user.NetWorth:n2}", true)
@@ -139,7 +138,6 @@ namespace MarbleBot.Modules
             user.NetWorth += requestedItem.Price * noCrafted;
             MarbleBotUser.UpdateUser(user);
             await ReplyAsync(embed: new EmbedBuilder()
-                .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .WithDescription($"**{Context.User.Username}** has successfully crafted **{requestedItem.Name}** x**{noCrafted}**!")
                 .WithTitle("Crafting: " + requestedItem.Name)
@@ -213,7 +211,6 @@ namespace MarbleBot.Modules
             await ReplyAsync(embed: embed
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Craftable items")
                 .Build());
         }
@@ -336,7 +333,6 @@ namespace MarbleBot.Modules
             user.NetWorth -= requestedItem.Price * noCrafted;
             MarbleBotUser.UpdateUser(user);
             await ReplyAsync(embed: new EmbedBuilder()
-                .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .WithDescription($"**{Context.User.Username}** has successfully decrafted **{requestedItem.Name}** x**{noCrafted}**!")
                 .WithTitle($"Crafting: {requestedItem.Name}")
@@ -404,7 +400,6 @@ namespace MarbleBot.Modules
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithAuthor(discordUser)
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(itemOutput.ToString())
                 .WithTitle(itemsPresent
                     ? $"Page **{page}** of **{(marbleBotUser.Items.Count - 1) / 20 + 1}**"
@@ -422,7 +417,6 @@ namespace MarbleBot.Modules
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithDescription($"{StageTooHighString()}\n\nYou are unable to view information about this item!")
                     .WithTitle(item.Name)
                     .Build());
@@ -432,7 +426,6 @@ namespace MarbleBot.Modules
             string price = item.Price == -1 ? "N/A" : $"{UnitOfMoney}{item.Price:n2}";
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(item.Description)
                 .WithTitle(item.Name)
                 .AddField("ID", $"{item.Id:000}", true)
@@ -509,7 +502,6 @@ namespace MarbleBot.Modules
             decimal totalCost = 0m;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Poup Soop Price Calculator");
             decimal[] poupSoopPrices =
             {
@@ -580,7 +572,6 @@ namespace MarbleBot.Modules
 
             var builder = new EmbedBuilder()
                 .WithAuthor(Context.Client.GetUser(user.Id))
-                .WithCurrentTimestamp()
                 .WithColor(GetColor(Context))
                 .WithFooter("All times in UTC, all dates YYYY-MM-DD.")
                 .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
@@ -626,8 +617,7 @@ namespace MarbleBot.Modules
         public async Task RecipesCommand(string rawPage = "1")
         {
             EmbedBuilder embed = new EmbedBuilder()
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp();
+                .WithColor(GetColor(Context));
             IDictionary<int, Item> items = Item.GetItems();
             if (!int.TryParse(rawPage, out int page) && page > 0)
             {
@@ -691,8 +681,8 @@ namespace MarbleBot.Modules
             }
 
             (int place, MarbleBotUser user)[] users = (from user in MarbleBotUser.GetUsers()
-                                                       orderby user.Value.NetWorth descending
-                                                       select (place: 0, user: user.Value)).ToArray();
+                orderby user.Value.NetWorth descending
+                select (place: 0, user: user.Value)).ToArray();
 
             await DisplayRichList(users, page);
         }
@@ -709,9 +699,9 @@ namespace MarbleBot.Modules
             }
 
             (int place, MarbleBotUser user)[] users = (from marbleBotUserPair in MarbleBotUser.GetUsers()
-                                                       orderby marbleBotUserPair.Value.NetWorth descending
-                                                       where Context.Guild.Users.Any(guildUser => guildUser.Id == marbleBotUserPair.Value.Id)
-                                                       select (place: 0, user: marbleBotUserPair.Value)).ToArray();
+                orderby marbleBotUserPair.Value.NetWorth descending
+                where Context.Guild.Users.Any(guildUser => guildUser.Id == marbleBotUserPair.Value.Id)
+                select (place: 0, user: marbleBotUserPair.Value)).ToArray();
 
             await DisplayRichList(users, page);
         }
@@ -756,7 +746,6 @@ namespace MarbleBot.Modules
 
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle($"Net Worth Leaderboard: Page {page}")
                 .WithDescription(output.ToString());
 
@@ -821,7 +810,6 @@ namespace MarbleBot.Modules
             var builder = new EmbedBuilder()
                 .AddField("Items for sale", output.ToString())
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription("Use `mb/buy <item ID> <# of items>` to buy an item on sale.")
                 .WithTitle("MarbleBot Shop :shopping_bags:");
             await ReplyAsync(embed: builder.Build());

@@ -40,7 +40,6 @@ namespace MarbleBot.Modules.Games
                 {
                     var scavengeMessage = await ReplyAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(Context))
-                        .WithCurrentTimestamp()
                         .WithDescription($"**{Context.User.Username}** has begun scavenging in **{location.ToString().CamelToTitleCase()}**!")
                         .WithTitle("Item Scavenge Begin!").Build());
                     _gamesService.Scavenges.GetOrAdd(Context.User.Id, new Scavenge(Context, _gamesService, _randomService, location, scavengeMessage));
@@ -66,7 +65,6 @@ namespace MarbleBot.Modules.Games
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                     .WithTitle("Scavenge: Destroyer's Remains")
                     .Build());
@@ -95,7 +93,6 @@ namespace MarbleBot.Modules.Games
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                     .WithTitle("Scavenge: Violet Volcanoes")
                     .Build());
@@ -248,7 +245,6 @@ namespace MarbleBot.Modules.Games
                 : ":lock: LOCKED\n:lock: LOCKED";
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription($"Canary Beach\nTree Wurld\n{stageTwoLocations}\n\nUse `mb/scavenge info <location name>` to see which items you can get!")
                 .WithTitle("Scavenge Locations")
                 .Build());
@@ -276,7 +272,6 @@ namespace MarbleBot.Modules.Games
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
                 .WithTitle($"Scavenge Location Info: {location}")
                 .Build());
@@ -301,7 +296,6 @@ namespace MarbleBot.Modules.Games
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                     .WithTitle("Scavenge Location Info: Destroyer's Remains")
                     .Build());
@@ -330,7 +324,6 @@ namespace MarbleBot.Modules.Games
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
-                    .WithCurrentTimestamp()
                     .WithDescription($"{StageTooHighString()}\n\nYou cannot scavenge in this location!")
                     .WithTitle("Scavenge Location Info: Violet Volcanoes")
                     .Build());
@@ -361,7 +354,6 @@ namespace MarbleBot.Modules.Games
             await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("How to play", $"{helpP1}{helpP2}{helpP3}{(userCanDrill ? helpP4 : "")}{helpP5}")
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Item Scavenge!")
                 .Build());
         }

@@ -7,6 +7,7 @@ namespace MarbleBot.Common.Games
         public float DamageMultiplier { get; set; } = 1f;
 
         private int _health;
+
         public int Health
         {
             get => _health;
@@ -14,6 +15,7 @@ namespace MarbleBot.Common.Games
         }
 
         private int _maxHealth;
+
         public int MaxHealth
         {
             get => _maxHealth;

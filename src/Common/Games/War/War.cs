@@ -111,7 +111,6 @@ namespace MarbleBot.Common.Games.War
             var winningTeam = team1Total > team2Total ? Team1 : Team2;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(context))
-                .WithCurrentTimestamp()
                 .WithTitle($"Team {winningTeam.Name} has defeated Team {(team2Total == 0 ? Team2 : Team1).Name}! :trophy:");
             var team1Output = new StringBuilder();
             var team2Output = new StringBuilder();
@@ -191,7 +190,6 @@ namespace MarbleBot.Common.Games.War
                     await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         .AddField("Remaining Health", $"**{randMarble.Health}**/{randMarble.MaxHealth}")
                         .WithColor(GetColor(_context))
-                        .WithCurrentTimestamp()
                         .WithDescription($"**{_aiMarble.Name}** dealt **{damage}** damage to **{randMarble.Name}** with **{_aiMarble.Weapon.Name}**!")
                         .WithTitle($"**{_aiMarble.Name}** attacks! :boom:")
                         .Build());
@@ -200,7 +198,6 @@ namespace MarbleBot.Common.Games.War
                 {
                     await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                         .WithColor(GetColor(_context))
-                        .WithCurrentTimestamp()
                         .WithDescription($"**{_aiMarble.Name}** tried to attack **{randMarble.Name}** but missed!")
                         .WithTitle($"**{_aiMarble.Name}** attacks! :boom:")
                         .Build());

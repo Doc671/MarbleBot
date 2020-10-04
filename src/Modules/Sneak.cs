@@ -143,8 +143,8 @@ namespace MarbleBot.Modules
             string logs;
             using (var logFile =
                 new StreamReader((LogManager.Configuration.FindTargetByName("logfile") as FileTarget)
-                !.FileName.ToString()
-                !.RemoveChar('\'')))
+                    !.FileName.ToString()
+                    !.RemoveChar('\'')))
             {
                 logs = await logFile.ReadToEndAsync();
             }
@@ -197,7 +197,6 @@ namespace MarbleBot.Modules
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
                 .WithTitle($"All Sieges: {_gamesService.Sieges.Count}")
                 .Build());
@@ -212,7 +211,6 @@ namespace MarbleBot.Modules
 
             var builder = new EmbedBuilder()
                 .WithColor(Color.Red)
-                .WithCurrentTimestamp()
                 .WithDescription(info)
                 .WithTitle("MarbleBot Update");
 

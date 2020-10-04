@@ -15,6 +15,7 @@ using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,7 +70,7 @@ namespace MarbleBot
             }
 
             var returnValue = JsonConvert.DeserializeObject<BotCredentials>(json);
-            using (var stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open,
+            using (FileStream? stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open,
                 FileAccess.Read))
             {
                 if (returnValue == null)
@@ -107,7 +108,7 @@ namespace MarbleBot
         {
             Console.Title = "MarbleBot";
 
-            await using var services = ConfigureServices();
+            await using ServiceProvider? services = ConfigureServices();
 
             var client = services.GetRequiredService<DiscordSocketClient>();
             await client.LoginAsync(TokenType.Bot, _botCredentials.Token).ConfigureAwait(false);
@@ -125,7 +126,7 @@ namespace MarbleBot
 
         private static Task Client_UserBanned(SocketUser user, SocketGuild socketGuild)
         {
-            var guildsDict = MarbleBotGuild.GetGuilds();
+            IDictionary<ulong, MarbleBotGuild>? guildsDict = MarbleBotGuild.GetGuilds();
             if (!guildsDict.ContainsKey(socketGuild.Id))
             {
                 return Task.CompletedTask;

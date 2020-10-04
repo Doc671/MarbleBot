@@ -47,6 +47,7 @@ namespace MarbleBot.Modules.Games
                     _ => c
                 });
             }
+
             output.Append("**");
             return output.ToString();
         }
@@ -85,7 +86,6 @@ namespace MarbleBot.Modules.Games
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(output)
                 .Build());
         }
@@ -251,6 +251,7 @@ namespace MarbleBot.Modules.Games
                         await marbleList.WriteAsync(wholeFile.ToString());
                         await ReplyAsync($"**{Context.User.Username}**, removed contestant {Bold(marbleToRemove)}!");
                     }
+
                     break;
             }
         }
@@ -308,8 +309,8 @@ namespace MarbleBot.Modules.Games
                     foreach ((ulong id, string name) in marbles)
                     {
                         user = Context.Client.GetUser(id);
-                        marbleOutput.AppendLine(user == null 
-                            ? $"{Bold(name)} [user not found]" 
+                        marbleOutput.AppendLine(user == null
+                            ? $"{Bold(name)} [user not found]"
                             : $"{Bold(name)} [{user.Username}#{user.Discriminator}]");
                     }
                 }
@@ -317,7 +318,6 @@ namespace MarbleBot.Modules.Games
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithFooter($"Contestant count: {count}")
                 .WithTitle($"Marble {GetGameName(gameType)}: Contestants")
                 .AddField("Contestants", marbleOutput.ToString())
@@ -346,7 +346,7 @@ namespace MarbleBot.Modules.Games
                 using var marbleList = new StreamReader(marbleListFilePath);
                 if (marbleList.BaseStream.Length != 0 &&
                     ((List<(ulong id, string name)>)binaryFormatter.Deserialize(marbleList.BaseStream)).Any(info =>
-                       info.id == Context.User.Id))
+                        info.id == Context.User.Id))
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you've already joined!");
                     return;
@@ -395,7 +395,6 @@ namespace MarbleBot.Modules.Games
 
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .AddField($"Marble {GetGameName(gameType)}: Signed up!",
                     $"**{Context.User.Username}** has successfully signed up as {Bold(marbleName)}{(gameType == GameType.War ? $" with the weapon **{weapon!.Name}**" : "")}!");
 
@@ -529,7 +528,6 @@ namespace MarbleBot.Modules.Games
                         await ReplyAsync(embed: new EmbedBuilder()
                             .AddField("Marbles", output.ToString())
                             .WithColor(GetColor(Context))
-                            .WithCurrentTimestamp()
                             .WithDescription($"**{userMarble.Name}** used **{item.Name}**! Everyone was healed!")
                             .WithTitle(item.Name)
                             .Build());
@@ -659,7 +657,6 @@ namespace MarbleBot.Modules.Games
 
                         await ReplyAsync(embed: new EmbedBuilder()
                             .WithColor(GetColor(Context))
-                            .WithCurrentTimestamp()
                             .WithDescription($"**{userMarble.Name}** used **{item.Name}**! Everyone was poisoned!")
                             .WithTitle(item.Name)
                             .Build());
@@ -685,7 +682,6 @@ namespace MarbleBot.Modules.Games
 
                         await ReplyAsync(embed: new EmbedBuilder()
                             .WithColor(GetColor(Context))
-                            .WithCurrentTimestamp()
                             .WithDescription($"**{userMarble.Name}** used **{item.Name}**! Everyone is doomed!")
                             .WithTitle(item.Name)
                             .Build());
@@ -707,7 +703,6 @@ namespace MarbleBot.Modules.Games
                         userMarble.StatusEffect = StatusEffect.None;
                         await ReplyAsync(embed: new EmbedBuilder()
                             .WithColor(GetColor(Context))
-                            .WithCurrentTimestamp()
                             .WithDescription($"**{userMarble.Name}** used **{item.Name}** and is now cured!")
                             .WithTitle(item.Name)
                             .Build());

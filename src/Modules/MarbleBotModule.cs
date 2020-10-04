@@ -34,7 +34,7 @@ namespace MarbleBot.Modules
             int lastPartIndex = 0;
             for (int i = 0; i < times.Length; i++)
             {
-                if (times[i] != 0) 
+                if (times[i] != 0)
                 {
                     penultimatePartIndex = lastPartIndex;
                     lastPartIndex = output.Length;
@@ -48,17 +48,19 @@ namespace MarbleBot.Modules
                     output.Append("**<1** second, ");
                 }
             }
+
             output.Remove(output.Length - 2, 2); // remove final ", "
             if (lastPartIndex != 0)
             {
                 output.Replace(", ", " and ", penultimatePartIndex, output.Length - penultimatePartIndex);
             }
+
             return output.ToString();
         }
 
         protected internal static string GetDateString(double seconds)
         {
-            return (seconds - 1) < double.Epsilon ? "**1** second" : $"**{seconds:n1}** seconds";
+            return seconds - 1 < double.Epsilon ? "**1** second" : $"**{seconds:n1}** seconds";
         }
 
         protected async Task<IUserMessage> SendErrorAsync(string messageContent)

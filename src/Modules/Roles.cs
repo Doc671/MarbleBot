@@ -107,7 +107,6 @@ namespace MarbleBot.Modules
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(output.ToString())
                 .WithTitle($"MarbleBot Role List: {Context.Guild.Name}")
                 .Build());

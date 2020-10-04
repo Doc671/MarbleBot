@@ -152,7 +152,6 @@ namespace MarbleBot.Modules
 
             await ReplyAsync(embed: new EmbedBuilder()
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithDescription(msg)
                 .WithTitle($"Advice: {Context.User.Username}")
                 .Build());
@@ -189,8 +188,8 @@ namespace MarbleBot.Modules
         public async Task ColorCommand(int red, int green, int blue)
         {
             if (red > byte.MaxValue || red < byte.MinValue
-                || green > byte.MaxValue || green < byte.MinValue
-                || blue > byte.MaxValue || blue < byte.MinValue)
+                                    || green > byte.MaxValue || green < byte.MinValue
+                                    || blue > byte.MaxValue || blue < byte.MinValue)
             {
                 await SendErrorAsync("The red, green and blue values must be integers between 0 and 255.");
                 return;
@@ -237,9 +236,9 @@ namespace MarbleBot.Modules
                 _ => Color.FromArgb(v, p, q)
             };
             var builder = new EmbedBuilder()
-                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", inline: true)
-                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", inline: true)
-                .AddField("HSL", $"Hue: **{hue}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", inline: true)
+                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
+                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
+                .AddField("HSL", $"Hue: **{hue}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
                 .AddField("Hex Code", $"#{color.R:X2}{color.G:X2}{color.B:X2}");
 
             await SendColorMessage(color, builder);
@@ -270,9 +269,9 @@ namespace MarbleBot.Modules
             color.GetHsv(out float hue, out float saturation, out float value);
 
             var builder = new EmbedBuilder()
-                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", inline: true)
-                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", inline: true)
-                .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", inline: true)
+                .AddField("RGB", $"Red: **{color.R}**\nGreen: **{color.G}**\nBlue: **{color.B}**", true)
+                .AddField("HSV", $"Hue: **{hue}**\nSaturation: **{saturation}**\nValue: **{value}**", true)
+                .AddField("HSL", $"Hue: **{color.GetHue()}**\nSaturation: **{color.GetSaturation()}**\nLightness: **{color.GetBrightness()}**", true)
                 .AddField("Hex Code", $"#{hexCode.ToUpper()}");
 
             await SendColorMessage(color, builder);

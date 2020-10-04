@@ -50,7 +50,6 @@ namespace MarbleBot.Modules
                 .AddField("Uptime", (DateTime.UtcNow - _startTimeService.StartTime).ToString(), true)
                 .WithAuthor(Context.Client.CurrentUser)
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithFooter($"Requested by {Context.User.Username}#{Context.User.Discriminator}")
                 .Build());
         }
@@ -69,22 +68,21 @@ namespace MarbleBot.Modules
             await ReplyAsync(embed: new EmbedBuilder()
                 .AddField("Daily",
                     timeUntilNextDaily.TotalHours < 0 ? "**Ready!**" : timeUntilNextDaily.ToString(@"hh\:mm\:ss"),
-                    inline: true)
+                    true)
                 .AddField("Race",
                     timeUntilNextRace.TotalHours < 0 ? "**Ready!**" : timeUntilNextRace.ToString(@"hh\:mm\:ss"),
-                    inline: true)
+                    true)
                 .AddField("Scavenge",
                     timeUntilNextScavenge.TotalHours < 0 ? "**Ready!**" : timeUntilNextScavenge.ToString(@"hh\:mm\:ss"),
-                    inline: true)
+                    true)
                 .AddField("Siege",
                     timeUntilNextSiege.TotalHours < 0 ? "**Ready!**" : timeUntilNextSiege.ToString(@"hh\:mm\:ss"),
-                    inline: true)
+                    true)
                 .AddField("War",
                     timeUntilNextWar.TotalHours < 0 ? "**Ready!**" : timeUntilNextWar.ToString(@"hh\:mm\:ss"),
-                    inline: true)
+                    true)
                 .WithAuthor(Context.User)
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .Build());
         }
 
@@ -94,7 +92,6 @@ namespace MarbleBot.Modules
         public async Task HelpCommand([Remainder] string commandToFind = "")
         {
             var builder = new EmbedBuilder()
-                .WithCurrentTimestamp()
                 .WithColor(GetColor(Context));
 
             ModuleInfo module = _commandService.Modules.FirstOrDefault(m =>
@@ -213,7 +210,7 @@ namespace MarbleBot.Modules
 
                 if (!string.IsNullOrEmpty(example))
                 {
-                    builder.AddField("Example", $"`{example}`", inline: true);
+                    builder.AddField("Example", $"`{example}`", true);
                 }
 
                 builder.AddField("Module", $"{CultureInfo.CurrentCulture.TextInfo.ToTitleCase(command.Module.Name)}",
@@ -226,7 +223,7 @@ namespace MarbleBot.Modules
                         {
                             stringBuilder.AppendLine($"`mb/{alias}`");
                             return stringBuilder;
-                        }).ToString(), inline: true);
+                        }).ToString(), true);
                 }
 
                 if (command.Parameters.Count != 0)
@@ -236,7 +233,7 @@ namespace MarbleBot.Modules
                         {
                             stringBuilder.AppendLine($"{param.Name.CamelToTitleCase()} ({(param.IsOptional ? "optional " : "")}{(param.IsRemainder ? "remainder " : "")}{param.Type.Name})");
                             return stringBuilder;
-                        }).ToString(), inline: true);
+                        }).ToString(), true);
                 }
 
                 if (command.Preconditions.Count != 0)
@@ -246,7 +243,7 @@ namespace MarbleBot.Modules
                         {
                             stringBuilder.AppendLine((precondition.TypeId as Type)!.Name[7..^9].CamelToTitleCase());
                             return stringBuilder;
-                        }).ToString(), inline: true);
+                        }).ToString(), true);
                 }
 
                 await ReplyAsync(embed: builder.Build());
@@ -304,7 +301,6 @@ namespace MarbleBot.Modules
                 .AddField("Embed", $"#{mbServer.Color.ToUpper()}", true)
                 .AddField("Prefix", mbServer.Prefix, true)
                 .WithColor(GetColor(Context))
-                .WithTimestamp(DateTime.UtcNow)
                 .WithFooter(Context.Guild.Id.ToString());
 
             if (mbServer.AnnouncementChannel != 0)
@@ -441,7 +437,6 @@ namespace MarbleBot.Modules
                         .AddField("Joined", ((DateTimeOffset)user.JoinedAt!).ToString("yyyy-MM-dd HH:mm:ss"), true)
                         .AddField("Roles", roles.ToString(), true)
                         .WithColor(GetColor(Context))
-                        .WithCurrentTimestamp()
                         .WithFooter("All times in UTC, all dates YYYY-MM-DD.");
 
                     await ReplyAsync(embed: builder.Build());

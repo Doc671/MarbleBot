@@ -10,6 +10,7 @@ namespace MarbleBot.Common.Games.Siege
     public class Boss
     {
         private int _health;
+
         public int Health
         {
             get => _health;

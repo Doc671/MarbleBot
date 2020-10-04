@@ -49,8 +49,7 @@ namespace MarbleBot.Modules.Games
             }
 
             var builder = new EmbedBuilder()
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp();
+                .WithColor(GetColor(Context));
             int marbleCount = 0;
             var marbles = new List<(ulong id, string name)>();
             using (var marbleList = new StreamReader($"Data{Path.DirectorySeparatorChar}{fileId}.race"))
@@ -191,8 +190,7 @@ namespace MarbleBot.Modules.Games
         public async Task RaceLeaderboardCommand(string option, int page = 1)
         {
             var builder = new EmbedBuilder()
-                .WithColor(GetColor(Context))
-                .WithCurrentTimestamp();
+                .WithColor(GetColor(Context));
             if (string.Compare(option.Trim(), "winners", StringComparison.OrdinalIgnoreCase) == 0)
             {
                 var winners = new SortedDictionary<string, int>();
@@ -219,8 +217,8 @@ namespace MarbleBot.Modules.Games
                 }
 
                 winList = (from winner in winList
-                           orderby winner.value descending
-                           select winner).ToList();
+                    orderby winner.value descending
+                    select winner).ToList();
 
                 builder.WithTitle("Race Leaderboard: Winners");
 
@@ -252,8 +250,8 @@ namespace MarbleBot.Modules.Games
                 }
 
                 winList = (from winner in winList
-                           orderby winner.value descending
-                           select winner).ToList();
+                    orderby winner.value descending
+                    select winner).ToList();
 
                 builder.WithTitle("Race Leaderboard: Most Used");
 
@@ -282,7 +280,6 @@ namespace MarbleBot.Modules.Games
                     .AppendLine("You can earn Units of Money if you win! (6 hour cooldown)")
                     .ToString())
                 .WithColor(GetColor(Context))
-                .WithCurrentTimestamp()
                 .WithTitle("Marble Race!")
                 .Build());
         }

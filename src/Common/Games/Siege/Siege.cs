@@ -95,17 +95,17 @@ namespace MarbleBot.Common.Games.Siege
             return powerUp switch
             {
                 PowerUp.Clone =>
-                "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
+                    "https://cdn.discordapp.com/attachments/296376584238137355/541373091495018496/PUClone.png",
                 PowerUp.Cure =>
-                "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
+                    "https://cdn.discordapp.com/attachments/296376584238137355/541373094724501524/PUCure.png",
                 PowerUp.Heal =>
-                "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
+                    "https://cdn.discordapp.com/attachments/296376584238137355/541373096238514202/PUHeal.png",
                 PowerUp.MoraleBoost =>
-                "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
+                    "https://cdn.discordapp.com/attachments/296376584238137355/541373099090903070/PUMoraleBoost.png",
                 PowerUp.Overclock =>
-                "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
+                    "https://cdn.discordapp.com/attachments/296376584238137355/541373101649428480/PUOverclock.png",
                 PowerUp.Summon =>
-                "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
+                    "https://cdn.discordapp.com/attachments/296376584238137355/541373120129531939/PUSummon.png",
                 _ => ""
             };
         }
@@ -184,7 +184,6 @@ namespace MarbleBot.Common.Games.Siege
                 .AddField("Boss Health", $"**{Math.Max(Boss!.Health - damage, 0)}**/{Boss.MaxHealth}")
                 .WithAuthor(_context.User)
                 .WithColor(GetColor(_context))
-                .WithCurrentTimestamp()
                 .WithDescription($"**{marble.Name}** used their **{item.Name}**, dealing **{damage}** damage to the boss!")
                 .WithTitle($"{item.Name} :boom:")
                 .Build());
@@ -217,7 +216,6 @@ namespace MarbleBot.Common.Games.Siege
             await _context.Channel.SendMessageAsync(embed: new EmbedBuilder()
                 .WithAuthor(Boss.Name, Boss.ImageUrl)
                 .WithColor(GetColor(_context))
-                .WithCurrentTimestamp()
                 .WithDescription($"All the marbles died!\n**{Boss.Name}** won!\nFinal Health: **{Boss.Health}**/{Boss.MaxHealth}")
                 .AddField($"Fallen Marbles: **{Marbles.Count}**", marbles.ToString())
                 .WithThumbnailUrl(Boss.ImageUrl)
@@ -237,7 +235,6 @@ namespace MarbleBot.Common.Games.Siege
             _victoryCalled = true;
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(_context))
-                .WithCurrentTimestamp()
                 .WithTitle("Siege Victory! :trophy:")
                 .WithDescription($"**{Boss!.Name}** has been defeated!");
             var usersDict = MarbleBotUser.GetUsers();
@@ -449,7 +446,6 @@ namespace MarbleBot.Common.Games.Siege
             var embedBuilder = new EmbedBuilder()
                 .WithAuthor(Boss.Name, Boss.ImageUrl)
                 .WithColor(GetColor(_context))
-                .WithCurrentTimestamp()
                 .WithDescription($"**{Boss.Name}** used **{attack.Name}**!")
                 .WithTitle($"WARNING: {attack.Name.ToUpper()} INBOUND! :warning:");
 
@@ -549,7 +545,6 @@ namespace MarbleBot.Common.Games.Siege
             var builder = new EmbedBuilder()
                 .WithAuthor(_context.User)
                 .WithColor(GetColor(_context))
-                .WithCurrentTimestamp()
                 .WithTitle($"{weapon.Name} :boom:");
 
             int totalDamage = 0;
@@ -559,10 +554,10 @@ namespace MarbleBot.Common.Games.Siege
                 if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                 {
                     totalDamage = (int)Math.Round((weapon.Damage +
-                                                    (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
-                                                        ? ammo.Damage
-                                                        : 0.0))
-                                                   * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                                                   (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
+                                                       ? ammo.Damage
+                                                       : 0.0))
+                                                  * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                     marble.LastMoveUsed = DateTime.UtcNow;
                     builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{totalDamage}** damage to **{Boss!.Name}**!");
                 }
@@ -578,10 +573,10 @@ namespace MarbleBot.Common.Games.Siege
                     if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                     {
                         damage = (int)Math.Round((weapon.Damage +
-                                                   (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
-                                                       ? ammo.Damage
-                                                       : 0.0))
-                                                  * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                                                  (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
+                                                      ? ammo.Damage
+                                                      : 0.0))
+                                                 * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                         totalDamage += damage;
                         builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss!.Name}**.");
                     }
