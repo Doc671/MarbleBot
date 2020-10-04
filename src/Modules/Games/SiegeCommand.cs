@@ -43,7 +43,6 @@ namespace MarbleBot.Modules.Games
         public async Task SiegeStartCommand([Remainder] string overrideString = "")
         {
             ulong fileId = Context.IsPrivate ? Context.User.Id : Context.Guild.Id;
-
             if (_gamesService.Sieges.ContainsKey(fileId) && _gamesService.Sieges[fileId].Active)
             {
                 await SendErrorAsync("A battle is currently ongoing!");

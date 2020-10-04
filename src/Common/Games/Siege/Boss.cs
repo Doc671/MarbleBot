@@ -26,7 +26,7 @@ namespace MarbleBot.Common.Games.Siege
         public int Stage { get; }
 
         public Boss(string name, int health, Difficulty difficulty, int stage, string imageUrl,
-            IEnumerable<Attack> attacks, IEnumerable<BossDropInfo> itemDrops)
+            IEnumerable<Attack> attacks, IEnumerable<BossDropInfo>? itemDrops)
         {
             Name = name;
             _health = health;
@@ -34,7 +34,7 @@ namespace MarbleBot.Common.Games.Siege
             Difficulty = difficulty;
             Stage = stage;
             Attacks = attacks.ToImmutableArray();
-            Drops = itemDrops.ToImmutableArray();
+            Drops = itemDrops?.ToImmutableArray() ?? ImmutableArray.Create<BossDropInfo>();
             ImageUrl = imageUrl;
         }
 
