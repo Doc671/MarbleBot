@@ -108,7 +108,7 @@ namespace MarbleBot
         {
             Console.Title = "MarbleBot";
 
-            await using ServiceProvider? services = ConfigureServices();
+            await using ServiceProvider services = ConfigureServices();
 
             var client = services.GetRequiredService<DiscordSocketClient>();
             await client.LoginAsync(TokenType.Bot, _botCredentials.Token).ConfigureAwait(false);
@@ -126,7 +126,7 @@ namespace MarbleBot
 
         private static Task Client_UserBanned(SocketUser user, SocketGuild socketGuild)
         {
-            IDictionary<ulong, MarbleBotGuild>? guildsDict = MarbleBotGuild.GetGuilds();
+            IDictionary<ulong, MarbleBotGuild> guildsDict = MarbleBotGuild.GetGuilds();
             if (!guildsDict.ContainsKey(socketGuild.Id))
             {
                 return Task.CompletedTask;
@@ -144,13 +144,13 @@ namespace MarbleBot
 
         private Task Client_LeftGuild(SocketGuild guild)
         {
-            _logger.Info("Left guild {0} [{1}]", guild?.Name, guild?.Id);
+            _logger.Info("Left guild {0} [{1}]", guild.Name, guild.Id);
             return Task.CompletedTask;
         }
 
         private Task Client_JoinedGuild(SocketGuild guild)
         {
-            _logger.Info("Joined guild {0} [{1}]", guild?.Name, guild?.Id);
+            _logger.Info("Joined guild {0} [{1}]", guild.Name, guild.Id);
             return Task.CompletedTask;
         }
     }

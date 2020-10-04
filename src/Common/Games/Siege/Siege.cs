@@ -493,7 +493,7 @@ namespace MarbleBot.Common.Games.Siege
 
         public override string ToString()
         {
-            return $"[{_id}] {Boss?.Name}: {Marbles.Count}";
+            return $"[{_id}] {Boss.Name}: {Marbles.Count}";
         }
 
         public async Task WeaponAttack(Weapon weapon)

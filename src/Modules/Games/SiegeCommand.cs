@@ -567,7 +567,7 @@ namespace MarbleBot.Modules.Games
             {
                 while (!leaderboardFile.EndOfStream)
                 {
-                    string? racerInfo = (await leaderboardFile.ReadLineAsync())!;
+                    string racerInfo = (await leaderboardFile.ReadLineAsync())!;
                     if (winners.ContainsKey(racerInfo))
                     {
                         winners[racerInfo]++;

@@ -14,7 +14,7 @@ namespace MarbleBot.Common
             throw new NotImplementedException();
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue,
             JsonSerializer serializer)
         {
             var jObject = JToken.ReadFrom(reader);

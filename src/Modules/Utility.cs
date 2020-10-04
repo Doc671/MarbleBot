@@ -124,7 +124,7 @@ namespace MarbleBot.Modules
                     commands = commands.Where(commandInfo => commandInfo.Remarks != "CM Only");
                 }
 
-                if (MarbleBotUser.Find(Context)?.Stage < 2)
+                if (MarbleBotUser.Find(Context).Stage < 2)
                 {
                     commands = commands.Where(commandInfo => commandInfo.Remarks != "Stage2");
                 }
