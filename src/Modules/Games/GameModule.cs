@@ -80,7 +80,7 @@ namespace MarbleBot.Modules.Games
             };
 
             var output = nextEarn.TotalHours < 6
-                ? $"You can earn money from {game} in **{GetTimeSpanSentence(lastWin - DateTime.UtcNow.AddHours(-6))}**!"
+                ? $"You can earn money from {game} in {GetTimeSpanSentence(lastWin - DateTime.UtcNow.AddHours(-6))}!"
                 : $"You can earn money from {game} now!";
 
             await ReplyAsync(embed: new EmbedBuilder()

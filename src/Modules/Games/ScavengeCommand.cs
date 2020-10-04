@@ -28,7 +28,7 @@ namespace MarbleBot.Modules.Games
             if ((DateTime.UtcNow - user.LastScavenge).TotalHours < 6)
             {
                 DateTime sixHoursAgo = DateTime.UtcNow.AddHours(-6);
-                await SendErrorAsync($"**{Context.User.Username}**, you need to wait for **{GetTimeSpanSentence(user.LastScavenge - sixHoursAgo)}** until you can scavenge again.");
+                await SendErrorAsync($"**{Context.User.Username}**, you need to wait for {GetTimeSpanSentence(user.LastScavenge - sixHoursAgo)} until you can scavenge again.");
             }
             else
             {

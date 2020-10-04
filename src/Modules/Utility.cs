@@ -366,7 +366,7 @@ namespace MarbleBot.Modules
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommand()
         {
-            await ReplyAsync($"The bot has been running for **{GetTimeSpanSentence(DateTime.UtcNow - _startTimeService.StartTime)}**.");
+            await ReplyAsync($"The bot has been running for {GetTimeSpanSentence(DateTime.UtcNow - _startTimeService.StartTime)}.");
         }
 
         [Command("userinfo")]
