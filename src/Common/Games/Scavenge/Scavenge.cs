@@ -67,7 +67,7 @@ namespace MarbleBot.Common.Games.Scavenge
         {
             var user = MarbleBotUser.Find(_context);
             user.LastScavenge = DateTime.UtcNow;
-            foreach (var item in Items.Where(item => !item.Name.Contains("Ore")))
+            foreach (var item in Items)
             {
                 if (user.Items.ContainsKey(item.Id))
                 {
