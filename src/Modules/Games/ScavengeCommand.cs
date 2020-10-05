@@ -346,7 +346,7 @@ namespace MarbleBot.Modules.Games
             const string helpP2 =
                 "\n\nWhen you find an item, use `mb/scavenge sell` to sell immediately or `mb/scavenge grab` to put the item in your inventory!";
             const string helpP3 =
-                "\n\nScavenge games last for 60 seconds - every 8 seconds there will be a 80% chance that you've found an item.";
+                "\n\nScavenge games last for 32 seconds - every 4 seconds there will be a 80% chance that you've found an item.";
             const string helpP4 =
                 "\n\nIf you find an ore, you can use `mb/scavenge drill` to drill it. Drilling requires a drill in your inventory.";
             string helpP5 =
