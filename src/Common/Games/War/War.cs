@@ -412,7 +412,7 @@ namespace MarbleBot.Common.Games.War
             output.AppendLine($"**Team {LeftTeam.Name}**");
             if (!LeftTeam.BoostUsed)
             {
-                output.AppendLine($"Boost: **{LeftTeam.Boost}**");
+                output.AppendLine($"Boost: **{LeftTeam.Boost.ToString().CamelToTitleCase()}**");
             }
 
             for (int i = 0; i < LeftTeam.Marbles.Count; i++)
@@ -424,7 +424,7 @@ namespace MarbleBot.Common.Games.War
             output.AppendLine($"**Team {RightTeam.Name}**");
             if (!RightTeam.BoostUsed)
             {
-                output.AppendLine($"Boost: **{RightTeam.Boost}**");
+                output.AppendLine($"Boost: **{RightTeam.Boost.ToString().CamelToTitleCase()}**");
             }
 
             for (int i = 0; i < RightTeam.Marbles.Count; i++)
