@@ -738,7 +738,7 @@ namespace MarbleBot.Common.Games.War
 
         private async void TimeoutTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{GetCurrentMarble().Name}** timed out!\n";
+            _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{GetCurrentMarble().Name}** timed out!";
             await EndMarbleTurn();
         }
 
