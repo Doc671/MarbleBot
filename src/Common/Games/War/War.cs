@@ -40,6 +40,7 @@ namespace MarbleBot.Common.Games.War
         private readonly Emoji _star2Emoji = new Emoji("\uD83C\uDF1F");
         private readonly Timer _timeoutTimer = new Timer(20000);
 
+        private List<Emoji> _emojisToReactWith = new List<Emoji>();
         private bool _endCalled;
         private bool _finished;
         private IUserMessage? _originalMessage;
@@ -123,8 +124,8 @@ namespace MarbleBot.Common.Games.War
                 || (userMarble.Weapon.WeaponClass == WeaponClass.Ranged
                 && (!Grid.IsWithinDistance(userMarble, targetMarble, 3) || !_grid.IsPathClear(userMarble.Position, targetMarble.Position)))))
             {
-                _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but cannot reach them!");
-                await UpdateDisplay(false, false, false);
+                _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but cannot reach them!\n");
+                await UpdateDisplay(false, false, false, false);
                 await MoveToNextTurn();
                 return;
             }
@@ -137,7 +138,7 @@ namespace MarbleBot.Common.Games.War
                 if (usingWeapon && _randomService.Rand.Next(0, 100) > userMarble.Weapon.Accuracy)
                 {
                     _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but missed!\n");
-                    await UpdateDisplay(false, false, false);
+                    await UpdateDisplay(false, false, false, false);
                     await MoveToNextTurn();
                     return;
                 }
@@ -203,10 +204,8 @@ namespace MarbleBot.Common.Games.War
             }
 
             _embedBuilder.Fields[(int)FieldIndex.Options].WithValue("None");
-
-            await _originalMessage!.RemoveAllReactionsAsync();
-
-            await UpdateDisplay(true, true, false);
+            _emojisToReactWith.Clear();
+            await UpdateDisplay(true, true, false, true);
 
             await Task.Delay(2000);
 
@@ -231,7 +230,7 @@ namespace MarbleBot.Common.Games.War
             WarTeam enemyTeam = currentMarble.Team!.IsLeftTeam ? RightTeam : LeftTeam;
 
             _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{currentMarble.Name}** has attempted to use **Team {currentMarble.Team.Name}**'s boost!";
-            await UpdateDisplay(false, false, false);
+            await UpdateDisplay(false, false, false, false);
 
             // Activate boost if enough team members (half rounded up) have chosen to boost
             int boosters = currentMarble.Team.Marbles.Aggregate(0, (total, marble) => marble.Boosted ? total + 1 : total);
@@ -304,7 +303,7 @@ namespace MarbleBot.Common.Games.War
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\nBoost failed! **{boosters}** out of the required **{boostsRequired}** team members have chosen to use Team {currentMarble.Team.Name}'s **{currentMarble.Team.Boost.ToString().CamelToTitleCase()}**.";
             }
 
-            await UpdateDisplay(false, true, true);
+            await UpdateDisplay(false, true, true, true);
         }
 
         private int CalculateDamage(WarMarble userMarble, WarMarble targetMarble, int baseDamage)
@@ -328,9 +327,9 @@ namespace MarbleBot.Common.Games.War
 
         private async Task EndMarbleTurn()
         {
-            _embedBuilder.Fields[(int)FieldIndex.Log].Value = $"**{_allMarbles[_turnIndex].Name}** ended their turn!\n";
-            await _originalMessage!.RemoveAllReactionsAsync();
-            await UpdateDisplay(false, false, true);
+            _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_allMarbles[_turnIndex].Name}**'s turn ended.\n";
+            _emojisToReactWith.Clear();
+            await UpdateDisplay(false, false, true, true);
             await MoveToNextTurn();
         }
 
@@ -352,7 +351,7 @@ namespace MarbleBot.Common.Games.War
             return _allMarbles[_turnIndex];
         }
 
-        private async Task<string> GetMoveMessage()
+        private string GetMoveMessage()
         {
             string[] directionStrings = { "left", "up", "right", "down" };
             (int x, int y)[] directions = { (-1, 0), (0, -1), (1, 0), (0, 1) };
@@ -364,7 +363,7 @@ namespace MarbleBot.Common.Games.War
                 if (_grid.IsValidCoords(currentMarble.Position.X + x, currentMarble.Position.Y + y))
                 {
                     validDirectionStrings.Add(directionStrings[i]);
-                    await _originalMessage!.AddReactionAsync(_arrowEmojis[i]);
+                    _emojisToReactWith.Add(_arrowEmojis[i]);
                 }
             }
 
@@ -378,20 +377,20 @@ namespace MarbleBot.Common.Games.War
             return output.ToString();
         }
 
-        private async Task<string> GetOptionsMessage()
+        private string GetOptionsMessage()
         {
             var currentMarble = GetCurrentMarble();
             var output = new StringBuilder();
             if (!_userMoved)
             {
-                output.Append(await GetMoveMessage());
+                output.Append(GetMoveMessage());
 
                 if (CanBoost())
                 {
-                    await _originalMessage!.AddReactionAsync(_star2Emoji);
+                    _emojisToReactWith.Add(_star2Emoji);
                 }
 
-                await _originalMessage!.AddReactionAsync(_negativeSquaredCrossMarkEmoji);
+                _emojisToReactWith.Add(_negativeSquaredCrossMarkEmoji);
             }
 
             output.Append("- Use `mb/war attack <marble ID>` to attack an adjacent enemy marble.\n");
@@ -534,7 +533,7 @@ namespace MarbleBot.Common.Games.War
             _grid.MoveMarble(_allMarbles[_turnIndex], changeX, changeY);
 
             _embedBuilder.Fields[(int)FieldIndex.Log].Value = $"{GetTurnTitle()}\n**{currentMarble.Name}** moved **{direction}**!";
-            await UpdateDisplay(true, false, true);
+            await UpdateDisplay(true, false, true, false);
         }
 
         private async Task MoveToNextTurn()
@@ -563,13 +562,13 @@ namespace MarbleBot.Common.Games.War
             {
                 _embedBuilder.Fields[(int)FieldIndex.Options].WithValue("None");
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n{GetTurnTitle()}";
-                await UpdateDisplay(false, false, false);
+                await UpdateDisplay(false, false, false, false);
                 await PerformAiMarbleTurn();
             }
             else
             {
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n{GetTurnTitle()}";
-                await UpdateDisplay(false, false, true);
+                await UpdateDisplay(false, false, true, true);
                 _timeoutTimer.Stop();
                 _timeoutTimer.Start();
             }
@@ -685,16 +684,16 @@ namespace MarbleBot.Common.Games.War
                         _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_aiMarble!.Name}** moved!";
                     }
                 }
-                await UpdateDisplay(true, false, false);
+                await UpdateDisplay(true, false, false, false);
             }
 
             reachableEnemies = LeftTeam.Marbles.Where(marble => Grid.IsWithinDistance(_aiMarble!, marble, _aiMarbleReachDistance)).ToArray();
 
             if (!reachableEnemies.Any())
             {
-                _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_aiMarble!.Name}** ended their turn!\n";
+                _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_aiMarble!.Name}**'s turn ended.\n";
                 await MoveToNextTurn();
-                await UpdateDisplay(false, false, false);
+                await UpdateDisplay(false, false, false, false);
                 return;
             }
 
@@ -713,17 +712,16 @@ namespace MarbleBot.Common.Games.War
             _embedBuilder.AddField("Log", GetTurnTitle());
             _embedBuilder.AddField($"**{_allMarbles[_turnIndex].Name}**'s options", ".");
             _embedBuilder.Description = null;
-            await UpdateDisplay(false, false, true);
+            await UpdateDisplay(false, false, true, true);
         }
 
         private async void TimeoutTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{GetCurrentMarble().Name}** timed out!\n";
-            await UpdateDisplay(false, false, true);
-            await MoveToNextTurn();
+            await EndMarbleTurn();
         }
 
-        private async Task UpdateDisplay(bool updateGrid, bool updateTeams, bool updateOptions)
+        private async Task UpdateDisplay(bool updateGrid, bool updateTeams, bool updateOptions, bool updateOptionEmojis)
         {
             if (updateGrid)
             {
@@ -738,10 +736,19 @@ namespace MarbleBot.Common.Games.War
             if (updateOptions)
             {
                 _embedBuilder.Fields[(int)FieldIndex.Options].Name = $"**{_allMarbles[_turnIndex].Name}**'s options";
-                _embedBuilder.Fields[(int)FieldIndex.Options].Value = await GetOptionsMessage();
+                _embedBuilder.Fields[(int)FieldIndex.Options].Value = GetOptionsMessage();
             }
 
             await _originalMessage!.ModifyAsync(message => message.Embed = _embedBuilder.Build());
+
+            if (updateOptionEmojis)
+            {
+                if (_aiMarble != null && GetCurrentMarble().Id != _aiMarble.Id)
+                {
+                    await _originalMessage!.RemoveAllReactionsAsync();
+                    await _originalMessage.AddReactionsAsync(_emojisToReactWith.ToArray());
+                }
+            }
         }
     }
 }
