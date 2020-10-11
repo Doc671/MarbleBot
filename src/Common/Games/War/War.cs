@@ -32,6 +32,7 @@ namespace MarbleBot.Common.Games.War
         };
         private readonly SocketCommandContext _context;
         private readonly EmbedBuilder _embedBuilder;
+        private readonly List<Emoji> _emojisToReactWith = new List<Emoji>(); 
         private readonly GamesService _gamesService;
         private readonly Grid _grid;
         private readonly ulong _id;
@@ -40,7 +41,6 @@ namespace MarbleBot.Common.Games.War
         private readonly Emoji _star2Emoji = new Emoji("\uD83C\uDF1F");
         private readonly Timer _timeoutTimer = new Timer(20000);
 
-        private List<Emoji> _emojisToReactWith = new List<Emoji>();
         private bool _endCalled;
         private bool _finished;
         private IUserMessage? _originalMessage;
@@ -115,6 +115,7 @@ namespace MarbleBot.Common.Games.War
 
         public async Task Attack(WarMarble userMarble, WarMarble targetMarble, bool usingWeapon, int baseDamage)
         {
+            bool aiMarbleTurn = IsAiMarbleTurn();
             if (usingWeapon
 
                 // Melee weapons have a range of 1
@@ -124,7 +125,14 @@ namespace MarbleBot.Common.Games.War
                 || (userMarble.Weapon.WeaponClass == WeaponClass.Ranged
                 && (!Grid.IsWithinDistance(userMarble, targetMarble, 3) || !_grid.IsPathClear(userMarble.Position, targetMarble.Position)))))
             {
-                _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but cannot reach them!\n");
+                if (aiMarbleTurn)
+                {
+                    _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but cannot reach them!\n";
+                }
+                else
+                {
+                    _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but cannot reach them!\n");
+                }
                 await UpdateDisplay(false, false, false, false);
                 await MoveToNextTurn();
                 return;
@@ -137,7 +145,14 @@ namespace MarbleBot.Common.Games.War
             {
                 if (usingWeapon && _randomService.Rand.Next(0, 100) > userMarble.Weapon.Accuracy)
                 {
-                    _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but missed!\n");
+                    if (aiMarbleTurn)
+                    {
+                        _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but missed!\n";
+                    }
+                    else
+                    {
+                        _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but missed!\n");
+                    }
                     await UpdateDisplay(false, false, false, false);
                     await MoveToNextTurn();
                     return;
@@ -194,7 +209,7 @@ namespace MarbleBot.Common.Games.War
                 fieldDescription = fieldDescriptionBuilder.ToString();
             }
 
-            if (_aiMarble != null && IsMarbleTurn(_aiMarble.Id))
+            if (aiMarbleTurn)
             {
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n{fieldDescription}";
             }
@@ -216,6 +231,11 @@ namespace MarbleBot.Common.Games.War
             }
 
             await MoveToNextTurn();
+        }
+
+        private bool IsAiMarbleTurn()
+        {
+            return _aiMarble != null && IsMarbleTurn(_aiMarble.Id);
         }
 
         private async Task Boost()
@@ -559,7 +579,7 @@ namespace MarbleBot.Common.Games.War
             {
                 await OnGameEnd();
             }
-            else if (_aiMarble != null && IsMarbleTurn(_aiMarble.Id))
+            else if (IsAiMarbleTurn())
             {
                 _embedBuilder.Fields[(int)FieldIndex.Options].WithValue("None");
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n{GetTurnTitle()}";
@@ -744,7 +764,7 @@ namespace MarbleBot.Common.Games.War
 
             if (updateOptionEmojis)
             {
-                if (_aiMarble != null && GetCurrentMarble().Id != _aiMarble.Id)
+                if (!IsAiMarbleTurn())
                 {
                     await _originalMessage!.RemoveAllReactionsAsync();
                     await _originalMessage.AddReactionsAsync(_emojisToReactWith.ToArray());
