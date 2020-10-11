@@ -539,6 +539,11 @@ namespace MarbleBot.Common.Games.War
 
         private async Task MoveToNextTurn()
         {
+            if (_finished)
+            {
+                return;
+            }
+
             _userMoved = false;
             int originalTurnIndex = _turnIndex;
             do
