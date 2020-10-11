@@ -3,7 +3,9 @@ using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Common;
 using MarbleBot.Common.Games;
+using MarbleBot.Common.Games.War;
 using MarbleBot.Common.TypeReaders;
+using MarbleBot.Modules.Games.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NLog;
 using System;
@@ -20,6 +22,7 @@ namespace MarbleBot.Services
         private readonly BotCredentials _botCredentials;
         private readonly DiscordSocketClient _client;
         private readonly CommandService _commands;
+        private readonly GamesService _gamesService;
         private readonly Logger _logger;
         private readonly IServiceProvider _services;
 
@@ -29,6 +32,7 @@ namespace MarbleBot.Services
             _botCredentials = _services.GetRequiredService<BotCredentials>();
             _client = _services.GetRequiredService<DiscordSocketClient>();
             _commands = _services.GetRequiredService<CommandService>();
+            _gamesService = _services.GetRequiredService<GamesService>();
             _logger = LogManager.GetCurrentClassLogger();
         }
 
@@ -37,6 +41,7 @@ namespace MarbleBot.Services
             _client.MessageReceived += HandleCommandAsync;
             _client.ChannelDestroyed += OnChannelDestroyedAsync;
             _commands.CommandExecuted += OnCommandExecutedAsync;
+            _client.ReactionAdded += Client_ReactionAdded;
 
             _commands.AddTypeReader<Item>(new ItemTypeReader());
             _commands.AddTypeReader<MarbleBotUser>(new MarbleBotUserTypeReader());
@@ -45,6 +50,21 @@ namespace MarbleBot.Services
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services).ConfigureAwait(false);
 
             await _client.SetGameAsync("for mb/help!", type: ActivityType.Watching);
+        }
+
+        private async Task Client_ReactionAdded(Cacheable<IUserMessage, ulong> cache, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            if (reaction.User.Value.IsBot)
+            {
+                return;
+            }
+
+            ulong id = channel is IGuildChannel guildChannel ? guildChannel.GuildId : cache.Value.Author.Id;
+            War? war = _gamesService.Wars.FirstOrDefault(warPair => warPair.Key == id).Value;
+            if (war != null)
+            {
+                await war.OnReactionAdded(reaction.Emote, reaction.User.Value);
+            }
         }
 
         private async Task HandleCommandAsync(SocketMessage msg)

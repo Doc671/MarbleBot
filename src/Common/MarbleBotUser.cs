@@ -59,6 +59,7 @@ namespace MarbleBot.Common
         public DateTime LastScavenge { get; set; } = DateTime.MinValue;
         public DateTime LastSiegeWin { get; set; } = DateTime.MinValue;
         public DateTime LastWarWin { get; set; } = DateTime.MinValue;
+        public string WarEmoji { get; set; } = "\uD83D\uDD35";
         public SortedDictionary<int, int> Items { get; } = new SortedDictionary<int, int>();
 
         public Ammo? GetAmmo(Weapon weapon)

@@ -14,6 +14,7 @@ namespace MarbleBot.Common.Games.Siege
         public DateTime DoomStart { get; set; } = DateTime.MinValue;
         public DateTime LastPoisonTick { get; set; } = DateTime.MinValue;
         public DateTime LastStun { get; set; } = DateTime.MinValue;
+        public DateTime LastMoveUsed { get; set; } = DateTime.MinValue;
 
         public SiegeMarble(ulong id, string name, int maxHealth) : base(id, name, maxHealth)
         {

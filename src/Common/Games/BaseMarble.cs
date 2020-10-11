@@ -31,7 +31,6 @@ namespace MarbleBot.Common.Games
         public int DamageDealt { get; set; }
         public Shield? Shield { get; set; }
         public Spikes? Spikes { get; set; }
-        public DateTime LastMoveUsed { get; set; } = DateTime.MinValue;
 
         protected BaseMarble(ulong id, string name, int maxHealth)
         {
