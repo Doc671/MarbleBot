@@ -344,6 +344,7 @@ namespace MarbleBot.Common.Games.War
             _gamesService.Wars.TryRemove(_id, out _);
             using var marbleList = new StreamWriter($"Data{Path.DirectorySeparatorChar}{_id}.war");
             marbleList.Write("");
+            _timeoutTimer.Dispose();
         }
 
         public WarMarble GetCurrentMarble()
