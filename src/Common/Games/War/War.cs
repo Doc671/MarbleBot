@@ -219,7 +219,6 @@ namespace MarbleBot.Common.Games.War
             }
 
             _embedBuilder.Fields[(int)FieldIndex.Options].WithValue("None");
-            _emojisToReactWith.Clear();
             await UpdateDisplay(true, true, false, true);
 
             await Task.Delay(2000);
@@ -348,7 +347,6 @@ namespace MarbleBot.Common.Games.War
         private async Task EndMarbleTurn()
         {
             _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_allMarbles[_turnIndex].Name}**'s turn ended.\n";
-            _emojisToReactWith.Clear();
             await UpdateDisplay(false, false, true, true);
             await MoveToNextTurn();
         }
@@ -402,6 +400,7 @@ namespace MarbleBot.Common.Games.War
         {
             var currentMarble = GetCurrentMarble();
             var output = new StringBuilder();
+            _emojisToReactWith.Clear();
             if (!_userMoved)
             {
                 output.Append(GetMoveMessage());
