@@ -27,6 +27,7 @@ namespace MarbleBot.Modules
 
         [Command("7ball")]
         [Summary("Predicts the outcome to a user-defined event.")]
+        [RequireMaximumLength(100)]
         public async Task SevenBallCommand([Remainder] string _)
         {
             string outcome = _randomService.Rand.Next(0, 13) switch
@@ -168,6 +169,7 @@ namespace MarbleBot.Modules
         [Command("cameltotitlecase")]
         [Alias("cameltotitle")]
         [Summary("Converts a camel case string to title case.")]
+        [RequireMaximumLength(100)]
         public async Task CamelToTitleCaseCommand([Remainder] string input)
         {
             await ReplyAsync(input.CamelToTitleCase());
@@ -175,6 +177,7 @@ namespace MarbleBot.Modules
 
         [Command("choose")]
         [Summary("Chooses between several provided choices.")]
+        [RequireMaximumLength(200)]
         public async Task ChooseCommand([Remainder] string input)
         {
             string[] choices = input.Split('|');
@@ -351,14 +354,16 @@ namespace MarbleBot.Modules
 
         [Command("repeat")]
         [Summary("Repeats the given message.")]
-        public async Task RepeatCommand([Remainder] string repeat)
+        [RequireMaximumLength(100)]
+        public async Task RepeatCommand([Remainder] string input)
         {
-            await ReplyAsync(repeat);
+            await ReplyAsync(input);
         }
 
         [Command("reverse")]
         [Alias("orangeify")]
         [Summary("Returns the user input reversed.")]
+        [RequireMaximumLength(100)]
         public async Task ReverseCommand([Remainder] string input)
         {
             await ReplyAsync(string.Concat(input.Reverse()));

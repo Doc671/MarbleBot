@@ -144,7 +144,7 @@ namespace MarbleBot.Services
                         await context.Channel.SendMessageAsync(":warning: | Failed to parse the given arguments. Use `mb/help <command name>` to see what type each argument should be.");
                         break;
                     case CommandError.UnmetPrecondition:
-                        await context.Channel.SendMessageAsync(":warning: | Insufficient permissions.");
+                        await context.Channel.SendMessageAsync($":warning: | {result.ErrorReason}");
                         break;
                     case CommandError.UnknownCommand:
                         await context.Channel.SendMessageAsync(":warning: | Unknown command. Use `mb/help` to see what commands there are.");
