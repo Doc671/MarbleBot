@@ -565,6 +565,8 @@ namespace MarbleBot.Common.Games.War
             }
 
             _userMoved = false;
+            _timeoutTimer.Stop();
+
             int originalTurnIndex = _turnIndex;
             do
             {
@@ -590,7 +592,6 @@ namespace MarbleBot.Common.Games.War
             {
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n{GetTurnTitle()}";
                 await UpdateDisplay(false, false, true, true);
-                _timeoutTimer.Stop();
                 _timeoutTimer.Start();
             }
         }
