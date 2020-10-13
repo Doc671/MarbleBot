@@ -342,7 +342,7 @@ namespace MarbleBot.Common.Games.War
         private bool CanBoost()
         {
             var currentMarble = GetCurrentMarble();
-            return !currentMarble.Boosted || !currentMarble.Team!.BoostUsed;
+            return !(currentMarble.Boosted || currentMarble.Team!.BoostUsed);
         }
 
         private async Task EndMarbleTurn()
