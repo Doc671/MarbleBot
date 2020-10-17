@@ -760,6 +760,12 @@ namespace MarbleBot.Common.Games.War
                 _embedBuilder.Fields[(int)FieldIndex.Options].Value = GetOptionsMessage();
             }
 
+            if ((await _context.Channel.GetMessageAsync(_originalMessage!.Id)) == null)
+            {
+                Finalise();
+                return;
+            }
+
             await _originalMessage!.ModifyAsync(message => message.Embed = _embedBuilder.Build());
 
             if (updateOptionEmojis)

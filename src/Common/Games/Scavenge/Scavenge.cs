@@ -171,6 +171,13 @@ namespace MarbleBot.Common.Games.Scavenge
             }
 
             var embed = _originalMessage.Embeds.First();
+
+            if ((await _context.Channel.GetMessageAsync(_originalMessage.Id)) == null)
+            {
+                Finalise();
+                return;
+            }
+
             await _originalMessage.ModifyAsync(m => m.Embed = new EmbedBuilder
             {
                 Color = embed.Color,
