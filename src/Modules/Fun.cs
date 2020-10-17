@@ -392,7 +392,7 @@ namespace MarbleBot.Modules
                 }
             }
 
-            await ReplyAsync("Your submission has been received and will now be reviewed. Expect up to 48 hours for a reply.");
+            await ReplyAsync("Your submission has been received.");
         }
     }
 }
