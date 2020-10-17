@@ -347,7 +347,8 @@ namespace MarbleBot.Common.Games.War
         private async Task EndMarbleTurn()
         {
             _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_allMarbles[_turnIndex].Name}**'s turn ended.\n";
-            await UpdateDisplay(false, false, true, true);
+            await _originalMessage!.RemoveAllReactionsAsync();
+            await UpdateDisplay(false, false, true, false);
             await MoveToNextTurn();
         }
 
