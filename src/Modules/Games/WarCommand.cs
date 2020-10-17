@@ -85,20 +85,15 @@ namespace MarbleBot.Modules.Games
                 if (i < (int)Math.Ceiling(marbles.Count / 2d))
                 {
                     team1.Add(marble);
-                    Context.Client.GetUser(marble.Id);
-                    if (MarbleBotUser.Find(Context, marble.Id).SiegePing)
-                    {
-                        mentions.Append($"<@{marble.Id}> ");
-                    }
                 }
                 else
                 {
                     team2.Add(marble);
-                    Context.Client.GetUser(marble.Id);
-                    if (MarbleBotUser.Find(Context, marble.Id).SiegePing)
-                    {
-                        mentions.Append($"<@{marble.Id}> ");
-                    }
+                }
+
+                if (MarbleBotUser.Find(Context, marble.Id).SiegePing && Context.Client.GetUser(marble.Id).Status != UserStatus.Offline)
+                {
+                    mentions.Append($"<@{marble.Id}> ");
                 }
             }
 
