@@ -163,7 +163,6 @@ namespace MarbleBot.Modules.Games
             const int foundRemoved = 2;
 
             int state = _botCredentials.AdminIds.Any(id => id == Context.User.Id) ? 3 : notFound;
-            var wholeFile = new StringBuilder();
             var formatter = new BinaryFormatter();
             if (gameType == GameType.War)
             {
@@ -246,12 +245,7 @@ namespace MarbleBot.Modules.Games
                     await ReplyAsync($"**{Context.User.Username}**, this is not your marble!");
                     break;
                 case foundRemoved:
-                    await using (var marbleList = new StreamWriter(marbleListDirectory, false))
-                    {
-                        await marbleList.WriteAsync(wholeFile.ToString());
-                        await ReplyAsync($"**{Context.User.Username}**, removed contestant {Bold(marbleToRemove)}!");
-                    }
-
+                    await ReplyAsync($"**{Context.User.Username}**, removed contestant {Bold(marbleToRemove)}!");
                     break;
             }
         }
