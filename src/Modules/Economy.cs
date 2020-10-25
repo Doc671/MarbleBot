@@ -683,6 +683,7 @@ namespace MarbleBot.Modules
 
         [Command("richlist local")]
         [Alias("richlist local", "leaderboard local", "networthleaderboard local")]
+        [Summary("Shows the ten richest people on the server by Net Worth.")]
         [RequireContext(ContextType.Guild)]
         public async Task RichListLocalCommand(int page = 1)
         {
