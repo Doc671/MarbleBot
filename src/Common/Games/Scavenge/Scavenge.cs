@@ -172,7 +172,7 @@ namespace MarbleBot.Common.Games.Scavenge
 
             var embed = _originalMessage.Embeds.First();
 
-            if ((await _context.Channel.GetMessageAsync(_originalMessage.Id)) == null)
+            if (await _context.Channel.GetMessageAsync(_originalMessage.Id) == null)
             {
                 Finalise();
                 return;

@@ -26,12 +26,14 @@ namespace MarbleBot
     public sealed class Program
     {
         private readonly BotCredentials _botCredentials;
+        private readonly DiscordSocketClient _discordSocketClient;
         private readonly Logger _logger;
         private readonly StartTimeService _startTimeService = new StartTimeService(DateTime.UtcNow);
 
         private Program()
         {
             _botCredentials = GetBotCredentials();
+            _discordSocketClient = GetClient();
             SetLogConfig();
             _logger = LogManager.GetCurrentClassLogger();
         }
@@ -45,8 +47,8 @@ namespace MarbleBot
         {
             return new ServiceCollection()
                 .AddSingleton(_botCredentials)
+                .AddSingleton(_discordSocketClient)
                 .AddSingleton(_startTimeService)
-                .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandler>()
                 .AddSingleton<GamesService>()
@@ -59,6 +61,14 @@ namespace MarbleBot
                     loggingBuilder.AddNLog();
                 })
                 .BuildServiceProvider();
+        }
+
+        private static DiscordSocketClient GetClient()
+        {
+            return new DiscordSocketClient(new DiscordSocketConfig
+            {
+                AlwaysDownloadUsers = true
+            });
         }
 
         private static BotCredentials GetBotCredentials()

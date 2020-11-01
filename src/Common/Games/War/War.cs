@@ -23,16 +23,18 @@ namespace MarbleBot.Common.Games.War
         private readonly WarMarble? _aiMarble;
         private readonly int _aiMarbleReachDistance;
         private readonly ImmutableArray<WarMarble> _allMarbles;
-        private readonly Emoji[] _arrowEmojis = 
-        { 
+
+        private readonly Emoji[] _arrowEmojis =
+        {
             new Emoji("\u2B05"),
             new Emoji("\u2B06"),
             new Emoji("\u27A1"),
-            new Emoji("\u2B07"),
+            new Emoji("\u2B07")
         };
+
         private readonly SocketCommandContext _context;
         private readonly EmbedBuilder _embedBuilder;
-        private readonly List<Emoji> _emojisToReactWith = new List<Emoji>(); 
+        private readonly List<Emoji> _emojisToReactWith = new List<Emoji>();
         private readonly GamesService _gamesService;
         private readonly Grid _grid;
         private readonly ulong _id;
@@ -119,11 +121,11 @@ namespace MarbleBot.Common.Games.War
             if (usingWeapon
 
                 // Melee weapons have a range of 1
-                && ((userMarble.Weapon.WeaponClass == WeaponClass.Melee && !Grid.IsWithinDistance(userMarble, targetMarble, 1))
+                && (userMarble.Weapon.WeaponClass == WeaponClass.Melee && !Grid.IsWithinDistance(userMarble, targetMarble, 1)
 
-                // Ranged weapons have a range of 3 and can't attack if the user's line of sight is blocked
-                || (userMarble.Weapon.WeaponClass == WeaponClass.Ranged
-                && (!Grid.IsWithinDistance(userMarble, targetMarble, 3) || !_grid.IsPathClear(userMarble.Position, targetMarble.Position)))))
+                    // Ranged weapons have a range of 3 and can't attack if the user's line of sight is blocked
+                    || userMarble.Weapon.WeaponClass == WeaponClass.Ranged
+                    && (!Grid.IsWithinDistance(userMarble, targetMarble, 3) || !_grid.IsPathClear(userMarble.Position, targetMarble.Position))))
             {
                 if (aiMarbleTurn)
                 {
@@ -133,6 +135,7 @@ namespace MarbleBot.Common.Games.War
                 {
                     _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but cannot reach them!\n");
                 }
+
                 await UpdateDisplay(false, false, false, false);
                 await MoveToNextTurn();
                 return;
@@ -153,6 +156,7 @@ namespace MarbleBot.Common.Games.War
                     {
                         _embedBuilder.Fields[(int)FieldIndex.Log].WithValue($"**{userMarble.Name}** tried to attack **{targetMarble.Name}**, but missed!\n");
                     }
+
                     await UpdateDisplay(false, false, false, false);
                     await MoveToNextTurn();
                     return;
@@ -261,58 +265,58 @@ namespace MarbleBot.Common.Games.War
                 switch (currentMarble.Team.Boost)
                 {
                     case WarBoost.HealKit:
+                    {
+                        IEnumerable<WarMarble> teammatesToHeal = currentMarble.Team.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
+                        foreach (WarMarble teammate in teammatesToHeal)
                         {
-                            IEnumerable<WarMarble> teammatesToHeal = currentMarble.Team.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
-                            foreach (WarMarble teammate in teammatesToHeal)
+                            if (teammate.Health > 0)
                             {
-                                if (teammate.Health > 0)
-                                {
-                                    teammate.Health += 8;
-                                    output.AppendLine($"**{teammate.Name}** recovered **8** health! (**{teammate.Health}**/{teammate.MaxHealth})");
-                                }
+                                teammate.Health += 8;
+                                output.AppendLine($"**{teammate.Name}** recovered **8** health! (**{teammate.Health}**/{teammate.MaxHealth})");
                             }
-
-                            break;
                         }
+
+                        break;
+                    }
                     case WarBoost.MissileStrike:
+                    {
+                        foreach (WarMarble enemy in enemyTeam.Marbles)
                         {
-                            foreach (WarMarble enemy in enemyTeam.Marbles)
+                            if (enemy.Health > 0)
                             {
-                                if (enemy.Health > 0)
-                                {
-                                    enemy.Health -= 5;
-                                }
+                                enemy.Health -= 5;
                             }
-
-                            output.Append($"All of **Team {enemyTeam.Name}** took **5** damage!");
-                            break;
                         }
+
+                        output.Append($"All of **Team {enemyTeam.Name}** took **5** damage!");
+                        break;
+                    }
                     case WarBoost.Rage:
+                    {
+                        foreach (WarMarble teammate in currentMarble.Team.Marbles)
                         {
-                            foreach (WarMarble teammate in currentMarble.Team.Marbles)
-                            {
-                                teammate.DamageMultiplier *= 2;
-                                teammate.LastRage = DateTime.UtcNow;
-                                teammate.Rage = true;
-                            }
-
-                            output.Append($"**Team {currentMarble.Team.Name}** can deal x2 damage for the next 10 seconds!");
-                            break;
+                            teammate.DamageMultiplier *= 2;
+                            teammate.LastRage = DateTime.UtcNow;
+                            teammate.Rage = true;
                         }
+
+                        output.Append($"**Team {currentMarble.Team.Name}** can deal x2 damage for the next 10 seconds!");
+                        break;
+                    }
                     case WarBoost.SpikeTrap:
+                    {
+                        IEnumerable<WarMarble> enemiesToDamage = enemyTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
+                        foreach (WarMarble enemy in enemiesToDamage)
                         {
-                            IEnumerable<WarMarble> enemiesToDamage = enemyTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
-                            foreach (WarMarble enemy in enemiesToDamage)
+                            if (enemy.Health > 0)
                             {
-                                if (enemy.Health > 0)
-                                {
-                                    enemy.Health -= 8;
-                                    output.AppendLine($"**{enemy.Name}** took **8** damage! Remaining health: **{enemy.Health}**/{enemy.MaxHealth}");
-                                }
+                                enemy.Health -= 8;
+                                output.AppendLine($"**{enemy.Name}** took **8** damage! Remaining health: **{enemy.Health}**/{enemy.MaxHealth}");
                             }
-
-                            break;
                         }
+
+                        break;
+                    }
                 }
 
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\nBoost successful! **{currentMarble.Name}** used **{currentMarble.Team.Boost.ToString().CamelToTitleCase()}**!\n{output}";
@@ -340,7 +344,7 @@ namespace MarbleBot.Common.Games.War
 
         private bool CanBoost()
         {
-            var currentMarble = GetCurrentMarble();
+            WarMarble? currentMarble = GetCurrentMarble();
             return !(currentMarble.Boosted || currentMarble.Team!.BoostUsed);
         }
 
@@ -399,7 +403,7 @@ namespace MarbleBot.Common.Games.War
 
         private string GetOptionsMessage()
         {
-            var currentMarble = GetCurrentMarble();
+            WarMarble? currentMarble = GetCurrentMarble();
             var output = new StringBuilder();
             _emojisToReactWith.Clear();
             if (!_userMoved)
@@ -607,7 +611,7 @@ namespace MarbleBot.Common.Games.War
             int team1Total = LeftTeam.Marbles.Sum(m => m.Health);
             int team2Total = RightTeam.Marbles.Sum(m => m.Health);
             WarTeam winningTeam = team1Total > team2Total ? LeftTeam : RightTeam;
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(_context))
                 .WithTitle($"Team {winningTeam.Name} has defeated Team {(team2Total == 0 ? RightTeam : LeftTeam).Name}! :trophy:");
             var team1Output = new StringBuilder();
@@ -706,6 +710,7 @@ namespace MarbleBot.Common.Games.War
                         _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_aiMarble!.Name}** moved!";
                     }
                 }
+
                 await UpdateDisplay(true, false, false, false);
             }
 
@@ -724,6 +729,7 @@ namespace MarbleBot.Common.Games.War
                 randomEnemyMarble = reachableEnemies[_randomService.Rand.Next(0, reachableEnemies.Length)];
             }
             while (randomEnemyMarble.Health == 0);
+
             await Attack(_aiMarble!, randomEnemyMarble, true, _aiMarble!.Weapon.Damage);
         }
 
@@ -761,7 +767,7 @@ namespace MarbleBot.Common.Games.War
                 _embedBuilder.Fields[(int)FieldIndex.Options].Value = GetOptionsMessage();
             }
 
-            if ((await _context.Channel.GetMessageAsync(_originalMessage!.Id)) == null)
+            if (await _context.Channel.GetMessageAsync(_originalMessage!.Id) == null)
             {
                 Finalise();
                 return;

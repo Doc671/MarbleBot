@@ -435,26 +435,26 @@ namespace MarbleBot.Modules
             switch (item)
             {
                 case Weapon weapon:
+                {
+                    builder.AddField("Weapon Info", new StringBuilder()
+                        .AppendLine($"Class: **{weapon.WeaponClass}**")
+                        .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
+                        .AppendLine($"Damage: **{weapon.Damage}**")
+                        .AppendLine($"Uses: **{weapon.Hits}**"), true);
+
+                    if (weapon.Ammo.Length != 0)
                     {
-                        builder.AddField("Weapon Info", new StringBuilder()
-                            .AppendLine($"Class: **{weapon.WeaponClass}**")
-                            .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
-                            .AppendLine($"Damage: **{weapon.Damage}**")
-                            .AppendLine($"Uses: **{weapon.Hits}**"), true);
-
-                        if (weapon.Ammo.Length != 0)
+                        var output = new StringBuilder();
+                        foreach (int ammoId in weapon.Ammo)
                         {
-                            var output = new StringBuilder();
-                            foreach (int ammoId in weapon.Ammo)
-                            {
-                                output.AppendLine($"`[{ammoId:000}]` {Item.Find<Ammo>(ammoId.ToString("000")).Name}");
-                            }
-
-                            builder.AddField("Ammo", output.ToString(), true);
+                            output.AppendLine($"`[{ammoId:000}]` {Item.Find<Ammo>(ammoId.ToString("000")).Name}");
                         }
 
-                        break;
+                        builder.AddField("Ammo", output.ToString(), true);
                     }
+
+                    break;
+                }
                 case Ammo ammo:
                     builder.AddField("Ammo Damage", ammo.Damage, true);
                     break;
@@ -675,14 +675,14 @@ namespace MarbleBot.Modules
             }
 
             (int place, MarbleBotUser user)[] users = (from user in MarbleBotUser.GetUsers()
-                                                       orderby user.Value.NetWorth descending
-                                                       select (place: 0, user: user.Value)).ToArray();
+                orderby user.Value.NetWorth descending
+                select (place: 0, user: user.Value)).ToArray();
 
             await DisplayRichList(users, page);
         }
 
         [Command("richlist local")]
-        [Alias("richlist local", "leaderboard local", "networthleaderboard local")]
+        [Alias("leaderboard local", "networthleaderboard local")]
         [Summary("Shows the ten richest people on the server by Net Worth.")]
         [RequireContext(ContextType.Guild)]
         public async Task RichListLocalCommand(int page = 1)
@@ -693,10 +693,12 @@ namespace MarbleBot.Modules
                 return;
             }
 
+            await Context.Guild.DownloadUsersAsync();
+
             (int place, MarbleBotUser user)[] users = (from marbleBotUserPair in MarbleBotUser.GetUsers()
-                                                       orderby marbleBotUserPair.Value.NetWorth descending
-                                                       where Context.Guild.Users.Any(guildUser => guildUser.Id == marbleBotUserPair.Value.Id)
-                                                       select (place: 0, user: marbleBotUserPair.Value)).ToArray();
+                where Context.Guild.GetUser(marbleBotUserPair.Key) != null
+                orderby marbleBotUserPair.Value.NetWorth descending
+                select (place: 0, user: marbleBotUserPair.Value)).ToArray();
 
             await DisplayRichList(users, page);
         }

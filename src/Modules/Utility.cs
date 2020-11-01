@@ -335,33 +335,6 @@ namespace MarbleBot.Modules
             await ReplyAsync(embed: builder.Build());
         }
 
-        [Command("staffcheck")]
-        [Summary("Displays a list of all staff members and their statuses.")]
-        [RequireContext(ContextType.Guild)]
-        public async Task StaffCheckCommand()
-        {
-            var output = new StringBuilder();
-            foreach (SocketGuildUser user in Context.Guild.Users)
-            {
-                if (user.GuildPermissions.ManageMessages && !user.IsBot)
-                {
-                    string status = user.Status switch
-                    {
-                        UserStatus.AFK => "Idle",
-                        UserStatus.DoNotDisturb => "Do Not Disturb",
-                        UserStatus.Idle => "Idle",
-                        UserStatus.Online => "Online",
-                        _ => "Offline"
-                    };
-                    output.AppendLine(string.IsNullOrEmpty(user.Nickname)
-                        ? $"{user.Username}#{user.Discriminator}: **{status}**"
-                        : $"{user.Nickname} ({user.Username}#{user.Discriminator}): **{status}**");
-                }
-            }
-
-            await ReplyAsync(output.ToString());
-        }
-
         [Command("uptime")]
         [Summary("Displays how long the bot has been running for.")]
         public async Task UptimeCommand()
@@ -374,74 +347,58 @@ namespace MarbleBot.Modules
         [RequireContext(ContextType.Guild)]
         public async Task UserInfoCommand([Remainder] string username = "")
         {
-            if (!Context.IsPrivate)
+            if (string.IsNullOrEmpty(username))
             {
-                var builder = new EmbedBuilder();
-                var user = (SocketGuildUser)Context.User;
-                bool userFound = true;
-                username = username.ToLower();
-                if (!string.IsNullOrEmpty(username))
-                {
-                    if (username[0] == '<')
-                    {
-                        try
-                        {
-                            ulong.TryParse(username.Trim('<').Trim('>').Trim('@'), out ulong id);
-                            user = Context.Guild.GetUser(id);
-                        }
-                        catch (NullReferenceException ex)
-                        {
-                            Logger.Error(ex);
-                            await ReplyAsync("Invalid ID!");
-                            userFound = false;
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            user = Context.Guild.Users.FirstOrDefault(u => u.Username.ToLower().Contains(username)
-                                                                           || username.Contains(u.Username.ToLower()));
-                        }
-                        catch (NullReferenceException ex)
-                        {
-                            Logger.Error(ex);
-                            await ReplyAsync("Could not find the requested user!");
-                            userFound = false;
-                        }
-                    }
-                }
-
-                if (userFound)
-                {
-                    string status = user.Status switch
-                    {
-                        UserStatus.Online => "Online",
-                        UserStatus.Idle => "Idle",
-                        UserStatus.DoNotDisturb => "Do Not Disturb",
-                        UserStatus.AFK => "Idle",
-                        _ => "Offline"
-                    };
-
-                    string nickname = string.IsNullOrEmpty(user.Nickname) ? "None" : user.Nickname;
-                    var roles = new StringBuilder();
-                    foreach (SocketRole role in user.Roles)
-                    {
-                        roles.AppendLine(role.Name);
-                    }
-
-                    builder.WithAuthor(user)
-                        .AddField("Status", status, true)
-                        .AddField("Nickname", nickname, true)
-                        .AddField("Registered", user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"), true)
-                        .AddField("Joined", ((DateTimeOffset)user.JoinedAt!).ToString("yyyy-MM-dd HH:mm:ss"), true)
-                        .AddField("Roles", roles.ToString(), true)
-                        .WithColor(GetColor(Context))
-                        .WithFooter("All times in UTC, all dates YYYY-MM-DD.");
-
-                    await ReplyAsync(embed: builder.Build());
-                }
+                return;
             }
+
+            username = username.ToLower();
+            SocketGuildUser user = Context.Guild.Users.FirstOrDefault(u => u.Username.ToLower().Contains(username)
+                                                                           || username.Contains(u.Username.ToLower()));
+            if (user == null)
+            {
+                await ReplyAsync("Could not find the requested user!");
+                return;
+            }
+
+            await UserInfoCommand(user);
+        }
+
+        [Command("userinfo")]
+        [Summary("Displays information about a user.")]
+        [RequireContext(ContextType.Guild)]
+        public async Task UserInfoCommand(ulong userId)
+        {
+            var user = Context.Guild.GetUser(userId);
+            if (user == null)
+            {
+                await ReplyAsync("Could not find the requested user!");
+                return;
+            }
+
+            await UserInfoCommand(user);
+        }
+
+        [Command("userinfo")]
+        [Summary("Displays information about a user.")]
+        [RequireContext(ContextType.Guild)]
+        public async Task UserInfoCommand(SocketGuildUser user)
+        {
+            string nickname = string.IsNullOrEmpty(user.Nickname) ? "None" : user.Nickname;
+            var roles = new StringBuilder();
+            foreach (SocketRole role in user.Roles)
+            {
+                roles.AppendLine(role.Name);
+            }
+
+            await ReplyAsync(embed: new EmbedBuilder()
+                .WithAuthor(user)
+                .AddField("Nickname", nickname, true)
+                .AddField("Registered", user.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"), true)
+                .AddField("Joined", ((DateTimeOffset)user.JoinedAt!).ToString("yyyy-MM-dd HH:mm:ss"), true)
+                .AddField("Roles", roles.ToString(), true)
+                .WithColor(GetColor(Context))
+                .WithFooter("All times in UTC, all dates YYYY-MM-DD.").Build());
         }
     }
 }

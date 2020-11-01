@@ -65,6 +65,7 @@ namespace MarbleBot.Common.Games.War
                     output.Append(_tiles[x, y].DisplayEmoji);
                 }
             }
+
             return output.ToString();
         }
 
@@ -88,14 +89,15 @@ namespace MarbleBot.Common.Games.War
                     return false;
                 }
             }
+
             return true;
         }
 
         public bool IsValidCoords(int x, int y)
         {
-            return x >= 0 && x < _width 
-                  && y >= 0 && y < _height 
-                  && _tiles[x, y].Element == null;
+            return x >= 0 && x < _width
+                          && y >= 0 && y < _height
+                          && _tiles[x, y].Element == null;
         }
 
         public static bool IsWithinDistance(WarMarble marble1, WarMarble marble2, int distance)

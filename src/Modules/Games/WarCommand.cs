@@ -351,8 +351,8 @@ namespace MarbleBot.Modules.Games
             }
 
             winList = (from winner in winList
-                       orderby winner.value descending
-                       select winner).ToList();
+                orderby winner.value descending
+                select winner).ToList();
 
             EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))

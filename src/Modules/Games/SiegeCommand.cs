@@ -353,40 +353,40 @@ namespace MarbleBot.Modules.Games
                         currentSiege.LastMorale = DateTime.UtcNow;
                         break;
                     case PowerUp.Summon:
+                    {
+                        int choice = _randomService.Rand.Next(0, 2);
+                        string allyName;
+                        string url;
+                        switch (choice)
                         {
-                            int choice = _randomService.Rand.Next(0, 2);
-                            string allyName;
-                            string url;
-                            switch (choice)
-                            {
-                                case 0:
-                                    allyName = "Frigidium";
-                                    url = "https://cdn.discordapp.com/attachments/296376584238137355/543745898690379816/Frigidium.png";
-                                    break;
-                                case 1:
-                                    allyName = "Neptune";
-                                    url = "https://cdn.discordapp.com/attachments/296376584238137355/543745899591893012/Neptune.png";
-                                    break;
-                                default:
-                                    allyName = "MarbleBot";
-                                    url = "";
-                                    break;
-                            }
-
-
-                            int baseDamage = _randomService.Rand.Next(25, 30);
-
-                            int damage = (int)MathF.Round(baseDamage * currentSiege.Boss!.Stage *
-                                                          ((int)currentSiege.Boss.Difficulty / 2) *
-                                                          currentSiege.DamageMultiplier);
-
-                            await currentSiege.DealDamageToBoss(damage);
-
-                            builder.WithThumbnailUrl(url)
-                                .AddField("Boss Health", $"**{currentSiege.Boss.Health}**/{currentSiege.Boss.MaxHealth}")
-                                .WithDescription($"**{currentMarble.Name}** activated **Summon**! **{allyName}** came into the arena and dealt **{damage}** damage to the boss!");
-                            break;
+                            case 0:
+                                allyName = "Frigidium";
+                                url = "https://cdn.discordapp.com/attachments/296376584238137355/543745898690379816/Frigidium.png";
+                                break;
+                            case 1:
+                                allyName = "Neptune";
+                                url = "https://cdn.discordapp.com/attachments/296376584238137355/543745899591893012/Neptune.png";
+                                break;
+                            default:
+                                allyName = "MarbleBot";
+                                url = "";
+                                break;
                         }
+
+
+                        int baseDamage = _randomService.Rand.Next(25, 30);
+
+                        int damage = (int)MathF.Round(baseDamage * currentSiege.Boss!.Stage *
+                                                      ((int)currentSiege.Boss.Difficulty / 2) *
+                                                      currentSiege.DamageMultiplier);
+
+                        await currentSiege.DealDamageToBoss(damage);
+
+                        builder.WithThumbnailUrl(url)
+                            .AddField("Boss Health", $"**{currentSiege.Boss.Health}**/{currentSiege.Boss.MaxHealth}")
+                            .WithDescription($"**{currentMarble.Name}** activated **Summon**! **{allyName}** came into the arena and dealt **{damage}** damage to the boss!");
+                        break;
+                    }
                 }
 
                 currentSiege.PowerUp = PowerUp.None;
@@ -582,8 +582,8 @@ namespace MarbleBot.Modules.Games
             }
 
             winList = (from winner in winList
-                       orderby winner.wins descending
-                       select winner)
+                    orderby winner.wins descending
+                    select winner)
                 .ToList();
 
             var builder = new EmbedBuilder()
