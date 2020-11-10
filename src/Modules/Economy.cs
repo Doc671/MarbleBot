@@ -28,12 +28,22 @@ namespace MarbleBot.Modules
         public async Task BalanceCommand([Remainder] MarbleBotUser? user = null)
         {
             user ??= MarbleBotUser.Find(Context);
-            await ReplyAsync(embed: new EmbedBuilder()
-                .WithAuthor(Context.Client.GetUser(user.Id))
-                .WithColor(GetColor(Context))
-                .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
-                .AddField("Net Worth", $"{UnitOfMoney}{user.NetWorth:n2}", true)
-                .Build());
+            var builder = new EmbedBuilder()
+                            .WithColor(GetColor(Context))
+                            .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
+                            .AddField("Net Worth", $"{UnitOfMoney}{user.NetWorth:n2}", true);
+
+            var author = Context.Client.GetUser(user.Id);
+            if (author == null)
+            {
+                builder.WithTitle($"{user.Name}#{user.Discriminator}");
+            }
+            else
+            {
+                builder.WithAuthor(author);
+            }
+
+            await base.ReplyAsync(embed: builder.Build());
         }
 
         [Command("buy")]
