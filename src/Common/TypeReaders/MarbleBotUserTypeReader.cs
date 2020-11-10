@@ -15,18 +15,31 @@ namespace MarbleBot.Common.TypeReaders
             }
 
             var usersDict = MarbleBotUser.GetUsers();
-            foreach ((ulong userId, MarbleBotUser user) in usersDict)
+            MarbleBotUser? closestUser = null;
+            // If the input and the username are equal, return straght away
+            // Otherwise, find the closest match
+            foreach ((_, MarbleBotUser user) in usersDict)
             {
-                if (string.Compare(input, user.Name, StringComparison.OrdinalIgnoreCase) == 0
-                    || input.Contains(user.Name, StringComparison.OrdinalIgnoreCase)
+                if (string.Compare(input, user.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    return Task.FromResult(TypeReaderResult.FromSuccess(user));
+                }
+                else if (input.Contains(user.Name, StringComparison.OrdinalIgnoreCase)
                     || user.Name.Contains(input, StringComparison.OrdinalIgnoreCase))
                 {
-                    return Task.FromResult(TypeReaderResult.FromSuccess(MarbleBotUser.FindAsync(context, usersDict, userId).Result));
+                    closestUser = user;
                 }
             }
 
-            return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
-                "Input could not be parsed as a user."));
+            if (closestUser == null)
+            {
+                return Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                    "Input could not be parsed as a user."));
+            }
+            else
+            {
+                return Task.FromResult(TypeReaderResult.FromSuccess(closestUser));
+            }
         }
     }
 }
