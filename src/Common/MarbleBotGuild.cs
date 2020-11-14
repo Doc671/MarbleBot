@@ -57,19 +57,5 @@ namespace MarbleBot.Common
             using var guildJsonWriter = new Utf8JsonWriter(guildWriter.BaseStream, new JsonWriterOptions { Indented = true });
             JsonSerializer.Serialize(guildJsonWriter, guildsDict);
         }
-
-        public static void UpdateGuilds(IDictionary<ulong, MarbleBotGuild> guildsDict, IGuild socketGuild,
-            MarbleBotGuild mbGuild)
-        {
-            if (guildsDict.ContainsKey(socketGuild.Id))
-            {
-                guildsDict.Remove(socketGuild.Id);
-            }
-
-            guildsDict.Add(socketGuild.Id, mbGuild);
-            using var guildWriter = new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json");
-            using var guildJsonWriter = new Utf8JsonWriter(guildWriter.BaseStream, new JsonWriterOptions { Indented = true });
-            JsonSerializer.Serialize(guildJsonWriter, guildsDict);
-        }
     }
 }
