@@ -53,8 +53,9 @@ namespace MarbleBot.Common
             }
 
             guildsDict.Add(guild.Id, guild);
-            using var guildWriter = new Utf8JsonWriter(File.OpenWrite($"Data{Path.DirectorySeparatorChar}Guilds.json"), new JsonWriterOptions { Indented = true });
-            JsonSerializer.Serialize(guildWriter, guildsDict);
+            using var guildWriter = new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json");
+            using var guildJsonWriter = new Utf8JsonWriter(guildWriter.BaseStream, new JsonWriterOptions { Indented = true });
+            JsonSerializer.Serialize(guildJsonWriter, guildsDict);
         }
 
         public static void UpdateGuilds(IDictionary<ulong, MarbleBotGuild> guildsDict, IGuild socketGuild,
@@ -66,8 +67,9 @@ namespace MarbleBot.Common
             }
 
             guildsDict.Add(socketGuild.Id, mbGuild);
-            using var guildWriter = new Utf8JsonWriter(File.OpenWrite($"Data{Path.DirectorySeparatorChar}Guilds.json"), new JsonWriterOptions { Indented = true });
-            JsonSerializer.Serialize(guildWriter, guildsDict);
+            using var guildWriter = new StreamWriter($"Data{Path.DirectorySeparatorChar}Guilds.json");
+            using var guildJsonWriter = new Utf8JsonWriter(guildWriter.BaseStream, new JsonWriterOptions { Indented = true });
+            JsonSerializer.Serialize(guildJsonWriter, guildsDict);
         }
     }
 }

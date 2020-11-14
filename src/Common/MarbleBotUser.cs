@@ -211,7 +211,8 @@ namespace MarbleBot.Common
 
         public static IDictionary<ulong, MarbleBotUser> GetUsers()
         {
-            string json; using (var itemFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json"))
+            string json; 
+            using (var itemFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json"))
             {
                 json = itemFile.ReadToEnd();
             }
@@ -246,8 +247,9 @@ namespace MarbleBot.Common
 
         public static void UpdateUsers(IDictionary<ulong, MarbleBotUser> usersDict)
         {
-            using var userWriter = new Utf8JsonWriter(File.OpenWrite($"Data{Path.DirectorySeparatorChar}Users.json"), new JsonWriterOptions { Indented = true });
-            JsonSerializer.Serialize(userWriter, usersDict);
+            using var userWriter = new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json");
+            using var userJsonWriter = new Utf8JsonWriter(userWriter.BaseStream, new JsonWriterOptions { Indented = true });
+            JsonSerializer.Serialize(userJsonWriter, usersDict);
         }
 
         public override string ToString()
