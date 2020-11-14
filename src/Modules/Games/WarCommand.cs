@@ -182,7 +182,7 @@ namespace MarbleBot.Modules.Games
             }
 
             var user = MarbleBotUser.Find(Context);
-            var ammo = new Ammo();
+            Ammo? ammo = null;
             if (currentMarble.Weapon.Ammo != null && currentMarble.Weapon.Ammo.Length != 0)
             {
                 ammo = user.GetAmmo(currentMarble.Weapon);
@@ -234,7 +234,7 @@ namespace MarbleBot.Modules.Games
                 await Context.Message.DeleteAsync();
             }
 
-            int baseDamage = currentMarble.Weapon.Damage + (currentMarble.Weapon.WeaponClass == WeaponClass.Ranged ? ammo.Damage : 0);
+            int baseDamage = currentMarble.Weapon.Damage + (currentMarble.Weapon.WeaponClass == WeaponClass.Ranged ? ammo!.Damage : 0);
             await war.Attack(currentMarble, enemyMarble, true, baseDamage);
         }
 
@@ -351,8 +351,8 @@ namespace MarbleBot.Modules.Games
             }
 
             winList = (from winner in winList
-                orderby winner.value descending
-                select winner).ToList();
+                       orderby winner.value descending
+                       select winner).ToList();
 
             EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
@@ -366,24 +366,15 @@ namespace MarbleBot.Modules.Games
         public async Task WarPingCommand(string option = "")
         {
             var user = MarbleBotUser.Find(Context);
-            switch (option)
+            user.WarPing = option switch
             {
-                case "enable":
-                case "true":
-                case "on":
-                    user.WarPing = true;
-                    break;
-                case "disable":
-                case "false":
-                case "off":
-                    user.WarPing = false;
-                    break;
-                default:
-                    user.WarPing = !user.WarPing;
-                    break;
-            }
+                "enable" or "true" or "on" => true,
+                "disable" or "false" or "off" => false,
+                _ => !user.WarPing
+            };
 
             MarbleBotUser.UpdateUser(user);
+
             if (user.WarPing)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you will now be pinged when a war that you are in starts.\n(type `mb/war ping` to turn off)");

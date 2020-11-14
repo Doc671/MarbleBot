@@ -1,5 +1,5 @@
 # MarbleBot
-MarbleBot is a Discord bot created by Doc671#1965 for several Algodoo marble race servers. It currently runs on .NET Core 3.1 and Discord.NET 2.2.
+MarbleBot is a Discord bot created by Doc671#1965 for several Algodoo marble race servers. It currently runs on .NET 5.0 and Discord.NET 2.2.
 
 Check the wiki for command information: [https://github.com/Doc671/MarbleBot/wiki](https://github.com/Doc671/MarbleBot/wiki)
 

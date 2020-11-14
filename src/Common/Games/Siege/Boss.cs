@@ -1,9 +1,9 @@
 using MarbleBot.Extensions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Text.Json;
 
 namespace MarbleBot.Common.Games.Siege
 {
@@ -57,12 +57,11 @@ namespace MarbleBot.Common.Games.Siege
         public static IDictionary<string, Boss> GetBosses()
         {
             string json;
-            using (var bosses = new StreamReader($"Resources{Path.DirectorySeparatorChar}Bosses.json"))
+            using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}Bosses.json"))
             {
-                json = bosses.ReadToEnd();
+                json = itemFile.ReadToEnd();
             }
-
-            return JsonConvert.DeserializeObject<IDictionary<string, Boss>>(json);
+            return JsonSerializer.Deserialize<IDictionary<string, Boss>>(json)!;
         }
     }
 }

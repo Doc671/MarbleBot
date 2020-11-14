@@ -14,11 +14,11 @@ namespace MarbleBot.Common.Games.Scavenge
 {
     public class Scavenge
     {
-        public Queue<Item> Items { get; } = new Queue<Item>();
+        public Queue<Item> Items { get; } = new();
         public ScavengeLocation Location { get; }
-        public Queue<Item> Ores { get; } = new Queue<Item>();
-        public Queue<Item> UsedItems { get; } = new Queue<Item>();
-        public Queue<Item> UsedOres { get; } = new Queue<Item>();
+        public Queue<Item> Ores { get; } = new();
+        public Queue<Item> UsedItems { get; } = new();
+        public Queue<Item> UsedOres { get; } = new();
 
         private readonly List<Item> _collectableItems;
         private readonly SocketCommandContext _context;
@@ -27,7 +27,7 @@ namespace MarbleBot.Common.Games.Scavenge
         private readonly IUserMessage _originalMessage;
         private readonly RandomService _randomService;
         private readonly DateTime _startTime;
-        private readonly Timer _timer = new Timer(4000);
+        private readonly Timer _timer = new(4000);
         private bool _finished;
         private bool _itemHasAppeared;
         private bool _oreHasAppeared;
@@ -93,8 +93,10 @@ namespace MarbleBot.Common.Games.Scavenge
             {
                 if (item.ScavengeLocation == Location)
                 {
-                    var outputItem = item;
-                    outputItem = new Item(outputItem, itemId);
+                    var outputItem = item with
+                    {
+                        Id = itemId
+                    };
                     _collectableItems.Add(outputItem);
                 }
             }

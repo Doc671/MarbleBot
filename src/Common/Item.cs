@@ -1,58 +1,20 @@
-﻿using MarbleBot.Common.Games.Scavenge;
+﻿using MarbleBot.Common.Games;
+using MarbleBot.Common.Games.Scavenge;
 using MarbleBot.Extensions;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MarbleBot.Common
 {
     [JsonConverter(typeof(ItemConverter))]
-    public class Item
+    public record Item(int Id, string Name, decimal Price, string Description, bool OnSale, int Stage,
+    ScavengeLocation ScavengeLocation, int CraftingProduced, Dictionary<int, int>? CraftingRecipe, int CraftingStationRequired)
     {
-        [JsonConstructor]
-        public Item(int? id = -1, string? name = "", decimal? price = 0m, string? description = "",
-            bool? onSale = false,
-            int? stage = 1, ScavengeLocation? scavengeLocation = ScavengeLocation.None, int? craftingProduced = 0,
-            Dictionary<int, int>? craftingRecipe = null, int? craftingStationRequired = 0)
-        {
-            Id = id ?? -1;
-            Name = name ?? "";
-            Price = price ?? 0m;
-            Description = description ?? "";
-            OnSale = onSale ?? false;
-            Stage = stage ?? 1;
-            ScavengeLocation = scavengeLocation ?? ScavengeLocation.None;
-            CraftingProduced = craftingProduced ?? 0;
-            CraftingRecipe = craftingRecipe;
-            CraftingStationRequired = craftingStationRequired ?? 0;
-        }
-
-        public Item(Item baseItem, int id = 0, bool onSale = false)
-        {
-            Id = id == 0 ? baseItem.Id : id;
-            Name = baseItem.Name;
-            Price = baseItem.Price;
-            Description = baseItem.Description;
-            OnSale = onSale == baseItem.OnSale ? onSale : baseItem.OnSale;
-            Stage = baseItem.Stage;
-            ScavengeLocation = baseItem.ScavengeLocation;
-            CraftingProduced = baseItem.CraftingProduced;
-            CraftingRecipe = baseItem.CraftingRecipe;
-            CraftingStationRequired = baseItem.CraftingStationRequired;
-        }
-
-        public int Id { get; }
-        public string Name { get; }
-        public decimal Price { get; }
-        public string Description { get; }
-        public bool OnSale { get; }
-        public int Stage { get; }
-        public ScavengeLocation ScavengeLocation { get; }
-        public int CraftingProduced { get; }
-        public Dictionary<int, int>? CraftingRecipe { get; }
-        public int CraftingStationRequired { get; }
-
         public static T Find<T>(int itemId) where T : Item
         {
             var itemsDict = GetItems();
@@ -100,13 +62,57 @@ namespace MarbleBot.Common
             {
                 json = itemFile.ReadToEnd();
             }
-
-            return JsonConvert.DeserializeObject<IDictionary<int, Item>>(json);
+            return JsonSerializer.Deserialize<IDictionary<string, Item>>(json)!
+                    .ToDictionary(pair => int.Parse(pair.Key), pair => pair.Value);
         }
 
         public override string ToString()
         {
             return $"`[{Id:000}]` **{Name}**";
+        }
+    }
+
+    public record Ammo(int Id, string Name, decimal Price, string Description, bool OnSale, int Stage,
+        ScavengeLocation ScavengeLocation, int CraftingProduced, Dictionary<int, int>? CraftingRecipe, int CraftingStationRequired,
+        int Damage) : Item(Id, Name, Price, Description, OnSale, Stage, ScavengeLocation, CraftingProduced, CraftingRecipe,
+        CraftingStationRequired)
+    {
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+    }
+
+    public record Weapon(int Id, string Name, decimal Price, string Description, bool OnSale, int Stage,
+        ScavengeLocation ScavengeLocation, int CraftingProduced, Dictionary<int, int>? CraftingRecipe, int CraftingStationRequired,
+        int Accuracy, ImmutableArray<int> Ammo, int Damage, int Hits, WeaponClass WeaponClass) : Item(Id, Name, Price, Description,
+        OnSale, Stage, ScavengeLocation, CraftingProduced, CraftingRecipe, CraftingStationRequired)
+    {
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+    }
+
+    public record Shield(int Id, string Name, decimal Price, string Description, bool OnSale, int Stage,
+        ScavengeLocation ScavengeLocation, int CraftingProduced, Dictionary<int, int>? CraftingRecipe, int CraftingStationRequired,
+        float IncomingDamageMultiplier) : Item(Id, Name, Price, Description, OnSale, Stage, ScavengeLocation, CraftingProduced, CraftingRecipe,
+        CraftingStationRequired)
+    {
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+    }
+
+    public record Spikes(int Id, string Name, decimal Price, string Description, bool OnSale, int Stage,
+        ScavengeLocation ScavengeLocation, int CraftingProduced, Dictionary<int, int>? CraftingRecipe, int CraftingStationRequired,
+        float OutgoingDamageMultiplier) : Item(Id, Name, Price, Description, OnSale, Stage, ScavengeLocation, CraftingProduced, CraftingRecipe,
+        CraftingStationRequired)
+    {
+        public override string ToString()
+        {
+            return base.ToString();
         }
     }
 }

@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SearchResult = Google.Apis.YouTube.v3.Data.SearchResult;
 
 namespace MarbleBot.Modules
 {
@@ -27,7 +28,7 @@ namespace MarbleBot.Modules
         [Summary("Returns information about a channel.")]
         public async Task ChannelInfoCommand([Remainder] string searchTerm)
         {
-            Channel channelListResult;
+            Channel? channelListResult;
 
             using (var youtubeService = new YouTubeService(new BaseClientService.Initializer
             {
@@ -39,7 +40,7 @@ namespace MarbleBot.Modules
                 SearchResource.ListRequest searchListRequest = youtubeService.Search.List("snippet");
                 searchListRequest.Q = searchTerm;
                 searchListRequest.MaxResults = 1;
-                var searchListResult = (await searchListRequest.ExecuteAsync()).Items.FirstOrDefault();
+                SearchResult? searchListResult = (await searchListRequest.ExecuteAsync()).Items.FirstOrDefault();
 
                 if (searchListResult == null)
                 {

@@ -2,7 +2,6 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using MarbleBot.Common;
-using MarbleBot.Common.Games;
 using MarbleBot.Common.Games.War;
 using MarbleBot.Common.TypeReaders;
 using MarbleBot.Modules.Games.Services;
@@ -69,7 +68,7 @@ namespace MarbleBot.Services
 
         private async Task HandleCommandAsync(SocketMessage msg)
         {
-            if (msg.Author.IsBot || !(msg is SocketUserMessage userMsg))
+            if (msg.Author.IsBot || msg is not SocketUserMessage userMsg)
             {
                 return;
             }

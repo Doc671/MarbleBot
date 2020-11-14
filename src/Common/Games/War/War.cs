@@ -34,14 +34,14 @@ namespace MarbleBot.Common.Games.War
 
         private readonly SocketCommandContext _context;
         private readonly EmbedBuilder _embedBuilder;
-        private readonly List<Emoji> _emojisToReactWith = new List<Emoji>();
+        private readonly List<IEmote> _emojisToReactWith = new();
         private readonly GamesService _gamesService;
         private readonly Grid _grid;
         private readonly ulong _id;
-        private readonly Emoji _negativeSquaredCrossMarkEmoji = new Emoji("\u274E");
+        private readonly Emoji _negativeSquaredCrossMarkEmoji = new("\u274E");
         private readonly RandomService _randomService;
-        private readonly Emoji _star2Emoji = new Emoji("\uD83C\uDF1F");
-        private readonly Timer _timeoutTimer = new Timer(20000);
+        private readonly Emoji _star2Emoji = new("\uD83C\uDF1F");
+        private readonly Timer _timeoutTimer = new(20000);
 
         private bool _endCalled;
         private bool _finished;
@@ -265,58 +265,58 @@ namespace MarbleBot.Common.Games.War
                 switch (currentMarble.Team.Boost)
                 {
                     case WarBoost.HealKit:
-                    {
-                        IEnumerable<WarMarble> teammatesToHeal = currentMarble.Team.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
-                        foreach (WarMarble teammate in teammatesToHeal)
                         {
-                            if (teammate.Health > 0)
+                            IEnumerable<WarMarble> teammatesToHeal = currentMarble.Team.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
+                            foreach (WarMarble teammate in teammatesToHeal)
                             {
-                                teammate.Health += 8;
-                                output.AppendLine($"**{teammate.Name}** recovered **8** health! (**{teammate.Health}**/{teammate.MaxHealth})");
+                                if (teammate.Health > 0)
+                                {
+                                    teammate.Health += 8;
+                                    output.AppendLine($"**{teammate.Name}** recovered **8** health! (**{teammate.Health}**/{teammate.MaxHealth})");
+                                }
                             }
-                        }
 
-                        break;
-                    }
+                            break;
+                        }
                     case WarBoost.MissileStrike:
-                    {
-                        foreach (WarMarble enemy in enemyTeam.Marbles)
                         {
-                            if (enemy.Health > 0)
+                            foreach (WarMarble enemy in enemyTeam.Marbles)
                             {
-                                enemy.Health -= 5;
+                                if (enemy.Health > 0)
+                                {
+                                    enemy.Health -= 5;
+                                }
                             }
-                        }
 
-                        output.Append($"All of **Team {enemyTeam.Name}** took **5** damage!");
-                        break;
-                    }
+                            output.Append($"All of **Team {enemyTeam.Name}** took **5** damage!");
+                            break;
+                        }
                     case WarBoost.Rage:
-                    {
-                        foreach (WarMarble teammate in currentMarble.Team.Marbles)
                         {
-                            teammate.DamageMultiplier *= 2;
-                            teammate.LastRage = DateTime.UtcNow;
-                            teammate.Rage = true;
-                        }
-
-                        output.Append($"**Team {currentMarble.Team.Name}** can deal x2 damage for the next 10 seconds!");
-                        break;
-                    }
-                    case WarBoost.SpikeTrap:
-                    {
-                        IEnumerable<WarMarble> enemiesToDamage = enemyTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
-                        foreach (WarMarble enemy in enemiesToDamage)
-                        {
-                            if (enemy.Health > 0)
+                            foreach (WarMarble teammate in currentMarble.Team.Marbles)
                             {
-                                enemy.Health -= 8;
-                                output.AppendLine($"**{enemy.Name}** took **8** damage! Remaining health: **{enemy.Health}**/{enemy.MaxHealth}");
+                                teammate.DamageMultiplier *= 2;
+                                teammate.LastRage = DateTime.UtcNow;
+                                teammate.Rage = true;
                             }
-                        }
 
-                        break;
-                    }
+                            output.Append($"**Team {currentMarble.Team.Name}** can deal x2 damage for the next 10 seconds!");
+                            break;
+                        }
+                    case WarBoost.SpikeTrap:
+                        {
+                            IEnumerable<WarMarble> enemiesToDamage = enemyTeam.Marbles.OrderBy(m => Guid.NewGuid()).Take(boostsRequired);
+                            foreach (WarMarble enemy in enemiesToDamage)
+                            {
+                                if (enemy.Health > 0)
+                                {
+                                    enemy.Health -= 8;
+                                    output.AppendLine($"**{enemy.Name}** took **8** damage! Remaining health: **{enemy.Health}**/{enemy.MaxHealth}");
+                                }
+                            }
+
+                            break;
+                        }
                 }
 
                 _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\nBoost successful! **{currentMarble.Name}** used **{currentMarble.Team.Boost.ToString().CamelToTitleCase()}**!\n{output}";
@@ -344,13 +344,13 @@ namespace MarbleBot.Common.Games.War
 
         private bool CanBoost()
         {
-            WarMarble? currentMarble = GetCurrentMarble();
+            WarMarble currentMarble = GetCurrentMarble();
             return !(currentMarble.Boosted || currentMarble.Team!.BoostUsed);
         }
 
         private async Task EndMarbleTurn()
         {
-            _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_allMarbles[_turnIndex].Name}**'s turn ended.\n";
+            _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_allMarbles[_turnIndex].Name}**'{GetPlural(_allMarbles[_turnIndex].Name)} turn ended.\n";
             await _originalMessage!.RemoveAllReactionsAsync();
             await UpdateDisplay(false, false, true, false);
             await MoveToNextTurn();
@@ -403,7 +403,7 @@ namespace MarbleBot.Common.Games.War
 
         private string GetOptionsMessage()
         {
-            WarMarble? currentMarble = GetCurrentMarble();
+            WarMarble currentMarble = GetCurrentMarble();
             var output = new StringBuilder();
             _emojisToReactWith.Clear();
             if (!_userMoved)
@@ -485,7 +485,12 @@ namespace MarbleBot.Common.Games.War
         private string GetTurnTitle()
         {
             WarMarble currentMarble = GetCurrentMarble();
-            return $"**{currentMarble.Name}**'s turn";
+            return $"**{currentMarble.Name}**'{GetPlural(currentMarble.Name)} turn";
+        }
+
+        private static string GetPlural(string word)
+        {
+            return word[^1] == 's' ? "" : "s";
         }
 
         public bool IsMarbleTurn(ulong marbleId)
@@ -718,7 +723,7 @@ namespace MarbleBot.Common.Games.War
 
             if (!reachableEnemies.Any())
             {
-                _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_aiMarble!.Name}**'s turn ended.\n";
+                _embedBuilder.Fields[(int)FieldIndex.Log].Value += $"\n**{_aiMarble!.Name}**'{GetPlural(_aiMarble.Name)} turn ended.\n";
                 await MoveToNextTurn();
                 await UpdateDisplay(false, false, false, false);
                 return;

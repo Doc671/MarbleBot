@@ -25,7 +25,7 @@ namespace MarbleBot.Common.TypeReaders
                     return Task.FromResult(TypeReaderResult.FromSuccess(user));
                 }
                 else if (input.Contains(user.Name, StringComparison.OrdinalIgnoreCase)
-                    || user.Name.Contains(input, StringComparison.OrdinalIgnoreCase))
+                         || user.Name.Contains(input, StringComparison.OrdinalIgnoreCase))
                 {
                     closestUser = user;
                 }

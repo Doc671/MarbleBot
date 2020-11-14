@@ -5,13 +5,13 @@ using MarbleBot.Common;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules
@@ -94,7 +94,7 @@ namespace MarbleBot.Modules
             var builder = new EmbedBuilder()
                 .WithColor(GetColor(Context));
 
-            ModuleInfo module = _commandService.Modules.FirstOrDefault(m =>
+            ModuleInfo? module = _commandService.Modules.FirstOrDefault(m =>
                 string.Equals(m.Name, commandToFind, StringComparison.CurrentCultureIgnoreCase));
             if (module != null)
             {
@@ -161,7 +161,7 @@ namespace MarbleBot.Modules
             else
             {
                 // If a module could not be found, try searching for a command
-                CommandInfo command = _commandService.Commands.FirstOrDefault(commandInfo =>
+                CommandInfo? command = _commandService.Commands.FirstOrDefault(commandInfo =>
                     commandInfo.Name.ToLower() == commandToFind || commandInfo.Aliases.Any(alias => alias == commandToFind)
                     && !commandInfo.Preconditions.Any(precondition => precondition is RequireOwnerAttribute));
 
@@ -188,13 +188,9 @@ namespace MarbleBot.Modules
                 string usage = $"mb/{command.Aliases[0]}{command.Parameters.Aggregate(new StringBuilder(), (stringBuilder, param) => { stringBuilder.Append($" <{param.Name}>"); return stringBuilder; })}";
 
                 // Gets extra command info (e.g. an example of the command's usage) if present
-                string json;
-                using (var itemFile = new StreamReader($"Resources{Path.DirectorySeparatorChar}ExtraCommandInfo.json"))
-                {
-                    json = await itemFile.ReadToEndAsync();
-                }
+                string json = await File.ReadAllTextAsync($"Resources{Path.DirectorySeparatorChar}ExtraCommandInfo.json");
 
-                var commandDict = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
+                var commandDict = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(json);
                 if (commandDict!.ContainsKey(command.Name) ||
                     command.Aliases.Any(alias => commandDict.ContainsKey(alias)))
                 {
@@ -290,7 +286,6 @@ namespace MarbleBot.Modules
 
             builder.WithThumbnailUrl(Context.Guild.IconUrl)
                 .WithTitle(Context.Guild.Name)
-                .AddField("Owner", $"{Context.Guild.Owner.Username}#{Context.Guild.Owner.Discriminator}", true)
                 .AddField("Voice Region", Context.Guild.VoiceRegionId, true)
                 .AddField("Text Channels", Context.Guild.TextChannels.Count, true)
                 .AddField("Voice Channels", Context.Guild.VoiceChannels.Count, true)
@@ -302,6 +297,11 @@ namespace MarbleBot.Modules
                 .AddField("Prefix", mbServer.Prefix, true)
                 .WithColor(GetColor(Context))
                 .WithFooter(Context.Guild.Id.ToString());
+
+            if (Context.Guild.Owner != null)
+            {
+                builder.AddField("Owner", $"{Context.Guild.Owner.Username}#{Context.Guild.Owner.Discriminator}", true);
+            }
 
             if (mbServer.AnnouncementChannel != 0)
             {
@@ -353,8 +353,8 @@ namespace MarbleBot.Modules
             }
 
             username = username.ToLower();
-            SocketGuildUser user = Context.Guild.Users.FirstOrDefault(u => u.Username.ToLower().Contains(username)
-                                                                           || username.Contains(u.Username.ToLower()));
+            SocketGuildUser? user = Context.Guild.Users.FirstOrDefault(u => u.Username.ToLower().Contains(username)
+                                                                            || username.Contains(u.Username.ToLower()));
             if (user == null)
             {
                 await ReplyAsync("Could not find the requested user!");

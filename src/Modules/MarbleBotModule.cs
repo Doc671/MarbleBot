@@ -18,6 +18,19 @@ namespace MarbleBot.Modules
 
         protected Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
+        protected static void AddAuthor(SocketCommandContext context, MarbleBotUser user, EmbedBuilder builder)
+        {
+            var author = context.Client.GetUser(user.Id);
+            if (author == null)
+            {
+                builder.WithTitle($"{user.Name}#{user.Discriminator}");
+            }
+            else
+            {
+                builder.WithAuthor(author);
+            }
+        }
+
         protected internal static Color GetColor(SocketCommandContext context)
         {
             return context.IsPrivate

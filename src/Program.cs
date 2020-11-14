@@ -9,7 +9,6 @@ using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NLog;
 using NLog.Config;
 using NLog.Extensions.Logging;
@@ -17,6 +16,7 @@ using NLog.Targets;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -28,7 +28,7 @@ namespace MarbleBot
         private readonly BotCredentials _botCredentials;
         private readonly DiscordSocketClient _discordSocketClient;
         private readonly Logger _logger;
-        private readonly StartTimeService _startTimeService = new StartTimeService(DateTime.UtcNow);
+        private readonly StartTimeService _startTimeService = new(DateTime.UtcNow);
 
         private Program()
         {
@@ -73,13 +73,12 @@ namespace MarbleBot
 
         private static BotCredentials GetBotCredentials()
         {
-            string json;
-            using (var botCredentialFile = new StreamReader("BotCredentials.json"))
+            string json; 
+            using (var itemFile = new StreamReader("BotCredentials.json"))
             {
-                json = botCredentialFile.ReadToEnd();
+                json = itemFile.ReadToEnd();
             }
-
-            var returnValue = JsonConvert.DeserializeObject<BotCredentials>(json);
+            var returnValue = JsonSerializer.Deserialize<BotCredentials>(json)!;
             using (FileStream? stream = File.Open($"Keys{Path.DirectorySeparatorChar}client_id.json", FileMode.Open,
                 FileAccess.Read))
             {

@@ -5,13 +5,13 @@ using MarbleBot.Common.Games;
 using MarbleBot.Extensions;
 using MarbleBot.Modules.Games.Services;
 using MarbleBot.Services;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Modules.Games
@@ -100,13 +100,8 @@ namespace MarbleBot.Modules.Games
                 // A special message may be displayed depending on the name of last place
                 if (alive == marbleCount)
                 {
-                    string json;
-                    using (var messageList = new StreamReader($"Resources{Path.DirectorySeparatorChar}RaceSpecialMessages.json"))
-                    {
-                        json = await messageList.ReadToEndAsync();
-                    }
-
-                    var messageDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                    string json = await File.ReadAllTextAsync($"Resources{Path.DirectorySeparatorChar}RaceSpecialMessages.json");
+                    var messageDict = JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
                     var marbleName = marbles[eliminatedIndex].name.ToLower().RemoveChar(' ');
                     if (messageDict.ContainsKey(marbleName))
                     {
@@ -217,8 +212,8 @@ namespace MarbleBot.Modules.Games
                 }
 
                 winList = (from winner in winList
-                    orderby winner.value descending
-                    select winner).ToList();
+                           orderby winner.value descending
+                           select winner).ToList();
 
                 builder.WithTitle("Race Leaderboard: Winners");
 
@@ -250,8 +245,8 @@ namespace MarbleBot.Modules.Games
                 }
 
                 winList = (from winner in winList
-                    orderby winner.value descending
-                    select winner).ToList();
+                           orderby winner.value descending
+                           select winner).ToList();
 
                 builder.WithTitle("Race Leaderboard: Most Used");
 

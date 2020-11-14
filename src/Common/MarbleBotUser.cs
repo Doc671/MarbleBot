@@ -1,11 +1,11 @@
 using Discord;
 using Discord.Commands;
-using MarbleBot.Common.Games;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MarbleBot.Common
@@ -60,7 +60,7 @@ namespace MarbleBot.Common
         public DateTime LastSiegeWin { get; set; } = DateTime.MinValue;
         public DateTime LastWarWin { get; set; } = DateTime.MinValue;
         public string WarEmoji { get; set; } = "\uD83D\uDD35";
-        public SortedDictionary<int, int> Items { get; } = new SortedDictionary<int, int>();
+        public SortedDictionary<int, int> Items { get; } = new();
 
         public Ammo? GetAmmo(Weapon weapon)
         {
@@ -211,13 +211,12 @@ namespace MarbleBot.Common
 
         public static IDictionary<ulong, MarbleBotUser> GetUsers()
         {
-            string json;
-            using (var usersDict = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json"))
+            string json; using (var itemFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json"))
             {
-                json = usersDict.ReadToEnd();
+                json = itemFile.ReadToEnd();
             }
-
-            return JsonConvert.DeserializeObject<IDictionary<ulong, MarbleBotUser>>(json);
+            return JsonSerializer.Deserialize<IDictionary<string, MarbleBotUser>>(json)!
+                    .ToDictionary(pair => ulong.Parse(pair.Key), pair => pair.Value);
         }
 
         public static void UpdateUser(MarbleBotUser user)
@@ -230,9 +229,7 @@ namespace MarbleBot.Common
             }
 
             usersDict.Add(user.Id, user);
-            using var userWriter = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
-            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
-            serialiser.Serialize(userWriter, usersDict);
+            UpdateUsers(usersDict);
         }
 
         public static void UpdateUser(IDictionary<ulong, MarbleBotUser> usersDict, IUser socketUser,
@@ -244,16 +241,13 @@ namespace MarbleBot.Common
             }
 
             usersDict.Add(socketUser.Id, newMarbleBotUser);
-            using var userWriter = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
-            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
-            serialiser.Serialize(userWriter, usersDict);
+            UpdateUsers(usersDict);
         }
 
         public static void UpdateUsers(IDictionary<ulong, MarbleBotUser> usersDict)
         {
-            using var userWriter = new JsonTextWriter(new StreamWriter($"Data{Path.DirectorySeparatorChar}Users.json"));
-            var serialiser = new JsonSerializer { Formatting = Formatting.Indented };
-            serialiser.Serialize(userWriter, usersDict);
+            using var userWriter = new Utf8JsonWriter(File.OpenWrite($"Data{Path.DirectorySeparatorChar}Users.json"), new JsonWriterOptions { Indented = true });
+            JsonSerializer.Serialize(userWriter, usersDict);
         }
 
         public override string ToString()

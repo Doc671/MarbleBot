@@ -27,7 +27,7 @@ namespace MarbleBot.Common.Games.Siege
         private readonly GamesService _gamesService;
         private readonly ulong _id;
         private readonly RandomService _randomService;
-        private readonly Timer _timer = new Timer(15000);
+        private readonly Timer _timer = new(15000);
         private bool _finished;
         private DateTime _startTime;
         private bool _victoryCalled;
@@ -151,7 +151,7 @@ namespace MarbleBot.Common.Games.Siege
                 return;
             }
 
-            var marble = Marbles.Find(m => m.Id == _context.User.Id);
+            SiegeMarble? marble = Marbles.Find(m => m.Id == _context.User.Id);
             if (marble == null)
             {
                 await _context.Channel.SendMessageAsync($":warning: | **{_context.User.Username}**, you aren't in this Siege!");
@@ -504,7 +504,7 @@ namespace MarbleBot.Common.Games.Siege
                 return;
             }
 
-            var marble = Marbles.Find(m => m.Id == _context.User.Id);
+            SiegeMarble? marble = Marbles.Find(m => m.Id == _context.User.Id);
             if (marble == null)
             {
                 await _context.Channel.SendMessageAsync($"**{_context.User.Username}**, you aren't in this Siege!");
@@ -524,7 +524,7 @@ namespace MarbleBot.Common.Games.Siege
                 return;
             }
 
-            var ammo = new Ammo();
+            Ammo? ammo = null;
             var user = MarbleBotUser.Find(_context);
 
             if (weapon.Ammo.Length != 0)
@@ -555,7 +555,7 @@ namespace MarbleBot.Common.Games.Siege
                 {
                     totalDamage = (int)Math.Round((weapon.Damage +
                                                    (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
-                                                       ? ammo.Damage
+                                                       ? ammo!.Damage
                                                        : 0.0))
                                                   * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                     marble.LastMoveUsed = DateTime.UtcNow;
@@ -574,7 +574,7 @@ namespace MarbleBot.Common.Games.Siege
                     {
                         damage = (int)Math.Round((weapon.Damage +
                                                   (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
-                                                      ? ammo.Damage
+                                                      ? ammo!.Damage
                                                       : 0.0))
                                                  * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
                         totalDamage += damage;

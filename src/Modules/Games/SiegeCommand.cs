@@ -353,40 +353,40 @@ namespace MarbleBot.Modules.Games
                         currentSiege.LastMorale = DateTime.UtcNow;
                         break;
                     case PowerUp.Summon:
-                    {
-                        int choice = _randomService.Rand.Next(0, 2);
-                        string allyName;
-                        string url;
-                        switch (choice)
                         {
-                            case 0:
-                                allyName = "Frigidium";
-                                url = "https://cdn.discordapp.com/attachments/296376584238137355/543745898690379816/Frigidium.png";
-                                break;
-                            case 1:
-                                allyName = "Neptune";
-                                url = "https://cdn.discordapp.com/attachments/296376584238137355/543745899591893012/Neptune.png";
-                                break;
-                            default:
-                                allyName = "MarbleBot";
-                                url = "";
-                                break;
+                            int choice = _randomService.Rand.Next(0, 2);
+                            string allyName;
+                            string url;
+                            switch (choice)
+                            {
+                                case 0:
+                                    allyName = "Frigidium";
+                                    url = "https://cdn.discordapp.com/attachments/296376584238137355/543745898690379816/Frigidium.png";
+                                    break;
+                                case 1:
+                                    allyName = "Neptune";
+                                    url = "https://cdn.discordapp.com/attachments/296376584238137355/543745899591893012/Neptune.png";
+                                    break;
+                                default:
+                                    allyName = "MarbleBot";
+                                    url = "";
+                                    break;
+                            }
+
+
+                            int baseDamage = _randomService.Rand.Next(25, 30);
+
+                            int damage = (int)MathF.Round(baseDamage * currentSiege.Boss!.Stage *
+                                                          ((int)currentSiege.Boss.Difficulty / 2) *
+                                                          currentSiege.DamageMultiplier);
+
+                            await currentSiege.DealDamageToBoss(damage);
+
+                            builder.WithThumbnailUrl(url)
+                                .AddField("Boss Health", $"**{currentSiege.Boss.Health}**/{currentSiege.Boss.MaxHealth}")
+                                .WithDescription($"**{currentMarble.Name}** activated **Summon**! **{allyName}** came into the arena and dealt **{damage}** damage to the boss!");
+                            break;
                         }
-
-
-                        int baseDamage = _randomService.Rand.Next(25, 30);
-
-                        int damage = (int)MathF.Round(baseDamage * currentSiege.Boss!.Stage *
-                                                      ((int)currentSiege.Boss.Difficulty / 2) *
-                                                      currentSiege.DamageMultiplier);
-
-                        await currentSiege.DealDamageToBoss(damage);
-
-                        builder.WithThumbnailUrl(url)
-                            .AddField("Boss Health", $"**{currentSiege.Boss.Health}**/{currentSiege.Boss.MaxHealth}")
-                            .WithDescription($"**{currentMarble.Name}** activated **Summon**! **{allyName}** came into the arena and dealt **{damage}** damage to the boss!");
-                        break;
-                    }
                 }
 
                 currentSiege.PowerUp = PowerUp.None;
@@ -582,8 +582,8 @@ namespace MarbleBot.Modules.Games
             }
 
             winList = (from winner in winList
-                    orderby winner.wins descending
-                    select winner)
+                       orderby winner.wins descending
+                       select winner)
                 .ToList();
 
             var builder = new EmbedBuilder()
@@ -758,7 +758,7 @@ namespace MarbleBot.Modules.Games
                 {
                     string difficulty = boss.Stage > userStage
                         ? StageTooHighString()
-                        : $"Difficulty: **{boss.Difficulty} {(int)boss.Difficulty}**/10, Health: **{boss.MaxHealth}**, Attacks: **{boss.Attacks.Count()}**";
+                        : $"Difficulty: **{boss.Difficulty} {(int)boss.Difficulty}**/10, Health: **{boss.MaxHealth}**, Attacks: **{boss.Attacks.Length}**";
                     builder.AddField($"{boss.Name}", difficulty);
                 }
             }
@@ -823,24 +823,15 @@ namespace MarbleBot.Modules.Games
         public async Task SiegePingCommand(string option = "")
         {
             MarbleBotUser user = MarbleBotUser.Find(Context);
-            switch (option)
+            user.SiegePing = option switch
             {
-                case "enable":
-                case "true":
-                case "on":
-                    user.SiegePing = true;
-                    break;
-                case "disable":
-                case "false":
-                case "off":
-                    user.SiegePing = false;
-                    break;
-                default:
-                    user.SiegePing = !user.SiegePing;
-                    break;
-            }
+                "enable" or "true" or "on" => true,
+                "disable" or "false" or "off" => false,
+                _ => !user.SiegePing
+            };
 
             MarbleBotUser.UpdateUser(user);
+
             if (user.SiegePing)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you will now be pinged when a Siege that you are in starts.\n(type `mb/siege ping` to turn off)");

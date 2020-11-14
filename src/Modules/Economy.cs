@@ -1,7 +1,6 @@
 using Discord;
 using Discord.Commands;
 using MarbleBot.Common;
-using MarbleBot.Common.Games;
 using MarbleBot.Extensions;
 using MarbleBot.Services;
 using System;
@@ -28,22 +27,14 @@ namespace MarbleBot.Modules
         public async Task BalanceCommand([Remainder] MarbleBotUser? user = null)
         {
             user ??= MarbleBotUser.Find(Context);
-            var builder = new EmbedBuilder()
-                            .WithColor(GetColor(Context))
-                            .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
-                            .AddField("Net Worth", $"{UnitOfMoney}{user.NetWorth:n2}", true);
+            EmbedBuilder? builder = new EmbedBuilder()
+                .WithColor(GetColor(Context))
+                .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
+                .AddField("Net Worth", $"{UnitOfMoney}{user.NetWorth:n2}", true);
 
-            var author = Context.Client.GetUser(user.Id);
-            if (author == null)
-            {
-                builder.WithTitle($"{user.Name}#{user.Discriminator}");
-            }
-            else
-            {
-                builder.WithAuthor(author);
-            }
+            AddAuthor(Context, user, builder);
 
-            await base.ReplyAsync(embed: builder.Build());
+            await ReplyAsync(embed: builder.Build());
         }
 
         [Command("buy")]
@@ -384,7 +375,7 @@ namespace MarbleBot.Modules
             }
 
             var itemOutput = new StringBuilder();
-            var items = marbleBotUser.Items.Skip((page - 1) * 20).Take(20).ToArray();
+            KeyValuePair<int, int>[]? items = marbleBotUser.Items.Skip((page - 1) * 20).Take(20).ToArray();
             bool itemsPresent = items.Any();
             if (itemsPresent)
             {
@@ -428,7 +419,7 @@ namespace MarbleBot.Modules
             }
 
             string price = item.Price == -1 ? "N/A" : $"{UnitOfMoney}{item.Price:n2}";
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithDescription(item.Description)
                 .WithTitle(item.Name)
@@ -445,26 +436,26 @@ namespace MarbleBot.Modules
             switch (item)
             {
                 case Weapon weapon:
-                {
-                    builder.AddField("Weapon Info", new StringBuilder()
-                        .AppendLine($"Class: **{weapon.WeaponClass}**")
-                        .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
-                        .AppendLine($"Damage: **{weapon.Damage}**")
-                        .AppendLine($"Uses: **{weapon.Hits}**"), true);
-
-                    if (weapon.Ammo.Length != 0)
                     {
-                        var output = new StringBuilder();
-                        foreach (int ammoId in weapon.Ammo)
+                        builder.AddField("Weapon Info", new StringBuilder()
+                            .AppendLine($"Class: **{weapon.WeaponClass}**")
+                            .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
+                            .AppendLine($"Damage: **{weapon.Damage}**")
+                            .AppendLine($"Uses: **{weapon.Hits}**"), true);
+
+                        if (weapon.Ammo.Length != 0)
                         {
-                            output.AppendLine($"`[{ammoId:000}]` {Item.Find<Ammo>(ammoId.ToString("000")).Name}");
+                            var output = new StringBuilder();
+                            foreach (int ammoId in weapon.Ammo)
+                            {
+                                output.AppendLine($"`[{ammoId:000}]` {Item.Find<Ammo>(ammoId.ToString("000")).Name}");
+                            }
+
+                            builder.AddField("Ammo", output.ToString(), true);
                         }
 
-                        builder.AddField("Ammo", output.ToString(), true);
+                        break;
                     }
-
-                    break;
-                }
                 case Ammo ammo:
                     builder.AddField("Ammo Damage", ammo.Damage, true);
                     break;
@@ -504,7 +495,7 @@ namespace MarbleBot.Modules
         {
             string[] splitMsg = msg.Split('|');
             decimal totalCost = 0m;
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithTitle("Poup Soop Price Calculator");
             decimal[] poupSoopPrices =
@@ -574,8 +565,7 @@ namespace MarbleBot.Modules
                 lastWarWin = "N/A";
             }
 
-            var builder = new EmbedBuilder()
-                .WithAuthor(Context.Client.GetUser(user.Id))
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithFooter("All times in UTC, all dates YYYY-MM-DD.")
                 .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
@@ -591,6 +581,8 @@ namespace MarbleBot.Modules
                 .AddField("Last Scavenge", lastScavenge, true)
                 .AddField("Last Siege Win", lastSiegeWin, true)
                 .AddField("Last War Win", lastWarWin, true);
+
+            AddAuthor(Context, user, builder);
 
             if (user.Stage == 2)
             {
@@ -685,8 +677,8 @@ namespace MarbleBot.Modules
             }
 
             (int place, MarbleBotUser user)[] users = (from user in MarbleBotUser.GetUsers()
-                orderby user.Value.NetWorth descending
-                select (place: 0, user: user.Value)).ToArray();
+                                                       orderby user.Value.NetWorth descending
+                                                       select (place: 0, user: user.Value)).ToArray();
 
             await DisplayRichList(users, page);
         }
@@ -706,9 +698,9 @@ namespace MarbleBot.Modules
             await Context.Guild.DownloadUsersAsync();
 
             (int place, MarbleBotUser user)[] users = (from marbleBotUserPair in MarbleBotUser.GetUsers()
-                where Context.Guild.GetUser(marbleBotUserPair.Key) != null
-                orderby marbleBotUserPair.Value.NetWorth descending
-                select (place: 0, user: marbleBotUserPair.Value)).ToArray();
+                                                       where Context.Guild.GetUser(marbleBotUserPair.Key) != null
+                                                       orderby marbleBotUserPair.Value.NetWorth descending
+                                                       select (place: 0, user: marbleBotUserPair.Value)).ToArray();
 
             await DisplayRichList(users, page);
         }
@@ -751,7 +743,7 @@ namespace MarbleBot.Modules
                 }
             }
 
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .WithTitle($"Net Worth Leaderboard: Page {page}")
                 .WithDescription(output.ToString());
@@ -814,7 +806,7 @@ namespace MarbleBot.Modules
                 }
             }
 
-            var builder = new EmbedBuilder()
+            EmbedBuilder? builder = new EmbedBuilder()
                 .AddField("Items for sale", output.ToString())
                 .WithColor(GetColor(Context))
                 .WithDescription("Use `mb/buy <item ID> <# of items>` to buy an item on sale.")
