@@ -695,8 +695,6 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            await Context.Guild.DownloadUsersAsync();
-
             (int place, MarbleBotUser user)[] users = (from marbleBotUserPair in MarbleBotUser.GetUsers()
                                                        where Context.Guild.GetUser(marbleBotUserPair.Key) != null
                                                        orderby marbleBotUserPair.Value.NetWorth descending
