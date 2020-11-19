@@ -63,4 +63,8 @@ namespace MarbleBot.Common.Games.Siege
             return JsonSerializer.Deserialize<IDictionary<string, Boss>>(json)!;
         }
     }
+
+    public record Attack(string Name, int Damage, int Accuracy, StatusEffect StatusEffect);
+
+    public record BossDropInfo(int ItemId, int MinCount, int MaxCount, int Chance);
 }
