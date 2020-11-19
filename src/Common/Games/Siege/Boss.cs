@@ -10,15 +10,15 @@ namespace MarbleBot.Common.Games.Siege
     public class Boss
     {
         private int _health;
-
         public int Health
         {
             get => _health;
-            set => _health = value > MaxHealth ? MaxHealth : value < 1 ? 0 : value;
+            set => _health = Math.Clamp(value, 0, MaxHealth);
         }
 
-        public string Name { get; }
         public int MaxHealth { get; }
+
+        public string Name { get; }
         public ImmutableArray<Attack> Attacks { get; }
         public Difficulty Difficulty { get; }
         public ImmutableArray<BossDropInfo> Drops { get; }
@@ -26,16 +26,15 @@ namespace MarbleBot.Common.Games.Siege
         public int Stage { get; }
 
         public Boss(string name, int health, Difficulty difficulty, int stage, string imageUrl,
-            IEnumerable<Attack> attacks, IEnumerable<BossDropInfo>? itemDrops)
+            ImmutableArray<Attack> attacks, ImmutableArray<BossDropInfo> drops)
         {
             Name = name;
-            _health = health;
-            MaxHealth = health;
+            _health = MaxHealth = health;
             Difficulty = difficulty;
             Stage = stage;
-            Attacks = attacks.ToImmutableArray();
-            Drops = itemDrops?.ToImmutableArray() ?? ImmutableArray.Create<BossDropInfo>();
             ImageUrl = imageUrl;
+            Attacks = attacks;
+            Drops = drops;
         }
 
         public static Boss GetBoss(string searchTerm)
