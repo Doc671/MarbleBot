@@ -117,23 +117,23 @@ namespace MarbleBot.Common.Games.Siege
                 case StatusEffect.Chill:
                     marble.StatusEffect = StatusEffect.Chill;
                     embedBuilder.AddField($"**{marble.Name}** has been chilled! All attacks will deal half damage unless cured!",
-                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Chill**");
+                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Chill** :snowflake:");
                     break;
                 case StatusEffect.Doom:
                     marble.StatusEffect = StatusEffect.Doom;
                     embedBuilder.AddField($"**{marble.Name}** has been doomed and will die in ~45 seconds if not cured!",
-                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Doom**");
+                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Doom** :skull_crossbones:");
                     marble.DoomStart = DateTime.UtcNow;
                     break;
                 case StatusEffect.Poison:
                     marble.StatusEffect = StatusEffect.Poison;
                     embedBuilder.AddField($"**{marble.Name}** has been poisoned and will lose health every ~15 seconds until cured/at 1 Health!",
-                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Poison**");
+                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Poison** :nauseated_face:");
                     break;
                 case StatusEffect.Stun:
                     marble.StatusEffect = StatusEffect.Stun;
                     embedBuilder.AddField($"**{marble.Name}** has been stunned and cannot attack for the next ~15 seconds!",
-                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Stun**");
+                        $"Health: **{marble.Health}**/{marble.MaxHealth}\nStatus Effect: **Stun** :zap:");
                     marble.LastStun = DateTime.UtcNow;
                     break;
                 default:
