@@ -27,10 +27,28 @@ namespace MarbleBot.Common.Games.Siege
 
         public string ToString(SocketCommandContext context, bool healthShown = true)
         {
-            var user = context.Client.GetUser(Id);
+            var marbleBotUser = MarbleBotUser.Find(Id);
+            string usernameString;
+            if (marbleBotUser != null)
+            {
+                usernameString = $"{marbleBotUser.Name}#{marbleBotUser.Discriminator}";
+            }
+            else
+            {
+                var discordSocketUser = context.Client.GetUser(Id);
+                if (discordSocketUser != null)
+                {
+                    usernameString = $"{discordSocketUser.Username}#{discordSocketUser.Discriminator}";
+                }
+                else
+                {
+                    usernameString = "user not found";
+                }
+            }
+
             return healthShown
-                ? $"**{Name}** (Health: **{Health}**/{MaxHealth}, DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]"
-                : $"**{Name}** (DMG: **{DamageDealt}**) [{user.Username}#{user.Discriminator}]";
+                ? $"**{Name}** (HP: **{Health}**/{MaxHealth}, DMG: **{DamageDealt}**) [{usernameString}]"
+                : $"**{Name}** (DMG: **{DamageDealt}**) [{usernameString}]";
         }
     }
 }
