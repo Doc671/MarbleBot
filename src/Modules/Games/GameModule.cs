@@ -284,10 +284,7 @@ namespace MarbleBot.Modules.Games
 
                     foreach ((ulong id, string name, int itemId) in marbles)
                     {
-                        user = Context.Client.GetUser(id);
-                        marbleOutput.AppendLine(user == null
-                            ? $"{Bold(name)} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [user not found]"
-                            : $"{Bold(name)} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{user.Username}#{user.Discriminator}]");
+                        marbleOutput.AppendLine($"{Bold(name)} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{GetUsernameDiscriminatorString(Context, id)}]");
                     }
                 }
                 else
@@ -302,10 +299,7 @@ namespace MarbleBot.Modules.Games
 
                     foreach ((ulong id, string name) in marbles)
                     {
-                        user = Context.Client.GetUser(id);
-                        marbleOutput.AppendLine(user == null
-                            ? $"{Bold(name)} [user not found]"
-                            : $"{Bold(name)} [{user.Username}#{user.Discriminator}]");
+                        marbleOutput.AppendLine($"{Bold(name)} [{GetUsernameDiscriminatorString(Context, id)}]");
                     }
                 }
             }

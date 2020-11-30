@@ -38,6 +38,29 @@ namespace MarbleBot.Modules
                 : new Color(uint.Parse(MarbleBotGuild.Find(context).Color, NumberStyles.HexNumber));
         }
 
+        protected internal static string GetUsernameDiscriminatorString(SocketCommandContext context, ulong id)
+        {
+            var marbleBotUser = MarbleBotUser.Find(id);
+            string usernameString;
+            if (marbleBotUser != null)
+            {
+                usernameString = $"{marbleBotUser.Name}#{marbleBotUser.Discriminator}";
+            }
+            else
+            {
+                var discordSocketUser = context.Client.GetUser(id);
+                if (discordSocketUser != null)
+                {
+                    usernameString = $"{discordSocketUser.Username}#{discordSocketUser.Discriminator}";
+                }
+                else
+                {
+                    usernameString = "user not found";
+                }
+            }
+            return usernameString;
+        }
+
         protected static string GetTimeSpanSentence(TimeSpan timeSpan)
         {
             var output = new StringBuilder();

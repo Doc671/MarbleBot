@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using MarbleBot.Modules;
 using System;
 
 namespace MarbleBot.Common.Games.Siege
@@ -27,24 +28,7 @@ namespace MarbleBot.Common.Games.Siege
 
         public string ToString(SocketCommandContext context, bool healthShown = true)
         {
-            var marbleBotUser = MarbleBotUser.Find(Id);
-            string usernameString;
-            if (marbleBotUser != null)
-            {
-                usernameString = $"{marbleBotUser.Name}#{marbleBotUser.Discriminator}";
-            }
-            else
-            {
-                var discordSocketUser = context.Client.GetUser(Id);
-                if (discordSocketUser != null)
-                {
-                    usernameString = $"{discordSocketUser.Username}#{discordSocketUser.Discriminator}";
-                }
-                else
-                {
-                    usernameString = "user not found";
-                }
-            }
+            string usernameString = MarbleBotModule.GetUsernameDiscriminatorString(context, Id);
 
             return healthShown
                 ? $"**{Name}** (HP: **{Health}**/{MaxHealth}, DMG: **{DamageDealt}**) [{usernameString}]"
