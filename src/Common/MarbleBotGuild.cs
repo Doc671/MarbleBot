@@ -1,9 +1,9 @@
-﻿using Discord;
-using Discord.Commands;
+﻿using Discord.Commands;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MarbleBot.Common
 {
@@ -12,6 +12,21 @@ namespace MarbleBot.Common
         public MarbleBotGuild(ulong id)
         {
             Id = id;
+        }
+
+        [JsonConstructor]
+        public MarbleBotGuild(ulong id, ulong announcementChannel, string? appealFormLink, ulong autoresponseChannel,
+                              string color, string prefix, List<ulong> roles, List<ulong> usableChannels,
+                              string? warningSheetLink) : this(id)
+        {
+            AnnouncementChannel = announcementChannel;
+            AppealFormLink = appealFormLink;
+            AutoresponseChannel = autoresponseChannel;
+            Color = color;
+            Prefix = prefix;
+            Roles = roles;
+            UsableChannels = usableChannels;
+            WarningSheetLink = warningSheetLink;
         }
 
         public ulong Id { get; }
