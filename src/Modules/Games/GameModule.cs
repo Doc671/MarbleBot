@@ -271,7 +271,6 @@ namespace MarbleBot.Modules.Games
                 }
 
                 var formatter = new BinaryFormatter();
-                SocketUser user;
                 if (gameType == GameType.War)
                 {
                     var marbles = (List<(ulong id, string name, int itemId)>)formatter.Deserialize(marbleListFile.BaseStream);
