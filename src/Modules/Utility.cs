@@ -349,6 +349,7 @@ namespace MarbleBot.Modules
         {
             if (string.IsNullOrEmpty(username))
             {
+                await UserInfoCommand((SocketGuildUser)Context.User);
                 return;
             }
 
