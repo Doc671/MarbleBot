@@ -90,7 +90,9 @@ namespace MarbleBot.Modules.Games
                 });
 
                 marbleOutput.AppendLine($"**{name}** [{user.Name}#{user.Discriminator}]");
-                if (user.SiegePing && Context.Client.GetUser(id).Status != UserStatus.Offline)
+
+                SocketUser socketUser = Context.Client.GetUser(id);
+                if (user.SiegePing && socketUser != null && socketUser.Status != UserStatus.Offline)
                 {
                     mentionOutput.Append($"<@{user.Id}> ");
                 }
