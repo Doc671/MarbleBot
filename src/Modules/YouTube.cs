@@ -78,8 +78,7 @@ namespace MarbleBot.Modules
 
             if (channelListResult.Snippet.PublishedAt != null)
             {
-                // date is in format YYYY-MM-DDThh:mm:ssZ - remove the T and Z
-                builder.AddField("Created", channelListResult.Snippet.PublishedAt.Replace('T', ' ').Remove(19), true);
+                builder.AddField("Created", channelListResult.Snippet.PublishedAt!.Value, true);
             }
 
             await ReplyAsync(embed: builder.Build());
@@ -136,7 +135,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            if ((DateTime.Now - DateTime.Parse(video.Snippet.PublishedAt)).Days > 1)
+            if ((DateTime.Now - video.Snippet.PublishedAt!.Value).Days > 1)
             {
                 await SendErrorAsync("The video cannot be more than two days old!");
                 return;
