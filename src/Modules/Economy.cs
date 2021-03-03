@@ -438,10 +438,10 @@ namespace MarbleBot.Modules
                 case Weapon weapon:
                     {
                         builder.AddField("Weapon Info", new StringBuilder()
-                            .AppendLine($"Class: **{weapon.WeaponClass}**")
-                            .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
-                            .AppendLine($"Damage: **{weapon.Damage}**")
-                            .AppendLine($"Uses: **{weapon.Hits}**"), true);
+                            .AppendLine($"Class **{weapon.WeaponClass}**")
+                            .AppendLine($"Accuracy **{weapon.Accuracy}**%")
+                            .AppendLine($"Damage **{weapon.Damage}**")
+                            .AppendLine($"Uses **{weapon.Hits}**"), true);
 
                         if (weapon.Ammo.Length != 0)
                         {
@@ -460,10 +460,10 @@ namespace MarbleBot.Modules
                     builder.AddField("Ammo Damage", ammo.Damage, true);
                     break;
                 case Spikes spikes:
-                    builder.AddField("Spikes Damage Boost", $"{spikes.OutgoingDamageMultiplier}%", true);
+                    builder.AddField("Spikes Damage Boost", $"x{spikes.OutgoingDamageMultiplier}", true);
                     break;
                 case Shield shield:
-                    builder.AddField("Shield Damage Absorption:", $"{shield.IncomingDamageMultiplier}%");
+                    builder.AddField("Shield Damage Absorption", $"x{shield.IncomingDamageMultiplier}");
                     break;
             }
 
