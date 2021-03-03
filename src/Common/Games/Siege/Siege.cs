@@ -16,7 +16,18 @@ namespace MarbleBot.Common.Games.Siege
     public class Siege
     {
         public bool Active { get; private set; }
-        public int ActiveMoraleBoosts { get; set; }
+
+        private int _activeMoraleBoosts;
+        public int ActiveMoraleBoosts
+        {
+            get => _activeMoraleBoosts;
+            set
+            {
+                DamageMultiplier *= (int)Math.Pow(2, value - _activeMoraleBoosts);
+                _activeMoraleBoosts = value;
+            }
+        }
+
         public Boss Boss { get; }
         public float DamageMultiplier { get; private set; } = 1f;
         public DateTime LastMorale { get; set; } = DateTime.MinValue;
