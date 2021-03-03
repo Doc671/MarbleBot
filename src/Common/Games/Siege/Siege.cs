@@ -23,7 +23,7 @@ namespace MarbleBot.Common.Games.Siege
             get => _activeMoraleBoosts;
             set
             {
-                DamageMultiplier = (int)Math.Round(DamageMultiplier * Math.Pow(2, value - _activeMoraleBoosts));
+                DamageMultiplier = MathF.Round(DamageMultiplier * MathF.Pow(2, value - _activeMoraleBoosts));
                 _activeMoraleBoosts = value;
             }
         }
