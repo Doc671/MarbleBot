@@ -553,11 +553,7 @@ namespace MarbleBot.Common.Games.Siege
             {
                 if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                 {
-                    totalDamage = (int)Math.Round((weapon.Damage +
-                                                   (weapon.WeaponClass is WeaponClass.Ranged or WeaponClass.Artillery
-                                                       ? ammo!.Damage
-                                                       : 0.0))
-                                                  * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                    totalDamage = CalculateWeaponDamage(weapon, ammo);
                     marble.LastMoveUsed = DateTime.UtcNow;
                     builder.WithDescription($"**{marble.Name}** used their **{weapon.Name}**, dealing **{totalDamage}** damage to **{Boss!.Name}**!");
                 }
@@ -572,11 +568,7 @@ namespace MarbleBot.Common.Games.Siege
                 {
                     if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                     {
-                        damage = (int)Math.Round((weapon.Damage +
-                                                  (weapon.WeaponClass is WeaponClass.Ranged or WeaponClass.Artillery
-                                                      ? ammo!.Damage
-                                                      : 0.0))
-                                                 * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
+                        damage = CalculateWeaponDamage(weapon, ammo);
                         totalDamage += damage;
                         builder.AddField($"Attack {i + 1}", $"**{damage}** damage to **{Boss!.Name}**.");
                     }
@@ -603,6 +595,13 @@ namespace MarbleBot.Common.Games.Siege
 
             await DealDamageToBoss(totalDamage);
             marble.DamageDealt += totalDamage;
+        }
+
+        private int CalculateWeaponDamage(Weapon weapon, Ammo? ammo)
+        {
+            double ammoIncrease = weapon.WeaponClass is WeaponClass.Ranged or WeaponClass.Artillery ? ammo!.Damage : 0.0;
+            double randomMultiplier = _randomService.Rand.NextDouble() * 0.4 + 0.8;
+            return (int)Math.Round((weapon.Damage + ammoIncrease) * randomMultiplier * 3d * DamageMultiplier);
         }
     }
 }
