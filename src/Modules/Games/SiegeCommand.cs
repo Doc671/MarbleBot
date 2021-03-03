@@ -743,7 +743,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Returns a list of bosses.")]
         public async Task SiegeBosslistCommand(int stage = 1)
         {
-            if (stage != 1 && stage != 2)
+            if (stage is not 1 and not 2)
             {
                 await ReplyAsync("Invalid stage number!");
                 return;
