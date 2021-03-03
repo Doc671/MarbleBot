@@ -588,7 +588,7 @@ namespace MarbleBot.Modules
             {
                 builder.AddField("Stage", user.Stage, true)
                     .AddField("Shield", user.GetShield()?.Name ?? "None", true)
-                    .AddField("Spikes", user.GetShield()?.Name ?? "None", true);
+                    .AddField("Spikes", user.GetSpikes()?.Name ?? "None", true);
             }
 
             var weaponOutput = new StringBuilder();
