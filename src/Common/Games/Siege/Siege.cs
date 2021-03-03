@@ -554,7 +554,7 @@ namespace MarbleBot.Common.Games.Siege
                 if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                 {
                     totalDamage = (int)Math.Round((weapon.Damage +
-                                                   (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
+                                                   (weapon.WeaponClass is WeaponClass.Ranged or WeaponClass.Artillery
                                                        ? ammo!.Damage
                                                        : 0.0))
                                                   * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
@@ -573,7 +573,7 @@ namespace MarbleBot.Common.Games.Siege
                     if (_randomService.Rand.Next(0, 100) < weapon.Accuracy)
                     {
                         damage = (int)Math.Round((weapon.Damage +
-                                                  (weapon.WeaponClass == WeaponClass.Ranged || weapon.WeaponClass == WeaponClass.Artillery
+                                                  (weapon.WeaponClass is WeaponClass.Ranged or WeaponClass.Artillery
                                                       ? ammo!.Damage
                                                       : 0.0))
                                                  * (_randomService.Rand.NextDouble() * 0.4 + 0.8) * 3d * DamageMultiplier);
