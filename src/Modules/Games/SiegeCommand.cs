@@ -237,7 +237,7 @@ namespace MarbleBot.Modules.Games
             {
                 currentSiege.ActiveMoraleBoosts--;
                 builder.AddField("Morale Boost has worn off!",
-                    $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{currentSiege.DamageMultiplier}**!");
+                    $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{currentSiege.DamageMultiplier:n1}**!");
             }
 
             int marbleDamage = _randomService.Rand.Next(1, 25);

@@ -471,7 +471,7 @@ namespace MarbleBot.Common.Games.Siege
             {
                 ActiveMoraleBoosts--;
                 embedBuilder.AddField("Morale Boost has worn off!",
-                    $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier}**!");
+                    $"The effects of a Morale Boost power-up have worn off! The damage multiplier is now **{DamageMultiplier:n1}**!");
             }
 
             SpawnNewPowerUp(embedBuilder);
