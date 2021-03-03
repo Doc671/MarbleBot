@@ -438,10 +438,10 @@ namespace MarbleBot.Modules
                 case Weapon weapon:
                     {
                         builder.AddField("Weapon Info", new StringBuilder()
-                            .AppendLine($"Class **{weapon.WeaponClass}**")
-                            .AppendLine($"Accuracy **{weapon.Accuracy}**%")
-                            .AppendLine($"Damage **{weapon.Damage}**")
-                            .AppendLine($"Uses **{weapon.Hits}**"), true);
+                            .AppendLine($"Class: **{weapon.WeaponClass}**")
+                            .AppendLine($"Accuracy: **{weapon.Accuracy}**%")
+                            .AppendLine($"Damage: **{weapon.Damage}**")
+                            .AppendLine($"Uses: **{weapon.Hits}**"), true);
 
                         if (weapon.Ammo.Length != 0)
                         {
