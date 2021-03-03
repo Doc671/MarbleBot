@@ -162,7 +162,7 @@ namespace MarbleBot.Common.Games.War
                     return;
                 }
 
-                int damage = CalculateDamage(userMarble, targetMarble, baseDamage);
+                int damage = CalculateDamage(userMarble, baseDamage);
                 targetMarble.DealDamage(damage);
                 if (targetMarble.Health == 0)
                 {
@@ -184,7 +184,7 @@ namespace MarbleBot.Common.Games.War
                     hitsPerformed++;
                     if (_randomService.Rand.Next(0, 100) > userMarble.Weapon.Accuracy)
                     {
-                        int damage = CalculateDamage(userMarble, targetMarble, baseDamage);
+                        int damage = CalculateDamage(userMarble, baseDamage);
                         totalDamage += damage;
                         targetMarble.DealDamage(damage);
                         fieldDescriptionBuilder.AppendLine($"**{damage}** damage dealt!");
@@ -295,7 +295,7 @@ namespace MarbleBot.Common.Games.War
                         {
                             foreach (WarMarble teammate in currentMarble.Team.Marbles)
                             {
-                                teammate.DamageMultiplier *= 2;
+                                teammate.OutgoingDamageMultiplier *= 2;
                                 teammate.LastRage = DateTime.UtcNow;
                                 teammate.Rage = true;
                             }
@@ -329,13 +329,11 @@ namespace MarbleBot.Common.Games.War
             await UpdateDisplay(false, true, true, true);
         }
 
-        private int CalculateDamage(WarMarble userMarble, WarMarble targetMarble, int baseDamage)
+        private int CalculateDamage(WarMarble userMarble, int baseDamage)
         {
-            float spikesMultiplier = userMarble.Spikes?.OutgoingDamageMultiplier ?? 1;
-            float shieldMultiplier = targetMarble.Shield?.IncomingDamageMultiplier ?? 1;
             float randomMultiplier = 1 + 0.5f * (float)_randomService.Rand.NextDouble();
 
-            int damage = (int)MathF.Round(baseDamage * spikesMultiplier * shieldMultiplier * randomMultiplier);
+            int damage = (int)MathF.Round(baseDamage * userMarble.OutgoingDamageMultiplier * randomMultiplier);
 
             userMarble.DamageDealt += damage;
 

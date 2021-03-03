@@ -177,7 +177,7 @@ namespace MarbleBot.Modules.Games
             WarMarble currentMarble = war.GetCurrentMarble();
             if (currentMarble.Rage && (DateTime.UtcNow - currentMarble.LastRage).Seconds > 20)
             {
-                currentMarble.DamageMultiplier /= 2;
+                currentMarble.OutgoingDamageMultiplier /= 2;
                 currentMarble.Rage = false;
             }
 
@@ -260,7 +260,7 @@ namespace MarbleBot.Modules.Games
             WarMarble currentMarble = war.GetCurrentMarble();
             if (currentMarble.Rage && (DateTime.UtcNow - currentMarble.LastRage).Seconds > 20)
             {
-                currentMarble.DamageMultiplier /= 2;
+                currentMarble.OutgoingDamageMultiplier /= 2;
                 currentMarble.Rage = false;
             }
 

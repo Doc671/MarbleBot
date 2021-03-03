@@ -269,7 +269,7 @@ namespace MarbleBot.Modules.Games
                 url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
             }
 
-            int totalDamage = marbleDamage = (int)MathF.Round(marbleDamage * currentSiege.DamageMultiplier * currentMarble.DamageMultiplier);
+            int totalDamage = marbleDamage = (int)MathF.Round(marbleDamage * currentSiege.DamageMultiplier * currentMarble.OutgoingDamageMultiplier);
 
             if (currentMarble.Cloned)
             {
@@ -545,7 +545,7 @@ namespace MarbleBot.Modules.Games
                 .AddField("Health", $"**{currentMarble.Health}**/{currentMarble.MaxHealth}", true)
                 .AddField("Status Effect", currentMarble.StatusEffect, true)
                 .AddField("Shield", currentMarble.Shield?.Name, true)
-                .AddField("Damage Multiplier", $"x{currentMarble.DamageMultiplier}", true)
+                .AddField("Damage Multiplier", $"x{currentMarble.OutgoingDamageMultiplier}", true)
                 .AddField("Damage Dealt", currentMarble.DamageDealt, true)
                 .AddField("Power-up Hits", currentMarble.PowerUpHits, true)
                 .AddField("Rocket Boots Used?", currentMarble.BootsUsed, true)

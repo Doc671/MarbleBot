@@ -13,7 +13,8 @@ namespace MarbleBot.Common
 {
     [JsonConverter(typeof(ItemConverter))]
     public record Item(int Id, string Name, decimal Price, string Description, bool OnSale, int Stage,
-    ScavengeLocation ScavengeLocation, int CraftingProduced, Dictionary<int, int>? CraftingRecipe, int CraftingStationRequired)
+        ScavengeLocation ScavengeLocation, int CraftingProduced, Dictionary<int, int>? CraftingRecipe, 
+        int CraftingStationRequired)
     {
         public static T Find<T>(int itemId) where T : Item
         {
