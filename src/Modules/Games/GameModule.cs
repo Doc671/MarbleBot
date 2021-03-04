@@ -346,7 +346,7 @@ namespace MarbleBot.Modules.Games
                     return;
                 }
 
-                if (weapon!.WeaponClass == WeaponClass.None || weapon.WeaponClass == WeaponClass.Artillery)
+                if (weapon!.WeaponClass is WeaponClass.None or WeaponClass.Artillery)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, this item cannot be used as a weapon!");
                     return;
