@@ -847,73 +847,31 @@ namespace MarbleBot.Modules.Games
         public Boss ChooseStageOneBoss(IEnumerable<SiegeMarble> marbles)
         {
             int bossWeight = (int)Math.Round(marbles.Count() * (_randomService.Rand.NextDouble() * 5 + 1));
-            if (bossWeight < 7)
+            return bossWeight switch
             {
-                return Boss.GetBoss("PreeTheTree");
-            }
-
-            if (bossWeight < 14)
-            {
-                return Boss.GetBoss("HelpMeTheTree");
-            }
-
-            if (bossWeight < 22)
-            {
-                return Boss.GetBoss("HattMann");
-            }
-
-            if (bossWeight < 30)
-            {
-                return Boss.GetBoss("Orange");
-            }
-
-            if (bossWeight < 38)
-            {
-                return Boss.GetBoss("Erango");
-            }
-
-            if (bossWeight < 46)
-            {
-                return Boss.GetBoss("Octopheesh");
-            }
-
-            if (bossWeight < 54)
-            {
-                return Boss.GetBoss("Green");
-            }
-
-            return Boss.GetBoss("Destroyer");
+                < 7 => Boss.GetBoss("PreeTheTree"),
+                < 14 => Boss.GetBoss("HelpMeTheTree"),
+                < 22 => Boss.GetBoss("HattMann"),
+                < 30 => Boss.GetBoss("Orange"),
+                < 38 => Boss.GetBoss("Erango"),
+                < 46 => Boss.GetBoss("Octopheesh"),
+                < 54 => Boss.GetBoss("Green"),
+                _ => Boss.GetBoss("Destroyer")
+            };
         }
 
         private Boss ChooseStageTwoBoss(IEnumerable<SiegeMarble> marbles)
         {
             int bossWeight = (int)Math.Round(marbles.Count() * (_randomService.Rand.NextDouble() * 5 + 1));
-            if (bossWeight < 10)
+            return bossWeight switch
             {
-                return Boss.GetBoss("Chest");
-            }
-
-            if (bossWeight < 19)
-            {
-                return Boss.GetBoss("ScaryFace");
-            }
-
-            if (bossWeight < 28)
-            {
-                return Boss.GetBoss("Red");
-            }
-
-            if (bossWeight < 37)
-            {
-                return Boss.GetBoss("CorruptPurple");
-            }
-
-            if (bossWeight < 46)
-            {
-                return Boss.GetBoss("MarbleBotPrototype");
-            }
-
-            return Boss.GetBoss("Overlord");
+                < 10 => Boss.GetBoss("Chest"),
+                < 19 => Boss.GetBoss("ScaryFace"),
+                < 28 => Boss.GetBoss("Red"),
+                < 37 => Boss.GetBoss("CorruptPurple"),
+                < 46 => Boss.GetBoss("MarbleBotPrototype"),
+                _ => Boss.GetBoss("Overlord")
+            };
         }
 
         [Command("help")]
