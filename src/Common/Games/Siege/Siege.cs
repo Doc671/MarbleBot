@@ -67,7 +67,7 @@ namespace MarbleBot.Common.Games.Siege
                     marble.Health = 0;
                     DamageMultiplier += 0.2f;
                     embedBuilder.AddField($"**{marble.Name}** has been killed! :skull:",
-                        $"Health: **0**/{marble.MaxHealth}\nDamage Multiplier: **{DamageMultiplier}**");
+                        $"Health: **0**/{marble.MaxHealth}\nDamage Multiplier: **{DamageMultiplier:n1}**");
                 }
                 else
                 {
