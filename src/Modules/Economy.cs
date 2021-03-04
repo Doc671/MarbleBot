@@ -26,7 +26,7 @@ namespace MarbleBot.Modules
         [Summary("Returns how much money you or someone else has.")]
         public async Task BalanceCommand([Remainder] MarbleBotUser? user = null)
         {
-            user ??= MarbleBotUser.Find(Context);
+            user ??= await MarbleBotUser.Find(Context);
             EmbedBuilder? builder = new EmbedBuilder()
                 .WithColor(GetColor(Context))
                 .AddField("Balance", $"{UnitOfMoney}{user.Balance:n2}", true)
@@ -60,7 +60,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             if (user.Balance >= item.Price * noOfItems)
             {
                 if (user.Items.ContainsKey(item.Id))
@@ -86,7 +86,7 @@ namespace MarbleBot.Modules
         [Summary("Crafts an item out of other items.")]
         public async Task CraftCommand(Item requestedItem, int noOfItems = 1)
         {
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             if (!user.Items.ContainsKey(17) && !user.Items.ContainsKey(62))
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you need a Crafting Station to craft items!");
@@ -154,7 +154,7 @@ namespace MarbleBot.Modules
         {
             int currentPart = 0;
             var embed = new EmbedBuilder();
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             var output = new StringBuilder();
             IDictionary<int, Item> itemsDict = Item.GetItems();
 
@@ -220,7 +220,7 @@ namespace MarbleBot.Modules
         [Summary("Gives daily Units of Money (200 to the power of (your streak / 100 - 1)).")]
         public async Task DailyCommand()
         {
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             if ((DateTime.UtcNow - user.LastDaily).TotalHours < 24)
             {
                 DateTime aDayAgo = DateTime.UtcNow.AddDays(-1);
@@ -273,7 +273,7 @@ namespace MarbleBot.Modules
         [Summary("Turns a crafted item back into its ingredients.")]
         public async Task DecraftCommand(Item requestedItem, int noOfItems = 1)
         {
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             if (!user.Items.ContainsKey(17) && !user.Items.ContainsKey(62))
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you need a Crafting Station to decraft items!");
@@ -363,7 +363,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            await ShowUserInventory(Context.User, MarbleBotUser.Find(Context), page);
+            await ShowUserInventory(Context.User, await MarbleBotUser.Find(Context), page);
         }
 
         private async Task ShowUserInventory(IUser discordUser, MarbleBotUser marbleBotUser, int page = 1)
@@ -407,7 +407,7 @@ namespace MarbleBot.Modules
         [Summary("Returns information about an item.")]
         public async Task ItemCommand([Remainder] Item item)
         {
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             if (item.Stage > user.Stage)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
@@ -533,7 +533,7 @@ namespace MarbleBot.Modules
         [Summary("Returns the profile of you or someone else.")]
         public async Task ProfileCommand([Remainder] MarbleBotUser? user = null)
         {
-            user ??= MarbleBotUser.Find(Context);
+            user ??= await MarbleBotUser.Find(Context);
 
             string lastDaily = user.LastDaily.ToString("yyyy-MM-dd HH:mm:ss");
             if (user.LastDaily.Year == 1)
@@ -637,7 +637,7 @@ namespace MarbleBot.Modules
                 {
                     if (itemId >= minValue && itemId <= maxValue)
                     {
-                        if (item.Stage > MarbleBotUser.Find(Context).Stage)
+                        if (item.Stage > (await MarbleBotUser.Find(Context)).Stage)
                         {
                             embed.AddField($"`[{itemId:000}]` {Item.Find<Item>(itemId).Name}",
                                 $"{StageTooHighString()}\n\nYou are unable to view information about this item!");
@@ -776,7 +776,7 @@ namespace MarbleBot.Modules
                 return;
             }
 
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] < noOfItems)
             {
                 await SendErrorAsync("You don't have enough of this item!");

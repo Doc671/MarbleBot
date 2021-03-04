@@ -129,7 +129,7 @@ namespace MarbleBot.Common
         private static async Task<MarbleBotUser> GetUserFromDictionary(ICommandContext context, ulong id,
             IDictionary<ulong, MarbleBotUser> usersDict)
         {
-            if (!usersDict.TryGetValue(id, out MarbleBotUser? user))
+            if (!usersDict.TryGetValue(id, out MarbleBotUser? marbleBotUser))
             {
                 IUser? discordUser = await context.Client.GetUserAsync(id);
                 string defaultUsername;
@@ -145,15 +145,17 @@ namespace MarbleBot.Common
                     defaultDiscriminator = discordUser.Discriminator;
                 }
 
-                user = new MarbleBotUser
+                marbleBotUser = new MarbleBotUser
                 {
                     Id = id,
                     Name = defaultUsername,
                     Discriminator = defaultDiscriminator
                 };
+
+                UpdateUser(usersDict, discordUser ?? context.User, marbleBotUser);
             }
 
-            return user;
+            return marbleBotUser;
         }
 
         public static IDictionary<ulong, MarbleBotUser> GetUsers()

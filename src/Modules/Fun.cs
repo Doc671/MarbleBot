@@ -55,7 +55,7 @@ namespace MarbleBot.Modules
         [Summary("Gives advice on progression.")]
         public async Task AdviceCommand()
         {
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             string msg;
             if (user.Items.ContainsKey(78))
             {
@@ -216,7 +216,7 @@ namespace MarbleBot.Modules
         [Summary("Shows info about a colo(u)r using its HSV values.")]
         public async Task ColorCommand(float hue, float saturation, float value)
         {
-            if (hue < 0f || hue > 360f)
+            if (hue is < 0f or > 360f)
             {
                 await SendErrorAsync("The given hue must be between 0 and 360!");
                 return;

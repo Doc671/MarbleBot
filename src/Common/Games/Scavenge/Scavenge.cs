@@ -65,7 +65,7 @@ namespace MarbleBot.Common.Games.Scavenge
 
         private async Task OnGameEnd()
         {
-            var user = MarbleBotUser.Find(_context);
+            var user = await MarbleBotUser.Find(_context);
             user.LastScavenge = DateTime.UtcNow;
             foreach (var item in Items)
             {
