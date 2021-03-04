@@ -248,25 +248,24 @@ namespace MarbleBot.Modules.Games
 
             string title;
             string url;
-            if (marbleDamage < 8)
+            switch (marbleDamage)
             {
-                title = "Slow attack! :boom:";
-                url = "https://cdn.discordapp.com/attachments/296376584238137355/548217423623356418/SiegeAttackSlow.png";
-            }
-            else if (marbleDamage < 15)
-            {
-                title = "Fast attack! :boom:";
-                url = "https://cdn.discordapp.com/attachments/296376584238137355/548217417847799808/SiegeAttackFast.png";
-            }
-            else if (marbleDamage < 21)
-            {
-                title = "Brutal attack! :boom:";
-                url = "https://cdn.discordapp.com/attachments/296376584238137355/548217407337005067/SiegeAttackBrutal.png";
-            }
-            else
-            {
-                title = "CRITICAL attack! :boom:";
-                url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
+                case < 8:
+                    title = "Slow attack! :boom:";
+                    url = "https://cdn.discordapp.com/attachments/296376584238137355/548217423623356418/SiegeAttackSlow.png";
+                    break;
+                case < 15:
+                    title = "Fast attack! :boom:";
+                    url = "https://cdn.discordapp.com/attachments/296376584238137355/548217417847799808/SiegeAttackFast.png";
+                    break;
+                case < 21:
+                    title = "Brutal attack! :boom:";
+                    url = "https://cdn.discordapp.com/attachments/296376584238137355/548217407337005067/SiegeAttackBrutal.png";
+                    break;
+                default:
+                    title = "CRITICAL attack! :boom:";
+                    url = "https://cdn.discordapp.com/attachments/296376584238137355/548217425359798274/SiegeAttackCritical.png";
+                    break;
             }
 
             int totalDamage = marbleDamage = (int)MathF.Round(marbleDamage * currentSiege.DamageMultiplier * currentMarble.OutgoingDamageMultiplier);
@@ -374,7 +373,6 @@ namespace MarbleBot.Modules.Games
                                     url = "";
                                     break;
                             }
-
 
                             int baseDamage = _randomService.Rand.Next(25, 30);
 
