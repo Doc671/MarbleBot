@@ -40,7 +40,7 @@ namespace MarbleBot.Modules
 
         protected internal static string GetUsernameDiscriminatorString(SocketCommandContext context, ulong id)
         {
-            var marbleBotUser = MarbleBotUser.Find(id);
+            var marbleBotUser = MarbleBotUser.Find(context, id);
             string usernameString;
             if (marbleBotUser != null)
             {

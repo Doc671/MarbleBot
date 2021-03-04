@@ -104,22 +104,6 @@ namespace MarbleBot.Common
             return (Spikes)spikes.Last();
         }
 
-        public static MarbleBotUser Find(ulong id)
-        {
-            var userDict = GetUsers();
-            MarbleBotUser user;
-            if (userDict.ContainsKey(id))
-            {
-                user = userDict[id];
-            }
-            else
-            {
-                throw new InvalidOperationException("The requested user was not found.");
-            }
-
-            return user;
-        }
-
         public static MarbleBotUser Find(ICommandContext context)
         {
             var userDict = GetUsers();
