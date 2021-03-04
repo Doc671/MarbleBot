@@ -81,7 +81,7 @@ namespace MarbleBot.Modules.Games
             int stageTotal = 0;
             foreach ((ulong id, string name) in rawMarbleData)
             {
-                MarbleBotUser user = MarbleBotUser.Find(Context, id);
+                var user = await MarbleBotUser.Find(Context, id);
                 stageTotal += user.Stage;
                 marbles.Add(new SiegeMarble(id, name, 0)
                 {
@@ -451,7 +451,7 @@ namespace MarbleBot.Modules.Games
             {
                 foreach (SiegeMarble marble in siege.Marbles)
                 {
-                    marbleOutput.AppendLine(marble.ToString(Context));
+                    marbleOutput.AppendLine(await marble.ToString(Context));
                 }
 
                 builder.AddField($"Boss: **{siege.Boss!.Name}**",
@@ -656,7 +656,7 @@ namespace MarbleBot.Modules.Games
                     return;
             }
 
-            if (boss.Stage > MarbleBotUser.Find(Context).Stage)
+            if (boss.Stage > (await MarbleBotUser.Find(Context)).Stage)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -753,7 +753,7 @@ namespace MarbleBot.Modules.Games
                 .WithColor(GetColor(Context));
 
             IDictionary<string, Boss> playableBosses = Boss.GetBosses();
-            int userStage = MarbleBotUser.Find(Context).Stage;
+            int userStage = (await MarbleBotUser.Find(Context)).Stage;
             foreach ((_, Boss boss) in playableBosses)
             {
                 if (boss.Stage == stage)
@@ -824,7 +824,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Toggles whether you are pinged when a Siege that you are in starts.")]
         public async Task SiegePingCommand(string option = "")
         {
-            MarbleBotUser user = MarbleBotUser.Find(Context);
+            var user = await MarbleBotUser.Find(Context);
             user.SiegePing = option switch
             {
                 "enable" or "true" or "on" => true,

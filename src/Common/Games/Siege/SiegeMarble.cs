@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using MarbleBot.Modules;
 using System;
+using System.Threading.Tasks;
 
 namespace MarbleBot.Common.Games.Siege
 {
@@ -26,9 +27,9 @@ namespace MarbleBot.Common.Games.Siege
             return $"{Name} Health: {Health}/20 [{Id}] BH: {DamageDealt} PH: {PowerUpHits} Cloned: {Cloned}";
         }
 
-        public string ToString(SocketCommandContext context, bool healthShown = true)
+        public async Task<string> ToString(SocketCommandContext context, bool healthShown = true)
         {
-            string usernameString = MarbleBotModule.GetUsernameDiscriminatorString(context, Id);
+            string usernameString = await MarbleBotModule.GetUsernameDiscriminatorString(context, Id);
 
             return healthShown
                 ? $"**{Name}** (HP: **{Health}**/{MaxHealth}, DMG: **{DamageDealt}**) [{usernameString}]"

@@ -104,48 +104,47 @@ namespace MarbleBot.Common
             return (Spikes)spikes.Last();
         }
 
-        public static MarbleBotUser Find(ICommandContext context)
+        public static async Task<MarbleBotUser> Find(ICommandContext context)
         {
             var usersDict = GetUsers();
-            return GetUserFromDictionary(context, context.User.Id, usersDict, context.User.Username, context.User.Discriminator);
+            return await GetUserFromDictionary(context, context.User.Id, usersDict);
         }
 
-        public static MarbleBotUser Find(ICommandContext context, ulong id)
+        public static async Task<MarbleBotUser> Find(ICommandContext context, ulong id)
         {
             var usersDict = GetUsers();
-            return GetUserFromDictionary(context, id, usersDict, context.User.Username, context.User.Discriminator);
+            return await GetUserFromDictionary(context, id, usersDict);
         }
 
-        public static MarbleBotUser Find(ICommandContext context, IDictionary<ulong, MarbleBotUser> usersDict)
+        public static async Task<MarbleBotUser> Find(ICommandContext context, IDictionary<ulong, MarbleBotUser> usersDict)
         {
-            return GetUserFromDictionary(context, context.User.Id, usersDict, context.User.Username, context.User.Discriminator);
+            return await GetUserFromDictionary(context, context.User.Id, usersDict);
         }
 
-        public static async Task<MarbleBotUser> FindAsync(ICommandContext context, ulong id,
+        public static async Task<MarbleBotUser> Find(ICommandContext context, ulong id, IDictionary<ulong, MarbleBotUser> usersDict)
+        {
+            return await GetUserFromDictionary(context, id, usersDict);
+        }
+
+        private static async Task<MarbleBotUser> GetUserFromDictionary(ICommandContext context, ulong id,
             IDictionary<ulong, MarbleBotUser> usersDict)
-        {
-            IUser? user = await context.Client.GetUserAsync(id);
-            string defaultUsername;
-            string defaultDiscriminator;
-            if (user == null)
-            {
-                defaultUsername = context.User.Username;
-                defaultDiscriminator = context.User.Discriminator;
-            }
-            else
-            {
-                defaultUsername = user.Username;
-                defaultDiscriminator = user.Discriminator;
-            }
-
-            return GetUserFromDictionary(context, id, usersDict, defaultUsername, defaultDiscriminator);
-        }
-
-        private static MarbleBotUser GetUserFromDictionary(ICommandContext context, ulong id,
-            IDictionary<ulong, MarbleBotUser> usersDict, string defaultUsername, string defaultDiscriminator)
         {
             if (!usersDict.TryGetValue(id, out MarbleBotUser? user))
             {
+                IUser? discordUser = await context.Client.GetUserAsync(id);
+                string defaultUsername;
+                string defaultDiscriminator;
+                if (discordUser == null)
+                {
+                    defaultUsername = context.User.Username;
+                    defaultDiscriminator = context.User.Discriminator;
+                }
+                else
+                {
+                    defaultUsername = discordUser.Username;
+                    defaultDiscriminator = discordUser.Discriminator;
+                }
+
                 user = new MarbleBotUser
                 {
                     Id = id,

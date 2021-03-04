@@ -38,9 +38,9 @@ namespace MarbleBot.Modules
                 : new Color(uint.Parse(MarbleBotGuild.Find(context).Color, NumberStyles.HexNumber));
         }
 
-        protected internal static string GetUsernameDiscriminatorString(SocketCommandContext context, ulong id)
+        protected internal static async Task<string> GetUsernameDiscriminatorString(SocketCommandContext context, ulong id)
         {
-            var marbleBotUser = MarbleBotUser.Find(context, id);
+            var marbleBotUser = await MarbleBotUser.Find(context, id);
             string usernameString;
             if (marbleBotUser != null)
             {
