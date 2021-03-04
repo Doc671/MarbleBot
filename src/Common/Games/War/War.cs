@@ -641,7 +641,7 @@ namespace MarbleBot.Common.Games.War
                     continue;
                 }
 
-                MarbleBotUser user = await MarbleBotUser.Find(_context, marble.Id, usersDict);
+                var user = (await MarbleBotUser.Find(_context, marble.Id, usersDict))!;
                 if ((DateTime.UtcNow - user.LastWarWin).TotalHours > 6 && marble.DamageDealt > 0)
                 {
                     var output = new StringBuilder();

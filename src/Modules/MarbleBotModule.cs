@@ -40,7 +40,7 @@ namespace MarbleBot.Modules
 
         protected internal static async Task<string> GetUsernameDiscriminatorString(SocketCommandContext context, ulong id)
         {
-            var marbleBotUser = await MarbleBotUser.Find(context, id);
+            var marbleBotUser = (await MarbleBotUser.Find(context, id))!;
             string usernameString;
             if (marbleBotUser != null)
             {

@@ -71,7 +71,7 @@ namespace MarbleBot.Modules.Games
 
                 foreach ((ulong id, string name, int itemId) in rawMarbles.OrderBy(marbleInfo => _randomService.Rand.Next()))
                 {
-                    var user = await MarbleBotUser.Find(Context, id);
+                    var user = (await MarbleBotUser.Find(Context, id))!;
                     marbles.Add(new WarMarble(user, name, 35, Item.Find<Weapon>(itemId)));
                 }
             }
@@ -91,7 +91,7 @@ namespace MarbleBot.Modules.Games
                     team2.Add(marble);
                 }
 
-                if ((await MarbleBotUser.Find(Context, marble.Id)).SiegePing && Context.Client.GetUser(marble.Id).Status != UserStatus.Offline)
+                if ((await MarbleBotUser.Find(Context, marble.Id))!.SiegePing && Context.Client.GetUser(marble.Id).Status != UserStatus.Offline)
                 {
                     mentions.Append($"<@{marble.Id}> ");
                 }
@@ -101,7 +101,7 @@ namespace MarbleBot.Modules.Games
             if ((team1.Count + team2.Count) % 2 > 0)
             {
                 WarMarble[] allMarbles = team1.Union(team2).ToArray();
-                if (allMarbles.Average(m => MarbleBotUser.Find(Context, m.Id).Result.Stage) > 1.5)
+                if (allMarbles.Average(m => MarbleBotUser.Find(Context, m.Id).Result!.Stage) > 1.5)
                 {
                     aiMarble = new WarMarble(Context.Client.CurrentUser.Id, "MarbleBot", 40, Item.Find<Weapon>(_randomService.Rand.Next(0, 9) switch
                     {
@@ -181,7 +181,7 @@ namespace MarbleBot.Modules.Games
                 currentMarble.Rage = false;
             }
 
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             Ammo? ammo = null;
             if (currentMarble.Weapon.Ammo != null && currentMarble.Weapon.Ammo.Length != 0)
             {
@@ -365,7 +365,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Toggles whether you are pinged when a war that you are in starts.")]
         public async Task WarPingCommand(string option = "")
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             user.WarPing = option switch
             {
                 "enable" or "true" or "on" => true,
@@ -401,7 +401,7 @@ namespace MarbleBot.Modules.Games
             const string rock = "\uD83E\uDEA8";
             if (rawEmoji.Length == 2 && rawEmoji != largeGreenSquare && rawEmoji != middleFinger && rawEmoji != rock)
             {
-                var user = await MarbleBotUser.Find(Context);
+                var user = (await MarbleBotUser.Find(Context))!;
                 user.WarEmoji = rawEmoji;
                 MarbleBotUser.UpdateUser(user);
                 await ReplyAsync($"Successfully updated emoji to {new Emoji(rawEmoji)}.");
@@ -424,7 +424,7 @@ namespace MarbleBot.Modules.Games
                 if (item is Weapon weapon)
                 {
                     if (weapon.WeaponClass is not WeaponClass.None and not WeaponClass.Artillery &&
-                        weapon.Stage <= (await MarbleBotUser.Find(Context)).Stage)
+                        weapon.Stage <= ((await MarbleBotUser.Find(Context))!).Stage)
                     {
                         output.AppendLine($"{weapon} ({weapon.WeaponClass})");
                     }

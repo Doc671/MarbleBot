@@ -59,7 +59,7 @@ namespace MarbleBot.Modules.Games
 
         protected async Task Checkearn(GameType gameType)
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             DateTime lastWin = gameType switch
             {
                 GameType.Race => user.LastRaceWin,
@@ -352,7 +352,7 @@ namespace MarbleBot.Modules.Games
                     return;
                 }
 
-                var user = await MarbleBotUser.Find(Context);
+                var user = (await MarbleBotUser.Find(Context))!;
                 if (!user.Items.ContainsKey(weapon.Id) || user.Items[weapon.Id] < 1)
                 {
                     await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");
@@ -453,7 +453,7 @@ namespace MarbleBot.Modules.Games
         public async Task UseCommand([Remainder] string searchTerm)
         {
             var item = Item.Find<Item>(searchTerm);
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             if (!user.Items.ContainsKey(item.Id) || user.Items[item.Id] == 0)
             {
                 await ReplyAsync($"**{Context.User.Username}**, you don't have this item!");

@@ -104,29 +104,29 @@ namespace MarbleBot.Common
             return (Spikes)spikes.Last();
         }
 
-        public static async Task<MarbleBotUser> Find(ICommandContext context)
+        public static async Task<MarbleBotUser?> Find(ICommandContext context)
         {
             var usersDict = GetUsers();
             return await GetUserFromDictionary(context, context.User.Id, usersDict);
         }
 
-        public static async Task<MarbleBotUser> Find(ICommandContext context, ulong id)
+        public static async Task<MarbleBotUser?> Find(ICommandContext context, ulong id)
         {
             var usersDict = GetUsers();
             return await GetUserFromDictionary(context, id, usersDict);
         }
 
-        public static async Task<MarbleBotUser> Find(ICommandContext context, IDictionary<ulong, MarbleBotUser> usersDict)
+        public static async Task<MarbleBotUser?> Find(ICommandContext context, IDictionary<ulong, MarbleBotUser> usersDict)
         {
             return await GetUserFromDictionary(context, context.User.Id, usersDict);
         }
 
-        public static async Task<MarbleBotUser> Find(ICommandContext context, ulong id, IDictionary<ulong, MarbleBotUser> usersDict)
+        public static async Task<MarbleBotUser?> Find(ICommandContext context, ulong id, IDictionary<ulong, MarbleBotUser> usersDict)
         {
             return await GetUserFromDictionary(context, id, usersDict);
         }
 
-        private static async Task<MarbleBotUser> GetUserFromDictionary(ICommandContext context, ulong id,
+        private static async Task<MarbleBotUser?> GetUserFromDictionary(ICommandContext context, ulong id,
             IDictionary<ulong, MarbleBotUser> usersDict)
         {
             if (!usersDict.TryGetValue(id, out MarbleBotUser? marbleBotUser))
@@ -134,15 +134,14 @@ namespace MarbleBot.Common
                 IUser? discordUser = await context.Client.GetUserAsync(id);
                 string defaultUsername;
                 string defaultDiscriminator;
-                if (discordUser == null)
-                {
-                    defaultUsername = context.User.Username;
-                    defaultDiscriminator = context.User.Discriminator;
-                }
-                else
+                if (discordUser != null)
                 {
                     defaultUsername = discordUser.Username;
                     defaultDiscriminator = discordUser.Discriminator;
+                }
+                else
+                {
+                    return null;
                 }
 
                 marbleBotUser = new MarbleBotUser

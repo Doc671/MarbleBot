@@ -130,7 +130,7 @@ namespace MarbleBot.Modules.Games
             await ReplyAsync($":trophy: | {boldedWinningMarbleName} won the race!");
 
             // Reward winner
-            var user = await MarbleBotUser.Find(Context, winningMarbleId);
+            var user = (await MarbleBotUser.Find(Context, winningMarbleId))!;
             if ((DateTime.UtcNow - user.LastRaceWin).TotalHours > 6)
             {
                 int noOfSameUser = marbleIds.Count(marbleId => marbleId == winningMarbleId);

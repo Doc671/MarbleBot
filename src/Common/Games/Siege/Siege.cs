@@ -182,7 +182,7 @@ namespace MarbleBot.Common.Games.Siege
                 return;
             }
 
-            var user = await MarbleBotUser.Find(_context);
+            var user = (await MarbleBotUser.Find(_context))!;
             var item = Item.Find<Item>(itemId.ToString("000"));
             if (item.Id == 10 && marble.QefpedunCharmUsed)
             {
@@ -252,7 +252,7 @@ namespace MarbleBot.Common.Games.Siege
 
             foreach (SiegeMarble marble in Marbles)
             {
-                var user = await MarbleBotUser.Find(_context, marble.Id, usersDict);
+                var user = (await MarbleBotUser.Find(_context, marble.Id, usersDict))!;
                 var output = new StringBuilder();
 
                 // Advance user's stage if necessary
@@ -536,7 +536,7 @@ namespace MarbleBot.Common.Games.Siege
             }
 
             Ammo? ammo = null;
-            var user = await MarbleBotUser.Find(_context);
+            var user = (await MarbleBotUser.Find(_context))!;
             if (weapon.Ammo.Length != 0)
             {
                 ammo = user.GetAmmo(weapon);

@@ -52,7 +52,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Canary Beach.")]
         public async Task ScavengeCanaryCommand()
         {
-            await ScavengeStartAsync(await MarbleBotUser.Find(Context), ScavengeLocation.CanaryBeach);
+            await ScavengeStartAsync((await MarbleBotUser.Find(Context))!, ScavengeLocation.CanaryBeach);
         }
 
         [Command("destroyersremains")]
@@ -61,7 +61,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Destroyer's Remains.")]
         public async Task ScavengeDestroyerCommand()
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             if (user.Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
@@ -81,7 +81,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Tree Wurld.")]
         public async Task ScavengeTreeCommand()
         {
-            await ScavengeStartAsync(await MarbleBotUser.Find(Context), ScavengeLocation.TreeWurld);
+            await ScavengeStartAsync((await MarbleBotUser.Find(Context))!, ScavengeLocation.TreeWurld);
         }
 
         [Command("violetvolcanoes")]
@@ -90,7 +90,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in the Violet Volcanoes.")]
         public async Task ScavengeVolcanoCommand()
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             if (user.Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
@@ -110,7 +110,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Grabs an item found in a scavenge session.")]
         public async Task ScavengeGrabCommand()
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
 
             if (!_gamesService.Scavenges.ContainsKey(Context.User.Id) ||
                 _gamesService.Scavenges[Context.User.Id] == null)
@@ -169,7 +169,7 @@ namespace MarbleBot.Modules.Games
                 return;
             }
 
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             if (!(user.Items.ContainsKey(81) || user.Items.ContainsKey(82)))
             {
                 await SendErrorAsync($"**{Context.User.Username}**, you need a drill to mine ore!");
@@ -206,7 +206,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Sells an item found in a scavenge session.")]
         public async Task ScavengeSellCommand()
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
 
             if (!_gamesService.Scavenges.ContainsKey(Context.User.Id) ||
                 _gamesService.Scavenges[Context.User.Id] == null)
@@ -242,7 +242,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Shows scavenge locations.")]
         public async Task ScavengeLocationCommand()
         {
-            string stageTwoLocations = (await MarbleBotUser.Find(Context)).Stage > 1
+            string stageTwoLocations = ((await MarbleBotUser.Find(Context))!).Stage > 1
                 ? "Destroyer's Remains\nViolet Volcanoes"
                 : ":lock: LOCKED\n:lock: LOCKED";
             await ReplyAsync(embed: new EmbedBuilder()
@@ -294,7 +294,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Shows scavenge location info for Destroyer's Remains")]
         public async Task ScavengeLocationDestroyerCommand()
         {
-            if ((await MarbleBotUser.Find(Context)).Stage < 2)
+            if (((await MarbleBotUser.Find(Context))!).Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -322,7 +322,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Starts a scavenge session in Destroyer's Remains")]
         public async Task ScavengeLocationVolcanoCommand()
         {
-            if ((await MarbleBotUser.Find(Context)).Stage < 2)
+            if (((await MarbleBotUser.Find(Context))!).Stage < 2)
             {
                 await ReplyAsync(embed: new EmbedBuilder()
                     .WithColor(GetColor(Context))
@@ -342,7 +342,7 @@ namespace MarbleBot.Modules.Games
         [Summary("Scavenge help.")]
         public async Task ScavengeHelpCommand([Remainder] string _ = "")
         {
-            bool userCanDrill = (await MarbleBotUser.Find(Context)).Stage > 1;
+            bool userCanDrill = ((await MarbleBotUser.Find(Context))!).Stage > 1;
             const string helpP1 =
                 "Use `mb/scavenge locations` to see where you can scavenge for items and use `mb/scavenge <location name>` to start a scavenge session!";
             const string helpP2 =

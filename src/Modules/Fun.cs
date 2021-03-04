@@ -55,7 +55,7 @@ namespace MarbleBot.Modules
         [Summary("Gives advice on progression.")]
         public async Task AdviceCommand()
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             string msg;
             if (user.Items.ContainsKey(78))
             {

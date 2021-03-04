@@ -59,7 +59,7 @@ namespace MarbleBot.Modules
         [Summary("Shows the time remaining for each activity with a cooldown.")]
         public async Task CheckTimesCommand()
         {
-            var user = await MarbleBotUser.Find(Context);
+            var user = (await MarbleBotUser.Find(Context))!;
             TimeSpan timeUntilNextDaily = user.LastDaily - DateTime.UtcNow.AddHours(-24);
             TimeSpan timeUntilNextRace = user.LastRaceWin - DateTime.UtcNow.AddHours(-6);
             TimeSpan timeUntilNextScavenge = user.LastScavenge - DateTime.UtcNow.AddHours(-6);
@@ -124,7 +124,7 @@ namespace MarbleBot.Modules
                     commands = commands.Where(commandInfo => commandInfo.Remarks != "CM Only");
                 }
 
-                if ((await MarbleBotUser.Find(Context)).Stage < 2)
+                if (((await MarbleBotUser.Find(Context))!).Stage < 2)
                 {
                     commands = commands.Where(commandInfo => commandInfo.Remarks != "Stage2");
                 }
