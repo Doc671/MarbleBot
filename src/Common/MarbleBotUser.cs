@@ -106,87 +106,51 @@ namespace MarbleBot.Common
 
         public static MarbleBotUser Find(ICommandContext context)
         {
-            var userDict = GetUsers();
-            MarbleBotUser user;
-            if (userDict.ContainsKey(context.User.Id))
-            {
-                user = userDict[context.User.Id];
-                user.Name = context.User.Username;
-                user.Discriminator = context.User.Discriminator;
-            }
-            else
-            {
-                user = new MarbleBotUser
-                {
-                    Id = context.User.Id,
-                    Name = context.User.Username,
-                    Discriminator = context.User.Discriminator
-                };
-            }
-
-            return user;
+            var usersDict = GetUsers();
+            return GetUserFromDictionary(context, context.User.Id, usersDict, context.User.Username, context.User.Discriminator);
         }
 
         public static MarbleBotUser Find(ICommandContext context, ulong id)
         {
-            var userDict = GetUsers();
-            MarbleBotUser user;
-            if (userDict.ContainsKey(id))
-            {
-                user = userDict[id];
-                user.Name = context.User.Username;
-                user.Discriminator = context.User.Discriminator;
-            }
-            else
-            {
-                user = new MarbleBotUser
-                {
-                    Id = context.User.Id,
-                    Name = context.User.Username,
-                    Discriminator = context.User.Discriminator
-                };
-            }
-
-            return user;
+            var usersDict = GetUsers();
+            return GetUserFromDictionary(context, id, usersDict, context.User.Username, context.User.Discriminator);
         }
 
         public static MarbleBotUser Find(ICommandContext context, IDictionary<ulong, MarbleBotUser> usersDict)
         {
-            MarbleBotUser user;
-            if (usersDict.ContainsKey(context.User.Id))
-            {
-                user = usersDict[context.User.Id];
-                user.Name = context.User.Username;
-                user.Discriminator = context.User.Discriminator;
-            }
-            else
-            {
-                user = new MarbleBotUser
-                {
-                    Id = context.User.Id,
-                    Name = context.User.Username,
-                    Discriminator = context.User.Discriminator
-                };
-            }
-
-            return user;
+            return GetUserFromDictionary(context, context.User.Id, usersDict, context.User.Username, context.User.Discriminator);
         }
 
-        public static async Task<MarbleBotUser> FindAsync(ICommandContext context,
-            IDictionary<ulong, MarbleBotUser> usersDict, ulong id)
+        public static async Task<MarbleBotUser> FindAsync(ICommandContext context, ulong id,
+            IDictionary<ulong, MarbleBotUser> usersDict)
         {
-            MarbleBotUser user;
-            if (usersDict.ContainsKey(id))
+            IUser? user = await context.Client.GetUserAsync(id);
+            string defaultUsername;
+            string defaultDiscriminator;
+            if (user == null)
             {
-                user = usersDict[id];
+                defaultUsername = context.User.Username;
+                defaultDiscriminator = context.User.Discriminator;
             }
             else
             {
+                defaultUsername = user.Username;
+                defaultDiscriminator = user.Discriminator;
+            }
+
+            return GetUserFromDictionary(context, id, usersDict, defaultUsername, defaultDiscriminator);
+        }
+
+        private static MarbleBotUser GetUserFromDictionary(ICommandContext context, ulong id,
+            IDictionary<ulong, MarbleBotUser> usersDict, string defaultUsername, string defaultDiscriminator)
+        {
+            if (!usersDict.TryGetValue(id, out MarbleBotUser? user))
+            {
                 user = new MarbleBotUser
                 {
-                    Id = context.User.Id,
-                    Name = (await context.Client.GetUserAsync(id)).Username,
-                    Discriminator = (await context.Client.GetUserAsync(id)).Discriminator
+                    Id = id,
+                    Name = defaultUsername,
+                    Discriminator = defaultDiscriminator
                 };
             }
 

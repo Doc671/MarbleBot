@@ -252,7 +252,7 @@ namespace MarbleBot.Common.Games.Siege
 
             foreach (SiegeMarble marble in Marbles)
             {
-                var user = await MarbleBotUser.FindAsync(_context, usersDict, marble.Id);
+                var user = await MarbleBotUser.FindAsync(_context, marble.Id, usersDict);
                 var output = new StringBuilder();
 
                 // Advance user's stage if necessary
