@@ -30,8 +30,8 @@ namespace MarbleBot.Common.Games
         public int DamageDealt { get; set; }
 
         private Shield? _shield;
-        public Shield? Shield 
-        { 
+        public Shield? Shield
+        {
             get => _shield;
             set
             {

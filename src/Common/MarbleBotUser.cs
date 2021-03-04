@@ -158,7 +158,7 @@ namespace MarbleBot.Common
 
         public static IDictionary<ulong, MarbleBotUser> GetUsers()
         {
-            string json; 
+            string json;
             using (var itemFile = new StreamReader($"Data{Path.DirectorySeparatorChar}Users.json"))
             {
                 json = itemFile.ReadToEnd();

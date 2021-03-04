@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using MarbleBot.Common;
 using MarbleBot.Common.Games;
 using MarbleBot.Common.Games.Scavenge;

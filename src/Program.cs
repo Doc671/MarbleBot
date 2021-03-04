@@ -73,7 +73,7 @@ namespace MarbleBot
 
         private static BotCredentials GetBotCredentials()
         {
-            string json; 
+            string json;
             using (var itemFile = new StreamReader("BotCredentials.json"))
             {
                 json = itemFile.ReadToEnd();
