@@ -282,7 +282,7 @@ namespace MarbleBot.Modules.Games
 
                     foreach ((ulong id, string name, int itemId) in marbles)
                     {
-                        marbleOutput.AppendLine($"{Bold(name)} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{GetUsernameDiscriminatorString(Context, id)}]");
+                        marbleOutput.AppendLine($"{Bold(name)} (Weapon: **{Item.Find<Item>(itemId.ToString()).Name}**) [{await GetUsernameDiscriminatorString(Context, id)}]");
                     }
                 }
                 else
@@ -297,7 +297,7 @@ namespace MarbleBot.Modules.Games
 
                     foreach ((ulong id, string name) in marbles)
                     {
-                        marbleOutput.AppendLine($"{Bold(name)} [{GetUsernameDiscriminatorString(Context, id)}]");
+                        marbleOutput.AppendLine($"{Bold(name)} [{await GetUsernameDiscriminatorString(Context, id)}]");
                     }
                 }
             }
