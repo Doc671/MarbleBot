@@ -120,4 +120,9 @@ public static class ColorExtensions
 
         return new Color(rawColor);
     }
+
+    public static string ToHexCode(this Color color)
+    {
+        return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
 }
