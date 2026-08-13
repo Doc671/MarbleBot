@@ -153,7 +153,8 @@ public class EconomyModule : MarbleBotSlashCommandModule
     public async Task ProfileCommand(
         [Summary("user", "Which user's profile to inspect. Will inspect your own balance if left blank.")] User? marbleBotUser = null)
     {
-        marbleBotUser ??= await _userDao.GetUserAsync(Context.User.Id);
+        ulong id = Context.User.Id;
+        marbleBotUser ??= await _userDao.GetUserAsync(id);
 
         decimal balance = marbleBotUser?.Balance ?? 0;
         decimal netWorth = marbleBotUser?.NetWorth ?? 0;
@@ -186,7 +187,12 @@ public class EconomyModule : MarbleBotSlashCommandModule
             //.AddField("Last War Win", lastWarWin, true);
         }
 
-        await RespondAsync(embed: builder.Build());
+        MemoryStream appearanceStream = await _marbleRendererService.RenderMarbleApperanceAsync(id, 0,
+            _marbleImageDimension, _marbleImageDimension, _marbleImageDimension / 2, _marbleImageDimension / 2, _marbleImageDimension / 2);
+
+        builder.WithThumbnailUrl($"attachment://MarbleAppearance{id}.png");
+
+        await RespondWithFileAsync(appearanceStream, $"MarbleAppearance{id}.png", embed: builder.Build());
     }
 
     private static string GetLastWinString(DateTime lastWin)
