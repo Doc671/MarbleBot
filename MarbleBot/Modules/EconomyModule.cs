@@ -1,5 +1,7 @@
 ﻿using MarbleBot.Data.Repositories;
 using MarbleBot.Entities;
+using MarbleBot.Modals;
+using MarbleBot.Services;
 using System.Text;
 
 namespace MarbleBot.Modules;
@@ -7,10 +9,14 @@ namespace MarbleBot.Modules;
 public class EconomyModule : MarbleBotSlashCommandModule
 {
     private readonly UserDao _userDao;
+    private readonly MarbleAppearanceDao _marbleAppearanceDao;
+    private readonly MarbleRendererService _marbleRendererService;
 
     public EconomyModule(UserDao userDao)
     {
         _userDao = userDao;
+        _marbleAppearanceDao = marbleAppearanceDao;
+        _marbleRendererService = marbleRendererService;
     }
 
     [SlashCommand("balance", "Returns how much money you or someone else has.")]
@@ -37,6 +43,51 @@ public class EconomyModule : MarbleBotSlashCommandModule
         }
 
         await RespondAsync(embed: builder.Build());
+    }
+
+    [SlashCommand("changeappearance", "Allows you to change your marble's appearance.")]
+    public async Task ChangeAppearanceCommand()
+    {
+        await RespondWithModalAsync<MarbleAppearanceModal>($"appearance_modal_{Context.User.Id}");
+    }
+
+    [ModalInteraction("appearance_modal_*")]
+    public async Task ChangeAppearanceCommand(ulong userId, MarbleAppearanceModal modal)
+    {
+        User marbleBotUser = await _userDao.GetOrCreateUserAsync(userId);
+
+        var colors = new List<Color>();
+        string[] hexCodes = modal.HexCodes?.Split('\n') ?? Array.Empty<string>();
+        foreach (string hexCode in hexCodes)
+        {
+            const int maxColors = 8;
+            if (Color.TryParse(hexCode.Trim(), out Color color) && colors.Count <= maxColors)
+            {
+                colors.Add(color);
+            }
+            else
+            {
+                await RespondWithErrorAsync($"Invalid hex code: {hexCode}.");
+                return;
+            }
+        }
+
+        float? gradientAngleDegrees = null;
+        if (modal.MarbleAppearanceType == MarbleAppearanceType.LinearGradient && !string.IsNullOrWhiteSpace(modal.GradientAngle))
+        {
+            if (float.TryParse(modal.GradientAngle, out float angle))
+            {
+                gradientAngleDegrees = angle;
+            }
+            else
+            {
+                await RespondWithErrorAsync($"Invalid gradient angle: {modal.GradientAngle}.");
+                return;
+            }
+        }
+
+        await _marbleAppearanceDao.UpdateAppearanceAsync(marbleBotUser.Id, modal.MarbleAppearanceType, colors, gradientAngleDegrees);
+        await RespondAsync($"Your marble appearance has been updated successfully!", ephemeral: true);
     }
 
     [SlashCommand("inventory", "Returns a list of your items.")]
@@ -146,5 +197,37 @@ public class EconomyModule : MarbleBotSlashCommandModule
             lastWinString = $"<t:{unixTime}:S>";
         }
         return lastWinString;
+    }
+
+    [SlashCommand("showappearance", "Returns your current marble appearance.")]
+    public async Task ShowAppearanceCommand(string backgroundHexCode = "#000000")
+    {
+        ulong id = Context.User.Id;
+        User? marbleBotUser = await _userDao.GetUserAsync(id);
+        if (marbleBotUser == null)
+        {
+            await RespondWithErrorAsync("You don't have a marble appearance yet. Use /changeappearance to set one.");
+            return;
+        }
+
+        uint background;
+        if (backgroundHexCode.StartsWith("#"))
+        {
+            background = uint.Parse(backgroundHexCode[1..], System.Globalization.NumberStyles.HexNumber);
+        }
+        else
+        {
+            background = uint.Parse(backgroundHexCode, System.Globalization.NumberStyles.HexNumber);
+        }
+
+        if (backgroundHexCode.Length is 6 or 7 && background is not 0)
+        {
+            background |= 0xFF000000;
+        }
+
+        MemoryStream appearanceStream = await _marbleRendererService.RenderMarbleApperanceAsync(id, background, 
+            _marbleImageDimension, _marbleImageDimension, _marbleImageDimension / 2, _marbleImageDimension / 2, _marbleImageDimension / 2);
+
+        await RespondWithFileAsync(appearanceStream, $"MarbleAppearance{id}.png", "Current marble appearance.");
     }
 }
