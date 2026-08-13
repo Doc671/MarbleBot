@@ -17,7 +17,7 @@ namespace MarbleBot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -165,6 +165,47 @@ namespace MarbleBot.Migrations
                     b.HasDiscriminator<string>("ItemType").HasValue("Item");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.MarbleAppearance", b =>
+                {
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("AppearanceType")
+                        .HasColumnType("integer");
+
+                    b.Property<float?>("GradientAngleDegrees")
+                        .HasColumnType("real");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("MarbleAppearances");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.MarbleAppearanceColor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("RawColor")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Order")
+                        .IsUnique();
+
+                    b.ToTable("MarbleAppearanceColors");
                 });
 
             modelBuilder.Entity("MarbleBot.Entities.User", b =>
@@ -357,6 +398,28 @@ namespace MarbleBot.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MarbleBot.Entities.MarbleAppearance", b =>
+                {
+                    b.HasOne("MarbleBot.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("MarbleBot.Entities.MarbleAppearance", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.MarbleAppearanceColor", b =>
+                {
+                    b.HasOne("MarbleBot.Entities.MarbleAppearance", "Appearance")
+                        .WithMany("Colors")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Appearance");
+                });
+
             modelBuilder.Entity("MarbleBot.Entities.UserInventoryItem", b =>
                 {
                     b.HasOne("MarbleBot.Entities.Item", "Item")
@@ -407,6 +470,11 @@ namespace MarbleBot.Migrations
                     b.Navigation("CraftingRecipeIngredientsAsTarget");
 
                     b.Navigation("Owners");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.MarbleAppearance", b =>
+                {
+                    b.Navigation("Colors");
                 });
 
             modelBuilder.Entity("MarbleBot.Entities.User", b =>
