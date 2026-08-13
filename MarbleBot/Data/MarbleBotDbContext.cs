@@ -10,6 +10,9 @@ namespace MarbleBot.Data;
 public class MarbleBotDbContext : DbContext
 {
     public DbSet<User> Users => Set<User>();
+    public DbSet<MarbleAppearance> MarbleAppearances => Set<MarbleAppearance>();
+    public DbSet<MarbleAppearanceColor> MarbleAppearanceColors => Set<MarbleAppearanceColor>();
+
     public DbSet<Item> Items => Set<Item>();
     public DbSet<UserInventoryItem> UserInventoryItems => Set<UserInventoryItem>();
     public DbSet<CraftingRecipeIngredient> CraftingRecipeIngredients => Set<CraftingRecipeIngredient>();
@@ -33,6 +36,10 @@ public class MarbleBotDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
+
+        new MarbleAppearanceEntityTypeConfiguration().Configure(modelBuilder.Entity<MarbleAppearance>());
+
+        new MarbleAppearanceColorEntityTypeConfiguration().Configure(modelBuilder.Entity<MarbleAppearanceColor>());
 
         new UserInventoryItemEntityTypeConfiguration().Configure(modelBuilder.Entity<UserInventoryItem>());
 
