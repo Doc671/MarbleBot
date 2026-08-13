@@ -1,0 +1,11 @@
+# ignore IDE settings
+.idea
+.vs
+.vscode
+MarbleBot/.vscode
+
+# ignore build & object folders
+MarbleBot/bin
+MarbleBot/obj
+MarbleBot.Tests/bin
+MarbleBot.Tests/obj
