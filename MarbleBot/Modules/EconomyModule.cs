@@ -12,7 +12,9 @@ public class EconomyModule : MarbleBotSlashCommandModule
     private readonly MarbleAppearanceDao _marbleAppearanceDao;
     private readonly MarbleRendererService _marbleRendererService;
 
-    public EconomyModule(UserDao userDao)
+    private const int _marbleImageDimension = 64;
+
+    public EconomyModule(UserDao userDao, MarbleAppearanceDao marbleAppearanceDao, MarbleRendererService marbleRendererService)
     {
         _userDao = userDao;
         _marbleAppearanceDao = marbleAppearanceDao;
@@ -211,7 +213,7 @@ public class EconomyModule : MarbleBotSlashCommandModule
         }
 
         uint background;
-        if (backgroundHexCode.StartsWith("#"))
+        if (backgroundHexCode.StartsWith('#'))
         {
             background = uint.Parse(backgroundHexCode[1..], System.Globalization.NumberStyles.HexNumber);
         }
