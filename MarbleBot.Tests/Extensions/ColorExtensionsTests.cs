@@ -75,4 +75,24 @@ public class ColorExtensionsTests
         Assert.Equal(expectedGreen, color.G);
         Assert.Equal(expectedBlue, color.B);
     }
+
+    [Theory]
+    [InlineData(0, 0, 0, "#000000")]         // Black
+    [InlineData(128, 128, 128, "#808080")]   // Grey
+    [InlineData(255, 255, 255, "#FFFFFF")]   // White
+    [InlineData(255, 0, 0, "#FF0000")]       // Red
+    [InlineData(0, 255, 0, "#00FF00")]       // Green
+    [InlineData(0, 0, 255, "#0000FF")]       // Blue
+    [InlineData(255, 255, 0, "#FFFF00")]     // Yellow
+    [InlineData(0, 255, 255, "#00FFFF")]     // Cyan
+    [InlineData(255, 0, 255, "#FF00FF")]     // Magenta
+    [InlineData(128, 70, 51, "#804633")]     // Chestnut
+    [InlineData(61, 153, 130, "#3D9982")]    // Zomp
+    [InlineData(153, 78, 173, "#994EAD")]    // Purpureus
+    public void ToHexCode_ReturnsCorrectHexCode(int red, int green, int blue, string expectedHex)
+    {
+        var color = new Color(red, green, blue);
+        string hexCode = color.ToHexCode();
+        Assert.Equal(expectedHex, hexCode);
+    }
 }
