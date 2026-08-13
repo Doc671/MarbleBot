@@ -61,6 +61,7 @@ internal sealed class Program
         builder.Services.AddScoped<ItemDao>();
         builder.Services.AddScoped<SignupGroupDao>();
         builder.Services.AddScoped<SignupGameResultDao>();
+        builder.Services.AddScoped<MarbleAppearanceDao>();
     }
 
     private static void AddBotServices(HostApplicationBuilder builder)
@@ -94,6 +95,8 @@ internal sealed class Program
 
         builder.Services.AddSingleton<AutoModFilterService>()
             .AddHostedService(provider => provider.GetRequiredService<AutoModFilterService>());
+
+        builder.Services.AddSingleton<MarbleRendererService>();
 
         builder.Services.AddSingleton<RaceSessionService>()
             .AddSingleton<RaceEngine>();
