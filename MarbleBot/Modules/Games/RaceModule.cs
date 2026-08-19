@@ -131,9 +131,11 @@ public class RaceModule : MarbleBotSlashCommandModule
             }
         }
 
+        string filteredOutput = await _autoModFilterService.FilterAsync(resultOutput.ToString(), Context);
+
         var embedBuilder = new EmbedBuilder()
             .WithTitle(title)
-            .WithDescription(resultOutput.ToString())
+            .WithDescription(filteredOutput)
             .WithCurrentTimestamp();
 
         var componentBuilder = new ComponentBuilder()
@@ -207,9 +209,11 @@ public class RaceModule : MarbleBotSlashCommandModule
             }
         }
 
+        string filteredOutput = await _autoModFilterService.FilterAsync(resultOutput.ToString(), Context);
+
         var embedBuilder = new EmbedBuilder()
             .WithTitle(title)
-            .WithDescription(resultOutput.ToString())
+            .WithDescription(filteredOutput)
             .WithCurrentTimestamp();
 
         var componentBuilder = new ComponentBuilder()
