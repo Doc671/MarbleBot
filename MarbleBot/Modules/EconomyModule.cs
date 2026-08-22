@@ -11,14 +11,16 @@ public class EconomyModule : MarbleBotSlashCommandModule
     private readonly UserDao _userDao;
     private readonly MarbleAppearanceDao _marbleAppearanceDao;
     private readonly MarbleRendererService _marbleRendererService;
+    private readonly GuildColorProvider _guildColorProvider;
 
     private const int _marbleImageDimension = 64;
 
-    public EconomyModule(UserDao userDao, MarbleAppearanceDao marbleAppearanceDao, MarbleRendererService marbleRendererService)
+    public EconomyModule(UserDao userDao, MarbleAppearanceDao marbleAppearanceDao, MarbleRendererService marbleRendererService, GuildColorProvider guildColorProvider)
     {
         _userDao = userDao;
         _marbleAppearanceDao = marbleAppearanceDao;
         _marbleRendererService = marbleRendererService;
+        _guildColorProvider = guildColorProvider;
     }
 
     [SlashCommand("balance", "Returns how much money you or someone else has.")]
@@ -31,6 +33,7 @@ public class EconomyModule : MarbleBotSlashCommandModule
         decimal netWorth = marbleBotUser?.NetWorth ?? 0;
 
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithFooter($"{_warning} | Balances are frozen for now and may be flattened in the future.")
             .AddField("Balance", $"{_unitOfMoney}{balance}", true)
             .AddField("Net Worth", $"{_unitOfMoney}{netWorth}", true);
@@ -121,6 +124,7 @@ public class EconomyModule : MarbleBotSlashCommandModule
         }
 
         var embedBuilder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithDescription(itemOutput.ToString())
             .WithFooter($"{_warning} | Inventories are frozen for now. Items may be changed in the future.")
             .WithTitle(itemsPresent
@@ -167,7 +171,7 @@ public class EconomyModule : MarbleBotSlashCommandModule
 
         EmbedBuilder? builder = new EmbedBuilder()
             .WithAuthor(Context.User)
-            //.WithColor(GetColor(Context))
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithFooter($"{_warning} | Balances are frozen for now and may be flattened in the future.")
             .AddField("Balance", $"{_unitOfMoney}{balance}", true)
             .AddField("Net Worth", $"{_unitOfMoney}{netWorth}", true);

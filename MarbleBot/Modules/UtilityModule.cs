@@ -1,14 +1,23 @@
-﻿using System.Diagnostics;
+﻿using MarbleBot.Services;
+using System.Diagnostics;
 using System.Text;
 
 namespace MarbleBot.Modules;
 
 public class UtilityModule : MarbleBotSlashCommandModule
 {
+    private readonly GuildColorProvider _guildColorProvider;
+
+    public UtilityModule(GuildColorProvider guildColorProvider)
+    {
+        _guildColorProvider = guildColorProvider;
+    }
+
     [SlashCommand("about", "Displays information about the bot.")]
     public async Task AboutCommmand()
     {
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithDescription("MarbleBot has currently been brought back in a limited capacity, so certain commands may be missing.")
             .WithAuthor(Context.Client.CurrentUser)
             .AddField("What happened to all the economy commands (e.g. daily)?", "Daily rewards used to increase exponentially over time from 200 units of money to a maximum of 40000. While the level of inflation was funny, I don't want to punish people who don't keep daily streaks to that extent.", true)
@@ -38,6 +47,7 @@ public class UtilityModule : MarbleBotSlashCommandModule
         }
 
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithThumbnailUrl(Context.Guild.IconUrl)
             .WithTitle(Context.Guild.Name)
             .AddField("Created At", Context.Guild.CreatedAt, true)
@@ -66,9 +76,9 @@ public class UtilityModule : MarbleBotSlashCommandModule
         long unixTimestamp = ((DateTimeOffset)startTime).ToUnixTimeSeconds();
 
         var embedBuilder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle("MarbleBot Uptime")
-            .WithDescription($"Online since: **<t:{unixTimestamp}:R>**\nUptime: **<t:{unixTimestamp}:R>**")
-            .WithColor(Color.Blue);
+            .WithDescription($"Online since: **<t:{unixTimestamp}:R>**\nUptime: **<t:{unixTimestamp}:R>**");
 
         await RespondAsync(embed: embedBuilder.Build());
     }
@@ -104,13 +114,13 @@ public class UtilityModule : MarbleBotSlashCommandModule
         }
 
         var embedBuilder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithAuthor(user)
             .WithTitle($"{user.GlobalName}")
             .AddField("Nickname", nickname, true)
             .AddField("Account Created", $"<t:{user.CreatedAt.ToUnixTimeSeconds()}:R>", true)
             .AddField("Joined Server", $"<t:{user.JoinedAt?.ToUnixTimeSeconds()}:R>", true)
-            .AddField("Roles", roles.Length > 0 ? roles.ToString() : "None")
-            .WithColor(Color.Blue);
+            .AddField("Roles", roles.Length > 0 ? roles.ToString() : "None");
 
         await ReplyAsync(embed: embedBuilder.Build());
     }

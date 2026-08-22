@@ -7,10 +7,12 @@ namespace MarbleBot.Modules;
 public class GeneralModule : MarbleBotSlashCommandModule
 {
     private readonly AutoModFilterService _autoModFilterService;
+    private readonly GuildColorProvider _guildColorProvider;
 
-    public GeneralModule(AutoModFilterService autoModFilterService)
+    public GeneralModule(AutoModFilterService autoModFilterService, GuildColorProvider guildColorProvider)
     {
         _autoModFilterService = autoModFilterService;
+        _guildColorProvider = guildColorProvider;
     }
 
     [SlashCommand("choose", "Randomly chooses between choices.")]
@@ -126,6 +128,7 @@ public class GeneralModule : MarbleBotSlashCommandModule
         }
 
         var embedBuilder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle("Chance of Being Eliminated Next (COBEN)")
             .WithDescription(stringBuilder.ToString())
             .WithFooter($"Points to be distributed after the next event: {pointsToDistribute}\n\nEliminations after the next event: {eliminationCount}\nNumber of simulations used to calculate: {simulationCount}\nTime taken to calculate: {timeTakenString}");
