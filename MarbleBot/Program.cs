@@ -59,6 +59,7 @@ internal sealed class Program
 
         builder.Services.AddScoped<UserDao>();
         builder.Services.AddScoped<ItemDao>();
+        builder.Services.AddScoped<GuildDao>();
         builder.Services.AddScoped<SignupGroupDao>();
         builder.Services.AddScoped<SignupGameResultDao>();
         builder.Services.AddScoped<MarbleAppearanceDao>();
@@ -91,7 +92,11 @@ internal sealed class Program
             .AddSingleton<YouTubeApiService>()
             .AddHostedService<ItemSyncService>()
             .AddHostedService<UserMigrationService>()
+            .AddHostedService<GuildMigrationService>()
             .AddHostedService<DiscordBotWorker>();
+
+        builder.Services.AddSingleton<GuildColorProvider>()
+            .AddSingleton<GuildUsableChannelProvider>();
 
         builder.Services.AddSingleton<AutoModFilterService>()
             .AddHostedService(provider => provider.GetRequiredService<AutoModFilterService>());
