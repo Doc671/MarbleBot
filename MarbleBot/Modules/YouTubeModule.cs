@@ -7,13 +7,15 @@ public class YouTubeModule : MarbleBotSlashCommandModule
 {
     private readonly YouTubeApiService _youTubeApiService;
     private readonly AutoModFilterService _autoModFilterService;
+    private readonly GuildColorProvider _guildColorProvider;
 
     private const int _maxDescriptionLength = 300;
 
-    public YouTubeModule(YouTubeApiService youTubeApiService, AutoModFilterService autoModFilterService)
+    public YouTubeModule(YouTubeApiService youTubeApiService, AutoModFilterService autoModFilterService, GuildColorProvider guildColorProvider)
     {
         _youTubeApiService = youTubeApiService;
         _autoModFilterService = autoModFilterService;
+        _guildColorProvider = guildColorProvider;
     }
 
     private bool ShouldEnforceSafeSearch()
@@ -57,6 +59,7 @@ public class YouTubeModule : MarbleBotSlashCommandModule
 
         string title = await _autoModFilterService.FilterAsync(channel.Snippet.Title, Context);
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle(title)
             .WithThumbnailUrl(channel.Snippet.Thumbnails.Medium.Url)
             .WithUrl($"https://www.youtube.com/channel/{channel.Id}")
@@ -128,6 +131,7 @@ public class YouTubeModule : MarbleBotSlashCommandModule
         searchResults = await _autoModFilterService.FilterAsync(searchResults, Context);
 
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle($"Search results for \"{filteredSearchTerm}\"")
             .WithDescription(searchResults);
 
@@ -158,6 +162,7 @@ public class YouTubeModule : MarbleBotSlashCommandModule
         searchResults = await _autoModFilterService.FilterAsync(searchResults, Context);
 
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle($"Search results for \"{filteredSearchTerm}\"")
             .WithDescription(searchResults);
 
@@ -191,6 +196,7 @@ public class YouTubeModule : MarbleBotSlashCommandModule
 
         string title = await _autoModFilterService.FilterAsync(video.Snippet.Title, Context);
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle(title)
             .WithThumbnailUrl(video.Snippet.Thumbnails.Medium.Url)
             .WithUrl($"https://www.youtube.com/watch?v={video.Id}")

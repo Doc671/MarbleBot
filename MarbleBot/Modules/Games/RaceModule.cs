@@ -11,12 +11,14 @@ public class RaceModule : MarbleBotSlashCommandModule
 {
     private readonly RaceSessionService _sessionService;
     private readonly AutoModFilterService _autoModFilterService;
+    private readonly GuildColorProvider _guildColorProvider;
     private readonly SignupGameResultDao _winnerDao;
 
-    public RaceModule(RaceSessionService sessionService, AutoModFilterService autoModFilterService, SignupGameResultDao winnerDao)
+    public RaceModule(RaceSessionService sessionService, AutoModFilterService autoModFilterService, GuildColorProvider guildColorProvider, SignupGameResultDao winnerDao)
     {
         _sessionService = sessionService;
         _autoModFilterService = autoModFilterService;
+        _guildColorProvider = guildColorProvider;
         _winnerDao = winnerDao;
     }
 
@@ -46,6 +48,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         }
 
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle("Marble Race: Contestants")
             .AddField($"Contestants: {entryCount}", stringBuilder.ToString());
 
@@ -83,6 +86,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         }
 
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .AddField("Marble Race: Signed up!", $"**{Context.User.Username}** has successfully signed up as {marbleName.ToDiscordBold()}!");
 
         if (session.GetEntryCount() == marbleLimit)
@@ -134,6 +138,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         string filteredOutput = await _autoModFilterService.FilterAsync(resultOutput.ToString(), Context);
 
         var embedBuilder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle(title)
             .WithDescription(filteredOutput)
             .WithCurrentTimestamp();
@@ -212,6 +217,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         string filteredOutput = await _autoModFilterService.FilterAsync(resultOutput.ToString(), Context);
 
         var embedBuilder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle(title)
             .WithDescription(filteredOutput)
             .WithCurrentTimestamp();
@@ -290,6 +296,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         await RespondAsync("Starting the race!");
 
         var builder = new EmbedBuilder()
+            .WithColor(await _guildColorProvider.GetColorAsync(Context))
             .WithTitle("The race has started!");
 
         IUserMessage message = await ReplyAsync(embed: builder.Build());
