@@ -122,6 +122,32 @@ namespace MarbleBot.Migrations
                     b.ToTable("SignupGroups");
                 });
 
+            modelBuilder.Entity("MarbleBot.Entities.Guild", b =>
+                {
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Color")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Guilds");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.GuildUsableChannel", b =>
+                {
+                    b.Property<long>("GuildId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ChannelId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("GuildId", "ChannelId");
+
+                    b.ToTable("GuildUsableChannels");
+                });
+
             modelBuilder.Entity("MarbleBot.Entities.Item", b =>
                 {
                     b.Property<int>("Id")
@@ -398,6 +424,17 @@ namespace MarbleBot.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MarbleBot.Entities.GuildUsableChannel", b =>
+                {
+                    b.HasOne("MarbleBot.Entities.Guild", "Guild")
+                        .WithMany("UsableChannels")
+                        .HasForeignKey("GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
             modelBuilder.Entity("MarbleBot.Entities.MarbleAppearance", b =>
                 {
                     b.HasOne("MarbleBot.Entities.User", "User")
@@ -461,6 +498,11 @@ namespace MarbleBot.Migrations
             modelBuilder.Entity("MarbleBot.Entities.Games.SignupGroup", b =>
                 {
                     b.Navigation("Entries");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.Guild", b =>
+                {
+                    b.Navigation("UsableChannels");
                 });
 
             modelBuilder.Entity("MarbleBot.Entities.Item", b =>
