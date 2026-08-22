@@ -12,14 +12,16 @@ public class SlashCommandHandler
     private readonly InteractionService _interactionService;
     private readonly ILogger<SlashCommandHandler> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly GuildUsableChannelProvider _guildUsableChannelProvider;
 
-    public SlashCommandHandler(DiscordSocketClient client, BotCredentials credentials, InteractionService interactionService, ILogger<SlashCommandHandler> logger, IServiceProvider serviceProvider)
+    public SlashCommandHandler(DiscordSocketClient client, BotCredentials credentials, InteractionService interactionService, ILogger<SlashCommandHandler> logger, IServiceProvider serviceProvider, GuildUsableChannelProvider guildUsableChannelProvider)
     {
         _client = client;
         _credentials = credentials;
         _interactionService = interactionService;
         _logger = logger;
         _serviceProvider = serviceProvider;
+        _guildUsableChannelProvider = guildUsableChannelProvider;
     }
 
     public async Task Initialise()
@@ -77,6 +79,12 @@ public class SlashCommandHandler
         try
         {
             var context = new SocketInteractionContext(_client, interaction);
+            if (!await _guildUsableChannelProvider.IsChannelUsable(context))
+            {
+                await interaction.RespondAsync(":x: | Commands are blocked in this channel.", ephemeral: true);
+                return;
+            }
+
             var result = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
             if (!result.IsSuccess)
             {
