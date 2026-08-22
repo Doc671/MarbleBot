@@ -18,6 +18,9 @@ public class MarbleBotDbContext : DbContext
     public DbSet<CraftingRecipeIngredient> CraftingRecipeIngredients => Set<CraftingRecipeIngredient>();
     public DbSet<WeaponAmmo> WeaponAmmo => Set<WeaponAmmo>();
 
+    public DbSet<Guild> Guilds => Set<Guild>();
+    public DbSet<GuildUsableChannel> GuildUsableChannels => Set<GuildUsableChannel>();
+
     public DbSet<SignupGroup> SignupGroups => Set<SignupGroup>();
     public DbSet<SignupEntry> SignupEntries => Set<SignupEntry>();
     public DbSet<SignupGameResultContainer> SignupGameResults => Set<SignupGameResultContainer>();
@@ -48,6 +51,10 @@ public class MarbleBotDbContext : DbContext
         new CraftingRecipeIngredientEntityTypeConfiguration().Configure(modelBuilder.Entity<CraftingRecipeIngredient>());
 
         new WeaponAmmoEntityTypeConfiguration().Configure(modelBuilder.Entity<WeaponAmmo>());
+
+        new GuildEntityTypeConfiguration().Configure(modelBuilder.Entity<Guild>());
+
+        new GuildUsableChannelEntityTypeConfiguration().Configure(modelBuilder.Entity<GuildUsableChannel>());
 
         new SignupGroupEntryEntityTypeConfiguration().Configure(modelBuilder.Entity<SignupEntry>());
     }
