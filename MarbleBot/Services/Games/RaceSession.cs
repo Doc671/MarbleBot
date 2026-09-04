@@ -12,9 +12,10 @@ public class RaceSession
 
     private readonly RaceEngine _engine;
 
-    public RaceSession(RaceEngine engine, int marbleLimit)
+    public RaceSession(RaceEngine engine, IReadOnlyList<SignupEntry> entries, int marbleLimit)
     {
         _engine = engine;
+        _entries.AddRange(entries);
         MarbleLimit = marbleLimit;
     }
 

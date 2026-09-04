@@ -18,20 +18,48 @@ public class RaceSessionService
         _scopeFactory = scopeFactory;
     }
 
-    public RaceSession GetOrCreateSession(ulong channelId, int marbleLimit)
+    public async Task<RaceSession> GetOrCreateSessionAsync(ulong channelId, int marbleLimit)
     {
-        return _sessions.GetOrAdd(channelId, _ => new RaceSession(_raceEngine, marbleLimit));
+        if (_sessions.TryGetValue(channelId, out RaceSession? existingSession))
+        {
+            return existingSession;
+        }
+
+        using IServiceScope scope = _scopeFactory.CreateScope();
+        var signupGroupDao = scope.ServiceProvider.GetRequiredService<SignupGroupDao>();
+        SignupGroup? group = await signupGroupDao.GetSignupGroupAsync(channelId, GameType.Race);
+
+        var newSession = new RaceSession(_raceEngine, group?.Entries ?? [], marbleLimit);
+        _sessions.AddOrUpdate(channelId, newSession, (_, _) => newSession);
+
+        return newSession;
     }
 
-    public RaceSession? GetSession(ulong channelId)
+    public async Task<RaceSession?> GetSessionAsync(ulong channelId)
     {
-        _sessions.TryGetValue(channelId, out var session);
-        return session;
+        if (_sessions.TryGetValue(channelId, out RaceSession? existingSession))
+        {
+            return existingSession;
+        }
+
+        using IServiceScope scope = _scopeFactory.CreateScope();
+        var signupGroupDao = scope.ServiceProvider.GetRequiredService<SignupGroupDao>();
+        SignupGroup? group = await signupGroupDao.GetSignupGroupAsync(channelId, GameType.Race);
+
+        if (group == null)
+        {
+            return null;
+        }
+
+        var newSession = new RaceSession(_raceEngine, group.Entries, 10);
+        _sessions.AddOrUpdate(channelId, newSession, (_, _) => newSession);
+
+        return newSession;
     }
 
     public async Task<IReadOnlyList<SignupEntry>?> TryGetEntriesAsync(ulong channelId)
     {
-        RaceSession? session = GetSession(channelId);
+        RaceSession? session = await GetSessionAsync(channelId);
         if (session == null) 
         {
             return null;
@@ -43,7 +71,7 @@ public class RaceSessionService
     public async Task<bool> TryAddEntryAsync(ulong channelId, ulong userId, string marbleName)
     {
         const int marbleLimit = 10;
-        RaceSession session = GetOrCreateSession(channelId, marbleLimit);
+        RaceSession session = await GetOrCreateSessionAsync(channelId, marbleLimit);
         bool success = session.TryAddEntry(userId, marbleName);
         if (!success)
         {
@@ -61,7 +89,7 @@ public class RaceSessionService
 
     public async Task<bool> TryRemoveEntryAsync(ulong channelId, ulong userId, string marbleName)
     {
-        RaceSession? session = GetSession(channelId);
+        RaceSession? session = await GetSessionAsync(channelId);
         if (session == null)
         {
             return false;

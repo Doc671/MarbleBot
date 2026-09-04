@@ -17,6 +17,7 @@ public class SignupGroupDao
     {
         return await _dbContext.SignupGroups
             .Include(group => group.Entries)
+            .ThenInclude(entry => entry.User)
             .FirstOrDefaultAsync(group => group.ChannelId == channelId && group.GameType == gameType);
     }
 

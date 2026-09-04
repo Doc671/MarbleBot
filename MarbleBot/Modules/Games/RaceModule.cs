@@ -25,7 +25,7 @@ public class RaceModule : MarbleBotSlashCommandModule
     [SlashCommand("contestants", "Returns a list of the race contestants in this channel.")]
     public async Task ContestantsCommand()
     {
-        RaceSession? session = _sessionService.GetSession(Context.Channel.Id);
+        RaceSession? session = await _sessionService.GetSessionAsync(Context.Channel.Id);
         if (session == null)
         {
             await RespondWithErrorAsync("Nobody has signed up!");
@@ -59,7 +59,7 @@ public class RaceModule : MarbleBotSlashCommandModule
     public async Task JoinCommand(string? marbleName = null)
     {
         const int marbleLimit = 10;
-        RaceSession session = _sessionService.GetOrCreateSession(Context.Channel.Id, marbleLimit);
+        RaceSession session = await _sessionService.GetOrCreateSessionAsync(Context.Channel.Id, marbleLimit);
 
         marbleName ??= Context.User.Username;
 
@@ -244,7 +244,7 @@ public class RaceModule : MarbleBotSlashCommandModule
     [SlashCommand("remove", "Removes your given marble name from the race.")]
     public async Task RemoveCommand(string? marbleName = null)
     {
-        RaceSession? session = _sessionService.GetSession(Context.Channel.Id);
+        RaceSession? session = await _sessionService.GetSessionAsync(Context.Channel.Id);
         if (session == null)
         {
             await RespondWithErrorAsync("Nobody has signed up!");
@@ -273,7 +273,7 @@ public class RaceModule : MarbleBotSlashCommandModule
     [SlashCommand("start", "Starts the race.")]
     public async Task StartCommand()
     {
-        RaceSession? session = _sessionService.GetSession(Context.Channel.Id);
+        RaceSession? session = await _sessionService.GetSessionAsync(Context.Channel.Id);
         if (session == null)
         {
             await RespondWithErrorAsync("Nobody has signed up!");
