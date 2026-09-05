@@ -150,13 +150,13 @@ public class RaceModule : MarbleBotSlashCommandModule
         await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
     }
 
-    [ComponentInteraction("race_mostuses_previous_*_*")]
+    [ComponentInteraction("race_mostuses_previous_*_*", ignoreGroupNames: true)]
     public async Task MostUsesPreviousCommand(bool thisChannelOnly, int page)
     {
         await MostUsesCommand(thisChannelOnly, page);
     }
 
-    [ComponentInteraction("race_mostuses_next_*_*")]
+    [ComponentInteraction("race_mostuses_next_*_*", ignoreGroupNames: true)]
     public async Task MostUsesNextCommand(bool thisChannelOnly, int page)
     {
         await MostUsesCommand(thisChannelOnly, page);
@@ -229,13 +229,13 @@ public class RaceModule : MarbleBotSlashCommandModule
         await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
     }
 
-    [ComponentInteraction("race_mostwins_previous_*_*_*")]
+    [ComponentInteraction("race_mostwins_previous_*_*_*", ignoreGroupNames: true)]
     public async Task MostWinsPreviousCommand(bool thisChannelOnly, bool winPercentage, int page)
     {
         await MostWinsCommand(thisChannelOnly, winPercentage, page);
     }
 
-    [ComponentInteraction("race_mostwins_next_*_*_*")]
+    [ComponentInteraction("race_mostwins_next_*_*_*", ignoreGroupNames: true)]
     public async Task MostWinsNextCommand(bool thisChannelOnly, bool winPercentage, int page)
     {
         await MostWinsCommand(thisChannelOnly, winPercentage, page);
