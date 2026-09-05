@@ -46,6 +46,15 @@ public class UserDao
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task UpdateNamesAsync(ulong userId, string? username, string? globalName)
+    {
+        await _dbContext.Users
+            .Where(user => user.Id == userId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(user => user.Username, username)
+                .SetProperty(user => user.GlobalName, globalName));
+    }
+
     public async Task AddBalanceAsync(ulong userId, decimal amount, CancellationToken cancellationToken = default)
     {
         var user = await GetOrCreateUserAsync(userId, cancellationToken: cancellationToken);
