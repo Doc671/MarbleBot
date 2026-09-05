@@ -12,6 +12,11 @@ public class UserDao
         _dbContext = dbContext;
     }
 
+    public async Task<bool> ContainsAsync(ulong id, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.Users.AnyAsync(user => user.Id == id, cancellationToken);
+    }
+
     public async Task<User?> GetUserAsync(ulong id, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Users
