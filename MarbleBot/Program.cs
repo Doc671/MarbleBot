@@ -90,6 +90,7 @@ internal sealed class Program
         builder.Services.AddSingleton<SlashCommandHandler>()
             .AddSingleton<LoggingService>()
             .AddSingleton<YouTubeApiService>()
+            .AddHostedService<UserSyncService>()
             .AddHostedService<ItemSyncService>()
             .AddHostedService<UserMigrationService>()
             .AddHostedService<GuildMigrationService>()
