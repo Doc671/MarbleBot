@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Resources\Bosses.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\DatabaseSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -40,10 +43,6 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="6.1.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageReference Include="SkiaSharp" Version="4.151.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Games\" />
   </ItemGroup>
 
 </Project>

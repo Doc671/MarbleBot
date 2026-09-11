@@ -109,5 +109,8 @@ internal sealed class Program
 
         builder.Services.AddSingleton<RaceSessionService>()
             .AddSingleton<RaceEngine>();
+
+        builder.Services.AddSingleton<SiegeSessionService>()
+            .AddSingleton<SiegeEngine>();
     }
 }
