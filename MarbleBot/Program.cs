@@ -86,11 +86,13 @@ internal sealed class Program
             }));
 
         builder.Services.AddSingleton<ItemLoadedService>();
+        
+        builder.Services.AddSingleton<UserSyncService>()
+            .AddHostedService(provider => provider.GetRequiredService<UserSyncService>());
 
         builder.Services.AddSingleton<SlashCommandHandler>()
             .AddSingleton<LoggingService>()
             .AddSingleton<YouTubeApiService>()
-            .AddHostedService<UserSyncService>()
             .AddHostedService<ItemSyncService>()
             .AddHostedService<UserMigrationService>()
             .AddHostedService<GuildMigrationService>()
