@@ -40,6 +40,101 @@ namespace MarbleBot.Migrations
                     b.ToTable("CraftingRecipeIngredients");
                 });
 
+            modelBuilder.Entity("MarbleBot.Entities.Games.Siege.Attack", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Accuracy")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("BossId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Damage")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("StatusEffect")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BossId");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Attacks");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.Games.Siege.Boss", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Difficulty")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Health")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("MaxHealth")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("Stage")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Bosses");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.Games.Siege.BossItemDrop", b =>
+                {
+                    b.Property<long>("BossId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Chance")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MinCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("BossId", "ItemId");
+
+                    b.HasIndex("ItemId");
+
+                    b.ToTable("BossItemDrops");
+                });
+
             modelBuilder.Entity("MarbleBot.Entities.Games.SignupEntry", b =>
                 {
                     b.Property<int>("Id")
@@ -405,6 +500,36 @@ namespace MarbleBot.Migrations
                     b.Navigation("TargetItem");
                 });
 
+            modelBuilder.Entity("MarbleBot.Entities.Games.Siege.Attack", b =>
+                {
+                    b.HasOne("MarbleBot.Entities.Games.Siege.Boss", "Boss")
+                        .WithMany("Attacks")
+                        .HasForeignKey("BossId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Boss");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.Games.Siege.BossItemDrop", b =>
+                {
+                    b.HasOne("MarbleBot.Entities.Games.Siege.Boss", "Boss")
+                        .WithMany("Drops")
+                        .HasForeignKey("BossId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MarbleBot.Entities.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Boss");
+
+                    b.Navigation("Item");
+                });
+
             modelBuilder.Entity("MarbleBot.Entities.Games.SignupEntry", b =>
                 {
                     b.HasOne("MarbleBot.Entities.Games.SignupGroup", "SignupGroup")
@@ -493,6 +618,13 @@ namespace MarbleBot.Migrations
                     b.Navigation("Ammo");
 
                     b.Navigation("Weapon");
+                });
+
+            modelBuilder.Entity("MarbleBot.Entities.Games.Siege.Boss", b =>
+                {
+                    b.Navigation("Attacks");
+
+                    b.Navigation("Drops");
                 });
 
             modelBuilder.Entity("MarbleBot.Entities.Games.SignupGroup", b =>
