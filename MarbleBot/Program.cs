@@ -63,6 +63,7 @@ internal sealed class Program
         builder.Services.AddScoped<SignupGroupDao>();
         builder.Services.AddScoped<SignupGameResultDao>();
         builder.Services.AddScoped<MarbleAppearanceDao>();
+        builder.Services.AddScoped<BossDao>();
     }
 
     private static void AddBotServices(HostApplicationBuilder builder)
