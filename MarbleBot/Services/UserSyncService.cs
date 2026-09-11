@@ -22,23 +22,37 @@ public class UserSyncService : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _client.UserUpdated += OnUserUpdated;
+        _client.UserUpdated += async (oldUser, newUser) =>
+        {
+            if (_userCache.TryGetValue(newUser.Id, out var cachedUser) && cachedUser.Username == newUser.Username && cachedUser.GlobalName == newUser.GlobalName)
+            {
+                return;
+            }
+
+            if (oldUser.Username == newUser.Username && oldUser.GlobalName == newUser.GlobalName)
+            {
+                return;
+            }
+
+            await OnUserUpdated(newUser.Id, oldUser.Username, oldUser.GlobalName, newUser.Username, newUser.GlobalName);
+        };
+
         return Task.CompletedTask;
     }
 
-    private async Task OnUserUpdated(SocketUser arg1, SocketUser arg2)
+    public void RegisterUsernameChanges(ulong userId, string? username, string? globalName)
     {
-        ulong userId = arg1.Id;
-        if (_userCache.TryGetValue(userId, out var cachedUser) && cachedUser.Username == arg2.Username && cachedUser.GlobalName == arg2.GlobalName)
+        if (_userCache.TryGetValue(userId, out var cachedUser) && cachedUser.Username == username && cachedUser.GlobalName == globalName)
         {
             return;
         }
 
-        if (arg1.Username == arg2.Username && arg1.GlobalName == arg2.GlobalName)
-        {
-            return;
-        }
+        _userCache[userId] = (username, globalName);
+        _ = OnUserUpdated(userId, cachedUser.Username, cachedUser.GlobalName, username, globalName);
+    }
 
+    private async Task OnUserUpdated(ulong userId, string? oldUsername, string? oldGlobalName, string? newUsername, string? newGlobalName)
+    {
         using IServiceScope scope = _scopeFactory.CreateScope();
         var userDao = scope.ServiceProvider.GetRequiredService<UserDao>();
         if (!await userDao.ContainsAsync(userId))
@@ -46,12 +60,12 @@ public class UserSyncService : IHostedService
             return;
         }
 
-        _userCache[userId] = (arg2.Username, arg2.GlobalName);
+        _userCache[userId] = (newUsername, newGlobalName);
 
         _logger.LogInformation("User {UserId} updated: Username changed from {OldUsername} to {NewUsername}, GlobalName changed from {OldGlobalName} to {NewGlobalName}",
-            userId, cachedUser.Username, arg2.Username, cachedUser.GlobalName, arg2.GlobalName);
+            userId, oldUsername, newUsername, oldGlobalName, newGlobalName);
 
-        await userDao.UpdateNamesAsync(userId, arg2.Username, arg2.GlobalName);
+        await userDao.UpdateNamesAsync(userId, newUsername, newGlobalName);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

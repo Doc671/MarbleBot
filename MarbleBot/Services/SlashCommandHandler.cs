@@ -12,15 +12,17 @@ public class SlashCommandHandler
     private readonly InteractionService _interactionService;
     private readonly ILogger<SlashCommandHandler> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly UserSyncService _userSyncService;
     private readonly GuildUsableChannelProvider _guildUsableChannelProvider;
 
-    public SlashCommandHandler(DiscordSocketClient client, BotCredentials credentials, InteractionService interactionService, ILogger<SlashCommandHandler> logger, IServiceProvider serviceProvider, GuildUsableChannelProvider guildUsableChannelProvider)
+    public SlashCommandHandler(DiscordSocketClient client, BotCredentials credentials, InteractionService interactionService, ILogger<SlashCommandHandler> logger, IServiceProvider serviceProvider, UserSyncService userSyncService, GuildUsableChannelProvider guildUsableChannelProvider)
     {
         _client = client;
         _credentials = credentials;
         _interactionService = interactionService;
         _logger = logger;
         _serviceProvider = serviceProvider;
+        _userSyncService = userSyncService;
         _guildUsableChannelProvider = guildUsableChannelProvider;
     }
 
@@ -84,6 +86,8 @@ public class SlashCommandHandler
                 await interaction.RespondAsync(":x: | Commands are blocked in this channel.", ephemeral: true);
                 return;
             }
+
+            _userSyncService.RegisterUsernameChanges(interaction.User.Id, interaction.User.Username, interaction.User.GlobalName);
 
             var result = await _interactionService.ExecuteCommandAsync(context, _serviceProvider);
             if (!result.IsSuccess)
