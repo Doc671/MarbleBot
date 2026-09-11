@@ -1,8 +1,10 @@
 ﻿using MarbleBot.Data.Configurations;
 using MarbleBot.Data.Configurations.Games;
+using MarbleBot.Data.Configurations.Games.Siege;
 using MarbleBot.Data.Converters;
 using MarbleBot.Entities;
 using MarbleBot.Entities.Games;
+using MarbleBot.Entities.Games.Siege;
 using Microsoft.EntityFrameworkCore;
 
 namespace MarbleBot.Data;
@@ -24,6 +26,10 @@ public class MarbleBotDbContext : DbContext
     public DbSet<SignupGroup> SignupGroups => Set<SignupGroup>();
     public DbSet<SignupEntry> SignupEntries => Set<SignupEntry>();
     public DbSet<SignupGameResultContainer> SignupGameResults => Set<SignupGameResultContainer>();
+
+    public DbSet<Boss> Bosses => Set<Boss>();
+    public DbSet<BossItemDrop> BossItemDrops => Set<BossItemDrop>();
+    public DbSet<Attack> Attacks => Set<Attack>();
 
     public MarbleBotDbContext(DbContextOptions<MarbleBotDbContext> options) : base(options)
     {
@@ -57,5 +63,11 @@ public class MarbleBotDbContext : DbContext
         new GuildUsableChannelEntityTypeConfiguration().Configure(modelBuilder.Entity<GuildUsableChannel>());
 
         new SignupGroupEntryEntityTypeConfiguration().Configure(modelBuilder.Entity<SignupEntry>());
+
+        new BossEntityTypeConfiguration().Configure(modelBuilder.Entity<Boss>());
+        
+        new BossItemDropEntityTypeConfiguration().Configure(modelBuilder.Entity<BossItemDrop>());
+
+        new AttackEntityTypeConfiguration().Configure(modelBuilder.Entity<Attack>());
     }
 }
