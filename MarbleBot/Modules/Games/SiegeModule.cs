@@ -138,6 +138,11 @@ public class SiegeModule : MarbleBotSlashCommandModule
     {
         const int marbleLimit = 10;
         SiegeSession session = await _sessionService.GetOrCreateSessionAsync(Context.Channel.Id, marbleLimit);
+        if (session.ContainsId(Context.User.Id))
+        {
+            await RespondWithErrorAsync("You can only sign up for a siege once!");
+            return;
+        }
 
         marbleName ??= Context.User.Username;
 
