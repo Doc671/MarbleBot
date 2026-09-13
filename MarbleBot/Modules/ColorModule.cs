@@ -27,6 +27,30 @@ public abstract class ColorModuleBase : MarbleBotSlashCommandModule
             hue %= 360f;
         }
 
+        if (saturation > 1f + float.Epsilon)
+        {
+            if (saturation > 100f + float.Epsilon)
+            {
+                saturation = 1f;
+            }
+            else
+            {
+                saturation /= 100f;
+            }
+        }
+
+        if (value > 1f + float.Epsilon)
+        {
+            if (value > 100f + float.Epsilon)
+            {
+                value = 1f;
+            }
+            else
+            {
+                value /= 100f;
+            }
+        }
+
         Color colour = ColorExtensions.FromHsv(hue, saturation, value);
         var embedBuilder = new EmbedBuilder()
             .AddField("RGB", $"Red: **{colour.R}**\nGreen: **{colour.G}**\nBlue: **{colour.B}**", true)
