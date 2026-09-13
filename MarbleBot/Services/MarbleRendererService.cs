@@ -19,7 +19,32 @@ public class MarbleRendererService
         using IServiceScope scope = _scopeFactory.CreateScope();
         var marbleAppearanceDao = scope.ServiceProvider.GetRequiredService<MarbleAppearanceDao>();
 
+        var imageInfo = new SKImageInfo(imageWidth, imageHeight);
+
+        using SKSurface surface = SKSurface.Create(imageInfo);
+
+        SKCanvas canvas = surface.Canvas;
+        canvas.Clear(imageBackground);
+
+        var marblePosition = new SKPoint(marblePositionX, marblePositionY);
+
         var appearance = await marbleAppearanceDao.GetAppearanceByUserIdAsync(userId);
+        RenderMarbleToCanvas(canvas, appearance, marblePosition, marbleRadius);
+
+        using SKImage image = surface.Snapshot();
+
+        const int imageQuality = 100;
+        using SKData data = image.Encode(SKEncodedImageFormat.Png, imageQuality);
+
+        var memoryStream = new MemoryStream();
+        data.SaveTo(memoryStream);
+        memoryStream.Position = 0;
+
+        return memoryStream;
+    }
+
+    public static void RenderMarbleToCanvas(SKCanvas canvas, MarbleAppearance? appearance, SKPoint marblePosition, int marbleRadius)
+    {
         SKColor[] colors;
         if (appearance == null)
         {
@@ -41,15 +66,6 @@ public class MarbleRendererService
                 .ToArray();
         }
 
-        var imageInfo = new SKImageInfo(imageWidth, imageHeight);
-
-        using SKSurface surface = SKSurface.Create(imageInfo);
-
-        SKCanvas canvas = surface.Canvas;
-        canvas.Clear(imageBackground);
-
-        var marblePosition = new SKPoint(marblePositionX, marblePositionY);
-
         switch (appearance?.AppearanceType ?? MarbleAppearanceType.Solid)
         {
             case MarbleAppearanceType.Solid:
@@ -65,17 +81,6 @@ public class MarbleRendererService
                 RenderRadialGradientMarble(canvas, colors, marblePosition, marbleRadius);
                 break;
         }
-
-        using SKImage image = surface.Snapshot();
-
-        const int imageQuality = 100;
-        using SKData data = image.Encode(SKEncodedImageFormat.Png, imageQuality);
-
-        var memoryStream = new MemoryStream();
-        data.SaveTo(memoryStream);
-        memoryStream.Position = 0;
-
-        return memoryStream;
     }
 
     private static void RenderSolidMarble(SKCanvas canvas, SKColor color, SKPoint marblePosition, int marbleRadius)
