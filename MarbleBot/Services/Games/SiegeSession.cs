@@ -1,6 +1,7 @@
 ﻿using MarbleBot.Entities;
 using MarbleBot.Entities.Games;
 using MarbleBot.Entities.Games.Siege;
+using MarbleBot.Games;
 using MarbleBot.Games.Siege;
 using MarbleBot.Modules.Games;
 
@@ -21,10 +22,16 @@ public class SiegeSession
     private Boss? _boss;
     private Dictionary<ulong, SiegeMarble>? _marbles;
 
-    public event EventHandler<SiegeMessage>? SiegeMessageSent;
+    private ulong _channelId;
+    private int _aliveMarbleCount;
+    private Dictionary<string, int>? _places;
 
-    public SiegeSession(SiegeEngine siegeEngine, IReadOnlyList<SignupEntry> entries, int marbleLimit)
+    public event EventHandler<SiegeMessage>? SiegeMessageSent;
+    public event EventHandler<SiegeCompleteEventArgs>? SiegeComplete;
+
+    public SiegeSession(ulong channelId, SiegeEngine siegeEngine, IReadOnlyList<SignupEntry> entries, int marbleLimit)
     {
+        _channelId = channelId;
         _siegeEngine = siegeEngine;
         _entries.AddRange(entries);
         MarbleLimit = marbleLimit;
@@ -106,6 +113,13 @@ public class SiegeSession
         _marbles = await SiegeEngine.ConvertToMarblesAsync(entriesCopy, _boss);
 
         List<SiegeMarble> marbles = _marbles.Values.ToList();
+        foreach (SiegeMarble marble in marbles)
+        {
+            marble.HealthChanged += OnMarbleHealthChanged;
+        }
+
+        _places = new Dictionary<string, int>(_marbles.Count);
+
         _messageHandler = new SiegeMessageHandler(this, message, embedBuilder, componentBuilder, _boss, marbles);
 
         try
@@ -123,7 +137,24 @@ public class SiegeSession
             lock (_lock)
             {
                 State = SiegeSessionState.Complete;
+
+                var results = new List<SiegeResult>();
+                foreach (SiegeMarble marble in marbles)
+                {
+                    int place = _places[marble.Name];
+                    results.Add(new SiegeResult(marble.Name, marble.Health, marble.DamageDealt, place));
+                }
+
+                SiegeComplete?.Invoke(this, new SiegeCompleteEventArgs(_channelId, results));
             }
+        }
+    }
+
+    private void OnMarbleHealthChanged(object? sender, HealthChangedEventArgs e)
+    {
+        if (e.NewHealth == 0)
+        {
+            _places![e.CombatantName] = _aliveMarbleCount--;
         }
     }
 
@@ -157,6 +188,7 @@ public class SiegeSession
                 }
 
                 marble.LastAttack = DateTime.UtcNow;
+                marble.DamageDealt += marbleDamage;
                 _boss!.Damage(marbleDamage, marble.Name);
                 return null;
             }
