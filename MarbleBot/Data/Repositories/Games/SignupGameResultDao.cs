@@ -172,4 +172,11 @@ public class SignupGameResultDao
 
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task RemoveSessionAsync(ulong channelId, GameType gameType)
+    {
+        await _dbContext.SignupGroups
+            .Where(group => group.ChannelId == channelId && group.GameType == gameType)
+            .ExecuteDeleteAsync();
+    }
 }
