@@ -11,13 +11,15 @@ namespace MarbleBot.Services;
 public class SiegeEngine
 {
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly SiegeRendererService _siegeRendererService;
 
     private const int _maxXSpots = 7;
     private const int _minX = -_maxXSpots / 2;
 
-    public SiegeEngine(IServiceScopeFactory scopeFactory)
+    public SiegeEngine(IServiceScopeFactory scopeFactory, SiegeRendererService siegeRendererService)
     {
         _scopeFactory = scopeFactory;
+        _siegeRendererService = siegeRendererService;
     }
 
     public async IAsyncEnumerable<SiegeMessage> RunSiegeAsync(IReadOnlyList<SiegeMarble> marbles, Boss boss, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -46,10 +48,13 @@ public class SiegeEngine
             SiegeMarble[] threatenedMarbles = aliveMarbles.Where(marble => marble.X >= attackMinX && marble.X <= attackMaxX).ToArray();
             string threatenedMarbleString = threatenedMarbles.Length == 0 ? "None" : string.Join(' ', threatenedMarbles.Select(marble => marble.Name));
 
+            MemoryStream imageStream = await _siegeRendererService.RenderMarblesWithAttackWarningAsync(marbles, 0xFF728CFF, _maxXSpots, _minX, attackMinX, attackMaxX);
+
             yield return new BossChargingSiegeMessage(
                 $"{boss.Name} is charging {attack.Name}! Threatened marbles: {threatenedMarbleString}.", 
                 SiegeSessionState.BossCharging, 
-                threatenedMarbles.Select(marble => marble.Id).ToList());
+                threatenedMarbles.Select(marble => marble.Id).ToList(),
+                imageStream);
 
             const int dodgeDelay = 5000;
             await Task.Delay(dodgeDelay, cancellationToken);
