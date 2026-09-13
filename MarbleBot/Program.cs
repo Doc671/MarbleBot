@@ -111,6 +111,7 @@ internal sealed class Program
             .AddSingleton<RaceEngine>();
 
         builder.Services.AddSingleton<SiegeSessionService>()
-            .AddSingleton<SiegeEngine>();
+            .AddSingleton<SiegeEngine>()
+            .AddSingleton<SiegeRendererService>();
     }
 }

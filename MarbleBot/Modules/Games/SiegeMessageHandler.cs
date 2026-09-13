@@ -62,6 +62,8 @@ public class SiegeMessageHandler
         {
             case SiegeSessionState.BossCharging:
                 await ToggleButtonAsync("siege_dodge", false);
+                var fullMessage = (e as BossChargingSiegeMessage)!;
+                await UpdateImageAsync(fullMessage.ImageStream);
                 break;
             case SiegeSessionState.BossIdle:
                 await ToggleButtonAsync("siege_dodge", true);
@@ -187,6 +189,17 @@ public class SiegeMessageHandler
     {
         _embedBuilder.WithDescription($"Health: **{newHealth}**/{maxHealth}");
         await _message.ModifyAsync(message => message.Embed = _embedBuilder.Build());
+    }
+
+    private async Task UpdateImageAsync(MemoryStream imageStream)
+    {
+        _embedBuilder.WithThumbnailUrl("attachment://Siege.png");
+
+        await _message.ModifyAsync(message =>
+        {
+            message.Attachments = new[] { new FileAttachment(imageStream, "Siege.png") };
+            message.Embed = _embedBuilder.Build();
+        });
     }
 
     private async Task ToggleButtonAsync(string customId, bool disabled)
