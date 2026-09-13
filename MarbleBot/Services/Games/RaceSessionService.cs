@@ -133,6 +133,8 @@ public class RaceSessionService
 
             await resultDao.IncrementWinsAsync(channelId, marbleNames.Last(), GameType.Race);
 
+            await resultDao.RemoveSessionAsync(channelId, GameType.Race);
+
             _sessions.TryRemove(channelId, out _);
         }
     }
