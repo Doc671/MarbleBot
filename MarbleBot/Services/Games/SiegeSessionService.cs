@@ -1,4 +1,5 @@
-﻿using MarbleBot.Data.Repositories.Games;
+﻿using Discord.Commands;
+using MarbleBot.Data.Repositories.Games;
 using MarbleBot.Entities;
 using MarbleBot.Entities.Games;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +31,8 @@ public class SiegeSessionService
         var signupGroupDao = scope.ServiceProvider.GetRequiredService<SignupGroupDao>();
         SignupGroup? group = await signupGroupDao.GetSignupGroupAsync(channelId, GameType.Siege);
 
-        var newSession = new SiegeSession(_siegeEngine, group?.Entries ?? [], marbleLimit);
+        var newSession = new SiegeSession(channelId, _siegeEngine, group?.Entries ?? [], marbleLimit);
+        newSession.SiegeComplete += OnSiegeComplete;
         _sessions.AddOrUpdate(channelId, newSession, (_, _) => newSession);
 
         return newSession;
@@ -51,7 +53,8 @@ public class SiegeSessionService
             return null;
         }
 
-        var newSession = new SiegeSession(_siegeEngine, group.Entries, 10);
+        var newSession = new SiegeSession(channelId, _siegeEngine, group.Entries, 10);
+        newSession.SiegeComplete += OnSiegeComplete;
         _sessions.AddOrUpdate(channelId, newSession, (_, _) => newSession);
 
         return newSession;
@@ -101,5 +104,24 @@ public class SiegeSessionService
         bool success = session.TryRemoveEntry(userId, marbleName);
         success &= await signupDao.TryRemoveSignupGroupAsync(channelId, GameType.Siege);
         return success;
+    }
+
+    private async void OnSiegeComplete(object? sender, SiegeCompleteEventArgs e)
+    {
+        using IServiceScope scope = _scopeFactory.CreateScope();
+        var resultDao = scope.ServiceProvider.GetRequiredService<SignupGameResultDao>();
+
+        string[] marbleNames = e.Results.Select(result => result.MarbleName).ToArray();
+
+        foreach (string marbleName in marbleNames)
+        {
+            await resultDao.IncrementTotalGamesAsync(e.ChannelId, marbleName, GameType.Siege);
+        }
+
+        await resultDao.IncrementWinsAsync(e.ChannelId, marbleNames.Last(), GameType.Siege);
+
+        await resultDao.RemoveSessionAsync(e.ChannelId, GameType.Siege);
+
+        _sessions.TryRemove(e.ChannelId, out _);
     }
 }

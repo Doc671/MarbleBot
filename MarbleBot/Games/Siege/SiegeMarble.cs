@@ -11,6 +11,8 @@ public class SiegeMarble : Combatant
 
     public bool Dodging { get; set; }
 
+    public int DamageDealt { get; set; }
+
     public DateTime LastAttack { get; set; }
 
     public SiegeMarble()
