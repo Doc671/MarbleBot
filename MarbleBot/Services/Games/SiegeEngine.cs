@@ -2,11 +2,10 @@
 using MarbleBot.Entities.Games;
 using MarbleBot.Entities.Games.Siege;
 using MarbleBot.Games.Siege;
-using MarbleBot.Services.Games;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
 
-namespace MarbleBot.Services;
+namespace MarbleBot.Services.Games;
 
 public class SiegeEngine
 {
