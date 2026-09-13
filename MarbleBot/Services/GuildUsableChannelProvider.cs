@@ -16,7 +16,7 @@ public class GuildUsableChannelProvider
 
     public async Task<bool> IsChannelUsable(IInteractionContext context)
     {
-        if (context.Channel.ChannelType is ChannelType.DM or ChannelType.Group)
+        if (context.Guild == null)
         {
             return true;
         }
