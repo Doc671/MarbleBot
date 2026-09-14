@@ -14,6 +14,7 @@ public class SiegeMessageHandler
     private EmbedFieldBuilder? _eventFieldBuilder;
     private EmbedFieldBuilder? _marbleFieldBuilder;
     private readonly ComponentBuilder _componentBuilder;
+    private readonly Dictionary<string, ButtonBuilder> _buttonBuilders;
 
     private readonly BlockingCollection<string> _siegeEvents = new(10);
 
@@ -24,6 +25,10 @@ public class SiegeMessageHandler
         _message = message;
         _embedBuilder = embedBuilder;
         _componentBuilder = componentBuilder;
+        _buttonBuilders = _componentBuilder.ActionRows.SelectMany(rowBuilder => rowBuilder.Components)
+            .OfType<ButtonBuilder>()
+            .ToDictionary(builder => builder.CustomId, builder => builder);
+
         _marbles = marbles;
 
         siegeSession.SiegeMessageSent += OnSiegeMessageSent;
@@ -204,21 +209,12 @@ public class SiegeMessageHandler
 
     private async Task ToggleButtonAsync(string customId, bool disabled)
     {
-        for (int i = 0; i < _componentBuilder.ActionRows.Count; i++)
+        if (!_buttonBuilders.TryGetValue(customId, out ButtonBuilder? buttonBuilder))
         {
-            ActionRowBuilder? row = _componentBuilder.ActionRows[i];
-            if (row != null)
-            {
-                for (int j = 0; j < row.Components.Count; j++)
-                {
-                    if (row.Components[j] is ButtonBuilder button && button.CustomId == customId)
-                    {
-                        button.WithDisabled(disabled);
-                        await _message.ModifyAsync(message => message.Components = _componentBuilder.Build());
-                        return;
-                    }
-                }
-            }
+            return;
         }
+
+        buttonBuilder.WithDisabled(disabled);
+        await _message.ModifyAsync(message => message.Components = _componentBuilder.Build());
     }
 }
