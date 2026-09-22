@@ -386,8 +386,13 @@ public class SiegeModule : MarbleBotSlashCommandModule
             .WithColor(await _guildColorProvider.GetColorAsync(Context));
 
         var componentBuilder = new ComponentBuilder()
-            .WithButton("Bash", customId: "siege_bash", style: ButtonStyle.Primary, emote: new Emoji("💥"), disabled: true)
-            .WithButton("Dodge", customId: "siege_dodge", style: ButtonStyle.Secondary, emote: new Emoji("💨"), disabled: true);
+            .WithButton("Bash", customId: "siege_bash", style: ButtonStyle.Primary, emote: new Emoji("💥"), disabled: true);
+
+        componentBuilder.AddRow(new ActionRowBuilder()
+            .WithButton(customId: "siege_dodge_veryleft", style: ButtonStyle.Secondary, emote: new Emoji("⏪"), disabled: true)
+            .WithButton(customId: "siege_dodge_left", style: ButtonStyle.Secondary, emote: new Emoji("◀️"), disabled: true)
+            .WithButton(customId: "siege_dodge_right", style: ButtonStyle.Secondary, emote: new Emoji("▶️"), disabled: true)
+            .WithButton(customId: "siege_dodge_veryright", style: ButtonStyle.Secondary, emote: new Emoji("⏩"), disabled: true));
 
         IUserMessage siegeMessage = await ReplyAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
 
@@ -415,8 +420,31 @@ public class SiegeModule : MarbleBotSlashCommandModule
         }
     }
 
-    [ComponentInteraction("siege_dodge", ignoreGroupNames: true)]
-    public async Task DodgeCommand()
+    [ComponentInteraction("siege_dodge_veryleft", ignoreGroupNames: true)]
+    public async Task DodgeVeryLeftCommand()
+    {
+        await DodgeCommand(-2);
+    }
+
+    [ComponentInteraction("siege_dodge_left", ignoreGroupNames: true)]
+    public async Task DodgeLeftCommand()
+    {
+        await DodgeCommand(-1);
+    }
+
+    [ComponentInteraction("siege_dodge_right", ignoreGroupNames: true)]
+    public async Task DodgeRightCommand()
+    {
+        await DodgeCommand(1);
+    }
+
+    [ComponentInteraction("siege_dodge_veryright", ignoreGroupNames: true)]
+    public async Task DodgeVeryRightCommand()
+    {
+        await DodgeCommand(2);
+    }
+
+    public async Task DodgeCommand(int moveDelta)
     {
         SiegeSession? session = await _sessionService.GetSessionAsync(Context.Channel.Id);
         if (session == null)
@@ -425,7 +453,7 @@ public class SiegeModule : MarbleBotSlashCommandModule
             return;
         }
 
-        string? result = await session.TryDodgeAsync(Context.User.Id);
+        string? result = await session.TryDodgeAsync(Context.User.Id, moveDelta);
         if (result == null)
         {
             await DeferAsync();

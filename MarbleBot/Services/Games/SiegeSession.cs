@@ -197,7 +197,7 @@ public class SiegeSession
         return null;
     }
 
-    public async Task<string?> TryDodgeAsync(ulong userId)
+    public async Task<string?> TryDodgeAsync(ulong userId, int moveDelta)
     {
         lock (_lock)
         {
@@ -216,7 +216,7 @@ public class SiegeSession
                 return "Your marble has died, so you cannot dodge!";
             }
 
-            marble.Dodging = true;
+            marble.MoveDelta = moveDelta;
         }
 
         return null;
