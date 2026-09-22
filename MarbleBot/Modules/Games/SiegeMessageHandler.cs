@@ -66,16 +66,25 @@ public class SiegeMessageHandler
         switch (e.SessionState)
         {
             case SiegeSessionState.BossCharging:
-                await ToggleButtonAsync("siege_dodge", false);
+                await ToggleButtonAsync("siege_dodge_veryleft", false);
+                await ToggleButtonAsync("siege_dodge_left", false);
+                await ToggleButtonAsync("siege_dodge_right", false);
+                await ToggleButtonAsync("siege_dodge_veryright", false);
                 var fullMessage = (e as BossChargingSiegeMessage)!;
                 await UpdateImageAsync(fullMessage.ImageStream);
                 break;
             case SiegeSessionState.BossIdle:
-                await ToggleButtonAsync("siege_dodge", true);
+                await ToggleButtonAsync("siege_dodge_veryleft", true);
+                await ToggleButtonAsync("siege_dodge_left", true);
+                await ToggleButtonAsync("siege_dodge_right", true);
+                await ToggleButtonAsync("siege_dodge_veryright", true);
                 break;
             case SiegeSessionState.Complete:
                 await ToggleButtonAsync("siege_bash", true);
-                await ToggleButtonAsync("siege_dodge", true);
+                await ToggleButtonAsync("siege_dodge_veryleft", true);
+                await ToggleButtonAsync("siege_dodge_left", true);
+                await ToggleButtonAsync("siege_dodge_right", true);
+                await ToggleButtonAsync("siege_dodge_veryright", true);
                 break;
             default:
                 break;

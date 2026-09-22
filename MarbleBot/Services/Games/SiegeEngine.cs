@@ -23,17 +23,17 @@ public class SiegeEngine
 
     public async IAsyncEnumerable<SiegeMessage> RunSiegeAsync(IReadOnlyList<SiegeMarble> marbles, Boss boss, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
+        ShuffleMarblePositions(marbles);
         while (marbles.Any(marble => marble.Health != 0) && boss.Health != 0)
         {
             const int attackDelay = 5000;
             await Task.Delay(attackDelay, cancellationToken);
 
             SiegeMarble[] aliveMarbles = marbles.Where(marble => marble.Health != 0).ToArray();
-            ShuffleMarblePositions(aliveMarbles);
 
             foreach (SiegeMarble marble in aliveMarbles)
             {
-                marble.Dodging = false;
+                marble.MoveDelta = 0;
             }
 
             int attackIndex = Random.Shared.Next(boss.Attacks.Count);
@@ -65,7 +65,8 @@ public class SiegeEngine
 
             foreach (SiegeMarble marble in threatenedMarbles)
             {
-                if (marble.Dodging)
+                marble.X += marble.MoveDelta;
+                if (marble.X < attackMinX || marble.X > attackMaxX)
                 {
                     yield return new SiegeMessage($"{marble.Name} dodged {boss.Name}'s {attack.Name}!", SiegeSessionState.BossIdle);
                 }

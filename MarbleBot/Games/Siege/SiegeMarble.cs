@@ -9,7 +9,7 @@ public class SiegeMarble : Combatant
     public int X { get; set; }
     public int Y { get; set; }
 
-    public bool Dodging { get; set; }
+    public int MoveDelta { get; set; }
 
     public int DamageDealt { get; set; }
 
