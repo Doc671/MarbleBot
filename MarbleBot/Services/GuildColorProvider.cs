@@ -16,7 +16,7 @@ public class GuildColorProvider
 
     public async Task<Color> GetColorAsync(IInteractionContext context, CancellationToken cancellationToken = default)
     {
-        if (context.Channel.ChannelType is ChannelType.DM or ChannelType.Group)
+        if (context.Guild == null)
         {
             return Color.DarkerGrey;
         }
