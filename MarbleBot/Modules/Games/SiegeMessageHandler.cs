@@ -20,6 +20,8 @@ public class SiegeMessageHandler
 
     private readonly IReadOnlyList<SiegeMarble> _marbles;
 
+    private FileAttachment _thumbnailAttachment;
+
     public SiegeMessageHandler(SiegeSession siegeSession, IUserMessage message, EmbedBuilder embedBuilder, ComponentBuilder componentBuilder, Boss boss, IReadOnlyList<SiegeMarble> marbles)
     {
         _message = message;
@@ -57,8 +59,8 @@ public class SiegeMessageHandler
             .WithThumbnailUrl(boss.ImageUrl)
             .AddField($"Marbles: **{marbles.Count}**", marbleOutput.ToString());
 
-        await _message.ModifyAsync(message => message.Embed = _embedBuilder.Build());
         await ToggleButtonAsync("siege_bash", false);
+        await UpdateMessageAsync();
     }
     
     private async void OnSiegeMessageSent(object? sender, SiegeMessage e)
@@ -72,12 +74,14 @@ public class SiegeMessageHandler
                 await ToggleButtonAsync("siege_dodge_veryright", false);
                 var fullMessage = (e as BossChargingSiegeMessage)!;
                 await UpdateImageAsync(fullMessage.ImageStream);
+                await UpdateMessageAsync();
                 break;
             case SiegeSessionState.BossIdle:
                 await ToggleButtonAsync("siege_dodge_veryleft", true);
                 await ToggleButtonAsync("siege_dodge_left", true);
                 await ToggleButtonAsync("siege_dodge_right", true);
                 await ToggleButtonAsync("siege_dodge_veryright", true);
+                await UpdateMessageAsync();
                 break;
             case SiegeSessionState.Complete:
                 await ToggleButtonAsync("siege_bash", true);
@@ -85,6 +89,7 @@ public class SiegeMessageHandler
                 await ToggleButtonAsync("siege_dodge_left", true);
                 await ToggleButtonAsync("siege_dodge_right", true);
                 await ToggleButtonAsync("siege_dodge_veryright", true);
+                await UpdateMessageAsync();
                 break;
             default:
                 break;
@@ -122,6 +127,7 @@ public class SiegeMessageHandler
         }
 
         await UpdateDescriptionAsync(e.NewHealth, e.MaxHealth);
+        await UpdateMessageAsync();
     }
 
     private async void OnMarbleHealthChanged(object? sender, HealthChangedEventArgs e)
@@ -141,6 +147,7 @@ public class SiegeMessageHandler
         }
 
         await UpdateMarbleFieldAsync();
+        await UpdateMessageAsync();
     }
 
     private async Task AddEventAsync(string message)
@@ -153,6 +160,7 @@ public class SiegeMessageHandler
         _siegeEvents.Add(message);
 
         await UpdateEventFieldAsync();
+        await UpdateMessageAsync();
     }
 
     private async Task UpdateEventFieldAsync()
@@ -174,8 +182,6 @@ public class SiegeMessageHandler
         {
             _eventFieldBuilder.WithValue(stringBuilder.ToString());
         }
-
-        await _message.ModifyAsync(message => message.Embed = _embedBuilder.Build());
     }
 
     private async Task UpdateMarbleFieldAsync()
@@ -195,25 +201,18 @@ public class SiegeMessageHandler
         {
             _marbleFieldBuilder.WithValue(stringBuilder.ToString());
         }
-
-        await _message.ModifyAsync(message => message.Embed = _embedBuilder.Build());
     }
 
     private async Task UpdateDescriptionAsync(int newHealth, int maxHealth)
     {
         _embedBuilder.WithDescription($"Health: **{newHealth}**/{maxHealth}");
-        await _message.ModifyAsync(message => message.Embed = _embedBuilder.Build());
     }
 
     private async Task UpdateImageAsync(MemoryStream imageStream)
     {
         _embedBuilder.WithThumbnailUrl("attachment://Siege.png");
 
-        await _message.ModifyAsync(message =>
-        {
-            message.Attachments = new[] { new FileAttachment(imageStream, "Siege.png") };
-            message.Embed = _embedBuilder.Build();
-        });
+        _thumbnailAttachment = new FileAttachment(imageStream, "Siege.png");
     }
 
     private async Task ToggleButtonAsync(string customId, bool disabled)
@@ -224,6 +223,19 @@ public class SiegeMessageHandler
         }
 
         buttonBuilder.WithDisabled(disabled);
-        await _message.ModifyAsync(message => message.Components = _componentBuilder.Build());
+    }
+
+    private async Task UpdateMessageAsync()
+    {
+        await _message.ModifyAsync(message =>
+        {
+            if (_thumbnailAttachment.Stream != null)
+            {
+                message.Attachments = new[] { _thumbnailAttachment };
+            }
+
+            message.Components = _componentBuilder.Build();
+            message.Embed = _embedBuilder.Build();
+        });
     }
 }
