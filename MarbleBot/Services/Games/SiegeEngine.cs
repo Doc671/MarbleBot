@@ -63,9 +63,13 @@ public class SiegeEngine
                 break;
             }
 
-            foreach (SiegeMarble marble in threatenedMarbles)
+            foreach (SiegeMarble marble in aliveMarbles)
             {
                 marble.X += marble.MoveDelta;
+            }
+
+            foreach (SiegeMarble marble in threatenedMarbles)
+            {
                 if (marble.X < attackMinX || marble.X > attackMaxX)
                 {
                     yield return new SiegeMessage($"{marble.Name} dodged {boss.Name}'s {attack.Name}!", SiegeSessionState.BossIdle);
