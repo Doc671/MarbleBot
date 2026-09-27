@@ -32,4 +32,9 @@ public class MarbleBotSlashCommandModule : InteractionModuleBase<SocketInteracti
     {
         await RespondAsync($"{_warning} | {message}", ephemeral: true);
     }
+
+    protected async Task FollowupWithErrorAsync(string message)
+    {
+        await FollowupAsync($"{_warning} | {message}", ephemeral: true);
+    }
 }
