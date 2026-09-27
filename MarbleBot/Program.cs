@@ -7,6 +7,7 @@ using MarbleBot.Data;
 using MarbleBot.Data.Repositories;
 using MarbleBot.Data.Repositories.Games;
 using MarbleBot.Services;
+using MarbleBot.Services.Docs;
 using MarbleBot.Services.Games;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -111,6 +112,8 @@ internal sealed class Program
 
         builder.Services.AddSingleton<AutoModFilterService>()
             .AddHostedService(provider => provider.GetRequiredService<AutoModFilterService>());
+
+        builder.Services.AddSingleton<ThymeAdditionalFunctionsService>();
 
         builder.Services.AddSingleton<MarbleRendererService>();
 
