@@ -32,6 +32,12 @@ internal sealed class Program
         string databaseSettingsPath = Path.Combine(AppContext.BaseDirectory, "Resources", "DatabaseSettings.json");
         builder.Configuration.AddJsonFile(databaseSettingsPath, optional: false, reloadOnChange: true);
 
+        string externalResourcesPath = Path.Combine(AppContext.BaseDirectory, "Resources", "ExternalResources.json");
+        builder.Configuration.AddJsonFile(externalResourcesPath, optional: false, reloadOnChange: true);
+
+        var externalResources = builder.Configuration.Get<ExternalResources>() ?? throw new InvalidDataException("Cannot bind ExternalResources.json");
+        builder.Services.AddSingleton(externalResources);
+
         builder.Logging.ClearProviders();
         builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
         builder.Logging.AddNLog();
@@ -93,6 +99,7 @@ internal sealed class Program
 
         builder.Services.AddSingleton<SlashCommandHandler>()
             .AddSingleton<LoggingService>()
+            .AddSingleton<GoogleDocsApiService>()
             .AddSingleton<YouTubeApiService>()
             .AddHostedService<ItemSyncService>()
             .AddHostedService<UserMigrationService>()
