@@ -3,6 +3,7 @@ using Google.Apis.Docs.v1;
 using Google.Apis.Docs.v1.Data;
 using Google.Apis.Services;
 using System.Reflection;
+using System.Text;
 
 namespace MarbleBot.Services.Docs;
 
@@ -40,6 +41,72 @@ public class GoogleDocsApiService : IDisposable
         var request = _docsService.Documents.Get(documentId);
         request.IncludeTabsContent = true;
         return await request.ExecuteAsync();
+    }
+
+    public static string FormatParagraph(Paragraph paragraph, int skipCount = 0)
+    {
+        var stringBuilder = new StringBuilder();
+        bool alreadyBold = false;
+        bool alreadyInlineCode = false;
+
+        const string boldDelimiter = "**";
+        const string inlineCodeDelimiter = "`";
+
+        foreach (var element in paragraph.Elements.Skip(skipCount))
+        {
+            if (element.TextRun?.Content != null)
+            {
+                TextRun textRun = element.TextRun;
+                string text = textRun.Content;
+
+                bool isBold = textRun.TextStyle.Bold == true;
+                if (isBold)
+                {
+                    if (!alreadyBold)
+                    {
+                        text = $"{boldDelimiter}{text}";
+                    }
+                    alreadyBold = true;
+                }
+
+                if (textRun.TextStyle.BackgroundColor?.Color == null)
+                {
+                    if (alreadyInlineCode)
+                    {
+                        text = $"{inlineCodeDelimiter}{text}";
+                    }
+                    alreadyInlineCode = false;
+                }
+                else
+                {
+                    if (!alreadyInlineCode)
+                    {
+                        text = $"{inlineCodeDelimiter}{text}";
+                    }
+                    alreadyInlineCode = true;
+                }
+
+                if (!isBold)
+                {
+                    if (alreadyBold)
+                    {
+                        text = $"{boldDelimiter}{text}";
+                    }
+                    alreadyBold = false;
+                }
+
+                stringBuilder.Append(text);
+            }
+        }
+
+        string outputText = stringBuilder.ToString().Trim();
+
+        if (alreadyInlineCode)
+        {
+            outputText = $"{outputText}{inlineCodeDelimiter}";
+        }
+
+        return outputText;
     }
 
     public void Dispose()
