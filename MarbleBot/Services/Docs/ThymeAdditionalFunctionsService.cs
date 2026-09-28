@@ -114,7 +114,7 @@ public class ThymeAdditionalFunctionsService
                                 }
                                 else
                                 {
-                                    example = FormatParagraph(paragraph);
+                                    example = FormatParagraph(paragraph, 1);
                                 }
                             }
                             else if (textContent.Contains("by"))
