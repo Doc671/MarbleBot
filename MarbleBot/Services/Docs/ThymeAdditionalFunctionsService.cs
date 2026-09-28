@@ -99,11 +99,11 @@ public class ThymeAdditionalFunctionsService
                             string textContent = textRun.Content;
                             if (textRun.TextStyle.Italic == true)  // Assume descriptions are in italics
                             {
-                                description = FormatParagraph(paragraph);
+                                description = GoogleDocsApiService.FormatParagraph(paragraph);
                             }
                             else if (textContent.StartsWith("Usage"))
                             {
-                                usage = FormatParagraph(paragraph, 1);
+                                usage = GoogleDocsApiService.FormatParagraph(paragraph, 1);
                             }
                             else if (textContent.StartsWith("Example"))
                             {
@@ -114,12 +114,12 @@ public class ThymeAdditionalFunctionsService
                                 }
                                 else
                                 {
-                                    example = FormatParagraph(paragraph, 1);
+                                    example = GoogleDocsApiService.FormatParagraph(paragraph, 1);
                                 }
                             }
                             else if (textContent.Contains("by"))
                             {
-                                credit = FormatParagraph(paragraph);
+                                credit = GoogleDocsApiService.FormatParagraph(paragraph);
                             }
                         }
                     }
@@ -181,7 +181,7 @@ public class ThymeAdditionalFunctionsService
                 string?[] parameterDetails = row.TableCells
                     .Select(cell => cell.Content[0].Paragraph)
                     .Where(paragraph => paragraph != null)
-                    .Select(paragraph => FormatParagraph(paragraph))
+                    .Select(paragraph => GoogleDocsApiService.FormatParagraph(paragraph))
                     .ToArray();
 
                 if (parameterDetails.Length < parameterInfoCellCount)
@@ -203,72 +203,6 @@ public class ThymeAdditionalFunctionsService
             })
            .Where(parameterInfo => parameterInfo != null)
            .ToList()!;
-    }
-
-    private static string FormatParagraph(Paragraph paragraph, int skipCount = 0)
-    {
-        var stringBuilder = new StringBuilder();
-        bool alreadyBold = false;
-        bool alreadyInlineCode = false;
-
-        const string boldDelimiter = "**";
-        const string inlineCodeDelimiter = "`";
-
-        foreach (var element in paragraph.Elements.Skip(skipCount))
-        {
-            if (element.TextRun?.Content != null)
-            {
-                TextRun textRun = element.TextRun;
-                string text = textRun.Content;
-
-                bool isBold = textRun.TextStyle.Bold == true;
-                if (isBold)
-                {
-                    if (!alreadyBold)
-                    {
-                        text = $"{boldDelimiter}{text}";
-                    }
-                    alreadyBold = true;
-                }
-
-                if (textRun.TextStyle.BackgroundColor?.Color == null)
-                {
-                    if (alreadyInlineCode)
-                    {
-                        text = $"{inlineCodeDelimiter}{text}";
-                    }
-                    alreadyInlineCode = false;
-                }
-                else
-                {
-                    if (!alreadyInlineCode)
-                    {
-                        text = $"{inlineCodeDelimiter}{text}";
-                    }
-                    alreadyInlineCode = true;
-                }
-
-                if (!isBold)
-                {
-                    if (alreadyBold)
-                    {
-                        text = $"{boldDelimiter}{text}";
-                    }
-                    alreadyBold = false;
-                }
-
-                stringBuilder.Append(text);
-            }
-        }
-
-        string outputText = stringBuilder.ToString().Trim();
-
-        if (alreadyInlineCode)
-        {
-            outputText = $"{outputText}{inlineCodeDelimiter}";
-        }
-
-        return outputText;
     }
 
     public async Task<string?> ListHeadersAsync(string category)
