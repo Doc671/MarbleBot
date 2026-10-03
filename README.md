@@ -7,8 +7,9 @@ A file named `BotCredentials.json` will need to be present in the executable's w
 {
   "Token": "",
   "GoogleApiKey": "",
-  "AdminIds": [ 224267581370925056 ],
-  "DebugChannel": 409655798730326016
+  "GoogleServiceAccountKeyPath": "",
+  "AdminUserIds": [ 224267581370925056 ],
+  "DebugGuildIds": [ 408694288604463114 ]
 }
 ```
 
