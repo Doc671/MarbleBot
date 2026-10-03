@@ -113,7 +113,8 @@ internal sealed class Program
         builder.Services.AddSingleton<AutoModFilterService>()
             .AddHostedService(provider => provider.GetRequiredService<AutoModFilterService>());
 
-        builder.Services.AddSingleton<ThymeAdditionalFunctionsService>();
+        builder.Services.AddSingleton<ThymeAdditionalFunctionsService>()
+            .AddSingleton<ThymePropertyListService>();
 
         builder.Services.AddSingleton<MarbleRendererService>();
 

@@ -129,10 +129,10 @@ public class ThymeAdditionalFunctionsService
                         {
                             string codeBlockContent = string.Concat(
                                 element.Table.TableRows[0].TableCells[0].Content
-                                .Where(element => element.Paragraph != null)
-                                .SelectMany(element => element.Paragraph.Elements
-                                    .Where(element => element?.TextRun != null)
-                                    .Select(element => element.TextRun.Content)))
+                                    .Where(element => element.Paragraph != null)
+                                    .SelectMany(element => element.Paragraph.Elements
+                                        .Where(element => element?.TextRun != null)
+                                        .Select(element => element.TextRun.Content)))
                                 .Trim()
                                 .Replace('\v', '\n');
 
