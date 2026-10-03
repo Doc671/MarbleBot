@@ -1,0 +1,38 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+        
+    - name: Restore
+      run: dotnet restore MarbleBot.Tests/MarbleBot.Tests.csproj
+      
+    - name: Build
+      run: dotnet build MarbleBot.Tests/MarbleBot.Tests.csproj --no-restore -c Release
+      
+    - name: Test
+      run: dotnet test MarbleBot.Tests/MarbleBot.Tests.csproj --no-build -c Release
+
+    - name: Migration check
+      env:
+        ConnectionStrings__Default: Host=localhost;Database=ci;Username=ci;Password=ci
+      run: |
+        dotnet tool install --global dotnet-ef
+        dotnet ef migrations has-pending-model-changes --project MarbleBot/MarbleBot.csproj
