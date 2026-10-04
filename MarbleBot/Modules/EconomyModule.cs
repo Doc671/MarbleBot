@@ -77,21 +77,21 @@ public class EconomyModule : MarbleBotSlashCommandModule
             }
         }
 
-        float? gradientAngleDegrees = null;
-        if (modal.MarbleAppearanceType == MarbleAppearanceType.LinearGradient && !string.IsNullOrWhiteSpace(modal.GradientAngle))
+        float? angleOffsetDegrees = null;
+        if (modal.MarbleAppearanceType is MarbleAppearanceType.LinearGradient or MarbleAppearanceType.Sectors && !string.IsNullOrWhiteSpace(modal.AngleOffset))
         {
-            if (float.TryParse(modal.GradientAngle, out float angle))
+            if (float.TryParse(modal.AngleOffset, out float angle))
             {
-                gradientAngleDegrees = angle;
+                angleOffsetDegrees = angle;
             }
             else
             {
-                await RespondWithErrorAsync($"Invalid gradient angle: {modal.GradientAngle}.");
+                await RespondWithErrorAsync($"Invalid angle offset: {modal.AngleOffset}.");
                 return;
             }
         }
 
-        await _marbleAppearanceDao.UpdateAppearanceAsync(marbleBotUser.Id, modal.MarbleAppearanceType, colors, gradientAngleDegrees);
+        await _marbleAppearanceDao.UpdateAppearanceAsync(marbleBotUser.Id, modal.MarbleAppearanceType, colors, angleOffsetDegrees);
         await RespondAsync($"Your marble appearance has been updated successfully!", ephemeral: true);
     }
 

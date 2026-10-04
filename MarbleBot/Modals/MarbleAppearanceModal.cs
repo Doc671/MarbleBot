@@ -14,8 +14,8 @@ public class MarbleAppearanceModal : IModal
     [ModalTextInput("hex_codes", TextInputStyle.Paragraph, "#000000", 6, 79, "#000000")]
     public string? HexCodes { get; set; }
 
-    [InputLabel("Gradient Angle (degrees)", "The angle of the gradient in degrees. This only applies if you choose a linear gradient.")]
-    [ModalTextInput("gradient_angle", TextInputStyle.Short, "0", 1, 3, "0")]
+    [InputLabel("Angle offset (degrees)", "The angle in degrees. This only affects sector and linear gradient marbles.")]
+    [ModalTextInput("angle_offset", TextInputStyle.Short, "0", 1, 3, "0")]
     [RequiredInput(false)]
-    public string? GradientAngle { get; set; }
+    public string? AngleOffset { get; set; }
 }
