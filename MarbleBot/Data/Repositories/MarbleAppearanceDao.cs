@@ -37,7 +37,7 @@ public class MarbleAppearanceDao
             // Update existing appearance
             existingAppearance.Colors = marbleAppearanceColors;
             existingAppearance.AppearanceType = appearanceType;
-            existingAppearance.GradientAngleDegrees = gradientAngleDegrees;
+            existingAppearance.AngleOffset = gradientAngleDegrees;
             _dbContext.MarbleAppearances.Update(existingAppearance);
         }
         else
@@ -48,7 +48,7 @@ public class MarbleAppearanceDao
                 UserId = userId,
                 AppearanceType = appearanceType,
                 Colors = marbleAppearanceColors,
-                GradientAngleDegrees = gradientAngleDegrees
+                AngleOffset = gradientAngleDegrees
             };
             await _dbContext.MarbleAppearances.AddAsync(newAppearance);
         }

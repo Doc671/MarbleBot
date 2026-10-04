@@ -78,7 +78,7 @@ public class MarbleRendererService
                 RenderSectorsMarble(canvas, colors, marblePosition, marbleRadius);
                 break;
             case MarbleAppearanceType.LinearGradient:
-                RenderLinearGradientMarble(canvas, colors, marblePosition, marbleRadius, appearance!.GradientAngleDegrees ?? 0f);
+                RenderLinearGradientMarble(canvas, colors, marblePosition, marbleRadius, appearance!.AngleOffset ?? 0f);
                 break;
             case MarbleAppearanceType.RadialGradient:
                 RenderRadialGradientMarble(canvas, colors, marblePosition, marbleRadius);

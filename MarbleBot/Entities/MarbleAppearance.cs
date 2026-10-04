@@ -9,5 +9,5 @@ public class MarbleAppearance
 
     public List<MarbleAppearanceColor> Colors { get; set; } = new();
 
-    public float? GradientAngleDegrees { get; set; }
+    public float? AngleOffset { get; set; }
 }
