@@ -75,7 +75,7 @@ public class MarbleRendererService
                 RenderConcentricMarble(canvas, colors, marblePosition, marbleRadius);
                 break;
             case MarbleAppearanceType.Sectors:
-                RenderSectorsMarble(canvas, colors, marblePosition, marbleRadius);
+                RenderSectorsMarble(canvas, colors, marblePosition, marbleRadius, appearance!.AngleOffset ?? 0f);
                 break;
             case MarbleAppearanceType.LinearGradient:
                 RenderLinearGradientMarble(canvas, colors, marblePosition, marbleRadius, appearance!.AngleOffset ?? 0f);
@@ -113,7 +113,7 @@ public class MarbleRendererService
         }
     }
 
-    private static void RenderSectorsMarble(SKCanvas canvas, SKColor[] colors, SKPoint marblePosition, int marbleRadius)
+    private static void RenderSectorsMarble(SKCanvas canvas, SKColor[] colors, SKPoint marblePosition, int marbleRadius, float angleOffset)
     {
         using var paint = new SKPaint
         {
@@ -130,7 +130,7 @@ public class MarbleRendererService
 
             var pathBuilder = new SKPathBuilder();
             pathBuilder.MoveTo(marblePosition);
-            pathBuilder.ArcTo(rect, i * sweepAngle, sweepAngle, false);
+            pathBuilder.ArcTo(rect, i * sweepAngle + angleOffset, sweepAngle, false);
             canvas.DrawPath(pathBuilder.Snapshot(), paint);
         }
     }
