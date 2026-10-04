@@ -17,7 +17,7 @@ namespace MarbleBot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.11")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -293,11 +293,11 @@ namespace MarbleBot.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
+                    b.Property<float?>("AngleOffset")
+                        .HasColumnType("real");
+
                     b.Property<int>("AppearanceType")
                         .HasColumnType("integer");
-
-                    b.Property<float?>("GradientAngleDegrees")
-                        .HasColumnType("real");
 
                     b.HasKey("UserId");
 
