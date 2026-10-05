@@ -14,6 +14,7 @@ public class SiegeEngine
 
     private const int _maxXSpots = 7;
     private const int _minX = -_maxXSpots / 2;
+    private const int _maxX = _minX + _maxXSpots - 1;
 
     public SiegeEngine(IServiceScopeFactory scopeFactory, SiegeRendererService siegeRendererService)
     {
@@ -42,7 +43,7 @@ public class SiegeEngine
             int attackX = _minX + Random.Shared.Next(_maxXSpots);
             int attackWidth = (int)MathF.Round(attack.Accuracy / 100f * _maxXSpots);
             int attackMinX = Math.Max(attackX - attackWidth / 2, _minX);
-            int attackMaxX = Math.Min(attackX + attackWidth / 2, _minX + _maxXSpots - 1);
+            int attackMaxX = Math.Min(attackX + attackWidth / 2, _maxX);
 
             SiegeMarble[] threatenedMarbles = aliveMarbles.Where(marble => marble.X >= attackMinX && marble.X <= attackMaxX).ToArray();
             string threatenedMarbleString = threatenedMarbles.Length == 0 ? "None" : string.Join(' ', threatenedMarbles.Select(marble => marble.Name));
@@ -65,7 +66,7 @@ public class SiegeEngine
 
             foreach (SiegeMarble marble in aliveMarbles)
             {
-                marble.X += marble.MoveDelta;
+                marble.X = Math.Clamp(marble.X + marble.MoveDelta, _minX, _maxX);
             }
 
             foreach (SiegeMarble marble in threatenedMarbles)
