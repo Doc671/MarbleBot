@@ -13,6 +13,7 @@ public class SiegeMessageHandler
     private readonly EmbedBuilder _embedBuilder;
     private EmbedFieldBuilder? _eventFieldBuilder;
     private EmbedFieldBuilder? _marbleFieldBuilder;
+    private EmbedFieldBuilder? _attackFieldBuilder;
     private readonly ComponentBuilder _componentBuilder;
     private readonly Dictionary<string, ButtonBuilder> _buttonBuilders;
 
@@ -21,6 +22,8 @@ public class SiegeMessageHandler
     private readonly IReadOnlyList<SiegeMarble> _marbles;
 
     private FileAttachment _thumbnailAttachment;
+
+    private bool _attackFieldEnabled;
 
     public SiegeMessageHandler(SiegeSession siegeSession, IUserMessage message, EmbedBuilder embedBuilder, ComponentBuilder componentBuilder, Boss boss, IReadOnlyList<SiegeMarble> marbles)
     {
@@ -98,7 +101,16 @@ public class SiegeMessageHandler
 
     public async Task AddSiegeMessage(SiegeMessage message)
     {
-        await AddEventAsync(message.Message);
+        if (message is BossChargingSiegeMessage bossChargingMessage)
+        {
+            UpdateAttackField(bossChargingMessage);
+            await UpdateMessageAsync();
+        }
+        else
+        {
+            DisableAttackField();
+            await AddEventAsync(message.Message);
+        }
     }
 
     private async void OnBossHealthChanged(object? sender, HealthChangedEventArgs e)
@@ -203,6 +215,43 @@ public class SiegeMessageHandler
         }
     }
 
+    private void UpdateAttackField(BossChargingSiegeMessage message)
+    {
+        string fieldValue;
+        if (message.TargetedMarbles.Count == 0)
+        {
+            fieldValue = "Threatened marbles: None.";
+        }
+        else
+        {
+            var stringBuilder = new StringBuilder("Threatened marbles: ");
+            foreach (SiegeMarble marble in message.TargetedMarbles)
+            {
+                stringBuilder.Append($"{marble.Name}, ");
+            }
+
+            stringBuilder.Remove(stringBuilder.Length - 2, 2);
+            stringBuilder.AppendLine($".\nUse the direction buttons to move out of the way!");
+            fieldValue = stringBuilder.ToString();
+        }
+
+        _attackFieldBuilder ??= _embedBuilder.Fields.FirstOrDefault(fieldBuilder => fieldBuilder.Name.EndsWith("inbound!"));
+        if (_attackFieldBuilder == null)
+        {
+            _embedBuilder.AddField($"{message.AttackName} inbound!", fieldValue);
+        }
+        else
+        {
+            _attackFieldBuilder.WithValue(fieldValue);
+            if (!_embedBuilder.Fields.Contains(_attackFieldBuilder))
+            {
+                _embedBuilder.Fields.Add(_attackFieldBuilder);
+            }
+        }
+
+        _attackFieldEnabled = true;
+    }
+
     private void UpdateDescription(int newHealth, int maxHealth)
     {
         _embedBuilder.WithDescription($"Health: **{newHealth}**/{maxHealth}");
@@ -213,6 +262,15 @@ public class SiegeMessageHandler
         _embedBuilder.WithThumbnailUrl("attachment://Siege.png");
 
         _thumbnailAttachment = new FileAttachment(imageStream, "Siege.png");
+    }
+
+    private void DisableAttackField()
+    {
+        if (_attackFieldBuilder != null && _attackFieldEnabled)
+        {
+            _embedBuilder.Fields.Remove(_attackFieldBuilder);
+            _attackFieldEnabled = false;
+        }
     }
 
     private void ToggleButton(string customId, bool disabled)

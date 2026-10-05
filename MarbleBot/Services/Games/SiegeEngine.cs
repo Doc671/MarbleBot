@@ -52,8 +52,9 @@ public class SiegeEngine
 
             yield return new BossChargingSiegeMessage(
                 $"{boss.Name} is charging {attack.Name}! Threatened marbles: {threatenedMarbleString}.", 
+                attack.Name,
                 SiegeSessionState.BossCharging, 
-                threatenedMarbles.Select(marble => marble.Id).ToList(),
+                threatenedMarbles,
                 imageStream);
 
             const int dodgeDelay = 5000;
