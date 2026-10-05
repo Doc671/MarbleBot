@@ -84,6 +84,12 @@ public class SiegeMessageHandler
                 ToggleButton("siege_dodge_left", true);
                 ToggleButton("siege_dodge_right", true);
                 ToggleButton("siege_dodge_veryright", true);
+
+                if (e is AttackCompleteSiegeMessage attackCompleteMessage)
+                {
+                    UpdateImage(attackCompleteMessage.ImageStream);
+                }
+
                 await UpdateMessageAsync();
                 break;
             case SiegeSessionState.Complete:

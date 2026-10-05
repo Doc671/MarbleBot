@@ -70,7 +70,8 @@ public class SiegeEngine
                 marble.X = Math.Clamp(marble.X + marble.MoveDelta, _minX, _maxX);
             }
 
-            yield return new SiegeMessage($"{boss.Name} used {attack.Name}!", SiegeSessionState.BossIdle);
+            imageStream = await _siegeRendererService.RenderMarblesAsync(marbles, 0xFF728CFF, _maxXSpots, _minX);
+            yield return new AttackCompleteSiegeMessage($"{boss.Name} used {attack.Name}!", SiegeSessionState.BossIdle, imageStream);
 
             foreach (SiegeMarble marble in threatenedMarbles)
             {
