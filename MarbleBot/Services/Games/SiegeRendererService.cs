@@ -57,7 +57,7 @@ public class SiegeRendererService
             MarbleRendererService.RenderMarbleToCanvas(canvas, appearance, imagePosition, marbleRadius);
         }
 
-        int attackWidthImage = (attackMaxX - attackMinX) * imageHeight;
+        int attackWidthImage = (attackMaxX - attackMinX + 1) * imageHeight; // minimum and maximum are inclusive
         int attackXImage = (attackMinX - minX) * imageHeight;
         var attackWarningRect = SKRectI.Create(attackXImage, 0, attackWidthImage, imageHeight);
         using var attackWarningPaint = new SKPaint()
