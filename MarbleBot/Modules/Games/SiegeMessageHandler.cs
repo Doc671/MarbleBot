@@ -59,7 +59,7 @@ public class SiegeMessageHandler
             .WithThumbnailUrl(boss.ImageUrl)
             .AddField($"Marbles: **{marbles.Count}**", marbleOutput.ToString());
 
-        await ToggleButtonAsync("siege_bash", false);
+        ToggleButton("siege_bash", false);
         await UpdateMessageAsync();
     }
     
@@ -68,27 +68,27 @@ public class SiegeMessageHandler
         switch (e.SessionState)
         {
             case SiegeSessionState.BossCharging:
-                await ToggleButtonAsync("siege_dodge_veryleft", false);
-                await ToggleButtonAsync("siege_dodge_left", false);
-                await ToggleButtonAsync("siege_dodge_right", false);
-                await ToggleButtonAsync("siege_dodge_veryright", false);
+                ToggleButton("siege_dodge_veryleft", false);
+                ToggleButton("siege_dodge_left", false);
+                ToggleButton("siege_dodge_right", false);
+                ToggleButton("siege_dodge_veryright", false);
                 var fullMessage = (e as BossChargingSiegeMessage)!;
-                await UpdateImageAsync(fullMessage.ImageStream);
+                UpdateImage(fullMessage.ImageStream);
                 await UpdateMessageAsync();
                 break;
             case SiegeSessionState.BossIdle:
-                await ToggleButtonAsync("siege_dodge_veryleft", true);
-                await ToggleButtonAsync("siege_dodge_left", true);
-                await ToggleButtonAsync("siege_dodge_right", true);
-                await ToggleButtonAsync("siege_dodge_veryright", true);
+                ToggleButton("siege_dodge_veryleft", true);
+                ToggleButton("siege_dodge_left", true);
+                ToggleButton("siege_dodge_right", true);
+                ToggleButton("siege_dodge_veryright", true);
                 await UpdateMessageAsync();
                 break;
             case SiegeSessionState.Complete:
-                await ToggleButtonAsync("siege_bash", true);
-                await ToggleButtonAsync("siege_dodge_veryleft", true);
-                await ToggleButtonAsync("siege_dodge_left", true);
-                await ToggleButtonAsync("siege_dodge_right", true);
-                await ToggleButtonAsync("siege_dodge_veryright", true);
+                ToggleButton("siege_bash", true);
+                ToggleButton("siege_dodge_veryleft", true);
+                ToggleButton("siege_dodge_left", true);
+                ToggleButton("siege_dodge_right", true);
+                ToggleButton("siege_dodge_veryright", true);
                 await UpdateMessageAsync();
                 break;
             default:
@@ -126,7 +126,7 @@ public class SiegeMessageHandler
             await AddEventAsync($"{e.AttackName} hit {e.CombatantName} for a {damageMessage} attack! {e.OldHealth} -> {e.NewHealth} HP.");
         }
 
-        await UpdateDescriptionAsync(e.NewHealth, e.MaxHealth);
+        UpdateDescription(e.NewHealth, e.MaxHealth);
         await UpdateMessageAsync();
     }
 
@@ -146,7 +146,7 @@ public class SiegeMessageHandler
             await AddEventAsync($"{e.CombatantName} was hit by {e.AttackName}! {e.OldHealth} -> {e.NewHealth} HP.");
         }
 
-        await UpdateMarbleFieldAsync();
+        UpdateMarbleField();
         await UpdateMessageAsync();
     }
 
@@ -159,11 +159,11 @@ public class SiegeMessageHandler
 
         _siegeEvents.Add(message);
 
-        await UpdateEventFieldAsync();
+        UpdateEventField();
         await UpdateMessageAsync();
     }
 
-    private async Task UpdateEventFieldAsync()
+    private void UpdateEventField()
     {
         var stringBuilder = new StringBuilder();
         foreach (string message in _siegeEvents.Take(_siegeEvents.Count - 1))
@@ -184,7 +184,7 @@ public class SiegeMessageHandler
         }
     }
 
-    private async Task UpdateMarbleFieldAsync()
+    private void UpdateMarbleField()
     {
         var stringBuilder = new StringBuilder();
         foreach (SiegeMarble marble in _marbles)
@@ -203,19 +203,19 @@ public class SiegeMessageHandler
         }
     }
 
-    private async Task UpdateDescriptionAsync(int newHealth, int maxHealth)
+    private void UpdateDescription(int newHealth, int maxHealth)
     {
         _embedBuilder.WithDescription($"Health: **{newHealth}**/{maxHealth}");
     }
 
-    private async Task UpdateImageAsync(MemoryStream imageStream)
+    private void UpdateImage(MemoryStream imageStream)
     {
         _embedBuilder.WithThumbnailUrl("attachment://Siege.png");
 
         _thumbnailAttachment = new FileAttachment(imageStream, "Siege.png");
     }
 
-    private async Task ToggleButtonAsync(string customId, bool disabled)
+    private void ToggleButton(string customId, bool disabled)
     {
         if (!_buttonBuilders.TryGetValue(customId, out ButtonBuilder? buttonBuilder))
         {
