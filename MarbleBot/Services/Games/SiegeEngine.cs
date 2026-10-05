@@ -70,6 +70,8 @@ public class SiegeEngine
                 marble.X = Math.Clamp(marble.X + marble.MoveDelta, _minX, _maxX);
             }
 
+            yield return new SiegeMessage($"{boss.Name} used {attack.Name}!", SiegeSessionState.BossIdle);
+
             foreach (SiegeMarble marble in threatenedMarbles)
             {
                 if (marble.X < attackMinX || marble.X > attackMaxX)
