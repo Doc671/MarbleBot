@@ -85,7 +85,11 @@ public class GuildDao
 
     public async Task<bool> IsChannelUsable(ulong guildId, ulong channelId, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.GuildUsableChannels
+        IQueryable<GuildUsableChannel> matchingChannels = _dbContext.GuildUsableChannels
+            .Where(guildChannel => guildChannel.GuildId == guildId);
+
+        return !(await matchingChannels.AnyAsync(cancellationToken))
+            || await matchingChannels
             .AnyAsync(guildChannel => guildChannel.GuildId == guildId && guildChannel.ChannelId == channelId, cancellationToken);
     }
 
