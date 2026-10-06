@@ -66,7 +66,7 @@ public static class CobenCalculator
             names = newNames;
         }
 
-        int[] eliminationCounts = new int[athleteCount];
+        double[] eliminationCounts = new double[athleteCount];
         Parallel.For(0, simulationCount,
             () => {
                 var threadLocalState = new
@@ -76,7 +76,8 @@ public static class CobenCalculator
                     PointsToDistribute = (long[])pointsToDistribute.Clone(),
                     NewPoints = new long[athleteCount],
                     LowestPoints = new long[eventEliminationCount],
-                    EliminationCounts = new int[athleteCount]
+                    EliminationCounts = new double[athleteCount],
+                    EliminationPossible = new bool[athleteCount]
                 };
 
                 Array.Fill(threadLocalState.LowestPoints, long.MaxValue);
@@ -114,15 +115,29 @@ public static class CobenCalculator
 
                 // Find who got the nth lowest score and increment their elimination count
                 long nthLowestPoints = threadLocalState.LowestPoints[threadLocalState.EventEliminationCount - 1];
+                int endangeredAthleteCount = 0;
                 for (int j = 0; j < athleteCount; j++)
                 {
                     if (threadLocalState.NewPoints[j] <= nthLowestPoints)
                     {
-                        threadLocalState.EliminationCounts[j]++;
+                        endangeredAthleteCount++;
+                        threadLocalState.EliminationPossible[j] = true;
+                    }
+                }
+
+                // If multiple contestants are tied for elimination, assume that a tiebreaker will occur
+                // and that the original elimination count remains the same
+                double eliminationsToAdd = (double)threadLocalState.EventEliminationCount / endangeredAthleteCount;
+                for (int j = 0; j < athleteCount; j++)
+                {
+                    if (threadLocalState.EliminationPossible[j])
+                    {
+                        threadLocalState.EliminationCounts[j] += eliminationsToAdd;
                     }
                 }
 
                 Array.Fill(threadLocalState.LowestPoints, long.MaxValue);
+                Array.Fill(threadLocalState.EliminationPossible, false);
 
                 return threadLocalState;
             },
@@ -130,10 +145,10 @@ public static class CobenCalculator
             {
                 for (int i = 0; i < athleteCount; i++)
                 {
-                    int localEliminationCount = threadLocalState.EliminationCounts[i];
+                    double localEliminationCount = threadLocalState.EliminationCounts[i];
                     if (localEliminationCount != 0)
                     {
-                        Interlocked.Add(ref eliminationCounts[i], threadLocalState.EliminationCounts[i]);
+                        InterlockedAddDouble(ref eliminationCounts[i], threadLocalState.EliminationCounts[i]);
                     }
                 }
             }
@@ -171,6 +186,23 @@ public static class CobenCalculator
         {
             int k = random.Next(n--);
             (array[n], array[k]) = (array[k], array[n]);
+        }
+    }
+
+    private static double InterlockedAddDouble(ref double location1, double value)
+    {
+        double newCurrentValue = Volatile.Read(ref location1);
+
+        while (true)
+        {
+            double currentValue = newCurrentValue;
+            double newValue = currentValue + value;
+            newCurrentValue = Interlocked.CompareExchange(ref location1, newValue, newCurrentValue);
+
+            if (newCurrentValue.Equals(currentValue))
+            {
+                return newValue;
+            }
         }
     }
 }
