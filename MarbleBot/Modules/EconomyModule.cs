@@ -107,6 +107,53 @@ public class EconomyModule : MarbleBotSlashCommandModule
             return;
         }
 
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetInventoryBuilders(marbleBotUser, page);
+
+        await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
+    }
+
+    [ComponentInteraction("inventory_previous_*_*")]
+    public async Task InventoryPreviousCommand(ulong id, int page)
+    {
+        User? marbleBotUser = await _userDao.GetUserAsync(id);
+        if (marbleBotUser == null || marbleBotUser.Inventory == null || marbleBotUser.Inventory.Count == 0)
+        {
+            await RespondWithErrorAsync("You have no items.");
+            return;
+        }
+
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetInventoryBuilders(marbleBotUser, page);
+
+        var messageComponent = (Context.Interaction as SocketMessageComponent)!;
+        await messageComponent.UpdateAsync(message =>
+        {
+            message.Embed = embedBuilder.Build();
+            message.Components = componentBuilder.Build();
+        });
+    }
+
+    [ComponentInteraction("inventory_next_*_*")]
+    public async Task InventoryNextCommand(ulong id, int page)
+    {
+        User? marbleBotUser = await _userDao.GetUserAsync(id);
+        if (marbleBotUser == null || marbleBotUser.Inventory == null || marbleBotUser.Inventory.Count == 0)
+        {
+            await RespondWithErrorAsync("You have no items.");
+            return;
+        }
+
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetInventoryBuilders(marbleBotUser, page);
+
+        var messageComponent = (Context.Interaction as SocketMessageComponent)!;
+        await messageComponent.UpdateAsync(message =>
+        {
+            message.Embed = embedBuilder.Build();
+            message.Components = componentBuilder.Build();
+        });
+    }
+
+    private async Task<(EmbedBuilder embedBuilder, ComponentBuilder componentBuilder)> GetInventoryBuilders(User marbleBotUser, int page)
+    {
         var itemOutput = new StringBuilder();
         const int itemsPerPage = 20;
         var itemsOnPage = marbleBotUser.Inventory.Skip((page - 1) * itemsPerPage).Take(itemsPerPage);
@@ -135,22 +182,7 @@ public class EconomyModule : MarbleBotSlashCommandModule
         var componentBuilder = new ComponentBuilder()
             .WithButton("Previous", customId: $"inventory_previous_{marbleBotUser.Id}_{page - 1}", disabled: page <= 1)
             .WithButton("Next", customId: $"inventory_next_{marbleBotUser.Id}_{page + 1}", disabled: marbleBotUser.Inventory.Count <= page * itemsPerPage);
-
-        await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
-    }
-
-    [ComponentInteraction("inventory_previous_*_*")]
-    public async Task InventoryPreviousCommand(ulong id, int page)
-    {
-        User? marbleBotUser = await _userDao.GetUserAsync(id);
-        await InventoryCommand(marbleBotUser, page);
-    }
-
-    [ComponentInteraction("inventory_next_*_*")]
-    public async Task InventoryNextCommand(ulong id, int page)
-    {
-        User? marbleBotUser = await _userDao.GetUserAsync(id);
-        await InventoryCommand(marbleBotUser, page);
+        return (embedBuilder, componentBuilder);
     }
 
     [SlashCommand("profile", "Returns your profile.")]

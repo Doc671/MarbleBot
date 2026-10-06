@@ -102,6 +102,40 @@ public class RaceModule : MarbleBotSlashCommandModule
         [Summary("thisChannelOnly", "If true, only shows the leaderboard based on uses in this channel. Global leaderboard otherwise.")] bool thisChannelOnly,
         [Summary("page", "The page number of the leaderboard to show. Each page contains 20 marble names.")] int page = 1)
     {
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostUsesBuilders(thisChannelOnly, page);
+
+        await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
+    }
+
+
+    [ComponentInteraction("race_mostuses_previous_*_*", ignoreGroupNames: true)]
+    public async Task MostUsesPreviousCommand(bool thisChannelOnly, int page)
+    {
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostUsesBuilders(thisChannelOnly, page);
+
+        var messageComponent = (Context.Interaction as SocketMessageComponent)!;
+        await messageComponent.UpdateAsync(message =>
+        {
+            message.Embed = embedBuilder.Build();
+            message.Components = componentBuilder.Build();
+        });
+    }
+
+    [ComponentInteraction("race_mostuses_next_*_*", ignoreGroupNames: true)]
+    public async Task MostUsesNextCommand(bool thisChannelOnly, int page)
+    {
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostUsesBuilders(thisChannelOnly, page);
+
+        var messageComponent = (Context.Interaction as SocketMessageComponent)!;
+        await messageComponent.UpdateAsync(message =>
+        {
+            message.Embed = embedBuilder.Build();
+            message.Components = componentBuilder.Build();
+        });
+    }
+
+    private async Task<(EmbedBuilder embedBuilder, ComponentBuilder componentBuilder)> GetMostUsesBuilders(bool thisChannelOnly, int page)
+    {
         IReadOnlyList<LeaderboardEntry> results;
         const int itemsPerPage = 20;
         if (thisChannelOnly)
@@ -146,20 +180,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         var componentBuilder = new ComponentBuilder()
             .WithButton("Previous", customId: $"race_mostuses_previous_{thisChannelOnly}_{page - 1}", disabled: page <= 1)
             .WithButton("Next", customId: $"race_mostuses_next_{thisChannelOnly}_{page + 1}", disabled: results.Count <= page * itemsPerPage);
-
-        await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
-    }
-
-    [ComponentInteraction("race_mostuses_previous_*_*", ignoreGroupNames: true)]
-    public async Task MostUsesPreviousCommand(bool thisChannelOnly, int page)
-    {
-        await MostUsesCommand(thisChannelOnly, page);
-    }
-
-    [ComponentInteraction("race_mostuses_next_*_*", ignoreGroupNames: true)]
-    public async Task MostUsesNextCommand(bool thisChannelOnly, int page)
-    {
-        await MostUsesCommand(thisChannelOnly, page);
+        return (embedBuilder, componentBuilder);
     }
 
     [SlashCommand("mostwins", "Returns a win leaderboard for all marble names.")]
@@ -167,6 +188,39 @@ public class RaceModule : MarbleBotSlashCommandModule
         [Summary("thisChannelOnly", "If true, only shows the leaderboard based on wins in this channel. Global leaderboard otherwise.")] bool thisChannelOnly, 
         [Summary("winPercentage", "If true, ranks the leaderboard based on win percentage rather than absolute win count.")] bool winPercentage,
         [Summary("page", "The page number of the leaderboard to show. Each page contains 20 marble names.")] int page = 1)
+    {
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostWinsBuilders(thisChannelOnly, winPercentage, page);
+
+        await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
+    }
+
+    [ComponentInteraction("race_mostwins_previous_*_*_*", ignoreGroupNames: true)]
+    public async Task MostWinsPreviousCommand(bool thisChannelOnly, bool winPercentage, int page)
+    {
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostWinsBuilders(thisChannelOnly, winPercentage, page);
+
+        var messageComponent = (Context.Interaction as SocketMessageComponent)!;
+        await messageComponent.UpdateAsync(message =>
+        {
+            message.Embed = embedBuilder.Build();
+            message.Components = componentBuilder.Build();
+        });
+    }
+
+    [ComponentInteraction("race_mostwins_next_*_*_*", ignoreGroupNames: true)]
+    public async Task MostWinsNextCommand(bool thisChannelOnly, bool winPercentage, int page)
+    {
+        (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostWinsBuilders(thisChannelOnly, winPercentage, page);
+
+        var messageComponent = (Context.Interaction as SocketMessageComponent)!;
+        await messageComponent.UpdateAsync(message =>
+        {
+            message.Embed = embedBuilder.Build();
+            message.Components = componentBuilder.Build();
+        });
+    }
+
+    private async Task<(EmbedBuilder embedBuilder, ComponentBuilder componentBuilder)> GetMostWinsBuilders(bool thisChannelOnly, bool winPercentage, int page)
     {
         IReadOnlyList<LeaderboardEntry> results;
         const int itemsPerPage = 20;
@@ -180,7 +234,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         }
 
         bool resultsPresent = results.Count != 0;
-        
+
         var resultOutput = new StringBuilder();
         string title;
         if (!resultsPresent)
@@ -225,20 +279,7 @@ public class RaceModule : MarbleBotSlashCommandModule
         var componentBuilder = new ComponentBuilder()
             .WithButton("Previous", customId: $"race_mostwins_previous_{thisChannelOnly}_{winPercentage}_{page - 1}", disabled: page <= 1)
             .WithButton("Next", customId: $"race_mostwins_next_{thisChannelOnly}_{winPercentage}_{page + 1}", disabled: results.Count <= page * itemsPerPage);
-
-        await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
-    }
-
-    [ComponentInteraction("race_mostwins_previous_*_*_*", ignoreGroupNames: true)]
-    public async Task MostWinsPreviousCommand(bool thisChannelOnly, bool winPercentage, int page)
-    {
-        await MostWinsCommand(thisChannelOnly, winPercentage, page);
-    }
-
-    [ComponentInteraction("race_mostwins_next_*_*_*", ignoreGroupNames: true)]
-    public async Task MostWinsNextCommand(bool thisChannelOnly, bool winPercentage, int page)
-    {
-        await MostWinsCommand(thisChannelOnly, winPercentage, page);
+        return (embedBuilder, componentBuilder);
     }
 
     [SlashCommand("remove", "Removes your given marble name from the race.")]
