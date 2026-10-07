@@ -108,9 +108,14 @@ public class RaceModule : MarbleBotSlashCommandModule
     }
 
 
-    [ComponentInteraction("race_mostuses_previous_*_*", ignoreGroupNames: true)]
-    public async Task MostUsesPreviousCommand(bool thisChannelOnly, int page)
+    [ComponentInteraction("race_mostuses_previous_*_*_*", ignoreGroupNames: true)]
+    public async Task MostUsesPreviousCommand(ulong id, bool thisChannelOnly, int page)
     {
+        if (Context.User.Id != id)
+        {
+            return;
+        }
+
         (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostUsesBuilders(thisChannelOnly, page);
 
         var messageComponent = (Context.Interaction as SocketMessageComponent)!;
@@ -121,9 +126,14 @@ public class RaceModule : MarbleBotSlashCommandModule
         });
     }
 
-    [ComponentInteraction("race_mostuses_next_*_*", ignoreGroupNames: true)]
-    public async Task MostUsesNextCommand(bool thisChannelOnly, int page)
+    [ComponentInteraction("race_mostuses_next_*_*_*", ignoreGroupNames: true)]
+    public async Task MostUsesNextCommand(ulong id, bool thisChannelOnly, int page)
     {
+        if (Context.User.Id != id)
+        {
+            return;
+        }
+
         (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostUsesBuilders(thisChannelOnly, page);
 
         var messageComponent = (Context.Interaction as SocketMessageComponent)!;
@@ -178,8 +188,8 @@ public class RaceModule : MarbleBotSlashCommandModule
             .WithCurrentTimestamp();
 
         var componentBuilder = new ComponentBuilder()
-            .WithButton("Previous", customId: $"race_mostuses_previous_{thisChannelOnly}_{page - 1}", disabled: page <= 1)
-            .WithButton("Next", customId: $"race_mostuses_next_{thisChannelOnly}_{page + 1}", disabled: results.Count <= page * itemsPerPage);
+            .WithButton("Previous", customId: $"race_mostuses_previous_{Context.User.Id}_{thisChannelOnly}_{page - 1}", disabled: page <= 1)
+            .WithButton("Next", customId: $"race_mostuses_next_{Context.User.Id}_{thisChannelOnly}_{page + 1}", disabled: results.Count <= page * itemsPerPage);
         return (embedBuilder, componentBuilder);
     }
 
@@ -194,9 +204,14 @@ public class RaceModule : MarbleBotSlashCommandModule
         await RespondAsync(embed: embedBuilder.Build(), components: componentBuilder.Build());
     }
 
-    [ComponentInteraction("race_mostwins_previous_*_*_*", ignoreGroupNames: true)]
-    public async Task MostWinsPreviousCommand(bool thisChannelOnly, bool winPercentage, int page)
+    [ComponentInteraction("race_mostwins_previous_*_*_*_*", ignoreGroupNames: true)]
+    public async Task MostWinsPreviousCommand(ulong id, bool thisChannelOnly, bool winPercentage, int page)
     {
+        if (Context.User.Id != id)
+        {
+            return;
+        }
+
         (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostWinsBuilders(thisChannelOnly, winPercentage, page);
 
         var messageComponent = (Context.Interaction as SocketMessageComponent)!;
@@ -207,9 +222,14 @@ public class RaceModule : MarbleBotSlashCommandModule
         });
     }
 
-    [ComponentInteraction("race_mostwins_next_*_*_*", ignoreGroupNames: true)]
-    public async Task MostWinsNextCommand(bool thisChannelOnly, bool winPercentage, int page)
+    [ComponentInteraction("race_mostwins_next_*_*_*_*", ignoreGroupNames: true)]
+    public async Task MostWinsNextCommand(ulong id, bool thisChannelOnly, bool winPercentage, int page)
     {
+        if (Context.User.Id != id)
+        {
+            return;
+        }
+
         (EmbedBuilder embedBuilder, ComponentBuilder componentBuilder) = await GetMostWinsBuilders(thisChannelOnly, winPercentage, page);
 
         var messageComponent = (Context.Interaction as SocketMessageComponent)!;
@@ -277,8 +297,8 @@ public class RaceModule : MarbleBotSlashCommandModule
             .WithCurrentTimestamp();
 
         var componentBuilder = new ComponentBuilder()
-            .WithButton("Previous", customId: $"race_mostwins_previous_{thisChannelOnly}_{winPercentage}_{page - 1}", disabled: page <= 1)
-            .WithButton("Next", customId: $"race_mostwins_next_{thisChannelOnly}_{winPercentage}_{page + 1}", disabled: results.Count <= page * itemsPerPage);
+            .WithButton("Previous", customId: $"race_mostwins_previous_{Context.User.Id}_{thisChannelOnly}_{winPercentage}_{page - 1}", disabled: page <= 1)
+            .WithButton("Next", customId: $"race_mostwins_next_{Context.User.Id}_{thisChannelOnly}_{winPercentage}_{page + 1}", disabled: results.Count <= page * itemsPerPage);
         return (embedBuilder, componentBuilder);
     }
 

@@ -115,6 +115,11 @@ public class EconomyModule : MarbleBotSlashCommandModule
     [ComponentInteraction("inventory_previous_*_*")]
     public async Task InventoryPreviousCommand(ulong id, int page)
     {
+        if (Context.User.Id != id)
+        {
+            return;
+        }
+
         User? marbleBotUser = await _userDao.GetUserAsync(id);
         if (marbleBotUser == null || marbleBotUser.Inventory == null || marbleBotUser.Inventory.Count == 0)
         {
@@ -135,6 +140,11 @@ public class EconomyModule : MarbleBotSlashCommandModule
     [ComponentInteraction("inventory_next_*_*")]
     public async Task InventoryNextCommand(ulong id, int page)
     {
+        if (Context.User.Id != id)
+        {
+            return;
+        }
+
         User? marbleBotUser = await _userDao.GetUserAsync(id);
         if (marbleBotUser == null || marbleBotUser.Inventory == null || marbleBotUser.Inventory.Count == 0)
         {
